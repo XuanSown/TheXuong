@@ -15,12 +15,12 @@ async function checkAuth() {
             <i class="fa-solid fa-right-from-bracket me-1"></i> Đăng xuất
         </button>
         `;
-        }  else {
+        } else {
             //chưa login/hết hạn token hiện login
             userArea.innerHTML = `<a href="login.html" class="btn btn-light btn-sm fw-bold">Đăng nhập ngay</a>`;
         }
     } catch (e) {
-        console.error("Lỗi kiểm tra Auth: ",e);
+        console.error("Lỗi kiểm tra Auth: ", e);
         //Lỗi do mạng hiện nút login
         userArea.innerHTML = `<a href="login.html" class="btn btn-light btn-sm fw-bold">Đăng nhập ngay</a>`;
     }
@@ -35,8 +35,8 @@ async function handleLogin() {
     try {
         const response = await fetch(`${API_URL}/auth/login`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password })
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({email, password})
         });
 
         if (response.ok) {
@@ -53,7 +53,7 @@ async function handleLogin() {
 
 // 3. Hàm Load Sản phẩm (Gọi API Products)
 async function loadProducts() {
-    const grid = document.getElementById('productGrid');
+    const grid = document.getElementById('productList');
     if (!grid) return;
 
     try {
@@ -63,7 +63,7 @@ async function loadProducts() {
         // Clear spinner cũ
         grid.innerHTML = '';
 
-        if(products.length === 0) {
+        if (products.length === 0) {
             grid.innerHTML = '<div class="col-12 text-center">Chưa có sản phẩm.</div>';
             return;
         }
@@ -78,9 +78,15 @@ async function loadProducts() {
                         <small class="text-muted text-uppercase mb-1">${p.category || 'Thể thao'}</small>
                         <h5 class="card-title fw-bold">${p.name}</h5>
                         <p class="card-text text-danger fw-bold fs-5 mb-3">
-                            ${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p.price)}
+                            ${new Intl.NumberFormat('vi-VN', {style: 'currency', currency: 'VND'}).format(p.price)}
                         </p>
-                        <button class="btn btn-dark w-100 mt-auto">Thêm vào giỏ</button>
+                        <div class="d-flex gap-2 mt-auto">
+    <button class="btn btn-outline-dark" title="Thêm vào giỏ">
+        <i class="fa-solid fa-cart-shopping"></i>
+    </button>
+    
+    <button class="btn btn-warning flex-grow-1">Mua ngay</button>
+</div>
                     </div>
                 </div>
             </div>
@@ -93,7 +99,7 @@ async function loadProducts() {
 
 // 4. Hàm Đăng xuất
 async function logout() {
-    await fetch(`${API_URL}/auth/logout`, { method: 'POST' }); // Gọi server để xóa cookie
+    await fetch(`${API_URL}/auth/logout`, {method: 'POST'}); // Gọi server để xóa cookie
     window.location.href = 'login.html';
 }
 

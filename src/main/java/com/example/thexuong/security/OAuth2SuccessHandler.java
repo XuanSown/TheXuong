@@ -41,9 +41,9 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         //Vì JwtService yêu cầu UserDetails, ta phải tạo thủ công object này
         UserDetails userDetails = new org.springframework.security.core.userdetails.User(
-          user.getEmail(),
-          user.getPassword() == null ? "" : user.getPassword(),
-          Collections.singleton(new SimpleGrantedAuthority(user.getRole()))
+                user.getEmail(),
+                user.getPassword() == null ? "" : user.getPassword(),
+                Collections.singleton(new SimpleGrantedAuthority(user.getRole()))
         );
         // tạo token
         String token = jwtService.generateToken(userDetails);
@@ -52,7 +52,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         cookie.setHttpOnly(true);
         cookie.setSecure(false);
         cookie.setPath("/");
-        cookie.setMaxAge(60 * 60 * 24); //1day
+        cookie.setMaxAge(60 * 60); //1giờ
         //gắn cookie vào response
         response.addCookie(cookie);
         // Redrect về home kèm token

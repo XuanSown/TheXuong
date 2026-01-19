@@ -27,7 +27,7 @@ public class ApplicationConfig {
     @Bean
     public UserDetailsService userDetailsService() {
         return username -> userRepository.findByEmail(username) //ưu tiên tìm bằng email khi đăng nhập bằng gg
-                .or(() ->userRepository.findByUsername(username)) //nếu không thì tìm bằng Username khi đăng nhập bình thường
+                .or(() -> userRepository.findByUsername(username)) //nếu không thì tìm bằng Username khi đăng nhập bình thường
                 .map(u -> new User(
                         u.getEmail(), //dùng email làm định danh chính
                         u.getPassword() == null ? "" : u.getPassword(), //nếu là gg user (pass null) thì trả về rỗng
@@ -40,7 +40,7 @@ public class ApplicationConfig {
     // dùng BCrypt - chuẩn bảo mật hiện nay
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return  new BCryptPasswordEncoder();
+        return new BCryptPasswordEncoder();
     }
 
     // 3. BEAN: Liên kết UserDetail với PasswordEncoder

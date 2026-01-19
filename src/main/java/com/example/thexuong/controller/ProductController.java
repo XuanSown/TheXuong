@@ -13,6 +13,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProductController {
     private final ProductRepository productRepository;
+
     //1. api ds sp trang chu
     // GET: http://localhost:8080/api/products
     @GetMapping
@@ -25,7 +26,7 @@ public class ProductController {
     @GetMapping("/{id}")
     public ResponseEntity<Product> getProductById(@PathVariable Long id) {
         return productRepository.findById(id)
-                        .map(ResponseEntity::ok)
+                .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 

@@ -53,7 +53,7 @@ public class AuthController {
         cookie.setHttpOnly(true); //chặn js đọc được
         cookie.setSecure(false); //hiện tại đang chạy localhost để 'false' - lên sever https thì để 'true'
         cookie.setPath("/"); //Cookie áp dụng cho toàn trang
-        cookie.setMaxAge(24 * 60 * 60); //1day
+        cookie.setMaxAge(60 * 60); //1 giờ
         //4. cookie phản hồi
         response.addCookie(cookie);
         return ResponseEntity.ok("Đăng nhập thành công! Token đã nằm trong Cookie.");

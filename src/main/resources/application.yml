@@ -15,4 +15,4 @@ spring:
             user-name-attribute: name
 jwt:
   secret: KhoaBiMatPhaiRatDaiDeBaoMatJWTTheXuongProject2024 # > 256 bits
-  expiration: 86400000 # 1 ngày
+  expiration: 3600000 # 1 giờ

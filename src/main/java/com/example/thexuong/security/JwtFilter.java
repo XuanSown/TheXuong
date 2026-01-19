@@ -27,15 +27,15 @@ public class JwtFilter extends OncePerRequestFilter {
             @NonNull HttpServletRequest request,
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain
-            ) throws ServletException, IOException {
+    ) throws ServletException, IOException {
 
         String jwt = null;
         String userEmail = null;
 
         // 1. tìm token trong cookie
-        if (request.getCookies() != null){
+        if (request.getCookies() != null) {
             for (Cookie cookie : request.getCookies()) {
-                if ("accessToken".equals(cookie.getName())){
+                if ("accessToken".equals(cookie.getName())) {
                     jwt = cookie.getValue();
                     break;
                 }
@@ -50,12 +50,12 @@ public class JwtFilter extends OncePerRequestFilter {
         userEmail = jwtService.extractUsername(jwt);// Trong dự án này ta dùng email hoặc username làm subject
 
         // 3. Nếu có userEmail và chưa được xác thực trong Context hiện tại
-        if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null){
+        if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             // Lấy thông tin user từ db
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
 
             // 4. Nếu token hợp lệ thì set Authentication cho spring security
-            if (jwtService.isTokenValid(jwt, userDetails)){
+            if (jwtService.isTokenValid(jwt, userDetails)) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 

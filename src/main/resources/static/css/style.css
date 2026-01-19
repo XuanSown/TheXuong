@@ -1,32 +1,169 @@
-/* Reset cơ bản */
-body { font-family: 'Segoe UI', sans-serif; background-color: #f8f9fa; margin: 0; }
+/* --- PHẦN LOGIN STYLE MỚI --- */
 
-/* Navbar đen giống Puma */
-.navbar { background-color: #000; padding: 15px 0; color: white; display: flex; justify-content: space-between; align-items: center; padding: 15px 5%; }
-.brand { font-size: 24px; font-weight: bold; color: white; text-decoration: none; text-transform: uppercase; letter-spacing: 2px; }
-.nav-links a, .nav-links button { color: white; text-decoration: none; margin-left: 20px; background: none; border: none; cursor: pointer; font-size: 16px; }
+/* 1. Background toàn màn hình */
+.login-container {
+    display: flex;
+    height: 100vh;
+    align-items: center;
+    justify-content: center;
+    /* Ảnh nền thể thao tối màu */
+    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.7)),
+    url('https://images.unsplash.com/photo-1517836357463-d25dfeac3438?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80');
+    background-size: cover;
+    background-position: center;
+}
 
-/* Banner lớn */
-.hero { background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1517836357463-d25dfeac3438?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'); background-size: cover; height: 500px; display: flex; align-items: center; justify-content: center; color: white; text-align: center; }
-.hero h1 { font-size: 4rem; margin: 0; text-transform: uppercase; font-weight: 800; }
-.btn-primary { background: #d63031; color: white; padding: 10px 30px; border: none; font-weight: bold; cursor: pointer; margin-top: 20px; text-transform: uppercase; }
+/* 2. Hộp Login */
+.login-box {
+    background: rgba(255, 255, 255, 0.95); /* Màu trắng hơi trong suốt */
+    padding: 40px 50px;
+    width: 400px;
+    border-radius: 15px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+    text-align: center;
+    backdrop-filter: blur(5px); /* Hiệu ứng mờ nền sau lưng */
+    animation: fadeIn 0.5s ease-in-out;
+}
 
-/* Grid Sản phẩm */
-.container { padding: 50px 5%; }
-.section-title { text-align: center; margin-bottom: 40px; text-transform: uppercase; font-weight: 800; letter-spacing: 1px; }
-.product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 30px; }
-.product-card { background: white; border: 1px solid #ddd; transition: 0.3s; }
-.product-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
-.product-img { width: 100%; height: 250px; object-fit: cover; background: #eee; }
-.product-info { padding: 15px; }
-.product-cat { color: #888; font-size: 0.9rem; text-transform: uppercase; }
-.product-name { font-weight: bold; margin: 5px 0; font-size: 1.1rem; }
-.product-price { color: #d63031; font-weight: bold; font-size: 1.2rem; }
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
 
-/* Form Login */
-.login-container { display: flex; height: 100vh; align-items: center; justify-content: center; background: #eee; }
-.login-box { background: white; padding: 40px; width: 400px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-.input-group { margin-bottom: 15px; }
-.input-group input { width: 100%; padding: 12px; box-sizing: border-box; border: 1px solid #ccc; }
-.btn-google { background: #4285F4; color: white; width: 100%; padding: 12px; border: none; margin-top: 10px; cursor: pointer; display: block; text-decoration: none; box-sizing: border-box; }
-.error-msg { color: red; margin-bottom: 10px; display: none; }
+/* 3. Tiêu đề */
+.brand-title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #000;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 5px;
+    font-family: 'Segoe UI', sans-serif; /* Hoặc font Russo One nếu có */
+}
+.subtitle {
+    color: #666;
+    margin-bottom: 30px;
+    font-size: 0.95rem;
+}
+
+/* 4. Ô nhập liệu có Icon */
+.input-group-custom {
+    position: relative;
+    margin-bottom: 20px;
+}
+.input-group-custom input {
+    width: 100%;
+    padding: 12px 15px 12px 45px; /* Chừa chỗ cho icon bên trái */
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    outline: none;
+    transition: 0.3s;
+    box-sizing: border-box; /* Quan trọng để không bị vỡ layout */
+}
+.input-group-custom input:focus {
+    border-color: #d63031;
+    box-shadow: 0 0 0 3px rgba(214, 48, 49, 0.1);
+}
+.input-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #888;
+}
+
+/* 5. Nút Login */
+.btn-login {
+    width: 100%;
+    padding: 12px;
+    background: #d63031; /* Màu đỏ chủ đạo */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: 0.3s;
+    text-transform: uppercase;
+    margin-top: 10px;
+}
+.btn-login:hover {
+    background: #b02627;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(214, 48, 49, 0.3);
+}
+
+/* 6. Nút Google */
+.btn-google {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 10px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    color: #333;
+    font-weight: 600;
+    text-decoration: none;
+    transition: 0.3s;
+    box-sizing: border-box;
+}
+.btn-google:hover {
+    background: #f8f9fa;
+    border-color: #ccc;
+}
+
+/* 7. Các thành phần phụ */
+.divider {
+    margin: 20px 0;
+    position: relative;
+    text-align: center;
+}
+.divider::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 50%;
+    width: 100%; height: 1px;
+    background: #eee;
+}
+.divider span {
+    background: #fff; /* Trùng màu nền login-box */
+    padding: 0 10px;
+    color: #aaa;
+    font-size: 0.8rem;
+    position: relative;
+}
+.actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+}
+.forgot-pass {
+    font-size: 0.9rem;
+    color: #666;
+    text-decoration: none;
+}
+.forgot-pass:hover {
+    color: #d63031;
+}
+.register-link {
+    margin-top: 25px;
+    font-size: 0.9rem;
+}
+.register-link a {
+    color: #d63031;
+    font-weight: bold;
+    text-decoration: none;
+}
+.error-msg {
+    background: #ffe6e6;
+    color: #d63031;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+    display: none; /* Mặc định ẩn */
+}

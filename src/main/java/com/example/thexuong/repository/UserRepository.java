@@ -10,6 +10,7 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Long> {
     //tìm user bằng username (dùng cho login thường)
     Optional<User> findByUsername(String username);
+
     //tìm user bằng email (dùng cho login gg)
     Optional<User> findByEmail(String email);
 }
