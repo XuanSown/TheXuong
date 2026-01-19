@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TheXuong - Thể Thao Đích Thực</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* CSS tuỳ chỉnh cho Banner (Hero) vì Bootstrap mặc định không có ảnh nền sẵn */
+        .hero-section {
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1517836357463-d25dfeac3438?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-position: center;
+            height: 500px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+        }
+        /* Đảm bảo ảnh sản phẩm có kích thước đồng đều */
+        .product-img-custom {
+            height: 250px;
+            object-fit: cover;
+        }
+        /* 2. STYLE MỚI CHO LOGO TEXT */
+        .brand-text {
+            font-family: 'Russo One', sans-serif; /* Font đậm chất thể thao */
+            font-size: 1.8rem; /* Chữ to hơn */
+            letter-spacing: 2px; /* Khoảng cách chữ rộng ra */
+            margin-left: 10px;
+
+            /* Hiệu ứng màu chuyển (Gradient) từ Trắng sang Vàng (theo logo anh) */
+            background: linear-gradient(to right, #ffffff, #FFD700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+
+            /* Bóng đổ nhẹ để nổi trên nền đen */
+            filter: drop-shadow(2px 2px 0px rgba(0,0,0,0.5));
+
+            /* Nghiêng nhẹ tạo cảm giác tốc độ */
+            transform: skewX(-10deg);
+            display: inline-block;
+        }
+    </style>
+</head>
+<body class="d-flex flex-column min-vh-100 bg-light">
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand d-flex align-items-center fw-bold text-uppercase" href="#">
+            <img src="/img/logo.png" alt="Logo" width="40" height="40" class="me-2">
+            <span class="brand-text">THE XUONG</span>
+        </a>
+
+        <div class="d-flex align-items-center" id="userArea"></div>
+    </div>
+</nav>
+
+<div class="hero-section mb-5">
+    <div>
+        <h1 class="display-4 fw-bold text-uppercase">Bứt Phá Giới Hạn</h1>
+        <br>
+        <button class="btn btn-danger btn-lg px-4 fw-bold">Mua Ngay</button>
+    </div>
+</div>
+
+<div class="container mb-5">
+    <h2 class="text-center text-uppercase fw-bold mb-4">Sản Phẩm Nổi Bật</h2>
+
+    <div id="productList" class="row g-4">
+        <div class="col-12 text-center py-5">
+            <div class="spinner-border" role="status"></div>
+            <p class="mt-2 text-muted">Đang tải dữ liệu...</p>
+        </div>
+    </div>
+</div>
+
+<footer class="bg-black text-white text-center py-4 mt-auto">
+    <div class="container">
+        &copy; 2026 TheXuong Sport by XuanSown and AI Gemini. All rights reserved.
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/main.js"></script>
+</body>
+</html>

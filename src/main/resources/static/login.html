@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Đăng nhập - TheXuong</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="login-container">
+    <div class="login-box">
+        <h2 style="text-transform: uppercase; letter-spacing: 2px;">The Xuong</h2>
+        <p style="color:#666">Đăng nhập để tiếp tục</p>
+
+        <div id="errorMsg" class="error-msg"></div>
+
+        <div class="input-group">
+            <input type="text" id="email" placeholder="Email">
+        </div>
+        <div class="input-group">
+            <input type="password" id="password" placeholder="Mật khẩu">
+        </div>
+        <button class="btn-primary" style="width:100%" onclick="handleLogin()">ĐĂNG NHẬP</button>
+
+        <div style="margin: 20px 0; color: #aaa;">---------- HOẶC ----------</div>
+
+        <a href="/oauth2/authorization/google" class="btn-google">
+            Tiếp tục với Google
+        </a>
+
+        <p style="margin-top:20px; font-size: 0.9rem;">
+            Chưa có tài khoản? <a href="#" style="color:black; font-weight:bold">Đăng ký ngay</a>
+        </p>
+    </div>
+</div>
+<script src="/js/main.js"></script>
+</body>
+</html>
