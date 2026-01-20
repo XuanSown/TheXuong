@@ -5,6 +5,11 @@ GO
 USE dbTheXuong;
 GO
 
+select *
+from Users
+select *
+from Products
+
 -- Bảng User
 CREATE TABLE Users
 (
@@ -27,10 +32,7 @@ CREATE TABLE Products
     description NVARCHAR(MAX)
 );
 
-select *
-from Users
-select *
-from Products
+
 
 -- Data mẫu (Style Decathlon/Puma)
     INSERT
