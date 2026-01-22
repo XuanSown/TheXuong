@@ -1,15 +1,15 @@
 spring:
   datasource:
-    url: jdbc:sqlserver://localhost:1444;databaseName=dbTheXuong;encrypt=true;trustServerCertificate=true
+    url: jdbc:sqlserver://localhost:1433;databaseName=dbTheXuong;encrypt=true;trustServerCertificate=true
     username: sa
-    password: Sontran1903@
+    password: DONG04082006@@
   security:
     oauth2:
       client:
         registration:
           google:
-            client-id: ${GOOGLE_CLIENT_ID}
-            client-secret: ${GOOGLE_CLIENT_SECRET}
+            client-id: 425173599446-qd901q0i2s75atio7pmqq2t8ckou3tdv.apps.googleusercontent.com
+            client-secret: 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
         provider:
           google:
             user-name-attribute: name
