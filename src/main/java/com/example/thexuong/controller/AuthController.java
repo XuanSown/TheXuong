@@ -79,10 +79,11 @@ public class AuthController {
     public ResponseEntity<?> logout(HttpServletResponse response) {
         Cookie cookie = new Cookie("accessToken", null);
         cookie.setHttpOnly(true);
+        cookie.setSecure(false);
         cookie.setPath("/");
         cookie.setMaxAge(0); // Set tuổi thọ = 0 để trình duyệt xóa ngay lập tức
         response.addCookie(cookie);
-        return ResponseEntity.ok("Đăng xuất thành công");
+        return ResponseEntity.ok(Collections.singletonMap("message", "Đăng xuất thành công"));
     }
 }
 

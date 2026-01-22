@@ -4,60 +4,95 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TheXuong - Thể Thao Đích Thực</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/promo.css">
-    <style>
-        /* CSS tuỳ chỉnh cho Banner (Hero) vì Bootstrap mặc định không có ảnh nền sẵn */
-        .hero-section {
-            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1517836357463-d25dfeac3438?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
-            background-size: cover;
-            background-position: center;
-            height: 500px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            text-align: center;
-        }
-
-        /* Đảm bảo ảnh sản phẩm có kích thước đồng đều */
-        .product-img-custom {
-            height: 250px;
-            object-fit: cover;
-        }
-
-        /* 2. STYLE MỚI CHO LOGO TEXT */
-        .brand-text {
-            font-family: 'Russo One', sans-serif; /* Font đậm chất thể thao */
-            font-size: 1.8rem; /* Chữ to hơn */
-            letter-spacing: 2px; /* Khoảng cách chữ rộng ra */
-            margin-left: 10px;
-
-            /* Hiệu ứng màu chuyển (Gradient) từ Trắng sang Vàng (theo logo anh) */
-            background: linear-gradient(to right, #ffffff, #FFD700);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-
-            /* Bóng đổ nhẹ để nổi trên nền đen */
-            filter: drop-shadow(2px 2px 0px rgba(0, 0, 0, 0.5));
-
-            /* Nghiêng nhẹ tạo cảm giác tốc độ */
-            transform: skewX(-10deg);
-            display: inline-block;
-        }
-    </style>
 </head>
 <body class="d-flex flex-column min-vh-100 bg-light">
 
 <nav class="navbar navbar-expand-lg navbar-dark">
-    <div class="container">
-        <a class="navbar-brand d-flex align-items-center fw-bold text-uppercase" href="#">
-            <img src="/img/logo.png" alt="Logo" width="40" height="40" class="me-2">
-            <span class="brand-text">THE XUONG</span>
-        </a>
+    <div class="container-fluid px-5"> <a class="navbar-brand d-flex align-items-center fw-bold text-uppercase" href="index.html">
+        <img src="/img/logo.png" alt="Logo" width="45" height="45" class="me-2">
+        <span class="brand-text">THE XUONG</span>
+    </a>
 
-        <div class="d-flex align-items-center" id="userArea">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarContent">
+
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item dropdown custom-dropdown">
+                    <a class="nav-link dropdown-toggle fw-bold text-white" href="#" id="sportDropdown">
+                        THỂ THAO
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-glass">
+                        <li><a class="dropdown-item" href="#"><i class="fa-solid fa-futbol me-2"></i>Bóng đá</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="fa-solid fa-feather me-2"></i>Cầu lông</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="fa-solid fa-person-running me-2"></i>Chạy bộ</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="fa-solid fa-basketball me-2"></i>Bóng rổ</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="fa-solid fa-table-tennis-paddle-ball me-2"></i>Pickleball</a></li>
+                    </ul>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link fw-bold text-white" href="#">
+                        NEW ARRIVALS <span class="badge bg-danger ms-1" style="font-size: 0.6rem;">HOT</span>
+                    </a>
+                </li>
+
+                <li class="nav-item dropdown custom-dropdown">
+                    <a class="nav-link dropdown-toggle fw-bold text-white" href="#" id="brandDropdown">
+                        THƯƠNG HIỆU
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-glass">
+                        <li><a class="dropdown-item" href="#">Nike</a></li>
+                        <li><a class="dropdown-item" href="#">Adidas</a></li>
+                        <li><a class="dropdown-item" href="#">Li-Ning</a></li>
+                        <li><a class="dropdown-item" href="#">Asics</a></li>
+                        <li><a class="dropdown-item" href="#">Puma</a></li>
+                    </ul>
+                </li>
+            </ul>
+
+            <form class="d-flex mx-auto search-form position-relative" role="search" style="width: 350px;">
+                <input class="form-control search-input" type="search" placeholder="Tìm tên sản phẩm..." aria-label="Search">
+                <button class="btn search-btn position-absolute end-0 top-0 h-100" type="submit">
+                    <i class="fa-solid fa-magnifying-glass text-white"></i>
+                </button>
+            </form>
+
+            <ul class="navbar-nav ms-auto align-items-center gap-3">
+
+                <li class="nav-item dropdown custom-dropdown">
+                    <a class="nav-link text-white" href="#" style="font-size: 1.2rem;">
+                        <i class="fa-solid fa-earth-americas"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-glass dropdown-menu-end" style="min-width: 100px;">
+                        <li><a class="dropdown-item active" href="#">🇻🇳 VN</a></li>
+                        <li><a class="dropdown-item" href="#">🇺🇸 EN</a></li>
+                    </ul>
+                </li>
+
+                <li class="nav-item position-relative">
+                    <a class="nav-link text-white" href="#" style="font-size: 1.2rem;">
+                        <i class="fa-solid fa-cart-shopping"></i>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">
+                            3 </span>
+                    </a>
+                </li>
+
+                <li class="nav-item dropdown custom-dropdown" id="userArea">
+                </li>
+            </ul>
+
         </div>
     </div>
 </nav>

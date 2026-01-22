@@ -11,35 +11,37 @@ body {
 }
 
 /* =========================================
-   2. NAVBAR (Kính mờ & Logo)
+   2. NAVBAR (Kính mờ & Đè lên ảnh Hero)
    ========================================= */
 .navbar {
-    background-color: rgba(0, 0, 0, 0.2) !important; /* Đen mờ 85% */
+    /* Nền đen cực trong (20%) để nhìn xuyên thấu xuống ảnh dưới */
+    background-color: rgba(0, 0, 0, 0.2) !important;
+
+    /* Hiệu ứng làm mờ kính (Glassmorphism) */
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
+
+    /* QUAN TRỌNG: Fixed để nổi lên trên ảnh Hero */
+    position: fixed;
+    top: 0; left: 0; width: 100%;
+    z-index: 1000;
 
     border-bottom: 1px solid rgba(255, 255, 255, 0.15);
     padding: 15px 0;
     transition: all 0.3s ease;
-
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 1000;
 }
 
+/* Hover vào thì đậm lên xíu cho dễ đọc */
 .navbar:hover {
     background-color: rgba(0, 0, 0, 0.6) !important;
 }
 
-/* Hiệu ứng chữ THE XUONG */
+/* Logo chữ THE XUONG */
 .brand-text {
     font-family: 'Russo One', sans-serif;
     font-size: 1.8rem;
     letter-spacing: 2px;
     margin-left: 10px;
-    /* Màu Gradient Vàng-Trắng */
     background: linear-gradient(to right, #ffffff, #FFD700);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -57,16 +59,21 @@ body {
     background-size: cover;
     background-position: center;
     height: 500px;
+
+    /* Căn giữa nội dung */
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
     text-align: center;
+
+    /* Margin top 0 để ảnh tràn lên đầu trang (nằm dưới Navbar) */
+    margin-top: 0;
     margin-bottom: 3rem;
 }
 
 /* =========================================
-   4. PRODUCTS (Danh sách sản phẩm)
+   4. PRODUCTS (Sản phẩm)
    ========================================= */
 .product-img-custom {
     height: 250px;
@@ -74,7 +81,6 @@ body {
     transition: transform 0.3s ease;
 }
 
-/* Hiệu ứng zoom nhẹ khi di chuột vào thẻ sản phẩm */
 .card {
     overflow: hidden;
     transition: all 0.3s ease;
@@ -88,14 +94,13 @@ body {
 }
 
 /* =========================================
-   5. AUTH PAGES (Login & Register)
+   5. LOGIN & REGISTER
    ========================================= */
 .login-container {
     display: flex;
     min-height: 100vh;
     align-items: center;
     justify-content: center;
-    /* Dùng chung ảnh nền với Banner nhưng tối hơn */
     background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.7)),
     url('https://images.unsplash.com/photo-1517836357463-d25dfeac3438?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80');
     background-size: cover;
@@ -113,142 +118,226 @@ body {
     animation: fadeIn 0.5s ease-in-out;
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-20px); }
+/* Utilities cho Login */
+.brand-title { font-family: 'Russo One', sans-serif; font-size: 2rem; text-transform: uppercase; margin-bottom: 5px; }
+.subtitle { color: #666; margin-bottom: 30px; font-size: 0.95rem; }
+.input-group-custom { position: relative; margin-bottom: 20px; }
+.input-group-custom input { width: 100%; padding: 12px 15px 12px 45px; border: 1px solid #ddd; border-radius: 8px; font-size: 1rem; outline: none; box-sizing: border-box; }
+.input-group-custom input:focus { border-color: #d63031; box-shadow: 0 0 0 3px rgba(214, 48, 49, 0.1); }
+.input-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #888; }
+
+.btn-login { width: 100%; padding: 12px; background: #d63031; color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 1rem; cursor: pointer; transition: 0.3s; text-transform: uppercase; margin-top: 10px; }
+.btn-login:hover { background: #b02627; transform: translateY(-2px); }
+
+.btn-google { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 10px; background: white; border: 1px solid #ddd; border-radius: 8px; color: #333; font-weight: 600; text-decoration: none; transition: 0.3s; box-sizing: border-box; }
+.btn-google:hover { background: #f8f9fa; border-color: #ccc; }
+
+.divider { margin: 20px 0; position: relative; text-align: center; }
+.divider::before { content: ""; position: absolute; left: 0; top: 50%; width: 100%; height: 1px; background: #eee; }
+.divider span { background: #fff; padding: 0 10px; color: #aaa; font-size: 0.8rem; position: relative; }
+
+.actions { display: flex; justify-content: flex-end; margin-bottom: 20px; }
+.forgot-pass { font-size: 0.9rem; color: #666; text-decoration: none; }
+.forgot-pass:hover { color: #d63031; }
+
+.register-link { margin-top: 25px; font-size: 0.9rem; }
+.register-link a { color: #d63031; font-weight: bold; text-decoration: none; }
+.error-msg { background: #ffe6e6; color: #d63031; padding: 10px; border-radius: 5px; margin-bottom: 20px; font-size: 0.9rem; display: none; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+
+
+/* =========================================
+   6. NAVBAR COMPONENTS (Chung)
+   ========================================= */
+
+/* A. Hiệu ứng Dropdown Kính mờ (Cho menu Thể Thao, Thương Hiệu...) */
+.dropdown-menu-glass {
+    background-color: rgba(0, 0, 0, 0.9); /* Nền đen đậm hơn để dễ đọc chữ */
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 10px 0;
+    margin-top: 15px; /* Cách xa navbar chút */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+/* Style cho từng item trong dropdown */
+.dropdown-item {
+    color: #ccc;
+    font-weight: 500;
+    padding: 8px 20px;
+    transition: all 0.2s;
+}
+
+.dropdown-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #FFD700; /* Màu vàng thương hiệu */
+    padding-left: 25px; /* Hiệu ứng trượt sang phải */
+}
+
+/* Xử lý Hover: Đưa chuột vào là hiện menu (Không cần click) */
+@media (min-width: 992px) {
+    .custom-dropdown:hover .dropdown-menu {
+        display: block;
+        animation: slideUp 0.3s ease;
+    }
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
-.brand-title {
-    font-size: 2rem;
-    font-weight: 800;
-    color: #000;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    margin-bottom: 5px;
-    font-family: 'Russo One', sans-serif;
+/* B. Thanh Tìm kiếm Trong suốt */
+.search-input {
+    background: rgba(255, 255, 255, 0.15) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    border-radius: 20px !important;
+    color: white !important;
+    padding-right: 40px; /* Chừa chỗ cho nút search */
+}
+.search-input::placeholder { color: rgba(255, 255, 255, 0.7); }
+.search-input:focus {
+    background: rgba(255, 255, 255, 0.25) !important;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+    border-color: #fff !important;
 }
 
-.subtitle {
-    color: #666;
-    margin-bottom: 30px;
-    font-size: 0.95rem;
-}
-
-/* --- Input Styles --- */
-.input-group-custom {
-    position: relative;
-    margin-bottom: 20px;
-}
-.input-group-custom input {
-    width: 100%;
-    padding: 12px 15px 12px 45px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 1rem;
-    outline: none;
-    transition: 0.3s;
-    box-sizing: border-box;
-}
-.input-group-custom input:focus {
-    border-color: #d63031;
-    box-shadow: 0 0 0 3px rgba(214, 48, 49, 0.1);
-}
-.input-icon {
-    position: absolute;
-    left: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #888;
-}
-
-/* --- Buttons --- */
-.btn-login {
-    width: 100%;
-    padding: 12px;
-    background: #d63031;
-    color: white;
+.search-btn {
+    background: none;
     border: none;
-    border-radius: 8px;
-    font-weight: bold;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: 0.3s;
-    text-transform: uppercase;
-    margin-top: 10px;
+    padding-right: 15px;
 }
-.btn-login:hover {
-    background: #b02627;
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(214, 48, 49, 0.3);
+.search-btn:hover i { transform: scale(1.1); color: #FFD700 !important; }
+
+/* =========================================
+   7. USER ACCOUNT ICON & MENU (Style Mới)
+   ========================================= */
+
+/* Khu vực bao quanh icon User */
+.user-dropdown {
+    position: relative;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    margin-left: 15px;
 }
 
-.btn-google {
+/* Style cho Icon User tròn (Trigger) */
+.user-icon-trigger {
+    width: 40px;
+    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    width: 100%;
-    padding: 10px;
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    color: #333;
-    font-weight: 600;
-    text-decoration: none;
-    transition: 0.3s;
-    box-sizing: border-box;
-}
-.btn-google:hover {
-    background: #f8f9fa;
-    border-color: #ccc;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.3); /* Viền mỏng */
+    color: white;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.1); /* Nền hơi sáng nhẹ */
 }
 
-/* --- Utilities (Tiện ích) --- */
-.divider {
-    margin: 20px 0;
-    position: relative;
-    text-align: center;
+/* Hiệu ứng khi di chuột vào Icon */
+.user-dropdown:hover .user-icon-trigger {
+    background: #FFD700; /* Nền vàng */
+    color: #000;         /* Icon chuyển đen */
+    border-color: #FFD700;
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.6); /* Phát sáng */
+    transform: scale(1.1);
 }
-.divider::before {
-    content: "";
+
+/* Menu xổ xuống của User (Chung cho cả 2 trạng thái) */
+.user-dropdown .dropdown-menu {
+    background-color: rgba(0, 0, 0, 0.95); /* Nền đen đậm */
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    width: 200px; /* Độ rộng vừa phải */
+
+    /* Vị trí */
     position: absolute;
-    left: 0; top: 50%;
-    width: 100%; height: 1px;
-    background: #eee;
-}
-.divider span {
-    background: #fff;
-    padding: 0 10px;
-    color: #aaa;
-    font-size: 0.8rem;
-    position: relative;
+    top: 100%;
+    right: 0;
+    margin-top: 15px;
+
+    /* Ẩn mặc định */
+    display: none;
+    opacity: 0;
 }
 
-.actions {
-    display: flex;
-    justify-content: flex-end;
-    margin-bottom: 20px;
+/* LOGIC: Di chuột vào (.user-dropdown) thì hiện menu */
+.user-dropdown:hover .dropdown-menu {
+    display: block;
+    animation: slideUpMenu 0.3s ease forwards;
 }
-.forgot-pass {
-    font-size: 0.9rem;
-    color: #666;
-    text-decoration: none;
+
+@keyframes slideUpMenu {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
-.register-link {
-    margin-top: 25px;
-    font-size: 0.9rem;
-}
-.register-link a {
-    color: #d63031;
-    font-weight: bold;
-    text-decoration: none;
-}
-.error-msg {
-    background: #ffe6e6;
-    color: #d63031;
-    padding: 10px;
+
+/* Style riêng cho item trong menu User */
+.user-dropdown .dropdown-item {
+    color: #ccc;
+    padding: 10px 20px;
+    font-weight: 500;
+    transition: all 0.2s;
     border-radius: 5px;
-    margin-bottom: 20px;
-    font-size: 0.9rem;
-    display: none;
+    margin: 2px 5px;
+}
+
+.user-dropdown .dropdown-item:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: #FFD700;
+    padding-left: 25px; /* Hiệu ứng trượt sang phải */
+}
+
+/* Tiêu đề nhỏ (Xin chào / Khách) */
+.user-dropdown .dropdown-header {
+    color: #888;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    padding: 10px 20px 5px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    margin-bottom: 5px;
+}
+
+/* =========================================
+   8. TOAST NOTIFICATION (Thông báo nhỏ)
+   ========================================= */
+.custom-toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%); /* Căn giữa màn hình phía dưới */
+    background-color: rgba(0, 0, 0, 0.9); /* Màu đen đậm */
+    color: #fff;
+    padding: 12px 25px;
+    border-radius: 30px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    font-weight: 500;
+    z-index: 9999;
+    border: 1px solid rgba(255,255,255,0.2);
+    display: flex;
+    align-items: center;
+    animation: slideUpToast 0.4s ease forwards;
+}
+
+.custom-toast i {
+    color: #00b894; /* Icon màu xanh lá */
+}
+
+/* Hiệu ứng trượt lên */
+@keyframes slideUpToast {
+    from { opacity: 0; transform: translate(-50%, 20px); }
+    to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+/* Hiệu ứng ẩn đi */
+.custom-toast.hide {
+    opacity: 0;
+    transition: opacity 0.5s ease;
 }

@@ -2,35 +2,91 @@ const API_URL = "http://localhost:8080/api";
 
 //1. Ktr token khi load cho index.html
 async function checkAuth() {
-    //TH 1: login gg xóa token trên url
-
     const userArea = document.getElementById('userArea');
+    userArea.innerHTML = ''; // Xóa nội dung cũ
+
     try {
         const response = await fetch(`${API_URL}/auth/profile`);
+        let menuContent = '';
+
         if (response.ok) {
+            // --- TRƯỜNG HỢP 1: ĐÃ ĐĂNG NHẬP ---
             const data = await response.json();
-            userArea.innerHTML = `
-            <span class="navbar-text text-light me-3">Xin chào, <b>${data.name}</b></span>
-            <button onclick="logout()" class="btn btn-outline-light btn-sm">
-            <i class="fa-solid fa-right-from-bracket me-1"></i> Đăng xuất
-        </button>
-        `;
+            menuContent = `
+                <li><h6 class="dropdown-header">Xin chào, ${data.name}</h6></li>
+                <li>
+                    <a class="dropdown-item" href="#">
+                        <i class="fa-solid fa-id-card me-2"></i> Tài khoản
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="#">
+                        <i class="fa-solid fa-gear me-2"></i> Cài đặt
+                    </a>
+                </li>
+                <li><hr class="dropdown-divider bg-light opacity-25 mx-2"></li>
+                <li>
+                    <a class="dropdown-item text-danger fw-bold" href="#" onclick="logout()">
+                        <i class="fa-solid fa-right-from-bracket me-2"></i> Đăng xuất
+                    </a>
+                </li>
+            `;
         } else {
-            //chưa login/hết hạn token hiện login
-            userArea.innerHTML = `<a href="login.html" class="btn btn-light btn-sm fw-bold">Đăng nhập ngay</a>`;
+            // --- TRƯỜNG HỢP 2: CHƯA ĐĂNG NHẬP ---
+            menuContent = `
+                <li><h6 class="dropdown-header">Khách truy cập</h6></li>
+                <li>
+                    <a class="dropdown-item" href="login.html">
+                        <i class="fa-solid fa-right-to-bracket me-2"></i> Đăng nhập
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="register.html">
+                        <i class="fa-solid fa-user-plus me-2"></i> Đăng ký
+                    </a>
+                </li>
+            `;
         }
+
+        // --- RENDER RA GIAO DIỆN CHUNG (Chỉ khác menuContent) ---
+        userArea.innerHTML = `
+            <div class="user-dropdown">
+                <div class="user-icon-trigger">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+
+                <ul class="dropdown-menu dropdown-menu-end">
+                    ${menuContent}
+                </ul>
+            </div>
+        `;
+
     } catch (e) {
-        console.error("Lỗi kiểm tra Auth: ", e);
-        //Lỗi do mạng hiện nút login
-        userArea.innerHTML = `<a href="login.html" class="btn btn-light btn-sm fw-bold">Đăng nhập ngay</a>`;
+        console.error("Lỗi Auth:", e);
+        // Fallback giống như chưa đăng nhập nếu lỗi mạng
+        userArea.innerHTML = `
+            <div class="user-dropdown">
+                <div class="user-icon-trigger"><i class="fa-solid fa-user"></i></div>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="login.html">Đăng nhập</a></li>
+                </ul>
+            </div>
+        `;
     }
 }
-
 // 2. Hàm Đăng nhập (Dùng cho Login.html)
 async function handleLogin() {
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value.trim();
     const errorMsg = document.getElementById('errorMsg');
+
+    if (!email || !password) {
+        if (errorMsg) {
+            errorMsg.style.display = 'block';
+            errorMsg.innerText = 'Vui lòng nhập đầy đủ Email và Mật khẩu!';
+        }
+        return; // Dừng lại, không gọi API
+    }
 
     try {
         const response = await fetch(`${API_URL}/auth/login`, {
@@ -47,7 +103,10 @@ async function handleLogin() {
         }
     } catch (e) {
         console.error(e);
-        alert('Lỗi kết nối server!');
+        if (errorMsg) {
+            errorMsg.style.display = 'block';
+            errorMsg.innerText = 'Lỗi kết nối server!';
+        }
     }
 }
 
@@ -99,8 +158,21 @@ async function loadProducts() {
 
 // 4. Hàm Đăng xuất
 async function logout() {
-    await fetch(`${API_URL}/auth/logout`, {method: 'POST'}); // Gọi server để xóa cookie
-    window.location.href = 'login.html';
+    try {
+        // 1. gọi api để server xóa cookie
+        await fetch(`${API_URL}/auth/logout`, {method: 'POST'});
+
+        const userArea = document.getElementById('userArea');
+        userArea.innerHTML = `
+            <a href="login.html" class="btn btn-outline-light btn-sm fw-bold rounded-pill px-3">
+                <i class="fa-regular fa-user me-1"></i> Đăng nhập
+            </a>
+        `;
+        showToast("Đã đăng xuất thành công!");
+    } catch (e) {
+        console.error("Lỗi logout: ", e);
+        alert("Có xảy ra lỗi khi đăng xuất");
+    }
 }
 
 // Tự động chạy khi load trang
@@ -139,8 +211,8 @@ async function handleRegister() {
     try {
         const response = await fetch(`${API_URL}/auth/register`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password })
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({email, password})
         });
 
         const message = await response.text();
@@ -173,4 +245,19 @@ function showError(element, msg) {
     element.style.background = '#ffe6e6'; // Màu nền đỏ nhạt
     element.style.color = '#d63031';      // Chữ đỏ đậm
     element.style.display = 'block';
+}
+
+// Hàm thông báo nhỏ
+function showToast(message) {
+    const toast = document.createElement("div");
+    toast.className = "custom-toast";
+    toast.innerHTML = `<i class="fa-solid fa-check-circle me-2"></i> ${message}`;
+    document.body.appendChild(toast);
+
+    // tự động ẩn sau 3 giây
+    setTimeout(() => {
+        toast.classList.add('hide');
+        setTimeout(() => toast.remove(), 500);
+    }, 3000);
+
 }

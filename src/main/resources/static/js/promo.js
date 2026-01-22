@@ -28,7 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
 function showPromo() {
     const popup = document.getElementById('promoPopup');
     if (popup) {
-        setTimeout(() => { popup.classList.add('show'); }, 500); // Hiện sau 0.5s
+        setTimeout(() => { popup.classList.add('show'); }, 0); // Hiện sau 0.5s
         setTimeout(() => { closePromo(); }, 5500); // Tự tắt sau 5s
     }
 }
