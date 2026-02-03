@@ -5,10 +5,12 @@ import com.example.thexuong.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -21,14 +23,23 @@ public class ProductController {
     // GET: http://localhost:8080/api/products
     @GetMapping
     public ResponseEntity<Page<Product>> getAllProducts(
-            @RequestParam(defaultValue = "0") int page, // Trang hiện tại (mặc định trang 0)
-            @RequestParam(defaultValue = "12") int size // Số lượng 1 sp/trang (mặc định 12)
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "12") int size,
+            @RequestParam(required = false) BigDecimal minPrice,
+            @RequestParam(required = false) BigDecimal maxPrice
     ) {
-        // Lấy sản phẩm, sắp xếp theo ID giảm dần (mới nhất lên đầu)
-        return ResponseEntity.ok((Page<Product>) productRepository.findAll(
-                PageRequest.of(page, size, Sort.by("id").descending())
-        ));
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
+
+        if (minPrice != null && maxPrice != null) {
+            return ResponseEntity.ok(productRepository.findByPriceBetween(minPrice, maxPrice, pageable));
+        }
+
+        if (minPrice != null) {
+            return ResponseEntity.ok(productRepository.findByPriceGreaterThanEqual(minPrice, pageable));
+        }
+        return ResponseEntity.ok(productRepository.findAll(pageable));
     }
+
     //2. chi tiet' sp
     // GET: http://localhost:8080/api/products/1
     @GetMapping("/{id}")
@@ -36,6 +47,7 @@ public class ProductController {
         return productRepository.findById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+
     }
 
     //3. api  them sp

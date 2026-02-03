@@ -1,6 +1,8 @@
 CREATE DATABASE dbTheXuong;
 GO
 
+USE master
+
 USE dbTheXuong;
 GO
 
@@ -8,10 +10,6 @@ SELECT *
 FROM Users;
 SELECT *
 FROM Products;
-
--- =============================================
--- 2. TẠO BẢNG (Cấu trúc chuẩn)
--- =============================================
 
 -- Bảng User
 CREATE TABLE Users

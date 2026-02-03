@@ -116,9 +116,23 @@ async function handleLogin() {
     }
 }
 
-// 3. Hàm Load Sản phẩm (Gọi API Products)
 // Biến toàn cục để theo dõi trang hiện tại
+// --- THÊM BIẾN TOÀN CỤC ---
 let currentPage = 0;
+let currentMinPrice = null;
+let currentMaxPrice = null;
+
+// --- HÀM LỌC MỚI ---
+function filterByPrice(minPrice, maxPrice, btnElement) {
+    document.querySelectorAll('.btn-group .btn').forEach(btn => btn.classList.remove('active'));
+    if (btnElement) btnElement.classList.add('active');
+
+    // Quy ước: 0 => không lọc
+    currentMinPrice = (minPrice && minPrice > 0) ? minPrice : null;
+    currentMaxPrice = (maxPrice && maxPrice > 0) ? maxPrice : null;
+
+    loadProducts(0);
+}
 
 // 3. Hàm Load Sản phẩm (CÓ PHÂN TRANG)
 async function loadProducts(page = 0) {
@@ -128,18 +142,25 @@ async function loadProducts(page = 0) {
     if (!grid) return;
 
     try {
-        // Gọi API với tham số page và size=12
-        const response = await fetch(`${API_URL}/products?page=${page}&size=12`);
+        let url = `${API_URL}/products?page=${page}&size=12`;
+
+        if (currentMinPrice !== null) {
+            url += `&minPrice=${currentMinPrice}`;
+        }
+        if (currentMaxPrice !== null) {
+            url += `&maxPrice=${currentMaxPrice}`;
+        }
+        const response = await fetch(url);
         if (!response.ok) throw new Error("Lỗi tải dữ liệu");
 
-        // Spring trả về đối tượng Page (gồm content, totalPages, number,...)
         const data = await response.json();
-        const products = data.content; // Đây là danh sách sản phẩm của trang này
+        const products = data.content;
 
         // 1. Render Sản phẩm
         grid.innerHTML = '';
         if (products.length === 0) {
-            grid.innerHTML = '<div class="col-12 text-center">Chưa có sản phẩm.</div>';
+            // Thông báo khi không tìm thấy sp nào
+            grid.innerHTML = '<div class="col-12 text-center py-5 text-muted">Không tìm thấy sản phẩm nào phù hợp.</div>';
             paginationArea.style.display = 'none';
             return;
         }
@@ -166,7 +187,7 @@ async function loadProducts(page = 0) {
             </div>
         `).join('');
 
-        // 2. Render Phân Trang (Giống hình mẫu)
+        // 2. Render Phân Trang
         renderPagination(data);
 
     } catch (e) {
