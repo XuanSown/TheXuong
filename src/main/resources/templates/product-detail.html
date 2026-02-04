@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${product.name}"></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .variant-btn { min-width: 60px; margin-right: 5px; text-decoration: none; display: inline-block; padding: 6px 12px; border: 1px solid #ccc; color: #333; border-radius: 4px; }
+        .variant-btn:hover { background: #f8f9fa; color: #333; }
+        .variant-btn.active { background-color: #0d6efd; color: white; border-color: #0d6efd; }
+        .disabled-link { pointer-events: none; opacity: 0.5; }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-dark bg-dark mb-4">
+    <div class="container">
+        <a class="navbar-brand" href="/">TheXuong</a>
+        <a class="nav-link text-white" th:href="@{/products}">Quay lại Shop</a>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            <img th:src="${product.imageUrl}" class="img-fluid rounded" alt="Product Image">
+        </div>
+
+        <div class="col-md-6">
+            <h2 th:text="${product.name}">Tên sản phẩm</h2>
+            <h4 class="text-danger my-3"
+                th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')} + ' đ'"></h4>
+            <p th:text="${product.description}">Mô tả</p>
+
+            <hr>
+
+            <div class="mb-3">
+                <strong>Chọn Size:</strong><br>
+                <div class="mt-2">
+                    <a th:each="s : ${sizes}"
+                       th:text="${s}"
+                       th:href="@{/product-detail/{id}(id=${product.id}, size=${s})}"
+                       class="variant-btn"
+                       th:classappend="${selectedSize == s} ? 'active'">
+                    </a>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <form action="/cart/add" method="POST">
+                    <input type="hidden" name="productId" th:value="${product.id}">
+                    <input type="hidden" name="variantId" th:value="${selectedVariantId}">
+                    <input type="hidden" name="quantity" value="1">
+
+                    <p th:if="${selectedSize != null}">
+                        Tồn kho: <span th:text="${quantity}" class="fw-bold"></span> sản phẩm
+                    </p>
+
+                    <button type="submit" class="btn btn-success btn-lg w-100"
+                            th:disabled="${selectedVariantId == null || quantity <= 0}">
+                        <span th:text="${quantity > 0 ? 'Thêm vào giỏ hàng' : (selectedVariantId == null ? 'Vui lòng chọn Size' : 'Hết hàng')}"></span>
+                    </button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+</body>
+</html>

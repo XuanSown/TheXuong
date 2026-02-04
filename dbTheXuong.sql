@@ -11,7 +11,6 @@ FROM Users;
 SELECT *
 FROM Products;
 
--- Bảng User
 CREATE TABLE Users
 (
     id        BIGINT IDENTITY (1,1) PRIMARY KEY,
@@ -34,6 +33,62 @@ CREATE TABLE Products
     price       DECIMAL(18, 2) CHECK (price >= 0),
     image_url   NVARCHAR(MAX), -- Dùng MAX để link ảnh dài không bị lỗi
     description NVARCHAR(MAX)
+);
+
+CREATE TABLE Sizes (
+    id BIGINT IDENTITY(1,1) PRIMARY KEY,
+    name NVARCHAR(10) NOT NULL
+);
+
+CREATE TABLE ProductVariants (
+    id BIGINT IDENTITY(1,1) PRIMARY KEY,
+    product_id BIGINT FOREIGN KEY REFERENCES Products(id),
+    size_id BIGINT FOREIGN KEY REFERENCES Sizes(id),
+    quantity INT DEFAULT 0, -- Số lượng tồn kho
+    sku NVARCHAR(50) UNIQUE -- Mã kho hàng
+);
+
+CREATE TABLE Carts (
+    id BIGINT IDENTITY(1,1) PRIMARY KEY,
+    user_id BIGINT FOREIGN KEY REFERENCES Users(id)
+);
+
+CREATE TABLE CartItems (
+    id BIGINT IDENTITY(1,1) PRIMARY KEY,
+    cart_id BIGINT FOREIGN KEY REFERENCES Carts(id),
+    product_variant_id BIGINT FOREIGN KEY REFERENCES ProductVariants(id), -- Link tới biến thể cụ thể
+    quantity INT DEFAULT 1
+);
+
+CREATE TABLE Orders (
+    id BIGINT IDENTITY(1,1) PRIMARY KEY,
+    user_id BIGINT FOREIGN KEY REFERENCES Users(id),
+    full_name NVARCHAR(100), -- Tên người nhận (có thể khác tên user)
+    phone_number NVARCHAR(15),
+    address NVARCHAR(MAX),
+    total_money DECIMAL(18, 2),
+    status NVARCHAR(20) DEFAULT 'PENDING', -- PENDING, SHIPPING, DELIVERED, CANCELLED
+    payment_method NVARCHAR(20), -- COD, MOMO, VNPAY
+    created_at DATETIME DEFAULT GETDATE()
+);
+
+CREATE TABLE OrderDetails (
+    id BIGINT IDENTITY(1,1) PRIMARY KEY,
+    order_id BIGINT FOREIGN KEY REFERENCES Orders(id),
+    product_id BIGINT, -- Lưu lại để query nhanh
+    product_name NVARCHAR(100), -- Lưu cứng tên sp tại thời điểm mua (đề phòng sp bị đổi tên sau này)
+    price DECIMAL(18, 2), -- Giá tại thời điểm mua
+    quantity INT,
+    total_price DECIMAL(18, 2)
+);
+
+CREATE TABLE Reviews (
+    id BIGINT IDENTITY(1,1) PRIMARY KEY,
+    user_id BIGINT FOREIGN KEY REFERENCES Users(id),
+    product_id BIGINT FOREIGN KEY REFERENCES Products(id) ON DELETE CASCADE,
+    rating INT CHECK (rating >= 1 AND rating <= 5), -- Chấm điểm 1-5 sao
+    comment NVARCHAR(MAX),
+    created_at DATETIME DEFAULT GETDATE()
 );
 
 INSERT INTO Products (name, brand, sport, category, price, image_url, description)
