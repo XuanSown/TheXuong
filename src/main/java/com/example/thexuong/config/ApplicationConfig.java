@@ -9,7 +9,6 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -20,31 +19,37 @@ import java.util.Collections;
 @Configuration
 @RequiredArgsConstructor
 public class ApplicationConfig {
+
     private final UserRepository userRepository;
 
-    // 1. BEAN: Tìm user trong Database
-    // spring security sẽ gọi hàm này khi người dùng đăng nhập
+    /**
+     * 1. UserDetailsService: Tìm kiếm user trong Database để Spring Security kiểm tra.
+     * Sử dụng cho cả Login thường (Form) và OAuth2 (nếu cần mapping).
+     */
     @Bean
     public UserDetailsService userDetailsService() {
-        return username -> userRepository.findByEmail(username) //ưu tiên tìm bằng email khi đăng nhập bằng gg
-                .or(() -> userRepository.findByUsername(username)) //nếu không thì tìm bằng Username khi đăng nhập bình thường
-                .map(u -> new User(
-                        u.getEmail(), //dùng email làm định danh chính
-                        u.getPassword() == null ? "" : u.getPassword(), //nếu là gg user (pass null) thì trả về rỗng
-                        Collections.singleton(new SimpleGrantedAuthority(u.getRole())) // gán quyền user/admin
+        return username -> userRepository.findByEmail(username) // Ưu tiên tìm bằng Email
+                .or(() -> userRepository.findByUsername(username)) // Tìm bằng Username nếu không thấy Email
+                .map(u -> new org.springframework.security.core.userdetails.User(
+                        u.getEmail(), // Dùng Email làm định danh chính trong Session
+                        u.getPassword() == null ? "" : u.getPassword(), // Xử lý trường hợp user Google không có pass
+                        Collections.singleton(new SimpleGrantedAuthority(u.getRole())) // Lưu ý: Database nên lưu role dạng "ROLE_USER" hoặc "USER" tùy SecurityConfig
                 ))
-                .orElseThrow(() -> new UsernameNotFoundException("Không tìm thấy người dùng với email/username này!!!"));
+                .orElseThrow(() -> new UsernameNotFoundException("Không tìm thấy người dùng với email/username: " + username));
     }
 
-    // 2. BEAN: Cung cấp thuật toán mã hoá mật khẩu
-    // dùng BCrypt - chuẩn bảo mật hiện nay
+    /**
+     * 2. PasswordEncoder: Mã hóa mật khẩu (BCrypt)
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // 3. BEAN: Liên kết UserDetail với PasswordEncoder
-    // giúp spring biết: "Lấy user ở đâu?" và "so sánh pass thế nào?"
+    /**
+     * 3. AuthenticationProvider: Cung cấp cơ chế xác thực cho Spring Security
+     * Kết hợp UserDetailsService (tìm user) và PasswordEncoder (so sánh pass)
+     */
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
@@ -53,8 +58,10 @@ public class ApplicationConfig {
         return authProvider;
     }
 
-    // 4.BEAN: Quản lý đăng nhập
-    // AuthController sẽ gọi thằng này để thực hiện lệnh .authenticate()
+    /**
+     * 4. AuthenticationManager: Quản lý xác thực
+     * Cần thiết nếu bạn muốn thực hiện login thủ công (programmatic login) sau khi đăng ký thành công
+     */
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();

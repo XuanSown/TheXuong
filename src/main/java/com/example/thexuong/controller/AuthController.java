@@ -2,102 +2,59 @@ package com.example.thexuong.controller;
 
 import com.example.thexuong.entity.User;
 import com.example.thexuong.repository.UserRepository;
-import com.example.thexuong.security.JwtService;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletResponse;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 
-import java.util.Collection;
-import java.util.Collections;
-
-@RestController
-@RequestMapping("/api/auth")
+@Controller
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final AuthenticationManager AuthenticationManager;
-    private final JwtService jwtService;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    @GetMapping("/profile")
-    public ResponseEntity<?> getProfile() {
-        //Lấy thông tin user từ SecurityContext (đã được JwtFilter nạp vào từ Cookie)
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.isAuthenticated() && !"anonymousUser".equals(authentication.getPrincipal())) {
-            return ResponseEntity.ok(Collections.singletonMap("name", authentication.getName()));
-        }
-        return ResponseEntity.status(404).body("Chưa đăng nhập");
+    // 1. Hiển thị trang đăng nhập
+    @GetMapping("/login")
+    public String loginPage() {
+        return "login"; // Trả về file login.html
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody AuthRequest request, HttpServletResponse response) {
-        //1. xác thực
-        Authentication authentication = AuthenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
-        );
-        //2. tạo token
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        String token = jwtService.generateToken(userDetails);
-        //3. tạo HttpOnly Cookie
-        Cookie cookie = new Cookie("accessToken", token);
-        cookie.setHttpOnly(true); //chặn js đọc được
-        cookie.setSecure(false); //hiện tại đang chạy localhost để 'false' - lên sever https thì để 'true'
-        cookie.setPath("/"); //Cookie áp dụng cho toàn trang
-        cookie.setMaxAge(60 * 60); //1 giờ
-        //4. cookie phản hồi
-        response.addCookie(cookie);
-        return ResponseEntity.ok("Đăng nhập thành công! Token đã nằm trong Cookie.");
+    // 2. Hiển thị trang đăng ký
+    @GetMapping("/register")
+    public String registerPage(Model model) {
+        model.addAttribute("user", new User()); // Tạo object rỗng để form binding
+        return "register"; // Trả về file register.html
     }
 
+    // 3. Xử lý logic đăng ký (Form Submit)
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody AuthRequest request) {
-        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-            return ResponseEntity.badRequest().body("Email đã tồn tại");
+    public String register(@ModelAttribute("user") User user, Model model) {
+        // Kiểm tra email đã tồn tại chưa
+        if (userRepository.existsByEmail(user.getEmail())) {
+            model.addAttribute("error", "Email đã tồn tại!");
+            return "register";
         }
-        User user = new User();
-        user.setEmail(request.getEmail());
-        user.setUsername(request.getEmail());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setRole("USER");
-        user.setProvider("LOCAL");
 
-        userRepository.save(user);
-        return ResponseEntity.ok("Đăng ký thành công");
-    }
+        try {
+            // Thiết lập thông tin mặc định
+            user.setUsername(user.getEmail()); // Dùng email làm username
+            user.setPassword(passwordEncoder.encode(user.getPassword())); // Mã hóa mật khẩu
+            user.setRole("USER");      // Gán quyền mặc định
+            user.setProvider("LOCAL"); // Gán provider là đăng ký tại web
 
-    @PostMapping("/logout")
-    public ResponseEntity<?> logout(HttpServletResponse response) {
-        Cookie cookie = new Cookie("accessToken", null);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(false);
-        cookie.setPath("/");
-        cookie.setMaxAge(0); // Set tuổi thọ = 0 để trình duyệt xóa ngay lập tức
-        response.addCookie(cookie);
-        return ResponseEntity.ok(Collections.singletonMap("message", "Đăng xuất thành công"));
-    }
-}
+            userRepository.save(user);
 
-@Data
-class AuthRequest {
-    private String email;
-    private String password;
-}
+            // Đăng ký thành công -> Chuyển hướng về trang login kèm thông báo
+            return "redirect:/login?registerSuccess";
 
-@Data
-class AuthResponse {
-    private String token;
-
-    public AuthResponse(String token) {
-        this.token = token;
+        } catch (Exception e) {
+            e.printStackTrace();
+            model.addAttribute("error", "Đã xảy ra lỗi trong quá trình đăng ký. Vui lòng thử lại.");
+            return "register";
+        }
     }
 }
