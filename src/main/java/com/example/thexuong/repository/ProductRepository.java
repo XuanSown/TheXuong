@@ -10,6 +10,4 @@ import java.math.BigDecimal;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
-    Page<Product> findByPriceGreaterThanEqual(BigDecimal minPrice, Pageable pageable);
-    Page<Product> findByPriceBetween(BigDecimal minPrice, BigDecimal maxPrice, Pageable pageable);
 }
