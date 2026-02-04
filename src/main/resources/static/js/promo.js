@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <button class="close-btn" onclick="closePromo()">
                 <i class="fa-solid fa-xmark"></i>
             </button>
-            <img src="/templates/img/promo.png" style="width: 650px; height: 500px" 
+            <img src="/img/promo.png" style="width: 650px; height: 500px" 
                  alt="Khuyến mãi" class="promo-img">
         </div>
     </div>
