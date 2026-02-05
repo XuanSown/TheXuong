@@ -1,24 +1,22 @@
 package com.example.thexuong.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "ProductVariants")
+@Table(name = "[ProductVariants]")
 public class ProductVariant {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "product_id", nullable = false)
+    @JoinColumn(name = "product_id")
+    @ToString.Exclude
     private Product product;
 
     @ManyToOne
@@ -30,4 +28,7 @@ public class ProductVariant {
 
     @Column(length = 50)
     private String sku;
+
+    @Column(name = "image_url")
+    private String imageUrl;
 }

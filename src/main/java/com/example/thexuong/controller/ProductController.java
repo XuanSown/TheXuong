@@ -14,6 +14,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 @RequiredArgsConstructor
@@ -82,19 +83,20 @@ public class ProductController {
 
         if (variants != null && !variants.isEmpty()) {
             allSizes = variants.stream()
-                    .map(v -> v.getSize().getName()) // Lấy tên size
-                    .distinct() // Loại bỏ trùng lặp
-                    .sorted() // Sắp xếp size (có thể cần custom Comparator nếu muốn S, M, L...)
+                    .filter(v -> v != null && v.getSize() != null && v.getSize().getName() != null)
+                    .map(v -> v.getSize().getName())
+                    .distinct()
+                    .sorted(Comparator.naturalOrder())
                     .collect(Collectors.toList());
         }
 
         int quantity = 0;
         Long selectedVariantId = null;
 
-        // 2. Xử lý khi người dùng chọn size
-        if (size != null && variants != null) {
+        if (size != null && !size.isBlank() && variants != null && !variants.isEmpty()) {
             ProductVariant variant = variants.stream()
-                    .filter(v -> v.getSize().getName().equals(size))
+                    .filter(v -> v != null && v.getSize() != null && v.getSize().getName() != null)
+                    .filter(v -> size.equals(v.getSize().getName()))
                     .findFirst()
                     .orElse(null);
 
@@ -104,7 +106,6 @@ public class ProductController {
             }
         }
 
-        // Truyền dữ liệu ra View
         model.addAttribute("product", product);
         model.addAttribute("sizes", allSizes);
         model.addAttribute("selectedSize", size);

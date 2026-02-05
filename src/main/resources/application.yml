@@ -3,6 +3,10 @@ spring:
     url: jdbc:sqlserver://localhost:1444;databaseName=dbTheXuong;encrypt=true;trustServerCertificate=true
     username: sa
     password: Sontran1903@
+  jpa:
+    hibernate:
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
   security:
     oauth2:
       client:
@@ -13,6 +17,7 @@ spring:
         provider:
           google:
             user-name-attribute: name
+
 jwt:
   secret: KhoaBiMatPhaiRatDaiDeBaoMatJWTTheXuongProject2024
   expiration: 3600000 # 1 giờ

@@ -31,7 +31,6 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
 
-                // 2. Set Provider đã cấu hình (tìm user bằng email/username & check pass)
                 .authenticationProvider(authenticationProvider)
 
                 .formLogin(form -> form

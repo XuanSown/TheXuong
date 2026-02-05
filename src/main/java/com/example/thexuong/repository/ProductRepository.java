@@ -22,6 +22,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Page<Product> findBySport(String sport, Pageable pageable);
     Page<Product> findByBrand(String brand, Pageable pageable);
 
-    @Query("SELECT p FROM Product p LEFT JOIN FETCH p.variants v LEFT JOIN FETCH v.size WHERE p.id = :id")
+    @Query("SELECT DISTINCT p FROM Product p LEFT JOIN FETCH p.variants v LEFT JOIN FETCH v.size LEFT JOIN FETCH p.reviews WHERE p.id = :id")
     Optional<Product> findByIdWithVariants(@Param("id") Long id);
 }

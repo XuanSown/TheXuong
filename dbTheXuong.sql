@@ -6,10 +6,12 @@ USE master
 USE dbTheXuong;
 GO
 
-SELECT *
-FROM Users;
-SELECT *
-FROM Products;
+    SELECT *
+    FROM Users;
+    SELECT *
+    FROM Products;
+    SELECT * FROM Sizes;
+
 
 CREATE TABLE Users
 (

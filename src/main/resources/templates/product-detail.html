@@ -26,6 +26,7 @@
             margin-bottom: 8px;
             transition: all 0.2s;
             text-align: center;
+            font-weight: 600;
         }
         .variant-btn:hover {
             background-color: #e9ecef;
@@ -162,17 +163,18 @@
     <div class="row gx-5">
         <div class="col-md-6 mb-4">
             <div class="bg-white p-2 rounded shadow-sm">
-                <img th:src="${product.imageUrl}" class="product-img-large" alt="Ảnh chi tiết sản phẩm">
+                <img th:src="${product.imageUrl != null ? product.imageUrl : 'https://placehold.co/600x400'}"
+                     class="product-img-large" alt="Ảnh chi tiết sản phẩm">
             </div>
         </div>
 
         <div class="col-md-6">
             <h1 class="fw-bold mb-3" th:text="${product.name}">Tên sản phẩm</h1>
 
-            <h2 class="text-danger fw-bold mb-4"
+            <h3 class="text fw-bold mb-4"
                 th:text="${#numbers.formatDecimal(product.price, 0, 'POINT', 0, 'COMMA')} + ' đ'">
                 1.000.000 đ
-            </h2>
+            </h3>
 
             <p class="text-muted mb-4" th:text="${product.description}" style="font-size: 1.1rem; line-height: 1.6;">
                 Mô tả sản phẩm...
@@ -180,32 +182,46 @@
 
             <hr class="my-4">
 
-<!--            <form th:action="@{/cart/add}" method="POST">-->
-<!--                <input type="hidden" name="productId" th:value="${product.id}">-->
-<!--                <input type="hidden" name="variantId" th:value="${selectedVariantId}">-->
+            <form th:action="@{/cart/add}" method="POST">
+                <input type="hidden" name="productId" th:value="${product.id}">
+                <input type="hidden" name="variantId" th:value="${selectedVariantId}">
 
-<!--                <div class="mb-4">-->
-<!--                    <h5 class="fw-bold mb-3">Chọn Kích Cỡ:</h5>-->
-<!--                    <div class="d-flex flex-wrap">-->
-<!--                        <a th:each="s : ${sizes}"-->
-<!--                           th:text="${s}"-->
-<!--                           th:href="@{/product-detail/{id}(id=${product.id}, size=${s})}"-->
-<!--                           class="variant-btn"-->
-<!--                           th:classappend="${selectedSize == s} ? 'active'">-->
-<!--                        </a>-->
-<!--                    </div>-->
-<!--                    <div th:if="${sizes.isEmpty()}" class="text-danger mt-2">-->
-<!--                        Sản phẩm này hiện đang hết hàng hoặc chưa cập nhật size.-->
-<!--                    </div>-->
-<!--                </div>-->
+                <div class="mb-4">
+                    <h5 class="fw-bold mb-3">Chọn Kích Cỡ:</h5>
+                    <div class="d-flex flex-wrap">
+                        <a th:each="s : ${sizes}"
+                           th:text="${s}"
+                           th:href="@{'/product-detail/' + ${product.id} + '?size=' + ${s}}"
+                           class="variant-btn"
+                           th:classappend="${selectedSize == s} ? 'active'">
+                        </a>
+                    </div>
 
-<!--                <button type="submit" class="btn btn-danger btn-lg w-100 py-3 fw-bold text-uppercase shadow-sm"-->
-<!--                        th:disabled="${selectedVariantId == null || quantity <= 0}">-->
-<!--                    <i class="fa-solid fa-cart-plus me-2"></i>-->
-<!--                    <span th:text="${selectedVariantId == null ? 'Vui lòng chọn Size' : (quantity > 0 ? 'Thêm vào giỏ hàng' : 'Hết hàng')}"></span>-->
-<!--                </button>-->
-<!--            </form>-->
+                    <div class="mt-2">
+                        <span th:if="${sizes.isEmpty()}" class="text-danger fw-bold">
+                            <i class="fa-solid fa-circle-exclamation me-1"></i>Sản phẩm đang tạm hết hàng.
+                        </span>
 
+                        <span th:if="${selectedSize != null}">
+                            <span th:if="${quantity > 0}" class="text-success small">
+                                <i class="fa-solid fa-check me-1"></i>Còn hàng (Size [[${selectedSize}]])
+                            </span>
+                            <span th:if="${quantity <= 0}" class="text-danger small">
+                                <i class="fa-solid fa-xmark me-1"></i>Hết hàng (Size [[${selectedSize}]])
+                            </span>
+                        </span>
+                    </div>
+                </div>
+
+                <button type="submit"
+                        class="btn btn-white btn-lg w-100 py-3 fw-bold text-uppercase shadow-sm"
+                        th:disabled="${selectedVariantId == null || quantity <= 0}">
+                    <i class="fa-solid fa-cart-plus me-2"></i>
+                    <span th:text="${selectedVariantId == null ? 'Vui lòng chọn Size' : (quantity > 0 ? 'Thêm vào giỏ hàng' : 'Hết hàng')}">
+                        Thêm vào giỏ hàng
+                    </span>
+                </button>
+            </form>
             <div class="row mt-5 text-center g-3">
                 <div class="col-4">
                     <i class="fa-solid fa-rotate-left fa-2x text-secondary mb-2"></i>
