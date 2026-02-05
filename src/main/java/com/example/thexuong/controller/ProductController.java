@@ -5,6 +5,9 @@ import com.example.thexuong.entity.ProductVariant;
 import com.example.thexuong.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -30,31 +33,30 @@ public class ProductController {
     @GetMapping("/products")
     public String showProductList(@RequestParam(required = false) String keyword,
                                   @RequestParam(required = false, defaultValue = "newest") String sort,
+                                  @RequestParam(defaultValue = "0") int page,
+                                  @RequestParam(defaultValue = "12") int size,
                                   Model model) {
         // 1. Xác định kiểu sắp xếp
         Sort sorting = Sort.by("id").descending(); // Mặc định là mới nhất
 
-        switch (sort) {
-            case "price_asc":
-                sorting = Sort.by("price").ascending();
-                break;
-            case "price_desc":
-                sorting = Sort.by("price").descending();
-                break;
+        if ("price_asc".equals(sort)) {
+            sorting = Sort.by("price").ascending();
+        } else if ("price_desc".equals(sort)) {
+            sorting = Sort.by("price").descending();
         }
-
+        Pageable pageable = PageRequest.of(page, size, sorting);
         // 2. Lấy danh sách sản phẩm
-        List<Product> products;
+        Page<Product> productsPage;
         if (keyword != null && !keyword.isEmpty()) {
             // Nếu có tìm kiếm -> Tìm theo tên + Sắp xếp
-            products = productRepository.findByNameContaining(keyword, sorting);
+            productsPage = productRepository.findByNameContaining(keyword, pageable);
         } else {
             // Nếu không tìm kiếm -> Lấy tất cả + Sắp xếp
-            products = productRepository.findAll(sorting);
+            productsPage = productRepository.findAll(pageable);
         }
 
         // 3. Truyền dữ liệu ra View
-        model.addAttribute("products", products);
+        model.addAttribute("productsPage", productsPage);
         model.addAttribute("sort", sort); // Để giữ trạng thái dropdown
         model.addAttribute("keyword", keyword); // Để giữ từ khóa tìm kiếm
 

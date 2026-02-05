@@ -323,7 +323,6 @@ footer {
 /* Nền footer đen huyền bí */
 .footer-custom {
     background-color: #0d0d0d !important; /* Đen hơn bg-dark mặc định */
-    border-top: 3px solid #d63031; /* Đường viền đỏ tạo điểm nhấn trên cùng */
     font-size: 0.95rem;
 }
 
@@ -379,4 +378,78 @@ footer {
     .footer-link:hover {
         padding-left: 0; /* Tắt hiệu ứng trượt trên mobile cho gọn */
     }
+}
+
+/* =========================================
+   12. ADIDAS STYLE PAGINATION
+   ========================================= */
+.pagination-container {
+    margin-top: 3rem;
+    margin-bottom: 2rem;
+}
+
+.pagination-custom .page-item {
+    margin: 0 5px; /* Khoảng cách giữa các nút */
+}
+
+.pagination-custom .page-link {
+    border: 1px solid #e6e6e6; /* Viền xám nhạt tinh tế */
+    color: #000;               /* Chữ đen */
+    background-color: transparent;
+    width: 45px;               /* Hình vuông */
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;          /* Chữ đậm */
+    font-size: 1rem;
+    border-radius: 0 !important; /* Vuông vức, không bo tròn */
+    transition: all 0.2s ease-in-out;
+    font-family: 'Segoe UI', sans-serif; /* Hoặc font chữ chính của web */
+}
+
+/* Hiệu ứng khi di chuột: Đen toàn bộ */
+.pagination-custom .page-link:hover {
+    background-color: #000;
+    color: #fff;
+    border-color: #000;
+    transform: translateY(-2px); /* Nhích lên nhẹ */
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+/* Trạng thái đang chọn (Active): Gạch chân hoặc Đen đậm */
+.pagination-custom .page-item.active .page-link {
+    background-color: #000;
+    color: #fff;
+    border-color: #000;
+    text-decoration: underline; /* Phong cách đặc trưng Adidas thường có gạch chân */
+    text-underline-offset: 4px;
+}
+
+/* Trạng thái Disabled (Không bấm được) */
+.pagination-custom .page-item.disabled .page-link {
+    color: #ccc;
+    border-color: #f0f0f0;
+    background-color: #fff;
+    cursor: not-allowed;
+}
+
+/* Nút Next/Prev: Làm rộng hơn hình vuông */
+.pagination-custom .page-item:first-child .page-link,
+.pagination-custom .page-item:last-child .page-link {
+    width: auto;
+    padding: 0 15px;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+}
+
+/* =========================================
+   13. FIX USER DROPDOWN ALIGNMENT
+   ========================================= */
+
+/* Bắt buộc căn phải cho menu user */
+.dropdown-menu-end {
+    right: 0 !important;
+    left: auto !important;
 }

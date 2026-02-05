@@ -14,5 +14,5 @@ import java.util.List;
 public interface ProductRepository extends JpaRepository<Product, Long> {
     // SELECT * FROM product ORDER BY id DESC LIMIT 4
     List<Product> findTop4ByOrderByIdDesc();
-    List<Product> findByNameContaining(String keyword, Sort sort);
+    Page<Product> findByNameContaining(String keyword, Pageable pageable);
 }
