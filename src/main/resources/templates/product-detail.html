@@ -60,22 +60,66 @@
         </button>
 
         <div class="collapse navbar-collapse" id="navbarContent">
+
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item dropdown custom-dropdown">
+                    <a class="nav-link dropdown-toggle fw-bold text-white" href="#" id="sportDropdown">
+                        THỂ THAO
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-glass">
+                        <li><a class="dropdown-item" th:href="@{/products(sport='Bóng đá')}"><i class="fa-solid fa-futbol me-2"></i>Bóng đá</a></li>
+                        <li><a class="dropdown-item" th:href="@{/products(sport='Cầu lông')}"><i class="fa-solid fa-feather me-2"></i>Cầu lông</a></li>
+                        <li><a class="dropdown-item" th:href="@{/products(sport='Chạy bộ')}"><i class="fa-solid fa-person-running me-2"></i>Chạy bộ</a></li>
+                        <li><a class="dropdown-item" th:href="@{/products(sport='Bóng rổ')}"><i class="fa-solid fa-basketball me-2"></i>Bóng rổ</a></li>
+                        <li><a class="dropdown-item" th:href="@{/products(sport='Pickleball')}"><i class="fa-solid fa-table-tennis-paddle-ball me-2"></i>Pickleball</a></li>
+                        <li><a class="dropdown-item" th:href="@{/products(sport='Khác')}">Khác...</a></li>
+                        <li><a class="dropdown-item" th:href="@{/products}">Tất cả...</a></li>
+                    </ul>
+                </li>
+
+                <li class="nav-item dropdown custom-dropdown">
+                    <a class="nav-link dropdown-toggle fw-bold text-white" href="#" id="brandDropdown">
+                        THƯƠNG HIỆU
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-glass">
+                        <li><a class="dropdown-item" th:href="@{/products(brand='Nike')}">Nike</a></li>
+                        <li><a class="dropdown-item" th:href="@{/products(brand='Adidas')}">Adidas</a></li>
+                        <li><a class="dropdown-item" th:href="@{/products(brand='Li-Ning')}">Li-Ning</a></li>
+                        <li><a class="dropdown-item" th:href="@{/products(brand='Asics')}">Asics</a></li>
+                        <li><a class="dropdown-item" th:href="@{/products(brand='Puma')}">Puma</a></li>
+                        <li><a class="dropdown-item" th:href="@{/products(sport='Khác')}">Khác...</a></li>
+                        <li><a class="dropdown-item" th:href="@{/products}">Tất cả...</a></li>
+                    </ul>
+                </li>
+
                 <li class="nav-item">
                     <a class="nav-link fw-bold text-white" th:href="@{/products}">
-                        <i class="fa-solid fa-arrow-left me-1"></i> TIẾP TỤC MUA SẮM
+                        TẤT CẢ SẢN PHẨM <span class="badge bg-danger ms-1" style="font-size: 0.6rem;">HOT</span>
                     </a>
                 </li>
             </ul>
 
-            <form class="d-flex mx-auto search-form position-relative" style="width: 350px;" th:action="@{/products}" method="get">
-                <input class="form-control search-input" type="search" name="keyword" placeholder="Tìm tên sản phẩm...">
+            <form class="d-flex mx-auto search-form position-relative" role="search" style="width: 350px;"
+                  th:action="@{/products}" method="get">
+                <input class="form-control search-input" type="search" name="keyword"
+                       placeholder="Tìm tên sản phẩm..." aria-label="Search" th:value="${keyword}">
                 <button class="btn search-btn position-absolute end-0 top-0 h-100" type="submit">
                     <i class="fa-solid fa-magnifying-glass text-white"></i>
                 </button>
             </form>
 
             <ul class="navbar-nav ms-auto align-items-center gap-3">
+
+                <li class="nav-item dropdown custom-dropdown">
+                    <a class="nav-link text-white" href="#" style="font-size: 1.2rem;">
+                        <i class="fa-solid fa-earth-americas"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-glass dropdown-menu-end" style="min-width: 100px;">
+                        <li><a class="dropdown-item active" href="#">🇻🇳 VN</a></li>
+                        <li><a class="dropdown-item" href="#">🇺🇸 EN</a></li>
+                    </ul>
+                </li>
+
                 <li class="nav-item position-relative">
                     <a class="nav-link text-white" th:href="@{/cart}" style="font-size: 1.2rem;">
                         <i class="fa-solid fa-cart-shopping"></i>
@@ -89,18 +133,25 @@
                     <a sec:authorize="!isAuthenticated()" class="nav-link text-white fw-bold" th:href="@{/login}">
                         <i class="fa-solid fa-user me-1"></i> Đăng nhập
                     </a>
-                    <a sec:authorize="isAuthenticated()" class="nav-link dropdown-toggle text-white fw-bold" href="#" role="button" data-bs-toggle="dropdown">
-                        Hello, <span sec:authentication="name">User</span>
+
+                    <a sec:authorize="isAuthenticated()" class="nav-link dropdown-toggle fw-bold" href="#" role="button" data-bs-toggle="dropdown">
+                        <i class="fa-solid fa-user"></i>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-glass dropdown-menu-end" sec:authorize="isAuthenticated()">
+                        <li><a class="dropdown-item" href="#">Hồ sơ cá nhân</a></li>
+                        <li><a class="dropdown-item" href="#">Đơn hàng của tôi</a></li>
+                        <li><hr class="dropdown-divider"></li>
                         <li>
                             <form th:action="@{/logout}" method="post">
-                                <button type="submit" class="dropdown-item text-danger">Đăng xuất</button>
+                                <button type="submit" class="dropdown-item text-danger">
+                                    <i class="fa-solid fa-right-from-bracket me-2"></i>Đăng xuất
+                                </button>
                             </form>
                         </li>
                     </ul>
                 </li>
             </ul>
+
         </div>
     </div>
 </nav>
@@ -129,49 +180,31 @@
 
             <hr class="my-4">
 
-            <form th:action="@{/cart/add}" method="POST">
-                <input type="hidden" name="productId" th:value="${product.id}">
-                <input type="hidden" name="variantId" th:value="${selectedVariantId}">
+<!--            <form th:action="@{/cart/add}" method="POST">-->
+<!--                <input type="hidden" name="productId" th:value="${product.id}">-->
+<!--                <input type="hidden" name="variantId" th:value="${selectedVariantId}">-->
 
-                <div class="mb-4">
-                    <h5 class="fw-bold mb-3">Chọn Kích Cỡ:</h5>
-                    <div class="d-flex flex-wrap">
-                        <a th:each="s : ${sizes}"
-                           th:text="${s}"
-                           th:href="@{/product-detail/{id}(id=${product.id}, size=${s})}"
-                           class="variant-btn"
-                           th:classappend="${selectedSize == s} ? 'active'">
-                            XL
-                        </a>
-                    </div>
-                    <div th:if="${selectedSize == null}" class="text-muted fst-italic mt-2">
-                        * Vui lòng chọn size để xem tình trạng tồn kho.
-                    </div>
-                </div>
+<!--                <div class="mb-4">-->
+<!--                    <h5 class="fw-bold mb-3">Chọn Kích Cỡ:</h5>-->
+<!--                    <div class="d-flex flex-wrap">-->
+<!--                        <a th:each="s : ${sizes}"-->
+<!--                           th:text="${s}"-->
+<!--                           th:href="@{/product-detail/{id}(id=${product.id}, size=${s})}"-->
+<!--                           class="variant-btn"-->
+<!--                           th:classappend="${selectedSize == s} ? 'active'">-->
+<!--                        </a>-->
+<!--                    </div>-->
+<!--                    <div th:if="${sizes.isEmpty()}" class="text-danger mt-2">-->
+<!--                        Sản phẩm này hiện đang hết hàng hoặc chưa cập nhật size.-->
+<!--                    </div>-->
+<!--                </div>-->
 
-                <div class="mb-4" th:if="${selectedSize != null}">
-                    <h5 class="fw-bold mb-2">Tình trạng:</h5>
-                    <div th:if="${quantity > 0}">
-                        <span class="badge bg-success mb-2">Còn hàng</span>
-                        <span class="text-muted ms-2">(Còn <span th:text="${quantity}" class="fw-bold text-dark"></span> sản phẩm)</span>
-
-                        <div class="d-flex align-items-center mt-3" style="max-width: 150px;">
-                            <span class="me-3 fw-bold">Số lượng:</span>
-                            <input type="number" name="quantity" class="form-control text-center" value="1" min="1" th:max="${quantity}">
-                        </div>
-                    </div>
-                    <div th:if="${quantity <= 0}">
-                        <span class="badge bg-secondary">Hết hàng</span>
-                        <p class="text-danger mt-2 small">Sản phẩm này tạm thời đang hết size bạn chọn.</p>
-                    </div>
-                </div>
-
-                <button type="submit" class="btn btn-danger btn-lg w-100 py-3 fw-bold text-uppercase shadow-sm"
-                        th:disabled="${selectedVariantId == null || quantity <= 0}">
-                    <i class="fa-solid fa-cart-plus me-2"></i>
-                    <span th:text="${selectedVariantId == null ? 'Vui lòng chọn Size' : (quantity > 0 ? 'Thêm vào giỏ hàng' : 'Hết hàng')}"></span>
-                </button>
-            </form>
+<!--                <button type="submit" class="btn btn-danger btn-lg w-100 py-3 fw-bold text-uppercase shadow-sm"-->
+<!--                        th:disabled="${selectedVariantId == null || quantity <= 0}">-->
+<!--                    <i class="fa-solid fa-cart-plus me-2"></i>-->
+<!--                    <span th:text="${selectedVariantId == null ? 'Vui lòng chọn Size' : (quantity > 0 ? 'Thêm vào giỏ hàng' : 'Hết hàng')}"></span>-->
+<!--                </button>-->
+<!--            </form>-->
 
             <div class="row mt-5 text-center g-3">
                 <div class="col-4">

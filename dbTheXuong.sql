@@ -131,3 +131,50 @@ VALUES (N'McLAREN RACING Speedcat', 'Puma', N'Khác', N'Giày', 2800000,
        (N'Mũ Trucker Stadium', 'Adidas', N'Khác', N'Phụ kiện', 500000,
         'https://assets.adidas.com/images/h_2000,f_auto,q_auto,fl_lossy,c_fill,g_auto/f092e600d2774d09ae0fb7ffa4732174_9366/Mu_Trucker_Stadium_trang_KF1577_01_00_standard.jpg',
         N'Mũ Trucker Stadium là phụ kiện không thể thiếu, hoàn hảo cho phong cách thư giãn hằng ngày. Thiết kế dáng trucker thời thượng, chiếc mũ lưỡi trai này là sự kết hợp hoàn hảo với tủ đồ thể thao của bạn.');
+
+
+-- 1. Thêm dữ liệu vào bảng Sizes
+INSERT INTO Sizes (name)
+VALUES
+    -- Size quần áo
+    ('S'), ('M'), ('L'), ('XL'),
+    -- Size giày
+    ('36'), ('37'), ('38'), ('39'), ('40'), ('41'), ('42'), ('43'),
+    -- Size cho phụ kiện/khác
+    ('FreeSize');
+
+-- A. Thêm variants cho QUẦN ÁO (Category: 'Áo', 'Quần áo') -> Size: S, M, L, XL
+INSERT INTO ProductVariants (product_id, size_id, quantity, sku)
+SELECT
+    p.id,
+    s.id,
+    100, -- Số lượng mặc định 100
+    CONCAT('SKU-', p.id, '-', s.name) -- SKU ví dụ: SKU-1-S
+FROM Products p
+CROSS JOIN Sizes s
+WHERE p.category IN (N'Áo', N'Quần áo')
+  AND s.name IN ('S', 'M', 'L', 'XL');
+
+-- B. Thêm variants cho GIÀY (Category: 'Giày') -> Size: 36 -> 43
+INSERT INTO ProductVariants (product_id, size_id, quantity, sku)
+SELECT
+    p.id,
+    s.id,
+    50, -- Số lượng mặc định 50
+    CONCAT('SKU-', p.id, '-', s.name)
+FROM Products p
+CROSS JOIN Sizes s
+WHERE p.category = N'Giày'
+  AND s.name IN ('36', '37', '38', '39', '40', '41', '42', '43');
+
+-- C. Thêm variants cho PHỤ KIỆN / KHÁC (Category còn lại) -> Size: FreeSize
+INSERT INTO ProductVariants (product_id, size_id, quantity, sku)
+SELECT
+    p.id,
+    s.id,
+    200, -- Số lượng mặc định 200
+    CONCAT('SKU-', p.id, '-FREE')
+FROM Products p
+CROSS JOIN Sizes s
+WHERE p.category NOT IN (N'Áo', N'Quần áo', N'Giày')
+  AND s.name = 'FreeSize';
