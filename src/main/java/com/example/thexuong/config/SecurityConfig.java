@@ -25,7 +25,7 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
                         // Cho phép truy cập public các trang này
-                        .requestMatchers("/", "/index", "/login", "/register", "/products/**", "/product-detail/**").permitAll()
+                        .requestMatchers("/", "/index", "/login", "/register", "/products/**", "/product-detail/**", "/forgot-password").permitAll()
                         // Cho phép truy cập resources
                         .requestMatchers("/css/**", "/js/**", "/img/**", "/fonts/**", "/uploads/**").permitAll()
                         .requestMatchers("/admin/**").hasAuthority("ADMIN")

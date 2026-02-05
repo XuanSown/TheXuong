@@ -4,6 +4,7 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -48,5 +49,18 @@ public class EmailService {
         } catch (MessagingException e) {
             e.printStackTrace();
         }
+    }
+
+    public void sendNewPassword(String toEmail, String newPassword) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom("TheXuong");
+        message.setTo(toEmail);
+        message.setSubject("Cấp lại mật khẩu mới - TheXuong");
+        message.setText("Chào bạn,\n\n"
+                + "Mật khẩu mới của bạn là: " + newPassword + "\n\n"
+                + "Vui lòng đăng nhập và đổi mật khẩu ngay lập tức để bảo mật tài khoản.\n\n"
+                + "Trân trọng,\nTheXuong Team");
+
+        mailSender.send(message);
     }
 }
