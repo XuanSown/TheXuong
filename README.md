@@ -21,12 +21,14 @@ Dự án có sử dụng Google Login, bạn cần set 2 biến môi trường s
 - `GOOGLE_CLIENT_ID`
 - `GOOGLE_CLIENT_SECRET`
 
+
 ### 3. Chạy ứng dụng
 Mở terminal tại thư mục gốc và chạy lệnh:
 ```bash
-./gradlew bootRun
+./gradlew bootRun/
+```
 
-### 4. Thay đổi tuổi thọ token
+### 4. Chỉnh sửa tuổi thọ web
 - Sửa file src/main/resources/application.yml
 - Sửa file src/main/java/com/example/thexuong/security/JwtService.java
 - Sửa file src/main/java/com/example/thexuong/controller/AuthController.java

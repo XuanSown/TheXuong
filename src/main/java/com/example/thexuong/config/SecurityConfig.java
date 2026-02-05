@@ -1,47 +1,61 @@
 package com.example.thexuong.config;
 
-import com.example.thexuong.security.JwtFilter;
 import com.example.thexuong.security.OAuth2SuccessHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-//Cấu hình Spring Security
 public class SecurityConfig {
 
-    private final JwtFilter jwtFilter;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
+    private final AuthenticationProvider authenticationProvider; // 1. Inject từ ApplicationConfig
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.disable()) //tắt csrf cho api
-                .cors(Customizer.withDefaults())
+        http
+                // Tắt CSRF để đơn giản hóa việc submit form (nếu bật, cần thêm input hidden csrf trong form html)
+                .csrf(csrf -> csrf.disable())
+
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**"
-                                , "/"
-                                , "/index.html"
-                                , "/login.html"
-                                , "/register.html"
-                                , "/css/**"
-                                , "/js/**"
-                                , "/img/**"
-                                , "/api/products/**"
-                        ).permitAll()
+                        // Cho phép truy cập public các trang này
+                        .requestMatchers("/", "/index", "/login", "/register", "/products/**", "/product-detail/**").permitAll()
+                        // Cho phép truy cập resources
+                        .requestMatchers("/css/**", "/js/**", "/img/**", "/fonts/**", "/uploads/**").permitAll()
                         .anyRequest().authenticated()
                 )
-                .oauth2Login(oauth2 -> oauth2
-                        .loginPage("/login.html")
-                        .successHandler(oAuth2SuccessHandler) //xử lí login gg thành công
+
+                .authenticationProvider(authenticationProvider)
+
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .loginProcessingUrl("/perform_login") // Phải trùng với th:action trong form login
+                        .defaultSuccessUrl("/", true)      // True: Luôn về trang chủ sau khi login
+                        .failureUrl("/login?error=true")
+                        .usernameParameter("email")        // Quan trọng: Form gửi lên name="email"
+                        .passwordParameter("password")
+                        .permitAll()
                 )
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+
+                .oauth2Login(oauth2 -> oauth2
+                        .loginPage("/login")
+                        .successHandler(oAuth2SuccessHandler)
+                )
+
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/login?logout=true")
+                        .invalidateHttpSession(true)       // Hủy session cũ
+                        .deleteCookies("JSESSIONID")       // Xóa cookie
+                        .permitAll()
+                );
+
         return http.build();
     }
 }

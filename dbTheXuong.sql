@@ -1,19 +1,18 @@
 CREATE DATABASE dbTheXuong;
 GO
 
+USE master
+
 USE dbTheXuong;
 GO
 
-SELECT *
-FROM Users;
-SELECT *
-FROM Products;
+    SELECT *
+    FROM Users;
+    SELECT *
+    FROM Products;
+    SELECT * FROM Sizes;
 
--- =============================================
--- 2. TẠO BẢNG (Cấu trúc chuẩn)
--- =============================================
 
--- Bảng User
 CREATE TABLE Users
 (
     id        BIGINT IDENTITY (1,1) PRIMARY KEY,
@@ -36,6 +35,62 @@ CREATE TABLE Products
     price       DECIMAL(18, 2) CHECK (price >= 0),
     image_url   NVARCHAR(MAX), -- Dùng MAX để link ảnh dài không bị lỗi
     description NVARCHAR(MAX)
+);
+
+CREATE TABLE Sizes (
+    id BIGINT IDENTITY(1,1) PRIMARY KEY,
+    name NVARCHAR(10) NOT NULL
+);
+
+CREATE TABLE ProductVariants (
+    id BIGINT IDENTITY(1,1) PRIMARY KEY,
+    product_id BIGINT FOREIGN KEY REFERENCES Products(id),
+    size_id BIGINT FOREIGN KEY REFERENCES Sizes(id),
+    quantity INT DEFAULT 0, -- Số lượng tồn kho
+    sku NVARCHAR(50) UNIQUE -- Mã kho hàng
+);
+
+CREATE TABLE Carts (
+    id BIGINT IDENTITY(1,1) PRIMARY KEY,
+    user_id BIGINT FOREIGN KEY REFERENCES Users(id)
+);
+
+CREATE TABLE CartItems (
+    id BIGINT IDENTITY(1,1) PRIMARY KEY,
+    cart_id BIGINT FOREIGN KEY REFERENCES Carts(id),
+    product_variant_id BIGINT FOREIGN KEY REFERENCES ProductVariants(id), -- Link tới biến thể cụ thể
+    quantity INT DEFAULT 1
+);
+
+CREATE TABLE Orders (
+    id BIGINT IDENTITY(1,1) PRIMARY KEY,
+    user_id BIGINT FOREIGN KEY REFERENCES Users(id),
+    full_name NVARCHAR(100), -- Tên người nhận (có thể khác tên user)
+    phone_number NVARCHAR(15),
+    address NVARCHAR(MAX),
+    total_money DECIMAL(18, 2),
+    status NVARCHAR(20) DEFAULT 'PENDING', -- PENDING, SHIPPING, DELIVERED, CANCELLED
+    payment_method NVARCHAR(20), -- COD, MOMO, VNPAY
+    created_at DATETIME DEFAULT GETDATE()
+);
+
+CREATE TABLE OrderDetails (
+    id BIGINT IDENTITY(1,1) PRIMARY KEY,
+    order_id BIGINT FOREIGN KEY REFERENCES Orders(id),
+    product_id BIGINT, -- Lưu lại để query nhanh
+    product_name NVARCHAR(100), -- Lưu cứng tên sp tại thời điểm mua (đề phòng sp bị đổi tên sau này)
+    price DECIMAL(18, 2), -- Giá tại thời điểm mua
+    quantity INT,
+    total_price DECIMAL(18, 2)
+);
+
+CREATE TABLE Reviews (
+    id BIGINT IDENTITY(1,1) PRIMARY KEY,
+    user_id BIGINT FOREIGN KEY REFERENCES Users(id),
+    product_id BIGINT FOREIGN KEY REFERENCES Products(id) ON DELETE CASCADE,
+    rating INT CHECK (rating >= 1 AND rating <= 5), -- Chấm điểm 1-5 sao
+    comment NVARCHAR(MAX),
+    created_at DATETIME DEFAULT GETDATE()
 );
 
 INSERT INTO Products (name, brand, sport, category, price, image_url, description)
@@ -77,19 +132,51 @@ VALUES (N'McLAREN RACING Speedcat', 'Puma', N'Khác', N'Giày', 2800000,
         N'Thoáng khí vượt trội'),
        (N'Mũ Trucker Stadium', 'Adidas', N'Khác', N'Phụ kiện', 500000,
         'https://assets.adidas.com/images/h_2000,f_auto,q_auto,fl_lossy,c_fill,g_auto/f092e600d2774d09ae0fb7ffa4732174_9366/Mu_Trucker_Stadium_trang_KF1577_01_00_standard.jpg',
-        N'Mũ Trucker Stadium là phụ kiện không thể thiếu, hoàn hảo cho phong cách thư giãn hằng ngày. Thiết kế dáng trucker thời thượng, chiếc mũ lưỡi trai này là sự kết hợp hoàn hảo với tủ đồ thể thao của bạn.'),
-		(N'Giày thể thao Speedcat Lux Unisex', 'Puma', N'Khác', N'Giày', 2800000,
-		'https://images.puma.com/image/upload/f_auto,q_auto,b_rgb:fafafa,w_2000,h_2000/global/408198/01/sv01/fnd/VNM/fmt/png/Gi%C3%A0y-th%E1%BB%83-thao-Speedcat-Lux-Unisex', 
-		N'Một mẫu giày cổ điển của PUMA lấy cảm hứng từ đường đua: Speedcat. Sản phẩm nổi bật với hình dáng lấy cảm hứng từ giày đua và những đường nét mạnh mẽ, táo bạo. Mang phong cách thể thao vào diện mạo của bạn và làm chủ xu hướng giày dáng thấp với phiên bản mới của kiểu dáng biểu tượng này.'),
-		(N'Giày Chạy Bộ Velocity NITRO 4 Nữ', 'Puma', N'Khác', N'Giày', 3350000,
-		'https://images.puma.com/image/upload/f_auto,q_auto,b_rgb:fafafa,w_2000,h_2000/global/311141/01/sv01/fnd/VNM/fmt/png/Gi%C3%A0y-Ch%E1%BA%A1y-B%E1%BB%99-Velocity-NITRO%E2%84%A2-4-N%E1%BB%AF',
-		N'Mỗi người có cảm giác chạy khác nhau – và đó chính xác là điều bạn nên có. Cho dù bạn đang theo đuổi kỷ lục cá nhân hay chỉ muốn có được cảm giác tốc độ, Velocity 4 đều được thiết kế để di chuyển cùng bạn. Bất kỳ người chạy bộ nào, bất kỳ lúc nào, bất kỳ khoảng cách nào, mẫu giày này đều có thể hỗ trợ, mang lại hiệu quả và vượt qua sự mong đợi. Velocity nhẹ nhất từ trước đến nay của chúng tôi có đế giữa NITROFOAM™ toàn bộ giày, khả năng thoáng khí được cải thiện nhờ lớp lưới mới ở phần thân trên và đế ngoài PUMAGRIP mang lại lực kéo tốt nhất khi chạy.'),
-		(N'Giày Thể Thao Bella UT LEA Nữ', 'Puma', N'Khác', N'Giày', 2100000,
-		'https://images.puma.com/image/upload/f_auto,q_auto,b_rgb:fafafa,w_2000,h_2000/global/405256/01/sv01/fnd/VNM/fmt/png/Gi%C3%A0y-Th%E1%BB%83-Thao-Bella-UT-LEA-N%E1%BB%AF',
-		N'Đơn giản, thanh lịch và dễ mang. Mùa này, chúng tôi sẽ mang trở lại đôi giày thể thao Bella yêu thích của mình với phong cách cổ điển và các chi tiết vượt thời gian. Lấy cảm hứng từ các thiết kế trong kho lưu trữ của PUMA, phiên bản này đang là xu hướng với phần trên bóng bẩy, kiểu dáng thấp và dải PUMA mang tính biểu tượng ở bên hông.'),
-		(N'Giày thể thao Palermo Premium', 'Puma', N'Khác', N'Giày', 2700000,
-		'https://images.puma.com/image/upload/f_auto,q_auto,b_rgb:fafafa,w_2000,h_2000/global/401744/01/sv01/fnd/VNM/fmt/png/Gi%C3%A0y-th%E1%BB%83-thao-Palermo-Premium',
-		N'Bước ra ngay từ kho lưu trữ, đó chính là PUMA Palermo. Đôi giày kiểu dáng hoạt động ngoài trời cổ điển này được làm mới lại với cấu trúc mũi giày T đặc trưng, kết hợp với sự phối màu táo bạo và chất liệu mềm mại, sang trọng.'),
-		(N'Giày Thể Thao FENTY x PUMA Avanti LS Unisex', 'Puma', N'Khác', N'Giày', 3000000,
-		'https://images.puma.com/image/upload/f_auto,q_auto,b_rgb:fafafa,w_2000,h_2000/global/404808/01/sv01/fnd/VNM/fmt/png/Gi%C3%A0y-Th%E1%BB%83-Thao-FENTY-x-PUMA-Avanti-LS-Unisex',
-		N'Bộ sưu tập mới của FENTY x PUMA tái hiện lại phong cách bóng đá truyền thống thông qua gu thẩm mỹ đặc trưng của Rihanna. Kết hợp giữa thể thao và phong cách độc đáo của riêng Rihanna, bộ sưu tập tự hào với bảng màu rực rỡ nổi bật trên sân cỏ, trên phố - bất cứ nơi nào bạn đến.');
+        N'Mũ Trucker Stadium là phụ kiện không thể thiếu, hoàn hảo cho phong cách thư giãn hằng ngày. Thiết kế dáng trucker thời thượng, chiếc mũ lưỡi trai này là sự kết hợp hoàn hảo với tủ đồ thể thao của bạn.');
+
+
+-- 1. Thêm dữ liệu vào bảng Sizes
+INSERT INTO Sizes (name)
+VALUES
+    -- Size quần áo
+    ('S'), ('M'), ('L'), ('XL'),
+    -- Size giày
+    ('36'), ('37'), ('38'), ('39'), ('40'), ('41'), ('42'), ('43'),
+    -- Size cho phụ kiện/khác
+    ('FreeSize');
+
+-- A. Thêm variants cho QUẦN ÁO (Category: 'Áo', 'Quần áo') -> Size: S, M, L, XL
+INSERT INTO ProductVariants (product_id, size_id, quantity, sku)
+SELECT
+    p.id,
+    s.id,
+    100, -- Số lượng mặc định 100
+    CONCAT('SKU-', p.id, '-', s.name) -- SKU ví dụ: SKU-1-S
+FROM Products p
+CROSS JOIN Sizes s
+WHERE p.category IN (N'Áo', N'Quần áo')
+  AND s.name IN ('S', 'M', 'L', 'XL');
+
+-- B. Thêm variants cho GIÀY (Category: 'Giày') -> Size: 36 -> 43
+INSERT INTO ProductVariants (product_id, size_id, quantity, sku)
+SELECT
+    p.id,
+    s.id,
+    50, -- Số lượng mặc định 50
+    CONCAT('SKU-', p.id, '-', s.name)
+FROM Products p
+CROSS JOIN Sizes s
+WHERE p.category = N'Giày'
+  AND s.name IN ('36', '37', '38', '39', '40', '41', '42', '43');
+
+-- C. Thêm variants cho PHỤ KIỆN / KHÁC (Category còn lại) -> Size: FreeSize
+INSERT INTO ProductVariants (product_id, size_id, quantity, sku)
+SELECT
+    p.id,
+    s.id,
+    200, -- Số lượng mặc định 200
+    CONCAT('SKU-', p.id, '-FREE')
+FROM Products p
+CROSS JOIN Sizes s
+WHERE p.category NOT IN (N'Áo', N'Quần áo', N'Giày')
+  AND s.name = 'FreeSize';
