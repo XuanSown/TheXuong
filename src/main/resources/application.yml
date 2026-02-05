@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:sqlserver://localhost:1444;databaseName=dbTheXuong;encrypt=true;trustServerCertificate=true
+    url: jdbc:sqlserver://localhost:1433;databaseName=dbTheXuong;encrypt=true;trustServerCertificate=true
     username: sa
-    password: Sontran1903@
+    password: DONG04082006@@
   jpa:
     hibernate:
       naming:
@@ -20,4 +20,4 @@ spring:
 
 jwt:
   secret: KhoaBiMatPhaiRatDaiDeBaoMatJWTTheXuongProject2024
-  expiration: 3600000 # 1 giờ
+  expiration: 3600000

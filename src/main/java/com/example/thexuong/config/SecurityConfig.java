@@ -28,6 +28,7 @@ public class SecurityConfig {
                         .requestMatchers("/", "/index", "/login", "/register", "/products/**", "/product-detail/**").permitAll()
                         // Cho phép truy cập resources
                         .requestMatchers("/css/**", "/js/**", "/img/**", "/fonts/**", "/uploads/**").permitAll()
+
                         .anyRequest().authenticated()
                 )
 
