@@ -16,8 +16,8 @@ GO
 CREATE TABLE Users
 (
     id        BIGINT IDENTITY (1,1) PRIMARY KEY,
-    username  NVARCHAR(50) UNIQUE,          -- Nullable (cho trường hợp login Google)
-    password  NVARCHAR(255),                -- Nullable (cho trường hợp login Google)
+    username  NVARCHAR(50) UNIQUE,
+    password  NVARCHAR(255),
     email     NVARCHAR(100) UNIQUE NOT NULL,
     provider  NVARCHAR(20) DEFAULT 'LOCAL', -- 'LOCAL' hoặc 'GOOGLE'
     role      NVARCHAR(20) DEFAULT 'USER',

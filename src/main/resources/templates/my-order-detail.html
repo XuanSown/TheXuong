@@ -1,18 +1,14 @@
 <!DOCTYPE html>
-<html lang="vi" xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tất cả sản phẩm - TheXuong</title>
-
+    <title>Chi tiết đơn hàng - TheXuong</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet">
-
     <link rel="stylesheet" href="/css/style.css" th:href="@{/css/style.css}">
 </head>
-<body class="d-flex flex-column min-vh-100 bg-light">
+<body class="bg-light">
 
 <!--nav-->
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -122,109 +118,130 @@
         </div>
     </div>
 </nav>
-
-<div class="hero-section mb-5"></div>
 <br>
 <br>
 <br>
-<div class="container mb-5">
-    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
-        <h2 class="text-uppercase fw-bold m-0">
-            Danh sách sản phẩm
-        </h2>
+<div class="container py-5">
+    <a th:href="@{/orders}" class="btn btn-outline-dark mb-4">
+        <i class="fa-solid fa-arrow-left me-2"></i>Quay lại danh sách
+    </a>
 
-        <div class="dropdown">
-            <button class="btn btn-outline-secondary dropdown-toggle fw-bold border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="fa-solid fa-sort"></i>
-                <span class="text-dark" th:switch="${sort}">
-                    <span th:case="'price_asc'">Giá: Thấp - Cao</span>
-                    <span th:case="'price_desc'">Giá: Cao - Thấp</span>
-                    <span th:case="*">Mới nhất</span>
-                </span>
-            </button>
-            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-                <li>
-                    <a class="dropdown-item" th:classappend="${sort == 'newest'} ? 'active'"
-                       th:href="@{/products(keyword=${param.keyword}, sort='newest')}">
-                        Mới nhất
-                    </a>
-                </li>
-                <li>
-                    <a class="dropdown-item" th:classappend="${sort == 'price_desc'} ? 'active'"
-                       th:href="@{/products(keyword=${param.keyword}, sort='price_desc')}">
-                        Giá: Cao - Thấp
-                    </a>
-                </li>
-                <li>
-                    <a class="dropdown-item" th:classappend="${sort == 'price_asc'} ? 'active'"
-                       th:href="@{/products(keyword=${param.keyword}, sort='price_asc')}">
-                        Giá: Thấp - Cao
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </div>
+    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
 
-    <div class="row g-4">
-        <h7>Tổng số sản phẩm: <b>[[${productsPage.totalElements}]]</b></h7>
-        <div class="col-md-3" th:each="prod : ${productsPage}">
-            <div class="card h-100 shadow-sm product-card">
-                <img th:src="${prod.imageUrl}" class="card-img-top"
-                     style="height: 200px; object-fit: cover;" alt="Ảnh sản phẩm">
-
-                <div class="card-body d-flex flex-column">
-                    <h5 class="card-title text-truncate" th:text="${prod.name}">Tên SP</h5>
-
-                    <p class="fw-bold mb-auto"
-                       th:text="${#numbers.formatDecimal(prod.price, 0, 'POINT', 0, 'COMMA')} + ' đ'">
+    <div class="row">
+        <div class="col-lg-4 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">Thông tin đơn hàng #[[${order.id}]]</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Trạng thái: </strong>
+                        <span th:switch="${order.status}">
+                            <span th:case="'PENDING'" class="badge bg-warning text-dark">Đang chờ duyệt</span>
+                            <span th:case="'CONFIRMED'" class="badge bg-info text-dark">Đã xác nhận</span>
+                            <span th:case="'SHIPPING'" class="badge bg-primary">Đang giao hàng</span>
+                            <span th:case="'COMPLETED'" class="badge bg-success">Hoàn thành</span>
+                            <span th:case="'CANCELLED'" class="badge bg-danger">Đã hủy</span>
+                        </span>
                     </p>
+                    <p><strong>Ngày đặt:</strong> Hôm nay</p> <p><strong>Tổng tiền:</strong> <span class="text-danger fw-bold" th:text="${#numbers.formatDecimal(order.totalMoney, 0, 'COMMA', 0, 'POINT')} + ' đ'"></span></p>
 
+                    <hr>
 
+                    <form th:action="@{/order/update}" method="post">
+                        <input type="hidden" name="orderId" th:value="${order.id}">
 
-                    <a th:href="@{/product-detail/{id}(id=${prod.id})}" class="btn btn-light w-100 mt-3">
-                        Xem chi tiết
-                    </a>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Họ tên người nhận</label>
+                            <input type="text" class="form-control" th:value="${order.fullName}">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Số điện thoại</label>
+                            <input type="text" name="phoneNumber" class="form-control"
+                                   th:value="${order.phoneNumber}"
+                                   th:readonly="${order.status != 'PENDING'}">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Địa chỉ giao hàng</label>
+                            <textarea name="address" class="form-control" rows="3"
+                                      th:readonly="${order.status != 'PENDING'}"
+                                      th:text="${order.address}"></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-dark w-100"
+                                th:if="${order.status == 'PENDING'}">
+                            <i class="fa-solid fa-floppy-disk me-2"></i>Cập nhật thông tin
+                        </button>
+                    </form>
+
+                    <div class="mt-3" th:if="${order.status == 'PENDING'}">
+                        <button type="button" class="btn btn-danger w-100"
+                                data-bs-toggle="modal" data-bs-target="#cancelModal">
+                            <i class="fa-solid fa-trash me-2"></i>Hủy đơn hàng này
+                        </button>
+                    </div>
+
+                    <div class="mt-3 alert alert-warning small" th:unless="${order.status == 'PENDING'}">
+                        <i class="fa-solid fa-lock me-1"></i>Đơn hàng đã được xử lý, bạn không thể thay đổi thông tin hoặc hủy.
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="col-12 text-center py-5" th:if="${productsPage == null || productsPage.isEmpty()}">
-            <i class="fa-solid fa-box-open fa-3x text-muted mb-3"></i>
-            <p class="text-muted">Không tìm thấy sản phẩm nào phù hợp.</p>
-            <a th:href="@{/products}" class="btn btn-outline-primary mt-2">Xem tất cả</a>
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Sản phẩm đã mua</h5>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                        <tr>
+                            <th>Sản phẩm</th>
+                            <th>Phân loại</th>
+                            <th>Đơn giá</th>
+                            <th>Số lượng</th>
+                            <th>Thành tiền</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="detail : ${order.orderDetails}">
+                            <td th:text="${detail.productName}"></td>
+                            <td>Size: <span th:text="${detail.size}"></span></td>
+                            <td th:text="${#numbers.formatDecimal(detail.price, 0, 'COMMA', 0, 'POINT')} + ' đ'"></td>
+                            <td th:text="${detail.quantity}"></td>
+                            <td class="fw-bold" th:text="${#numbers.formatDecimal(detail.totalPrice, 0, 'COMMA', 0, 'POINT')} + ' đ'"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
+</div>
 
-    <nav class="pagination-container" th:if="${productsPage.totalPages > 1}">
-        <ul class="pagination justify-content-center pagination-custom">
-
-            <li class="page-item" th:classappend="${productsPage.first} ? 'disabled'">
-                <a class="page-link" th:href="@{/products(keyword=${keyword}, sort=${sort}, sport=${sport}, brand=${brand}, page=${productsPage.number - 1})}">
-                    PREV
-                </a>
-            </li>
-
-            <li class="page-item" th:each="i : ${#numbers.sequence(0, productsPage.totalPages - 1)}"
-                th:if="${i == 0 || i == productsPage.totalPages - 1 || (i >= productsPage.number - 2 && i <= productsPage.number + 2)}"
-                th:classappend="${i == productsPage.number} ? 'active'">
-
-                <a class="page-link" th:text="${i + 1}"
-                   th:href="@{/products(keyword=${keyword}, sort=${sort}, sport=${sport}, brand=${brand}, page=${i})}">
-                </a>
-            </li>
-
-            <li class="page-item disabled" th:if="${productsPage.totalPages > 5 && productsPage.number < productsPage.totalPages - 3}">
-                <span class="page-link border-0">...</span>
-            </li>
-
-            <li class="page-item" th:classappend="${productsPage.last} ? 'disabled'">
-                <a class="page-link" th:href="@{/products(keyword=${keyword}, sort=${sort}, sport=${sport}, brand=${brand}, page=${productsPage.number + 1})}">
-                    NEXT
-                </a>
-            </li>
-        </ul>
-    </nav>
-
+<div class="modal fade" id="cancelModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Xác nhận hủy đơn</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Bạn có chắc chắn muốn hủy đơn hàng này không? Hành động này không thể hoàn tác.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Đóng</button>
+                <form th:action="@{/order/cancel}" method="post">
+                    <input type="hidden" name="orderId" th:value="${order.id}">
+                    <button type="submit" class="btn btn-dark">Đồng ý Hủy</button>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!--footer-->

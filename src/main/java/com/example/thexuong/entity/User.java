@@ -25,6 +25,11 @@ public class User {
     @Column(name = "full_name")
     private String fullName;
 
+    @Column(name = "phone_number")
+    private String phoneNumber;
+
+    private String address;
+
     @Column(name = "provider_id")
     private String providerId;
 

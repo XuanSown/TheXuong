@@ -48,7 +48,7 @@
     </style>
 </head>
 <body class="d-flex flex-column min-vh-100 bg-light">
-
+<!--nav-->
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid px-5">
         <a class="navbar-brand d-flex align-items-center fw-bold text-uppercase" th:href="@{/}">
@@ -126,7 +126,7 @@
                         <i class="fa-solid fa-cart-shopping"></i>
                         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
                               style="font-size: 0.6rem;"
-                              th:text="${cartCount != null ? cartCount : 0}">0</span>
+                              th:text="${cartCount != null ? cartCount : 0}"></span>
                     </a>
                 </li>
 
@@ -139,8 +139,8 @@
                         <i class="fa-solid fa-user"></i>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-glass dropdown-menu-end" sec:authorize="isAuthenticated()">
-                        <li><a class="dropdown-item" href="#">Hồ sơ cá nhân</a></li>
-                        <li><a class="dropdown-item" href="#">Đơn hàng của tôi</a></li>
+                        <li><a class="dropdown-item" th:href="@{/profile}">Hồ sơ cá nhân</a></li>
+                        <li><a class="dropdown-item" th:href="@{/orders}">Đơn hàng của tôi</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li>
                             <form th:action="@{/logout}" method="post">
@@ -213,6 +213,12 @@
                     </div>
                 </div>
 
+                <div class="mb-4" th:if="${selectedVariantId != null && quantity > 0}">
+                    <label for="quantityInput" class="fw-bold mb-2">Số lượng:</label>
+                    <input type="number" id="quantityInput" name="quantity" value="1" min="1" max="10"
+                           class="form-control" style="width: 100px;">
+                </div>
+
                 <button type="submit"
                         class="btn btn-white btn-lg w-100 py-3 fw-bold text-uppercase shadow-sm"
                         th:disabled="${selectedVariantId == null || quantity <= 0}">
@@ -240,7 +246,7 @@
         </div>
     </div>
 </div>
-
+<!--footer-->
 <footer class="bg-dark text-white pt-5 pb-3 mt-auto footer-custom">
     <div class="container text-center text-md-start">
         <div class="row text-center text-md-start">
@@ -254,10 +260,11 @@
                     Nơi đam mê thể thao hội tụ. Chúng tôi cam kết mang đến những sản phẩm chất lượng nhất cho cộng đồng yêu thể thao Việt Nam.
                 </p>
                 <div class="contact-info mt-3">
-                    <p class="mb-2"><i class="fas fa-home me-2 text-warning"></i> Q. Tân Bình, TP. Hồ Chí Minh</p>
-                    <p class="mb-2"><i class="fas fa-envelope me-2 text-warning"></i> support@thexuong.com</p>
-                    <p class="mb-2"><i class="fas fa-phone me-2 text-warning"></i> +84 909 123 456</p>
+                    <p class="mb-2"><i class="fas fa-home me-2"></i> Q. 12, TP. Hồ Chí Minh</p>
+                    <p class="mb-2"><i class="fas fa-envelope me-2"></i> xuansown1903@gmail.com</p>
+                    <p class="mb-2"><i class="fas fa-phone me-2"></i> +84 909 123 456</p>
                 </div>
+
             </div>
 
             <div class="col-md-2 col-lg-2 col-xl-2 mx-auto mt-3">
@@ -281,7 +288,18 @@
             </div>
 
             <div class="col-md-4 col-lg-3 col-xl-3 mx-auto mt-3">
-                <h6 class="text-uppercase mb-4 fw-bold text-light">Kết nối với chúng tôi</h6>
+
+                <h6 class="text-uppercase mb-3 fw-bold text-light">Đăng ký nhận tin</h6>
+                <form th:action="@{/subscribe}" method="post" class="mb-4">
+                    <div class="input-group">
+                        <input type="email" name="email" class="form-control form-control-sm" placeholder="Email của bạn..."
+                               aria-label="Email" required style="border-radius: 4px 0 0 4px;">
+                        <button class="btn btn-outline-dark btn-sm text-white fw-bold" type="submit" style="border-radius: 0 4px 4px 0;">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </form>
+                <h6 class="text-uppercase mb-3 fw-bold text-light">Kết nối với chúng tôi</h6>
                 <div class="d-flex justify-content-center justify-content-md-start mb-4">
                     <a href="#" class="btn btn-outline-light btn-floating m-1 rounded-circle social-icon"><i class="fab fa-facebook-f"></i></a>
                     <a href="#" class="btn btn-outline-light btn-floating m-1 rounded-circle social-icon"><i class="fab fa-tiktok"></i></a>
@@ -296,6 +314,7 @@
                     <i class="fa-solid fa-money-bill-wave fa-2x text-white-50"></i>
                 </div>
             </div>
+
         </div>
 
         <hr class="mb-3 mt-4 border-secondary">
