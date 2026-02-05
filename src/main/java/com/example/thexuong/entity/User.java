@@ -22,12 +22,13 @@ public class User {
 
     private String password;
 
-    @Column(name = "full_name")
+    @Column(name = "full_name", columnDefinition = "NVARCHAR(255)") // Tên người dùng tiếng Việt
     private String fullName;
 
     @Column(name = "phone_number")
     private String phoneNumber;
 
+    @Column(columnDefinition = "NVARCHAR(MAX)") // Địa chỉ có thể dài
     private String address;
 
     @Column(name = "provider_id")

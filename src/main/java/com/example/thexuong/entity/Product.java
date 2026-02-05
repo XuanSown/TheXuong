@@ -20,12 +20,15 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "NVARCHAR(255)") // Tên sản phẩm
     private String name;
 
+    @Column(columnDefinition = "NVARCHAR(100)") // Danh mục
     private String category;
     private BigDecimal price;
+    @Column(columnDefinition = "NVARCHAR(100)") // Môn thể thao
     private String sport;
+    @Column(columnDefinition = "NVARCHAR(100)") // Thương hiệu
     private String brand;
     @Column(name = "image_url")
     private String imageUrl;

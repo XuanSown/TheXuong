@@ -26,14 +26,17 @@ public class Order {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(name = "full_name")
+    @Column(name = "full_name", columnDefinition = "NVARCHAR(255)") // Tên người nhận
     private String fullName;
 
     @Column(name = "phone_number")
     private String phoneNumber;
 
-    @Column(columnDefinition = "NVARCHAR(MAX)")
+    @Column(columnDefinition = "NVARCHAR(MAX)") // Đã có sẵn trong file của bạn, giữ nguyên
     private String address;
+
+    @Column(name = "payment_method")
+    private String paymentMethod;
 
     @Column(name = "total_money")
     private BigDecimal totalMoney;

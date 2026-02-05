@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý người dùng - TheXuong</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css" th:href="@{/css/style.css}">
+</head>
+<body class="bg-light">
+<!--nav-->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid px-5">
+        <a class="navbar-brand d-flex align-items-center fw-bold text-uppercase" th:href="@{/}">
+            <img src="/img/logo.png" th:src="@{/img/logo.png}" alt="Logo" width="45" height="45" class="me-2">
+            <span class="brand-text">THE XUONG</span>
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarContent">
+
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item dropdown custom-dropdown">
+                    <a class="nav-link dropdown-toggle fw-bold text-white" href="#" id="sportDropdown">
+                        THỂ THAO
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-glass">
+                        <li><a class="dropdown-item" th:href="@{/products(sport='Bóng đá')}"><i class="fa-solid fa-futbol me-2"></i>Bóng đá</a></li>
+                        <li><a class="dropdown-item" th:href="@{/products(sport='Cầu lông')}"><i class="fa-solid fa-feather me-2"></i>Cầu lông</a></li>
+                        <li><a class="dropdown-item" th:href="@{/products(sport='Chạy bộ')}"><i class="fa-solid fa-person-running me-2"></i>Chạy bộ</a></li>
+                        <li><a class="dropdown-item" th:href="@{/products(sport='Bóng rổ')}"><i class="fa-solid fa-basketball me-2"></i>Bóng rổ</a></li>
+                        <li><a class="dropdown-item" th:href="@{/products(sport='Pickleball')}"><i class="fa-solid fa-table-tennis-paddle-ball me-2"></i>Pickleball</a></li>
+                        <li><a class="dropdown-item" th:href="@{/products(sport='Khác')}">Khác...</a></li>
+                        <li><a class="dropdown-item" th:href="@{/products}">Tất cả...</a></li>
+                    </ul>
+                </li>
+
+                <li class="nav-item dropdown custom-dropdown">
+                    <a class="nav-link dropdown-toggle fw-bold text-white" href="#" id="brandDropdown">
+                        THƯƠNG HIỆU
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-glass">
+                        <li><a class="dropdown-item" th:href="@{/products(brand='Nike')}">Nike</a></li>
+                        <li><a class="dropdown-item" th:href="@{/products(brand='Adidas')}">Adidas</a></li>
+                        <li><a class="dropdown-item" th:href="@{/products(brand='Li-Ning')}">Li-Ning</a></li>
+                        <li><a class="dropdown-item" th:href="@{/products(brand='Asics')}">Asics</a></li>
+                        <li><a class="dropdown-item" th:href="@{/products(brand='Puma')}">Puma</a></li>
+                        <li><a class="dropdown-item" th:href="@{/products(sport='Khác')}">Khác...</a></li>
+                        <li><a class="dropdown-item" th:href="@{/products}">Tất cả...</a></li>
+                    </ul>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link fw-bold text-white" th:href="@{/products}">
+                        TẤT CẢ SẢN PHẨM <span class="badge bg-danger ms-1" style="font-size: 0.6rem;">HOT</span>
+                    </a>
+                </li>
+            </ul>
+
+            <form class="d-flex mx-auto search-form position-relative" role="search" style="width: 350px;"
+                  th:action="@{/products}" method="get">
+                <input class="form-control search-input" type="search" name="keyword"
+                       placeholder="Tìm tên sản phẩm..." aria-label="Search" th:value="${keyword}">
+                <button class="btn search-btn position-absolute end-0 top-0 h-100" type="submit">
+                    <i class="fa-solid fa-magnifying-glass text-white"></i>
+                </button>
+            </form>
+
+            <ul class="navbar-nav ms-auto align-items-center gap-3">
+
+                <li class="nav-item dropdown custom-dropdown">
+                    <a class="nav-link text-white" href="#" style="font-size: 1.2rem;">
+                        <i class="fa-solid fa-earth-americas"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-glass dropdown-menu-end" style="min-width: 100px;">
+                        <li><a class="dropdown-item active" href="#">🇻🇳 VN</a></li>
+                        <li><a class="dropdown-item" href="#">🇺🇸 EN</a></li>
+                    </ul>
+                </li>
+
+                <li class="nav-item position-relative">
+                    <a class="nav-link text-white" th:href="@{/cart}" style="font-size: 1.2rem;">
+                        <i class="fa-solid fa-cart-shopping"></i>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                              style="font-size: 0.6rem;"
+                              th:text="${cartCount != null ? cartCount : 0}"></span>
+                    </a>
+                </li>
+
+                <li class="nav-item dropdown custom-dropdown">
+                    <a sec:authorize="!isAuthenticated()" class="nav-link text-white fw-bold" th:href="@{/login}">
+                        <i class="fa-solid fa-user me-1"></i> Đăng nhập
+                    </a>
+
+                    <a sec:authorize="isAuthenticated()" class="nav-link dropdown-toggle fw-bold" href="#" role="button" data-bs-toggle="dropdown">
+                        <i class="fa-solid fa-user"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-glass dropdown-menu-end" sec:authorize="isAuthenticated()">
+                        <li><a class="dropdown-item" th:href="@{/profile}">Hồ sơ cá nhân</a></li>
+                        <li><a class="dropdown-item" th:href="@{/orders}">Đơn hàng của tôi</a></li>
+                        <li sec:authorize="hasAuthority('ADMIN')">
+                            <hr class="dropdown-divider">
+                            <h6 class="dropdown-header text-warning fw-bold">QUẢN TRỊ</h6>
+                        </li>
+                        <li sec:authorize="hasAuthority('ADMIN')">
+                            <a class="dropdown-item" th:href="@{/admin/products}">
+                                Quản lý Sản phẩm
+                            </a>
+                        </li>
+                        <li sec:authorize="hasAuthority('ADMIN')">
+                            <a class="dropdown-item" th:href="@{/admin/orders}">
+                                Quản lý Đơn hàng
+                            </a>
+                        </li>
+                        <li sec:authorize="hasAuthority('ADMIN')">
+                            <a class="dropdown-item" th:href="@{/admin/dashboard}">
+                                Xem Thống kê
+                            </a>
+                        </li>
+                        <li sec:authorize="hasAuthority('ADMIN')">
+                            <a class="dropdown-item" th:href="@{/admin/users}">
+                                Quản lý Người dùng
+                            </a>
+                        </li>
+
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form th:action="@{/logout}" method="post">
+                                <button type="submit" class="dropdown-item text-danger">
+                                    <i class="fa-solid fa-right-from-bracket me-2"></i>Đăng xuất
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+
+        </div>
+    </div>
+</nav>
+<br>
+<br>
+<br>
+<br>
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="fw-bold m-0">Quản lý người dùng</h3>
+    </div>
+
+    <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
+    <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
+
+    <div class="row g-4">
+        <div class="col-lg-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold" th:text="${isEdit} ? 'Cập nhật người dùng' : 'Thêm người dùng'">
+                        Thêm người dùng
+                    </h5>
+                    <form th:action="@{/admin/users/save}" th:object="${formUser}" method="post" class="mt-3">
+                        <input type="hidden" th:field="*{id}">
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Email</label>
+                            <input type="email" class="form-control" th:field="*{email}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Username</label>
+                            <input type="text" class="form-control" th:field="*{username}">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Họ tên</label>
+                            <input type="text" class="form-control" th:field="*{fullName}">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Mật khẩu</label>
+                            <input type="password" class="form-control" th:field="*{password}">
+                            <small class="text-muted" th:if="${isEdit}">Bỏ trống để giữ mật khẩu cũ.</small>
+                        </div>
+
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="adminSwitch" name="admin"
+                                   th:checked="${formUser != null && formUser.role == 'ADMIN'}">
+                            <label class="form-check-label fw-bold" for="adminSwitch">Cấp quyền Admin</label>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-dark">
+                                <i class="fa-solid fa-floppy-disk me-1"></i>Lưu
+                            </button>
+                            <a class="btn btn-outline-secondary" th:href="@{/admin/users}">
+                                <i class="fa-solid fa-rotate-left me-1"></i>Hủy
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold">Danh sách người dùng</h5>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mt-3">
+                            <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Email</th>
+                                <th>Username</th>
+                                <th>Họ tên</th>
+                                <th>Role</th>
+                                <th>Provider</th>
+                                <th class="text-end">Hành động</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="u : ${users}">
+                                <td th:text="${u.id}">1</td>
+                                <td th:text="${u.email}">email</td>
+                                <td th:text="${u.username}">username</td>
+                                <td th:text="${u.fullName}">name</td>
+                                <td>
+                                    <span class="badge"
+                                          th:classappend="${u.role == 'ADMIN'} ? 'bg-danger' : 'bg-secondary'"
+                                          th:text="${u.role}">USER</span>
+                                </td>
+                                <td th:text="${u.provider}">LOCAL</td>
+                                <td class="text-end">
+                                    <a class="btn btn-sm btn-outline-primary"
+                                       th:href="@{/admin/users(editId=${u.id})}">
+                                        <i class="fa-solid fa-pen-to-square"></i>
+                                    </a>
+                                    <form th:action="@{/admin/users/delete/{id}(id=${u.id})}" method="post"
+                                          class="d-inline">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                th:disabled="${currentUserId != null && currentUserId == u.id}"
+                                                onclick="return confirm('Bạn có chắc muốn xóa user này?');">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

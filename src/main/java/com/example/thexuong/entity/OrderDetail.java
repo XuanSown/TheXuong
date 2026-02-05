@@ -26,7 +26,7 @@ public class OrderDetail {
     @Column(name = "product_id")
     private Long productId; // Chỉ lưu ID để tham chiếu, không join cứng để tránh lỗi khi xóa SP
 
-    @Column(name = "product_name")
+    @Column(name = "product_name", columnDefinition = "NVARCHAR(255)") // Tên sản phẩm trong đơn hàng
     private String productName;
 
     private String size;
