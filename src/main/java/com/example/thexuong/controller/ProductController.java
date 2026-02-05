@@ -74,10 +74,9 @@ public class ProductController {
     public String showProductDetail(@PathVariable Long id,
                                     @RequestParam(required = false) String size,
                                     Model model) {
-        Product product = productRepository.findById(id)
+        Product product = productRepository.findByIdWithVariants(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm: " + id));
 
-        // 1. Lấy danh sách variants một cách an toàn
         List<ProductVariant> variants = product.getVariants();
         List<String> allSizes = new ArrayList<>();
 
