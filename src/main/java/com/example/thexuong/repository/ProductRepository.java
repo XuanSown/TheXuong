@@ -44,14 +44,13 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Object[]> findSlowMovingProducts(Pageable pageable);
 
     // Lấy top sản phẩm xem nhiều nhất
-    @Query("SELECT p.name, COALESCE(p.viewCount, 0) as luotXem " +
+    @Query("SELECT p.name, COALESCE(p.viewCount, 0) " +
             "FROM Product p " +
-            "ORDER BY luotXem DESC")
+            "ORDER BY COALESCE(p.viewCount, 0) DESC")
     List<Object[]> findTopViewedProducts(Pageable pageable);
 
-    // Lấy top sản phẩm xem ít nhất
-    @Query("SELECT p.name, COALESCE(p.viewCount, 0) as luotXem " +
+    @Query("SELECT p.name, COALESCE(p.viewCount, 0) " +
             "FROM Product p " +
-            "ORDER BY luotXem ASC")
+            "ORDER BY COALESCE(p.viewCount, 0) ASC")
     List<Object[]> findLeastViewedProducts(Pageable pageable);
 }

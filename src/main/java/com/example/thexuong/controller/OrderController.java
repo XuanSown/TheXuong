@@ -148,17 +148,22 @@ public class OrderController {
         if("00".equals(vnp_ResponseCode)) {
             //thành công
             try {
-                String orderIdStr = orderInfo.replace("Thanh toan don hang ma so ", "").trim();
-                Long orderId = Long.parseLong(orderIdStr);
-                Order order = orderRepository.findById(orderId).orElse(null);
-                if (order != null) {
-                    order.setStatus("PAID");
-                    orderRepository.save(order);
+                if (orderInfo != null && orderInfo.contains("Thanh toan don hang ma so ")) {
+                    // Lấy ID đơn hàng từ chuỗi orderInfo
+                    String orderIdStr = orderInfo.replace("Thanh toan don hang ma so ", "").trim();
+                    Long orderId = Long.parseLong(orderIdStr);
+
+                    // Cập nhật trạng thái đơn hàng thành "Đã thanh toán" (PAID)
+                    Order order = orderRepository.findById(orderId).orElse(null);
+                    if (order != null) {
+                        order.setStatus("PAID");
+                        orderRepository.save(order);
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            redirectAttributes.addFlashAttribute("errorMessage", "Thanh toán VNPAY thành công đơn hàng của bạn đang được xử lý!");
+            redirectAttributes.addFlashAttribute("successMessage", "Thanh toán VNPAY thành công! Đơn hàng của bạn đang được xử lý.");
         } else {
             redirectAttributes.addFlashAttribute("errorMessage", "Thanh toán VNPAY thất bại hoặc do hủy giao dịch!");
         }

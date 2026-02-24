@@ -167,6 +167,25 @@
                     <textarea class="form-control" id="address" name="address" rows="3" required></textarea>
                 </div>
 
+                <h4 class="mt-4 mb-3">Phương thức thanh toán</h4>
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-body">
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="radio" name="paymentMethod" id="paymentCOD" value="COD" checked>
+                            <label class="form-check-label fw-bold" for="paymentCOD">
+                                <i class="fa-solid fa-truck text-secondary me-2"></i>Thanh toán khi nhận hàng (COD)
+                            </label>
+                        </div>
+
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="paymentMethod" id="paymentVNPAY" value="VNPAY">
+                            <label class="form-check-label fw-bold text-primary" for="paymentVNPAY">
+                                <i class="fa-solid fa-qrcode me-2"></i>Thanh toán qua VNPAY (Quét mã QR / Thẻ ATM)
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
                 <hr class="mb-4">
                 <button class="btn btn-primary btn-lg w-100" type="submit">Đặt hàng</button>
             </form>

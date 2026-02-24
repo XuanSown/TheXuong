@@ -10,8 +10,8 @@ import java.util.Random;
 @Configuration
 public class VNPayConfig {
     // Đăng ký VNPAY Sandbox để lấy 2 mã này (Tạm thời dùng mã test này để chạy thử)
-    public static String vnp_TmnCode = "5O5E0Q9H";
-    public static String secretKey = "VMBBOUJMWXMBYYAXRCHIVKDEOWYIVNXT";
+    public static String vnp_TmnCode = "VSU1QOMH";
+    public static String secretKey = "W3KWLMYBGF7SN8JRFTAQNUXN6F2U5OUS";
 
     public static String vnp_PayUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
     public static String vnp_ReturnUrl = "http://localhost:8080/vnpay-return"; // Đường dẫn trả về sau khi thanh toán
