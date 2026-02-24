@@ -23,4 +23,12 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             "GROUP BY CAST(created_at AS DATE) " +
             "ORDER BY order_date DESC", nativeQuery = true)
     List<Object[]> getRevenueByDay();
+
+    // 1. Thống kê số lượng đơn hàng theo từng trạng thái
+    @Query("SELECT o.status, COUNT(o) FROM Order o GROUP BY o.status")
+    List<Object[]> countOrdersByStatus();
+
+    // 2. Đếm số lượng User (đã đăng ký) CÓ thực hiện mua hàng (có đơn hàng)
+    @Query("SELECT COUNT(DISTINCT o.user.id) FROM Order o WHERE o.user IS NOT NULL")
+    long countUsersWithOrders();
 }

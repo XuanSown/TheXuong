@@ -36,6 +36,10 @@ public class Product {
     @Column(columnDefinition = "NVARCHAR(MAX)")
     private String description;
 
+    @Column(name = "view_count")
+    @Builder.Default
+    private Integer viewCount = 0;
+
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore // Tránh lặp vô hạn khi convert sang JSON
     @ToString.Exclude

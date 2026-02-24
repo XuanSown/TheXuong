@@ -78,6 +78,12 @@ public class ProductController {
         Product product = productRepository.findByIdWithVariants(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm: " + id));
 
+        if(product.getViewCount() == null){
+            product.setViewCount(0);
+        }
+        product.setViewCount(product.getViewCount() + 1);
+        productRepository.save(product);
+
         List<ProductVariant> variants = product.getVariants();
         List<String> allSizes = new ArrayList<>();
 

@@ -42,4 +42,16 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             "GROUP BY p.id, p.name, p.price, p.imageUrl, p.category, p.description, p.brand, p.sport " +
             "ORDER BY daBan ASC")
     List<Object[]> findSlowMovingProducts(Pageable pageable);
+
+    // Lấy top sản phẩm xem nhiều nhất
+    @Query("SELECT p.name, COALESCE(p.viewCount, 0) as luotXem " +
+            "FROM Product p " +
+            "ORDER BY luotXem DESC")
+    List<Object[]> findTopViewedProducts(Pageable pageable);
+
+    // Lấy top sản phẩm xem ít nhất
+    @Query("SELECT p.name, COALESCE(p.viewCount, 0) as luotXem " +
+            "FROM Product p " +
+            "ORDER BY luotXem ASC")
+    List<Object[]> findLeastViewedProducts(Pageable pageable);
 }

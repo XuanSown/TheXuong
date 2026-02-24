@@ -8,6 +8,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/style.css" th:href="@{/css/style.css}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="bg-light">
 <!--nav-->
@@ -156,6 +157,33 @@
     </div>
 
     <div class="row g-4">
+
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-dark text-white fw-bold">
+                    <i class="fa-solid fa-chart-pie me-2"></i>Tỷ lệ Trạng thái Đơn hàng
+                </div>
+                <div class="card-body d-flex justify-content-center">
+                    <div style="width: 300px; height: 300px;">
+                        <canvas id="orderStatusChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-dark text-white fw-bold">
+                    <i class="fa-solid fa-users me-2"></i>Tỷ lệ Mua hàng của Người dùng
+                </div>
+                <div class="card-body d-flex justify-content-center">
+                    <div style="width: 300px; height: 300px;">
+                        <canvas id="userPurchaseChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="col-md-6">
             <div class="card shadow-sm h-100 border-success">
                 <div class="card-header bg-dark text-white fw-bold">
@@ -256,8 +284,116 @@
                 </div>
             </div>
         </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100 border-info">
+                <div class="card-header bg-dark text-white fw-bold">
+                    Top 5 Sản Phẩm Xem Nhiều Nhất
+                </div>
+                <div class="card-body">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>Tên sản phẩm</th>
+                            <th class="text-end">Lượt xem</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="row : ${topViewed}">
+                            <td th:text="${row[0]}">Tên SP</td>
+                            <td class="text-end fw-bold text-info" th:text="${row[1]}">100</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100 border-danger">
+                <div class="card-header bg-dark text-white fw-bold">
+                    Top 5 Sản Phẩm Xem Ít Nhất
+                </div>
+                <div class="card-body">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>Tên sản phẩm</th>
+                            <th class="text-end">Lượt xem</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="row : ${leastViewed}">
+                            <td th:text="${row[0]}">Tên SP</td>
+                            <td class="text-end fw-bold text-danger" th:text="${row[1]}">1</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+<script th:inline="javascript">
+    /*<![CDATA[*/
 
+    // --- BIỂU ĐỒ 1: TRẠNG THÁI ĐƠN HÀNG ---
+    const orderStats = /*[[${orderStatusStats}]]*/ [];
+    const statusLabels = orderStats.map(item => item[0]); // Trạng thái (PENDING, DELIVERED...)
+    const statusData = orderStats.map(item => item[1]);   // Số lượng
+
+    // Tạo màu tự động cho từng trạng thái
+    const statusColors = {
+        'PENDING': '#ffc107', // Vàng
+        'SHIPPING': '#17a2b8', // Xanh dương
+        'DELIVERED': '#198754', // Xanh lá
+        'CANCELLED': '#dc3545'  // Đỏ
+    };
+    const backgroundColors = statusLabels.map(label => statusColors[label] || '#6c757d'); // Nếu khác thì xám
+
+    new Chart(document.getElementById('orderStatusChart'), {
+        type: 'pie', // Biểu đồ tròn
+        data: {
+            labels: statusLabels,
+            datasets: [{
+                data: statusData,
+                backgroundColor: backgroundColors,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'bottom' }
+            }
+        }
+    });
+
+
+    // --- BIỂU ĐỒ 2: TỶ LỆ NGƯỜI DÙNG MUA HÀNG ---
+    const usersWithOrders = /*[[${usersWithOrders}]]*/ 0;
+    const usersWithoutOrders = /*[[${usersWithoutOrders}]]*/ 0;
+
+    new Chart(document.getElementById('userPurchaseChart'), {
+        type: 'doughnut', // Biểu đồ tròn dạng vành khuyên (Donut) nhìn cho khác biệt
+        data: {
+            labels: ['Có mua hàng', 'Chưa mua hàng'],
+            datasets: [{
+                data: [usersWithOrders, usersWithoutOrders],
+                backgroundColor: ['#28a745', '#ced4da'], // Xanh lá và Xám
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'bottom' }
+            }
+        }
+    });
+
+    /*]]>*/
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

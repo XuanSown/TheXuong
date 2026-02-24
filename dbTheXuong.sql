@@ -51,6 +51,15 @@ CREATE TABLE Products
     description NVARCHAR(MAX)
 );
 
+ALTER TABLE Products
+ADD view_count INT DEFAULT 0;
+GO
+
+UPDATE Products
+SET view_count = 0
+WHERE view_count IS NULL;
+GO
+
 CREATE TABLE Sizes (
     id BIGINT IDENTITY(1,1) PRIMARY KEY,
     name NVARCHAR(10) NOT NULL

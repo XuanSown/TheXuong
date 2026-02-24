@@ -22,7 +22,7 @@ public class OrderService {
     private final OrderDetailRepository orderDetailRepository;
 
     @Transactional
-    public void placeOrder(String username, String fullName, String phone, String address) {
+    public Order placeOrder(String username, String fullName, String phone, String address) {
         Cart cart = cartService.getCartByUser(username);
         List<CartItem> cartItems = cart.getItems();
 
@@ -66,6 +66,7 @@ public class OrderService {
             orderDetailRepository.save(detail);
         }
         cartService.clearCart(cart);
+        return savedOrder;
     }
 
     public Order getOrderByIdAndUser(Long orderId, String username){
