@@ -105,8 +105,35 @@
                         <i class="fa-solid fa-user"></i>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-glass dropdown-menu-end" sec:authorize="isAuthenticated()">
-                        <li><a class="dropdown-item" th:href="@{/profile}">Hồ sơ cá nhân</a></li>
+                        <li th:unless="${#authentication instanceof T(org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken)}">
+                            <a class="dropdown-item" th:href="@{/profile}">Hồ sơ cá nhân</a>
+                        </li>
                         <li><a class="dropdown-item" th:href="@{/orders}">Đơn hàng của tôi</a></li>
+                        <li sec:authorize="hasAuthority('ADMIN')">
+                            <hr class="dropdown-divider">
+                            <h6 class="dropdown-header text-warning fw-bold">QUẢN TRỊ</h6>
+                        </li>
+                        <li sec:authorize="hasAuthority('ADMIN')">
+                            <a class="dropdown-item" th:href="@{/admin/products}">
+                                Quản lý Sản phẩm
+                            </a>
+                        </li>
+                        <li sec:authorize="hasAuthority('ADMIN')">
+                            <a class="dropdown-item" th:href="@{/admin/orders}">
+                                Quản lý Đơn hàng
+                            </a>
+                        </li>
+                        <li sec:authorize="hasAuthority('ADMIN')">
+                            <a class="dropdown-item" th:href="@{/admin/statistics}">
+                                Xem Thống kê
+                            </a>
+                        </li>
+                        <li sec:authorize="hasAuthority('ADMIN')">
+                            <a class="dropdown-item" th:href="@{/admin/users}">
+                                Quản lý Người dùng
+                            </a>
+                        </li>
+
                         <li><hr class="dropdown-divider"></li>
                         <li>
                             <form th:action="@{/logout}" method="post">
