@@ -28,9 +28,9 @@ public class CartService {
     @Autowired
     private final UserRepository userRepository;
 
-    public Cart getCartByUser(String username) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    public Cart getCartByUser(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"+ email));
 
         return cartRepository.findByUserIdWithItems(user.getId())
                 .orElseGet(() -> {
@@ -59,6 +59,8 @@ public class CartService {
                     .productVariant(variant)
                     .quantity(quantity)
                     .build();
+
+            cart.getItems().add(newItem);
             cartItemRepository.save(newItem);
         }
     }

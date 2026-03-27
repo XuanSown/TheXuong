@@ -16,7 +16,7 @@ spring:
             client-secret: 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
         provider:
           google:
-            user-name-attribute: name
+            user-name-attribute: email
 
 jwt:
   secret: KhoaBiMatPhaiRatDaiDeBaoMatJWTTheXuongProject2024

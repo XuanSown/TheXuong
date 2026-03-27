@@ -17,7 +17,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true)
+    @Column(name= "username",unique = true, columnDefinition = "NVARCHAR(255)")
     private String username;
 
     private String password;
@@ -25,11 +25,6 @@ public class User {
     @Column(name = "full_name", columnDefinition = "NVARCHAR(255)") // Tên người dùng tiếng Việt
     private String fullName;
 
-    @Column(name = "phone_number")
-    private String phoneNumber;
-
-    @Column(columnDefinition = "NVARCHAR(MAX)") // Địa chỉ có thể dài
-    private String address;
 
     @Column(name = "provider_id")
     private String providerId;
@@ -39,6 +34,11 @@ public class User {
 
     @Builder.Default
     private String provider = "LOCAL"; //'local' hoặc 'google'
+    @Column(name = "phone_number")
+    private String phoneNumber;
+
+    @Column(columnDefinition = "NVARCHAR(MAX)") // Địa chỉ có thể dài
+    private String address;
 
     @Builder.Default
     private String role = "USER"; //'user' hoặc 'admin'

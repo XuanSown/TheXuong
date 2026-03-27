@@ -1,10 +1,7 @@
 package com.example.thexuong.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
@@ -25,5 +22,7 @@ public class Cart {
 
     // Relationship ngược để dễ lấy items
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private List<CartItem> items;
 }
