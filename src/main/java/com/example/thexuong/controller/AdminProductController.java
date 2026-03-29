@@ -21,30 +21,28 @@ import java.util.Optional;
 @RequestMapping("/admin/products")
 @RequiredArgsConstructor
 public class AdminProductController {
+
     @Autowired
     private final ProductRepository productRepository;
     @Autowired
-    private final SizeRepository  sizeRepository;
+    private final SizeRepository sizeRepository;
     @Autowired
     private final ProductVariantRepository productVariantRepository;
 
     @GetMapping
     public String showProductList(Model model) {
-        // Lấy tất cả sản phẩm, sắp xếp mới nhất lên đầu
         List<Product> products = productRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
         model.addAttribute("products", products);
-        return "admin/products"; // Trả về file templates/admin/products.html
+        return "admin/products";
     }
 
-    // 2. MỞ FORM THÊM MỚI
     @GetMapping("/create")
     public String showCreateForm(Model model) {
         model.addAttribute("product", new Product());
         model.addAttribute("sizes", sizeRepository.findAll());
-        return "admin/products-edit"; // Trả về file form (dùng chung cho thêm và sửa)
+        return "admin/products-edit";
     }
 
-    // 3. MỞ FORM CHỈNH SỬA
     @GetMapping("/edit/{id}")
     public String showEditForm(@PathVariable("id") Long id, Model model) {
         Product product = productRepository.findById(id)
@@ -60,28 +58,24 @@ public class AdminProductController {
         return "admin/products-edit";
     }
 
-    // 4. LƯU SẢN PHẨM (Xử lý cho cả Thêm và Sửa)
     @PostMapping("/save")
     public String saveProduct(@ModelAttribute("product") Product product,
                               @RequestParam(value = "sizeId", required = false) Long sizeId,
                               @RequestParam(value = "quantity", required = false, defaultValue = "0") Integer quantity,
                               RedirectAttributes redirectAttributes) {
         try {
-            // A. Lưu thông tin chung của Product trước
             Product savedProduct = productRepository.save(product);
 
-            // B. Lưu thông tin Biến thể (Size + Số lượng)
             if (sizeId != null && quantity != null) {
-                Size size = (Size) sizeRepository.findById(sizeId).orElse(null);
+                Size size = sizeRepository.findById(sizeId).orElse(null);
 
                 if (size != null) {
-                    // Kiểm tra xem biến thể này đã tồn tại chưa để update hay insert
                     Optional<ProductVariant> existingVariant = productVariantRepository
                             .findByProductIdAndSizeId(savedProduct.getId(), sizeId);
+
                     ProductVariant variant;
                     if (existingVariant.isPresent()) {
                         variant = existingVariant.get();
-                        // Ghi đè số lượng mới
                         variant.setQuantity(quantity);
                     } else {
                         variant = new ProductVariant();
@@ -89,8 +83,7 @@ public class AdminProductController {
                         variant.setSize(size);
                         variant.setQuantity(quantity);
 
-                        // FIX LỖI SQL SERVER: Sinh mã SKU ngẫu nhiên dựa trên ID Sản phẩm + Size + Thời gian
-                        // Để đảm bảo không bao giờ bị NULL và không bao giờ trùng lặp
+                        // FIX SQL SERVER ERROR: Auto-generate SKU để tránh lỗi dính NULL Unique Key
                         String autoSku = "SKU-" + savedProduct.getId() + "-" + size.getId() + "-" + System.currentTimeMillis();
                         variant.setSku(autoSku);
                     }
@@ -103,17 +96,14 @@ public class AdminProductController {
             e.printStackTrace();
             redirectAttributes.addFlashAttribute("error", "Lỗi: " + e.getMessage());
         }
-        return "redirect:/admin/products"; // Lưu xong quay về trang danh sách
+        return "redirect:/admin/products";
     }
 
-    // 5. XÓA SẢN PHẨM
     @GetMapping("/delete/{id}")
     public String deleteProduct(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
-            // Cần xóa các variant trước khi xóa product (nếu chưa set Cascade)
             List<ProductVariant> variants = productVariantRepository.findByProductId(id);
             productVariantRepository.deleteAll(variants);
-
             productRepository.deleteById(id);
             redirectAttributes.addFlashAttribute("success", "Xóa sản phẩm thành công");
         } catch (Exception e) {
@@ -121,5 +111,4 @@ public class AdminProductController {
         }
         return "redirect:/admin/products";
     }
-
 }

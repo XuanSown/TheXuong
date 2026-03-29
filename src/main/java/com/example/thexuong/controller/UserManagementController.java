@@ -20,8 +20,10 @@ import java.util.Optional;
 @RequestMapping("/admin/users")
 @RequiredArgsConstructor
 public class UserManagementController {
+
     @Autowired
     private final UserRepository userRepository;
+
     @Autowired
     private final PasswordEncoder passwordEncoder;
 
@@ -45,7 +47,6 @@ public class UserManagementController {
             }
         }
 
-        // Lấy thông tin Role của người đang đăng nhập để truyền ra giao diện
         String currentUserRole = "USER";
         Long currentUserId = getCurrentUserId();
         if (currentUserId != null) {
@@ -59,24 +60,24 @@ public class UserManagementController {
         model.addAttribute("formUser", formUser);
         model.addAttribute("isEdit", isEdit);
         model.addAttribute("currentUserId", currentUserId);
-        model.addAttribute("currentUserRole", currentUserRole); // Truyền Role ra HTML
+        model.addAttribute("currentUserRole", currentUserRole);
 
         return "admin/users";
     }
 
     @PostMapping("/save")
     public String saveUser(@ModelAttribute("formUser") User formUser,
-                           @RequestParam(value = "role", defaultValue = "USER") String role, // Nhận Role từ giao diện
+                           @RequestParam(value = "role", defaultValue = "USER") String role,
                            RedirectAttributes redirectAttributes) {
 
-        // 1. CHẶN Ở BACKEND: Ép tài khoản Google phải là USER
+        // ÉP ROLE: Tài khoản đăng nhập bằng Google bắt buộc là USER
         if ("GOOGLE".equals(formUser.getProvider())) {
             role = "USER";
         } else if (!List.of("USER", "ADMIN", "BOTH").contains(role)) {
             role = "USER";
         }
+
         if (formUser.getId() == null) {
-            // ... (Giữ nguyên các khối check lỗi email, username, password rỗng như cũ) ...
             if (formUser.getEmail() == null || formUser.getEmail().isBlank()) {
                 redirectAttributes.addFlashAttribute("error", "Email không được để trống.");
                 return "redirect:/admin/users";
@@ -99,7 +100,7 @@ public class UserManagementController {
             }
 
             formUser.setPassword(passwordEncoder.encode(formUser.getPassword()));
-            formUser.setRole(role); // Gán role mới
+            formUser.setRole(role);
             if (formUser.getProvider() == null || formUser.getProvider().isBlank()) {
                 formUser.setProvider("LOCAL");
             }
@@ -111,7 +112,11 @@ public class UserManagementController {
         User existing = userRepository.findById(formUser.getId())
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy người dùng."));
 
-        // ... (Giữ nguyên check lỗi update như cũ) ...
+        // Chặn sửa Role của tài khoản Google khi Update
+        if ("GOOGLE".equals(existing.getProvider())) {
+            role = "USER";
+        }
+
         if (formUser.getEmail() == null || formUser.getEmail().isBlank()) {
             redirectAttributes.addFlashAttribute("error", "Email không được để trống.");
             return "redirect:/admin/users";
@@ -136,7 +141,7 @@ public class UserManagementController {
 
         existing.setEmail(formUser.getEmail());
         existing.setFullName(formUser.getFullName());
-        existing.setRole(role); // Gán role mới khi update
+        existing.setRole(role);
 
         if (formUser.getPassword() != null && !formUser.getPassword().isBlank()) {
             existing.setPassword(passwordEncoder.encode(formUser.getPassword()));
@@ -151,7 +156,6 @@ public class UserManagementController {
     public String deleteUser(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         Long currentUserId = getCurrentUserId();
 
-        // 1. Không ai được tự xóa chính mình
         if (currentUserId != null && currentUserId.equals(id)) {
             redirectAttributes.addFlashAttribute("error", "Không thể tự xóa tài khoản của mình.");
             return "redirect:/admin/users";
@@ -161,16 +165,15 @@ public class UserManagementController {
         User targetUser = userRepository.findById(id).orElse(null);
 
         if (currentUser != null && targetUser != null) {
-            // 2. Phân quyền: ADMIN chỉ được xóa USER, không được xóa BOTH hay ADMIN khác
+            // QUY TẮC XÓA: Admin chỉ xóa được USER, BOTH xóa được mọi thứ
             if ("ADMIN".equals(currentUser.getRole()) && !"USER".equals(targetUser.getRole())) {
                 redirectAttributes.addFlashAttribute("error", "Quyền ADMIN chỉ được phép xóa tài khoản Khách hàng (USER).");
                 return "redirect:/admin/users";
             }
-            // BOTH mặc định được qua ải này vì không bị vướng câu IF trên (BOTH xóa được ADMIN và USER)
         }
 
         userRepository.deleteById(id);
-        redirectAttributes.addFlashAttribute("success", "Đã xóa người dùng thành công.");
+        redirectAttributes.addFlashAttribute("success", "Đã xóa người dùng.");
         return "redirect:/admin/users";
     }
 

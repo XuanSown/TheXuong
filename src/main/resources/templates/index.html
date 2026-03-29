@@ -12,7 +12,6 @@
     <link rel="stylesheet" href="/css/style.css" th:href="@{/css/style.css}">
 </head>
 <body class="d-flex flex-column min-vh-100 bg-light">
-<!--nav-->
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid px-5">
         <a class="navbar-brand d-flex align-items-center fw-bold text-uppercase" th:href="@{/}">
@@ -26,7 +25,7 @@
 
         <div class="collapse navbar-collapse" id="navbarContent">
 
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0" sec:authorize="!hasAuthority('ADMIN')">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0" sec:authorize="!hasAnyAuthority('ADMIN', 'ROLE_ADMIN')">
                 <li class="nav-item dropdown custom-dropdown">
                     <a class="nav-link dropdown-toggle fw-bold text-white" href="#" id="sportDropdown">
                         THỂ THAO
@@ -64,7 +63,7 @@
                 </li>
             </ul>
 
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0" sec:authorize="hasAuthority('ADMIN')">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0" sec:authorize="hasAnyAuthority('ADMIN', 'ROLE_ADMIN')">
                 <li class="nav-item"><a class="nav-link fw-bold text-white" th:href="@{/admin/products}"><i class="fa-solid fa-box me-1"></i> Sản phẩm</a></li>
                 <li class="nav-item"><a class="nav-link fw-bold text-white" th:href="@{/admin/orders}"><i class="fa-solid fa-clipboard-list me-1"></i> Đơn hàng</a></li>
                 <li class="nav-item"><a class="nav-link fw-bold text-white" th:href="@{/admin/statistics}"><i class="fa-solid fa-chart-line me-1"></i> Thống kê</a></li>
@@ -72,7 +71,7 @@
             </ul>
 
             <form class="d-flex mx-auto search-form position-relative" role="search" style="width: 350px;"
-                  th:action="@{/products}" method="get" sec:authorize="!hasAuthority('ADMIN')">
+                  th:action="@{/products}" method="get" sec:authorize="!hasAnyAuthority('ADMIN', 'ROLE_ADMIN')">
                 <input class="form-control search-input" type="search" name="keyword"
                        placeholder="Tìm tên sản phẩm..." aria-label="Search" th:value="${keyword}">
                 <button class="btn search-btn position-absolute end-0 top-0 h-100" type="submit">
@@ -82,7 +81,7 @@
 
             <ul class="navbar-nav ms-auto align-items-center gap-3">
 
-                <li class="nav-item dropdown custom-dropdown" sec:authorize="!hasAuthority('ADMIN')">
+                <li class="nav-item dropdown custom-dropdown" sec:authorize="!hasAnyAuthority('ADMIN', 'ROLE_ADMIN')">
                     <a class="nav-link text-white" href="#" style="font-size: 1.2rem;">
                         <i class="fa-solid fa-earth-americas"></i>
                     </a>
@@ -92,7 +91,7 @@
                     </ul>
                 </li>
 
-                <li class="nav-item position-relative" sec:authorize="!hasAuthority('ADMIN')">
+                <li class="nav-item position-relative" sec:authorize="!hasAnyAuthority('ADMIN', 'ROLE_ADMIN')">
                     <a class="nav-link text-white" th:href="@{/cart}" style="font-size: 1.2rem;">
                         <i class="fa-solid fa-cart-shopping"></i>
                         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
@@ -111,15 +110,15 @@
                     </a>
                     <ul class="dropdown-menu dropdown-menu-glass dropdown-menu-end" sec:authorize="isAuthenticated()">
 
-                        <li sec:authorize="!hasAuthority('ADMIN')"><a class="dropdown-item" th:href="@{/profile}">Hồ sơ cá nhân</a></li>
-                        <li sec:authorize="!hasAuthority('ADMIN')"><a class="dropdown-item" th:href="@{/orders}">Đơn hàng của tôi</a></li>
+                        <li sec:authorize="!hasAnyAuthority('ADMIN', 'ROLE_ADMIN')"><a class="dropdown-item" th:href="@{/profile}">Hồ sơ cá nhân</a></li>
+                        <li sec:authorize="!hasAnyAuthority('ADMIN', 'ROLE_ADMIN')"><a class="dropdown-item" th:href="@{/orders}">Đơn hàng của tôi</a></li>
 
-                        <li sec:authorize="hasAnyAuthority('ADMIN', 'BOTH')"><hr class="dropdown-divider"></li>
-                        <li sec:authorize="hasAnyAuthority('ADMIN', 'BOTH')"><h6 class="dropdown-header text-warning fw-bold">QUẢN TRỊ</h6></li>
-                        <li sec:authorize="hasAnyAuthority('ADMIN', 'BOTH')"><a class="dropdown-item" th:href="@{/admin/products}">Quản lý Sản phẩm</a></li>
-                        <li sec:authorize="hasAnyAuthority('ADMIN', 'BOTH')"><a class="dropdown-item" th:href="@{/admin/orders}">Quản lý Đơn hàng</a></li>
-                        <li sec:authorize="hasAnyAuthority('ADMIN', 'BOTH')"><a class="dropdown-item" th:href="@{/admin/statistics}">Xem Thống kê</a></li>
-                        <li sec:authorize="hasAnyAuthority('ADMIN', 'BOTH')"><a class="dropdown-item" th:href="@{/admin/users}">Quản lý Người dùng</a></li>
+                        <li sec:authorize="hasAnyAuthority('ADMIN', 'ROLE_ADMIN', 'BOTH')"><hr class="dropdown-divider"></li>
+                        <li sec:authorize="hasAnyAuthority('ADMIN', 'ROLE_ADMIN', 'BOTH')"><h6 class="dropdown-header text-warning fw-bold">QUẢN TRỊ</h6></li>
+                        <li sec:authorize="hasAnyAuthority('ADMIN', 'ROLE_ADMIN', 'BOTH')"><a class="dropdown-item" th:href="@{/admin/products}">Quản lý Sản phẩm</a></li>
+                        <li sec:authorize="hasAnyAuthority('ADMIN', 'ROLE_ADMIN', 'BOTH')"><a class="dropdown-item" th:href="@{/admin/orders}">Quản lý Đơn hàng</a></li>
+                        <li sec:authorize="hasAnyAuthority('ADMIN', 'ROLE_ADMIN', 'BOTH')"><a class="dropdown-item" th:href="@{/admin/statistics}">Xem Thống kê</a></li>
+                        <li sec:authorize="hasAnyAuthority('ADMIN', 'ROLE_ADMIN', 'BOTH')"><a class="dropdown-item" th:href="@{/admin/users}">Quản lý Người dùng</a></li>
 
                         <li><hr class="dropdown-divider"></li>
 
@@ -217,15 +216,25 @@
                     <p class="fw-bold mb-auto"
                        th:text="${#numbers.formatDecimal(prod.price, 0, 'POINT', 0, 'COMMA')} + ' đ'">
                     </p>
-                    <a th:href="@{/product-detail/{id}(id=${prod.id})}" class="btn btn-outline-light w-100 mt-3">
+
+                    <a th:href="@{/product-detail/{id}(id=${prod.id})}"
+                       class="btn btn-outline-dark w-100 mt-3"
+                       sec:authorize="!hasAnyAuthority('ADMIN', 'ROLE_ADMIN')">
                         Xem chi tiết
                     </a>
+
+                    <button class="btn btn-secondary w-100 mt-3 opacity-50"
+                            sec:authorize="hasAnyAuthority('ADMIN', 'ROLE_ADMIN')"
+                            onclick="alert('Quyền Quản trị viên không được phép xem chi tiết và đặt hàng.'); return false;">
+                        Xem chi tiết
+                    </button>
+
                 </div>
             </div>
         </div>
     </div>
 </div>
-<!--footer-->
+
 <footer class="bg-dark text-white pt-5 pb-3 mt-auto footer-custom">
     <div class="container text-center text-md-start">
         <div class="row text-center text-md-start">

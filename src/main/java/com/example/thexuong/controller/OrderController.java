@@ -39,10 +39,13 @@ public class OrderController {
 
         Cart cart = cartService.getCartByUser(principal.getName());
         if (cart.getItems().isEmpty()) {
-            return "redirect:/cart"; // Giỏ hàng rỗng thì không cho checkout
+            return "redirect:/cart";
         }
 
-        User user = userRepository.findByUsername(principal.getName()).orElse(null);
+        // FIX LỖI: Tìm bằng Email trước, nếu không có mới tìm bằng Username
+        String identifier = principal.getName();
+        User user = userRepository.findByEmail(identifier)
+                .orElseGet(() -> userRepository.findByUsername(identifier).orElse(null));
 
         model.addAttribute("cart", cart);
         model.addAttribute("user", user);
@@ -58,10 +61,16 @@ public class OrderController {
     @GetMapping("/orders")
     public String myOrders(Model model, Principal principal) {
         if (principal == null) return "redirect:/login";
-        User user = userRepository.findByUsername(principal.getName()).orElse(null);
 
-        List<Order> orders = orderRepository.findByUserIdOrderByIdDesc(user.getId());
-        model.addAttribute("orders", orders);
+        // FIX LỖI TƯƠNG TỰ Ở TRANG DANH SÁCH ĐƠN HÀNG
+        String identifier = principal.getName();
+        User user = userRepository.findByEmail(identifier)
+                .orElseGet(() -> userRepository.findByUsername(identifier).orElse(null));
+
+        if (user != null) {
+            List<Order> orders = orderRepository.findByUserIdOrderByIdDesc(user.getId());
+            model.addAttribute("orders", orders);
+        }
         return "my-orders";
     }
 
@@ -74,9 +83,8 @@ public class OrderController {
                              Principal principal) {
         if (principal == null) return "redirect:/login";
 
-        //tạo đơn hàng lưu vào db
         Order savedOrder = orderService.placeOrder(principal.getName(), fullName, phoneNumber, address);
-        //xử lý thanh toán vnpay
+
         if("VNPAY".equals(paymentMethod)) {
             int totalAmount = savedOrder.getTotalMoney().intValue();
             String orderInfo = "Thanh toan don hang ma so " + savedOrder.getId();
@@ -84,12 +92,9 @@ public class OrderController {
             return "redirect:" + vnpayUrl;
         }
 
-//        orderService.placeOrder(principal.getName(), fullName, phoneNumber, address);
-
         return "redirect:/orders";
     }
 
-    //xem chi tiết đơn hàng
     @GetMapping("/order/{id}")
     public String viewOrderDetail(@PathVariable("id") Long id, Model model, Principal principal) {
         if (principal == null) return "redirect:/login";
@@ -99,11 +104,10 @@ public class OrderController {
             model.addAttribute("order", order);
             return "my-order-detail";
         } catch (Exception e) {
-            return "redirect:/orders"; // Quay về danh sách nếu lỗi
+            return "redirect:/orders";
         }
     }
 
-    //update đơn hàng
     @PostMapping("/order/update")
     public String updateOrderInfo(@RequestParam("orderId") Long orderId,
                                   @RequestParam("phoneNumber") String phoneNumber,
@@ -122,7 +126,6 @@ public class OrderController {
         return "redirect:/order/" + orderId;
     }
 
-    //hủy đơn hàng
     @PostMapping("/order/cancel")
     public String cancelOrder(@RequestParam("orderId") Long orderId,
                               Principal principal,
@@ -139,21 +142,17 @@ public class OrderController {
         return "redirect:/order/" + orderId;
     }
 
-    //VNPAY return
     @GetMapping("/vnpay-return")
     public String vnpayReturn(HttpServletRequest request, RedirectAttributes redirectAttributes) {
         String vnp_ResponseCode = request.getParameter("vnp_ResponseCode");
         String orderInfo = request.getParameter("vnp_OrderInfo");
 
         if("00".equals(vnp_ResponseCode)) {
-            //thành công
             try {
                 if (orderInfo != null && orderInfo.contains("Thanh toan don hang ma so ")) {
-                    // Lấy ID đơn hàng từ chuỗi orderInfo
                     String orderIdStr = orderInfo.replace("Thanh toan don hang ma so ", "").trim();
                     Long orderId = Long.parseLong(orderIdStr);
 
-                    // Cập nhật trạng thái đơn hàng thành "Đã thanh toán" (PAID)
                     Order order = orderRepository.findById(orderId).orElse(null);
                     if (order != null) {
                         order.setStatus("PAID");

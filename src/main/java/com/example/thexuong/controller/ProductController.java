@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+
 @RequiredArgsConstructor
 @Controller
 public class ProductController {
@@ -75,6 +76,18 @@ public class ProductController {
     public String showProductDetail(@PathVariable Long id,
                                     @RequestParam(required = false) String size,
                                     Model model) {
+
+        // 1. KHÓA BACKEND: Chặn đứng ADMIN nếu cố tình gõ URL hoặc click vào
+        org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
+            boolean isAdmin = auth.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ADMIN") || a.getAuthority().equals("ROLE_ADMIN"));
+            if (isAdmin) {
+                return "redirect:/admin/products"; // Đá văng Admin về trang quản lý sản phẩm
+            }
+        }
+
+        // 2. Xử lý logic hiển thị sản phẩm bình thường cho Khách/USER/BOTH
         Product product = productRepository.findByIdWithVariants(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm: " + id));
 

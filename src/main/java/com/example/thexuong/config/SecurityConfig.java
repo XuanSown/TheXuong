@@ -15,26 +15,25 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
-    private final AuthenticationProvider authenticationProvider; // 1. Inject từ ApplicationConfig
+    private final AuthenticationProvider authenticationProvider;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                // Tắt CSRF để đơn giản hóa việc submit form (nếu bật, cần thêm input hidden csrf trong form html)
                 .csrf(csrf -> csrf.disable())
 
                 .authorizeHttpRequests(auth -> auth
+                        // 1. Cho phép truy cập resources
                         .requestMatchers("/css/**", "/js/**", "/img/**", "/fonts/**", "/uploads/**").permitAll()
 
-                        // 1. CHẶN ADMIN: URL của khách hàng chỉ có USER và BOTH mới được phép vào.
-                        // Nếu ADMIN cố tình gõ URL /cart, /checkout, /orders... sẽ bị văng lỗi 403.
+                        // 2. Các trang Public ai cũng xem được
+                        .requestMatchers("/", "/index", "/login", "/register", "/products/**", "/product-detail/**", "/forgot-password", "/vnpay-return").permitAll()
+
+                        // 3. CHẶN ADMIN: Tránh trường hợp Admin gõ URL vào trang của Khách
                         .requestMatchers("/cart/**", "/checkout/**", "/orders/**", "/profile/**", "/place-order", "/order/**").hasAnyAuthority("USER", "BOTH")
 
-                        // 2. CHỈ ADMIN và BOTH mới vào được hệ thống quản trị
+                        // 4. CHỈ ADMIN và BOTH mới vào được hệ thống quản trị
                         .requestMatchers("/admin/**").hasAnyAuthority("ADMIN", "BOTH")
-
-                        // 3. Các trang Public (Ai cũng xem được)
-                        .requestMatchers("/", "/index", "/login", "/register", "/products/**", "/product-detail/**", "/forgot-password", "/vnpay-return").permitAll()
 
                         .anyRequest().authenticated()
                 )
@@ -43,10 +42,10 @@ public class SecurityConfig {
 
                 .formLogin(form -> form
                         .loginPage("/login")
-                        .loginProcessingUrl("/perform_login") // Phải trùng với th:action trong form login
-                        .defaultSuccessUrl("/", true)      // True: Luôn về trang chủ sau khi login
+                        .loginProcessingUrl("/perform_login")
+                        .defaultSuccessUrl("/", true)
                         .failureUrl("/login?error=true")
-                        .usernameParameter("email")        // Quan trọng: Form gửi lên name="email"
+                        .usernameParameter("email")
                         .passwordParameter("password")
                         .permitAll()
                 )
@@ -59,8 +58,8 @@ public class SecurityConfig {
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/login?logout=true")
-                        .invalidateHttpSession(true)       // Hủy session cũ
-                        .deleteCookies("JSESSIONID")       // Xóa cookie
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID")
                         .permitAll()
                 );
 
