@@ -78,17 +78,21 @@ public class AdminProductController {
                     // Kiểm tra xem biến thể này đã tồn tại chưa để update hay insert
                     Optional<ProductVariant> existingVariant = productVariantRepository
                             .findByProductIdAndSizeId(savedProduct.getId(), sizeId);
-
                     ProductVariant variant;
                     if (existingVariant.isPresent()) {
                         variant = existingVariant.get();
-                        // Cộng dồn hoặc ghi đè? Ở đây mình để ghi đè số lượng mới
+                        // Ghi đè số lượng mới
                         variant.setQuantity(quantity);
                     } else {
                         variant = new ProductVariant();
                         variant.setProduct(savedProduct);
                         variant.setSize(size);
                         variant.setQuantity(quantity);
+
+                        // FIX LỖI SQL SERVER: Sinh mã SKU ngẫu nhiên dựa trên ID Sản phẩm + Size + Thời gian
+                        // Để đảm bảo không bao giờ bị NULL và không bao giờ trùng lặp
+                        String autoSku = "SKU-" + savedProduct.getId() + "-" + size.getId() + "-" + System.currentTimeMillis();
+                        variant.setSku(autoSku);
                     }
                     productVariantRepository.save(variant);
                 }

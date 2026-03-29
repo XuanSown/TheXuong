@@ -64,27 +64,11 @@
                 </li>
             </ul>
 
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0" sec:authorize="hasAnyAuthority('ADMIN', 'BOTH')">
-                <li class="nav-item">
-                    <a class="nav-link fw-bold text-white" th:href="@{/admin/products}">
-                        <i class="fa-solid fa-box me-1"></i> Sản phẩm
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link fw-bold text-white" th:href="@{/admin/orders}">
-                        <i class="fa-solid fa-clipboard-list me-1"></i> Đơn hàng
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link fw-bold text-white" th:href="@{/admin/statistics}">
-                        <i class="fa-solid fa-chart-line me-1"></i> Thống kê
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link fw-bold text-white" th:href="@{/admin/users}">
-                        <i class="fa-solid fa-users-gear me-1"></i> Người dùng
-                    </a>
-                </li>
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0" sec:authorize="hasAuthority('ADMIN')">
+                <li class="nav-item"><a class="nav-link fw-bold text-white" th:href="@{/admin/products}"><i class="fa-solid fa-box me-1"></i> Sản phẩm</a></li>
+                <li class="nav-item"><a class="nav-link fw-bold text-white" th:href="@{/admin/orders}"><i class="fa-solid fa-clipboard-list me-1"></i> Đơn hàng</a></li>
+                <li class="nav-item"><a class="nav-link fw-bold text-white" th:href="@{/admin/statistics}"><i class="fa-solid fa-chart-line me-1"></i> Thống kê</a></li>
+                <li class="nav-item"><a class="nav-link fw-bold text-white" th:href="@{/admin/users}"><i class="fa-solid fa-users-gear me-1"></i> Người dùng</a></li>
             </ul>
 
             <form class="d-flex mx-auto search-form position-relative" role="search" style="width: 350px;"
@@ -103,8 +87,8 @@
                         <i class="fa-solid fa-earth-americas"></i>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-glass dropdown-menu-end" style="min-width: 100px;">
-                        <li><a class="dropdown-item active" href="#">🇻🇳 VN</a></li>
-                        <li><a class="dropdown-item" href="#">🇺🇸 EN</a></li>
+                        <li><a class="dropdown-item active" href="#">�� VN</a></li>
+                        <li><a class="dropdown-item" href="#">�� EN</a></li>
                     </ul>
                 </li>
 
@@ -126,10 +110,18 @@
                         <i class="fa-solid fa-user-circle" style="font-size: 1.3rem;"></i>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-glass dropdown-menu-end" sec:authorize="isAuthenticated()">
-                        <li sec:authorize="hasAnyAuthority('USER', 'BOTH')"><a class="dropdown-item" th:href="@{/profile}">Hồ sơ cá nhân</a></li>
-                        <li sec:authorize="hasAnyAuthority('USER', 'BOTH')"><a class="dropdown-item" th:href="@{/orders}">Đơn hàng của tôi</a></li>
 
-                        <li sec:authorize="hasAnyAuthority('USER', 'BOTH')"><hr class="dropdown-divider"></li>
+                        <li sec:authorize="!hasAuthority('ADMIN')"><a class="dropdown-item" th:href="@{/profile}">Hồ sơ cá nhân</a></li>
+                        <li sec:authorize="!hasAuthority('ADMIN')"><a class="dropdown-item" th:href="@{/orders}">Đơn hàng của tôi</a></li>
+
+                        <li sec:authorize="hasAnyAuthority('ADMIN', 'BOTH')"><hr class="dropdown-divider"></li>
+                        <li sec:authorize="hasAnyAuthority('ADMIN', 'BOTH')"><h6 class="dropdown-header text-warning fw-bold">QUẢN TRỊ</h6></li>
+                        <li sec:authorize="hasAnyAuthority('ADMIN', 'BOTH')"><a class="dropdown-item" th:href="@{/admin/products}">Quản lý Sản phẩm</a></li>
+                        <li sec:authorize="hasAnyAuthority('ADMIN', 'BOTH')"><a class="dropdown-item" th:href="@{/admin/orders}">Quản lý Đơn hàng</a></li>
+                        <li sec:authorize="hasAnyAuthority('ADMIN', 'BOTH')"><a class="dropdown-item" th:href="@{/admin/statistics}">Xem Thống kê</a></li>
+                        <li sec:authorize="hasAnyAuthority('ADMIN', 'BOTH')"><a class="dropdown-item" th:href="@{/admin/users}">Quản lý Người dùng</a></li>
+
+                        <li><hr class="dropdown-divider"></li>
 
                         <li>
                             <form th:action="@{/logout}" method="post">
@@ -145,6 +137,10 @@
         </div>
     </div>
 </nav>
+
+
+
+
 <br>
 <br>
 <br>
@@ -191,7 +187,14 @@
 
                         <div class="mb-3">
                             <label class="form-label fw-bold">Vai trò (Role)</label>
-                            <select class="form-select" name="role" required>
+
+                            <div th:if="${formUser.provider == 'GOOGLE'}">
+                                <input type="text" class="form-control text-muted" value="Khách hàng (USER)" readonly>
+                                <input type="hidden" name="role" value="USER">
+                                <small class="text-danger fw-bold"><i class="fa-solid fa-triangle-exclamation"></i> Không thể cấp quyền Quản trị cho tài khoản đăng nhập bằng Google.</small>
+                            </div>
+
+                            <select th:unless="${formUser.provider == 'GOOGLE'}" class="form-select" name="role" required>
                                 <option value="USER" th:selected="${formUser.role == 'USER' || formUser.role == null}">Khách hàng (USER)</option>
                                 <option value="ADMIN" th:selected="${formUser.role == 'ADMIN'}">Quản trị viên (ADMIN)</option>
                                 <option value="BOTH" th:selected="${formUser.role == 'BOTH'}">Quản trị & Khách hàng (BOTH)</option>
@@ -248,7 +251,7 @@
                                     <form th:action="@{/admin/users/delete/{id}(id=${u.id})}" method="post"
                                           class="d-inline">
                                         <button type="submit" class="btn btn-sm btn-outline-danger"
-                                                th:disabled="${currentUserId != null && currentUserId == u.id}"
+                                                th:disabled="${(currentUserId != null && currentUserId == u.id) || (currentUserRole == 'ADMIN' && u.role != 'USER')}"
                                                 onclick="return confirm('Bạn có chắc muốn xóa user này?');">
                                             <i class="fa-solid fa-trash"></i>
                                         </button>

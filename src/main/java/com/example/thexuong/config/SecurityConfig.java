@@ -24,16 +24,17 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
 
                 .authorizeHttpRequests(auth -> auth
-                        // Cho phép truy cập public các trang này
-                        .requestMatchers("/", "/index", "/login", "/register", "/products/**", "/product-detail/**", "/forgot-password", "/vnpay-return").permitAll()
-                        // Cho phép truy cập resources
                         .requestMatchers("/css/**", "/js/**", "/img/**", "/fonts/**", "/uploads/**").permitAll()
 
-                        // 1. Chỉ ADMIN và BOTH mới vào được trang quản trị
+                        // 1. CHẶN ADMIN: URL của khách hàng chỉ có USER và BOTH mới được phép vào.
+                        // Nếu ADMIN cố tình gõ URL /cart, /checkout, /orders... sẽ bị văng lỗi 403.
+                        .requestMatchers("/cart/**", "/checkout/**", "/orders/**", "/profile/**", "/place-order", "/order/**").hasAnyAuthority("USER", "BOTH")
+
+                        // 2. CHỈ ADMIN và BOTH mới vào được hệ thống quản trị
                         .requestMatchers("/admin/**").hasAnyAuthority("ADMIN", "BOTH")
 
-                        // 2. Chặn ADMIN thuần không cho vào các trang chức năng của User
-                        .requestMatchers("/cart/**", "/checkout/**", "/orders/**", "/profile/**", "/place-order", "/order/**").hasAnyAuthority("USER", "BOTH")
+                        // 3. Các trang Public (Ai cũng xem được)
+                        .requestMatchers("/", "/index", "/login", "/register", "/products/**", "/product-detail/**", "/forgot-password", "/vnpay-return").permitAll()
 
                         .anyRequest().authenticated()
                 )
