@@ -2,7 +2,9 @@ package com.example.thexuong.controller;
 
 import com.example.thexuong.entity.Product;
 import com.example.thexuong.entity.ProductVariant;
+import com.example.thexuong.entity.Size;
 import com.example.thexuong.repository.ProductRepository;
+import com.example.thexuong.repository.SizeRepository; // THÊM IMPORT
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -14,17 +16,19 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Controller
 public class ProductController {
+
     @Autowired
     private final ProductRepository productRepository;
 
-    // Trang chủ: Chỉ load 4 sản phẩm mới nhất
+    // THÊM REPOSITORY SIZE ĐỂ LẤY FULL SIZE TỪ DB
+    @Autowired
+    private final SizeRepository sizeRepository;
+
     @GetMapping(value = {"/", "/index"})
     public String home(Model model) {
         List<Product> newProducts = productRepository.findTop4ByOrderByIdDesc();
@@ -32,24 +36,23 @@ public class ProductController {
         return "index";
     }
 
-    // Trang danh sách tất cả sản phẩm
     @GetMapping("/products")
     public String showProductList(@RequestParam(required = false) String keyword,
                                   @RequestParam(required = false) String sport,
                                   @RequestParam(required = false) String brand,
                                   @RequestParam(required = false, defaultValue = "newest") String sort,
                                   @RequestParam(defaultValue = "0") int page,
-                                  @RequestParam(defaultValue = "12") int size,
+                                  @RequestParam(defaultValue = "12") int pageSize,
                                   Model model) {
-        // 1. Xác định kiểu sắp xếp
-        Sort sorting = Sort.by("id").descending(); // Mặc định là mới nhất
+
+        Sort sorting = Sort.by("id").descending();
         if ("price_asc".equals(sort)) {
             sorting = Sort.by("price").ascending();
         } else if ("price_desc".equals(sort)) {
             sorting = Sort.by("price").descending();
         }
 
-        Pageable pageable = PageRequest.of(page, size, sorting);
+        Pageable pageable = PageRequest.of(page, pageSize, sorting);
         Page<Product> productsPage;
         if (keyword != null && !keyword.isEmpty()) {
             productsPage = productRepository.findByNameContaining(keyword, pageable);
@@ -61,33 +64,30 @@ public class ProductController {
             productsPage = productRepository.findAll(pageable);
         }
 
-        // 3. Truyền dữ liệu ra View
         model.addAttribute("productsPage", productsPage);
-        model.addAttribute("sort", sort); // Để giữ trạng thái dropdown
-        model.addAttribute("keyword", keyword); // Để giữ từ khóa tìm kiếm
+        model.addAttribute("sort", sort);
+        model.addAttribute("keyword", keyword);
         model.addAttribute("sport", sport);
         model.addAttribute("brand", brand);
 
         return "products";
     }
 
-    // Chi tiết sản phẩm
     @GetMapping("/product-detail/{id}")
     public String showProductDetail(@PathVariable Long id,
                                     @RequestParam(required = false) String size,
                                     Model model) {
 
-        // 1. KHÓA BACKEND: Chặn đứng ADMIN nếu cố tình gõ URL hoặc click vào
+        // KHÓA BACKEND CHẶN ADMIN
         org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
             boolean isAdmin = auth.getAuthorities().stream()
                     .anyMatch(a -> a.getAuthority().equals("ADMIN") || a.getAuthority().equals("ROLE_ADMIN"));
             if (isAdmin) {
-                return "redirect:/admin/products"; // Đá văng Admin về trang quản lý sản phẩm
+                return "redirect:/admin/products";
             }
         }
 
-        // 2. Xử lý logic hiển thị sản phẩm bình thường cho Khách/USER/BOTH
         Product product = productRepository.findByIdWithVariants(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm: " + id));
 
@@ -97,18 +97,25 @@ public class ProductController {
         product.setViewCount(product.getViewCount() + 1);
         productRepository.save(product);
 
-        List<ProductVariant> variants = product.getVariants();
-        List<String> allSizes = new ArrayList<>();
+        // LOGIC MỚI: LẤY LIST SIZE DỰA TRÊN DANH MỤC
+        List<Size> allDbSizes = sizeRepository.findAll();
+        List<String> displaySizes = new ArrayList<>();
+        String category = product.getCategory();
 
-        if (variants != null && !variants.isEmpty()) {
-            allSizes = variants.stream()
-                    .filter(v -> v != null && v.getSize() != null && v.getSize().getName() != null)
-                    .map(v -> v.getSize().getName())
-                    .distinct()
-                    .sorted(Comparator.naturalOrder())
-                    .collect(Collectors.toList());
+        for (Size s : allDbSizes) {
+            String sizeName = s.getName().trim();
+            // Kiểm tra xem tên size có phải là số không (VD: 39, 40)
+            boolean isNumeric = sizeName.matches("\\d+");
+
+            if (category != null && category.toLowerCase().contains("giày")) {
+                if (isNumeric) displaySizes.add(sizeName);
+            } else {
+                // Nếu là quần áo hoặc balo, lấy size chữ (S, M, L, XL...)
+                if (!isNumeric) displaySizes.add(sizeName);
+            }
         }
 
+        List<ProductVariant> variants = product.getVariants();
         int quantity = 0;
         Long selectedVariantId = null;
 
@@ -126,9 +133,9 @@ public class ProductController {
         }
 
         model.addAttribute("product", product);
-        model.addAttribute("sizes", allSizes);
+        model.addAttribute("sizes", displaySizes); // Gửi list size thông minh ra view
         model.addAttribute("selectedSize", size);
-        model.addAttribute("quantity", quantity);
+        model.addAttribute("quantity", quantity); // Nếu chưa có Variant, quantity = 0 (Hết hàng)
         model.addAttribute("selectedVariantId", selectedVariantId);
 
         return "product-detail";

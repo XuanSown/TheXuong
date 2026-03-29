@@ -9,10 +9,32 @@
     <link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/style.css" th:href="@{/css/style.css}">
 
+    <style>
+        .size-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+        }
+        .size-item {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 10px;
+            text-align: center;
+        }
+        .size-item label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+            color: #495057;
+        }
+        .size-item input {
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
 
-<!--nav-->
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid px-5">
         <a class="navbar-brand d-flex align-items-center fw-bold text-uppercase" th:href="@{/}">
@@ -25,6 +47,7 @@
         </button>
 
         <div class="collapse navbar-collapse" id="navbarContent">
+
             <ul class="navbar-nav me-auto mb-2 mb-lg-0" sec:authorize="!hasAnyAuthority('ADMIN', 'ROLE_ADMIN')">
                 <li class="nav-item dropdown custom-dropdown">
                     <a class="nav-link dropdown-toggle fw-bold text-white" href="#" id="sportDropdown">THỂ THAO</a>
@@ -34,6 +57,7 @@
                         <li><a class="dropdown-item" th:href="@{/products}">Tất cả...</a></li>
                     </ul>
                 </li>
+
                 <li class="nav-item dropdown custom-dropdown">
                     <a class="nav-link dropdown-toggle fw-bold text-white" href="#" id="brandDropdown">THƯƠNG HIỆU</a>
                     <ul class="dropdown-menu dropdown-menu-glass">
@@ -41,6 +65,7 @@
                         <li><a class="dropdown-item" th:href="@{/products}">Tất cả...</a></li>
                     </ul>
                 </li>
+
                 <li class="nav-item">
                     <a class="nav-link fw-bold text-white" th:href="@{/products}">TẤT CẢ SẢN PHẨM <span class="badge bg-danger ms-1" style="font-size: 0.6rem;">HOT</span></a>
                 </li>
@@ -50,10 +75,11 @@
                 <li class="nav-item"><a class="nav-link fw-bold text-white" th:href="@{/admin/products}"><i class="fa-solid fa-box me-1"></i> Sản phẩm</a></li>
                 <li class="nav-item"><a class="nav-link fw-bold text-white" th:href="@{/admin/orders}"><i class="fa-solid fa-clipboard-list me-1"></i> Đơn hàng</a></li>
                 <li class="nav-item"><a class="nav-link fw-bold text-white" th:href="@{/admin/statistics}"><i class="fa-solid fa-chart-line me-1"></i> Thống kê</a></li>
-                <li class="nav-item"><a class="nav-link fw-bold text-white active" th:href="@{/admin/users}"><i class="fa-solid fa-users-gear me-1"></i> Người dùng</a></li>
+                <li class="nav-item"><a class="nav-link fw-bold text-white" th:href="@{/admin/users}"><i class="fa-solid fa-users-gear me-1"></i> Người dùng</a></li>
             </ul>
 
-            <form class="d-flex mx-auto search-form position-relative" role="search" style="width: 350px;" th:action="@{/products}" method="get" sec:authorize="!hasAnyAuthority('ADMIN', 'ROLE_ADMIN')">
+            <form class="d-flex mx-auto search-form position-relative" role="search" style="width: 350px;"
+                  th:action="@{/products}" method="get" sec:authorize="!hasAnyAuthority('ADMIN', 'ROLE_ADMIN')">
                 <input class="form-control search-input" type="search" name="keyword" placeholder="Tìm tên sản phẩm..." aria-label="Search" th:value="${keyword}">
                 <button class="btn search-btn position-absolute end-0 top-0 h-100" type="submit"><i class="fa-solid fa-magnifying-glass text-white"></i></button>
             </form>
@@ -68,6 +94,7 @@
 
                 <li class="nav-item dropdown custom-dropdown">
                     <a sec:authorize="!isAuthenticated()" class="nav-link text-white fw-bold" th:href="@{/login}"><i class="fa-solid fa-user me-1"></i> Đăng nhập</a>
+
                     <a sec:authorize="isAuthenticated()" class="nav-link dropdown-toggle fw-bold text-white" href="#" role="button" data-bs-toggle="dropdown">
                         <i class="fa-solid fa-user-circle" style="font-size: 1.3rem;"></i>
                     </a>
@@ -91,13 +118,15 @@
                     </ul>
                 </li>
             </ul>
+
         </div>
     </div>
 </nav>
+
 <br>
 <br>
 <br>
-<div class="container mt-5">
+<div class="container mt-5 mb-5">
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card shadow">
@@ -109,68 +138,65 @@
                         <input type="hidden" th:field="*{id}">
 
                         <div class="mb-3">
-                            <label class="form-label">Tên Sản Phẩm</label>
+                            <label class="form-label fw-bold">Tên Sản Phẩm</label>
                             <input type="text" class="form-control" th:field="*{name}" required>
                         </div>
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Giá (VNĐ)</label>
+                                <label class="form-label fw-bold">Giá (VNĐ)</label>
                                 <input type="number" class="form-control" th:field="*{price}" required>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Link Hình Ảnh (URL)</label>
+                                <label class="form-label fw-bold">Link Hình Ảnh (URL)</label>
                                 <input type="text" class="form-control" th:field="*{imageUrl}">
                             </div>
                         </div>
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Danh Mục (Category)</label>
+                                <label class="form-label fw-bold">Danh Mục (Category)</label>
                                 <input type="text" class="form-control" th:field="*{category}">
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Thương Hiệu (Brand)</label>
+                                <label class="form-label fw-bold">Thương Hiệu (Brand)</label>
                                 <input type="text" class="form-control" th:field="*{brand}">
                             </div>
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">Môn Thể Thao (Sport)</label>
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Môn Thể Thao (Sport)</label>
                             <input type="text" class="form-control" th:field="*{sport}">
                         </div>
 
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">Chọn Size</label>
-                                <select class="form-select" name="sizeId">
-                                    <option th:each="s : ${sizes}"
-                                            th:value="${s.id}"
-                                            th:text="${s.name}"
-                                            th:selected="${currentSizeId != null && currentSizeId == s.id}">
-                                        38
-                                    </option>
-                                </select>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">Số lượng nhập</label>
-                                <input type="number" class="form-control" name="quantity"
-                                       th:value="${currentQuantity != null ? currentQuantity : 10}"
-                                       min="0" placeholder="Nhập số lượng tồn kho...">
+                        <div class="card bg-light border-0 mb-4">
+                            <div class="card-body">
+                                <h6 class="fw-bold mb-3 text-primary"><i class="fa-solid fa-layer-group me-2"></i>Cập nhật Số lượng theo Size</h6>
+                                <p class="text-muted small mb-3">Chỉ cần điền số lượng cho những size mà bạn muốn bán. Để trống nếu size đó không kinh doanh.</p>
+
+                                <div class="size-grid">
+                                    <div class="size-item shadow-sm" th:each="sq : ${sizeQuantities}">
+                                        <input type="hidden" name="sizeIds" th:value="${sq.sizeId}">
+
+                                        <label th:text="${sq.sizeName}">M</label>
+
+                                        <input type="number" class="form-control form-control-sm"
+                                               name="quantities"
+                                               th:value="${sq.quantity}"
+                                               min="0" placeholder="SL">
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <small class="text-muted fst-italic">
-                            * Lưu ý: Nếu sản phẩm đã có Size này, số lượng sẽ được cập nhật mới.
-                        </small>
 
                         <div class="mb-3">
-                            <label class="form-label">Mô Tả Chi Tiết</label>
+                            <label class="form-label fw-bold">Mô Tả Chi Tiết</label>
                             <textarea class="form-control" rows="4" th:field="*{description}"></textarea>
                         </div>
 
-                        <div class="d-flex justify-content-end">
+                        <div class="d-flex justify-content-end mt-4">
                             <a href="/admin/products" class="btn btn-outline-danger me-2">Hủy</a>
-                            <button type="submit" class="btn btn-outline-dark">Lưu Sản Phẩm</button>
+                            <button type="submit" class="btn btn-dark"><i class="fa-solid fa-floppy-disk me-2"></i>Lưu Sản Phẩm</button>
                         </div>
                     </form>
                 </div>
@@ -179,5 +205,6 @@
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
