@@ -55,12 +55,16 @@ public class UserManagementController {
 
     @PostMapping("/save")
     public String saveUser(@ModelAttribute("formUser") User formUser,
-                           @RequestParam(value = "admin", required = false) String admin,
+                           @RequestParam(value = "role", defaultValue = "USER") String role, // Nhận Role từ giao diện
                            RedirectAttributes redirectAttributes) {
-        boolean isAdmin = admin != null;
-        String role = isAdmin ? "ADMIN" : "USER";
+
+        // Đảm bảo role chỉ nằm trong 3 loại này, nếu ai cố tình hack truyền bậy bạ thì cho về USER
+        if (!List.of("USER", "ADMIN", "BOTH").contains(role)) {
+            role = "USER";
+        }
 
         if (formUser.getId() == null) {
+            // ... (Giữ nguyên các khối check lỗi email, username, password rỗng như cũ) ...
             if (formUser.getEmail() == null || formUser.getEmail().isBlank()) {
                 redirectAttributes.addFlashAttribute("error", "Email không được để trống.");
                 return "redirect:/admin/users";
@@ -83,7 +87,7 @@ public class UserManagementController {
             }
 
             formUser.setPassword(passwordEncoder.encode(formUser.getPassword()));
-            formUser.setRole(role);
+            formUser.setRole(role); // Gán role mới
             if (formUser.getProvider() == null || formUser.getProvider().isBlank()) {
                 formUser.setProvider("LOCAL");
             }
@@ -95,6 +99,7 @@ public class UserManagementController {
         User existing = userRepository.findById(formUser.getId())
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy người dùng."));
 
+        // ... (Giữ nguyên check lỗi update như cũ) ...
         if (formUser.getEmail() == null || formUser.getEmail().isBlank()) {
             redirectAttributes.addFlashAttribute("error", "Email không được để trống.");
             return "redirect:/admin/users";
@@ -119,7 +124,7 @@ public class UserManagementController {
 
         existing.setEmail(formUser.getEmail());
         existing.setFullName(formUser.getFullName());
-        existing.setRole(role);
+        existing.setRole(role); // Gán role mới khi update
 
         if (formUser.getPassword() != null && !formUser.getPassword().isBlank()) {
             existing.setPassword(passwordEncoder.encode(formUser.getPassword()));

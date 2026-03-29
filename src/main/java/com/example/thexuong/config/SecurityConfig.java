@@ -28,7 +28,13 @@ public class SecurityConfig {
                         .requestMatchers("/", "/index", "/login", "/register", "/products/**", "/product-detail/**", "/forgot-password", "/vnpay-return").permitAll()
                         // Cho phép truy cập resources
                         .requestMatchers("/css/**", "/js/**", "/img/**", "/fonts/**", "/uploads/**").permitAll()
-                        .requestMatchers("/admin/**").hasAuthority("ADMIN")
+
+                        // 1. Chỉ ADMIN và BOTH mới vào được trang quản trị
+                        .requestMatchers("/admin/**").hasAnyAuthority("ADMIN", "BOTH")
+
+                        // 2. Chặn ADMIN thuần không cho vào các trang chức năng của User
+                        .requestMatchers("/cart/**", "/checkout/**", "/orders/**", "/profile/**", "/place-order", "/order/**").hasAnyAuthority("USER", "BOTH")
+
                         .anyRequest().authenticated()
                 )
 
