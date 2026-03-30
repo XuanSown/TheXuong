@@ -32,4 +32,9 @@ public class UserService {
         }
         userRepository.save(user);
     }
+
+    @Transactional
+    public void deleteUser(Long userId) {
+        userRepository.deleteById(userId);
+    }
 }

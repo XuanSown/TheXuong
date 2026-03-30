@@ -1,7 +1,11 @@
 package com.example.thexuong.controller;
 
+import com.example.thexuong.entity.Cart;
 import com.example.thexuong.entity.User;
+import com.example.thexuong.repository.CartItemRepository;
+import com.example.thexuong.repository.CartRepository;
 import com.example.thexuong.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -26,6 +30,13 @@ public class UserManagementController {
 
     @Autowired
     private final PasswordEncoder passwordEncoder;
+
+    // Inject thêm các Repository để xử lý xóa dữ liệu liên quan
+    @Autowired
+    private final CartRepository cartRepository;
+
+    @Autowired
+    private final CartItemRepository cartItemRepository;
 
     @GetMapping
     public String showUsers(@RequestParam(required = false) Long editId, Model model) {
@@ -153,6 +164,7 @@ public class UserManagementController {
     }
 
     @PostMapping("/delete/{id}")
+    @Transactional // Thêm @Transactional để đảm bảo xóa nhiều bảng cùng lúc không bị lỗi
     public String deleteUser(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         Long currentUserId = getCurrentUserId();
 
@@ -172,8 +184,26 @@ public class UserManagementController {
             }
         }
 
-        userRepository.deleteById(id);
-        redirectAttributes.addFlashAttribute("success", "Đã xóa người dùng.");
+        try {
+            // Bước 1: Tìm xem User này có Giỏ hàng (Cart) không
+            Optional<Cart> userCart = cartRepository.findByUserId(id);
+            if (userCart.isPresent()) {
+                Cart cart = userCart.get();
+                // Bước 2: Xóa tất cả CartItems thuộc về Cart này
+                cartItemRepository.deleteAllByCartId(cart.getId());
+                // Bước 3: Xóa Cart
+                cartRepository.delete(cart);
+            }
+
+            // Bước 4: Cuối cùng mới xóa User
+            userRepository.deleteById(id);
+            redirectAttributes.addFlashAttribute("success", "Đã xóa người dùng thành công.");
+
+        } catch (Exception e) {
+            // Nếu User có Đơn hàng (Orders) hoặc Đánh giá (Reviews), code sẽ nhảy vào đây
+            redirectAttributes.addFlashAttribute("error", "Không thể xóa! Người dùng này đã có Đơn hàng hoặc Đánh giá trong hệ thống.");
+        }
+
         return "redirect:/admin/users";
     }
 
