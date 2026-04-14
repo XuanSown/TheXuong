@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "skills": {
+    "find-skills": {
+      "source": "vercel-labs/skills",
+      "sourceType": "github",
+      "computedHash": "9e1c8b3103f92fa8092568a44fe64858de7c5c9dc65ce4bea8f168080e889cfd"
+    },
+    "fix": {
+      "source": "jvm-skills/jvm-skills",
+      "sourceType": "github",
+      "computedHash": "4ee1332c318be9ad8b2719871ede17fe5a0c0c22b1c6350d330b845bff547b4f"
+    },
+    "frontend-design": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "computedHash": "516bd2154eb843a8240e43d5b285229129853114ad7075a5e141e1c08e408c84"
+    },
+    "frontend-security": {
+      "source": "schalkneethling/webdev-agent-skills",
+      "sourceType": "github",
+      "computedHash": "e8d405042bb53c7b1a87523b01a6e7d219c31627679a4e92f8b32abbde4cbbc9"
+    },
+    "performance": {
+      "source": "jvm-skills/jvm-skills",
+      "sourceType": "github",
+      "computedHash": "2e93d6e4afbf01b606012e73893fbe9a8c8e222fe3537c4e265dc32eac579c67"
+    },
+    "restart-spring-boot": {
+      "source": "jvm-skills/jvm-skills",
+      "sourceType": "github",
+      "computedHash": "05842d6a85e6b001a6c61eea2fa7fe78b88a82cdbe8b9bae5f5cb9315578d3c4"
+    },
+    "spec-to-plan": {
+      "source": "jvm-skills/jvm-skills",
+      "sourceType": "github",
+      "computedHash": "565ae80e6abf581b81793452b3c8316c1b0e075f14e801e27b98c0baf934e989"
+    },
+    "test-gradle": {
+      "source": "jvm-skills/jvm-skills",
+      "sourceType": "github",
+      "computedHash": "039bd914b8fa77895287a464a8d97f2f2c568da3b0726aa76ce8bd90b55355da"
+    }
+  }
+}

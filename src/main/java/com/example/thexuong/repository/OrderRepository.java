@@ -19,7 +19,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     // Trả về: [Ngày (yyyy-MM-dd), Tổng tiền]
     @Query(value = "SELECT CAST(created_at AS DATE) as order_date, SUM(total_money) " +
             "FROM Orders " +
-            "WHERE status = 'DELIVERED' " +
+            "WHERE status = 'SHIPPED' " +
             "GROUP BY CAST(created_at AS DATE) " +
             "ORDER BY order_date DESC", nativeQuery = true)
     List<Object[]> getRevenueByDay();

@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:sqlserver://localhost:1444;databaseName=DATN;encrypt=true;trustServerCertificate=true
+    url: jdbc:sqlserver://localhost:1444;databaseName=dbTheXuong;encrypt=true;trustServerCertificate=true
     username: sa
-    password: Vinhledz7479@1234
+    password: Sontran1903@
   jpa:
     hibernate:
       naming:
@@ -12,8 +12,8 @@ spring:
       client:
         registration:
           google:
-            client-id: 425173599446-qd901q0i2s75atio7pmqq2t8ckou3tdv.apps.googleusercontent.com
-            client-secret: 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
+            client-id: GOOGLE_CLIENT_ID # 425173599446-qd901q0i2s75atio7pmqq2t8ckou3tdv.apps.googleusercontent.com
+            client-secret: GOOGLE_CLIENT_SECRET # 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
         provider:
           google:
             user-name-attribute: email

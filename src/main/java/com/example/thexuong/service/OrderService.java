@@ -3,7 +3,6 @@ package com.example.thexuong.service;
 import com.example.thexuong.entity.*;
 import com.example.thexuong.repository.OrderDetailRepository;
 import com.example.thexuong.repository.OrderRepository;
-import com.example.thexuong.repository.ProductVariantRepository; // THÊM IMPORT NÀY
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,10 +20,6 @@ public class OrderService {
     private final CartService cartService;
     @Autowired
     private final OrderDetailRepository orderDetailRepository;
-
-    // THÊM REPOSITORY NÀY ĐỂ XỬ LÝ SỐ LƯỢNG
-    @Autowired
-    private final ProductVariantRepository productVariantRepository;
 
     @Transactional
     public Order placeOrder(String username, String fullName, String phone, String address) {
@@ -53,25 +48,16 @@ public class OrderService {
 
         Order savedOrder = orderRepository.save(order);
 
-        // 3. Tạo OrderDetail VÀ TRỪ SỐ LƯỢNG TỒN KHO
+        // 3. Tạo OrderDetail
         for (CartItem item : cartItems) {
             ProductVariant variant = item.getProductVariant();
             Product product = variant.getProduct();
 
-            // KIỂM TRA TỒN KHO
-            if (variant.getQuantity() < item.getQuantity()) {
-                throw new RuntimeException("Sản phẩm " + product.getName() + " (Size " + variant.getSize().getName() + ") không đủ số lượng trong kho!");
-            }
-
-            // TRỪ SỐ LƯỢNG TRONG KHO VÀ LƯU LẠI
-            variant.setQuantity(variant.getQuantity() - item.getQuantity());
-            productVariantRepository.save(variant);
-
             OrderDetail detail = OrderDetail.builder()
                     .order(savedOrder)
-                    .productId(product.getId())
+                    .productId(product.getId()) // Lưu ID để tham chiếu lỏng
                     .productName(product.getName())
-                    .size(variant.getSize().getName())
+                    .size(variant.getSize().getName()) // Giả sử Size có getName()
                     .price(product.getPrice())
                     .quantity(item.getQuantity())
                     .totalPrice(product.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
@@ -96,6 +82,7 @@ public class OrderService {
     public void updateOrderInfo(Long orderId, String phoneNumber, String address, String username) {
         Order order = getOrderByIdAndUser(orderId, username);
 
+        // Chỉ cho phép sửa khi trạng thái là PENDING
         if (!"PENDING".equals(order.getStatus())) {
             throw new RuntimeException("Đơn hàng đã được duyệt hoặc đang giao, không thể thay đổi thông tin!");
         }
@@ -109,13 +96,13 @@ public class OrderService {
     public void cancelOrder(Long orderId, String username) {
         Order order = getOrderByIdAndUser(orderId, username);
 
+        // Chỉ cho phép hủy khi trạng thái là PENDING
         if (!"PENDING".equals(order.getStatus())) {
             throw new RuntimeException("Đơn hàng đã được duyệt, không thể hủy!");
         }
 
-        order.setStatus("CANCELLED");
+        order.setStatus("CANCELLED"); // Chuyển trạng thái thành Đã hủy
         orderRepository.save(order);
 
-        // Lưu ý: Nếu hủy đơn, bạn có thể cân nhắc code thêm đoạn cộng lại số lượng vào kho ở đây
     }
 }

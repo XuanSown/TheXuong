@@ -1,17 +1,16 @@
-CREATE DATABASE DATN;
+CREATE DATABASE dbTheXuong;
 GO
 
 USE master
 
-USE DATN;
+USE dbTheXuong;
 GO
 
     SELECT * FROM Users;
     SELECT * FROM Products;
-    SELECT * FROM ProductVariants;
     SELECT * FROM Sizes;
     SELECT * FROM Carts;
-
+    SELECT * FROM ProductVariants;
     SELECT * FROM CartItems;
     SELECT * FROM Orders;
     SELECT * FROM OrderDetails;
@@ -27,18 +26,6 @@ DROP TABLE IF EXISTS ProductVariants;
 DROP TABLE IF EXISTS Sizes;
 DROP TABLE IF EXISTS Products;
 DROP TABLE IF EXISTS Users;
-
-
-    INSERT INTO Users (username, password, email, provider, role, full_name)
-VALUES (
-    'admin',
-    '123',
-    'admin@gmail.com',
-    'LOCAL',
-    'ADMIN',
-    N'Quản trị viên'
-);
-
 
 CREATE TABLE Users
 (

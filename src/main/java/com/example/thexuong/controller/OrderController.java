@@ -155,7 +155,7 @@ public class OrderController {
 
                     Order order = orderRepository.findById(orderId).orElse(null);
                     if (order != null) {
-                        order.setStatus("PAID");
+                        order.setStatus("PENDING");
                         orderRepository.save(order);
                     }
                 }
