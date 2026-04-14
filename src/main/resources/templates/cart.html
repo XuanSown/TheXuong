@@ -115,10 +115,10 @@
             <tbody>
             <tr th:each="item : ${cart.items}">
                 <td th:text="${item.productVariant.product.name}"></td>
-                <td th:text="${item.productVariant.size.name}"></td> <td th:text="${#numbers.formatDecimal(item.productVariant.product.price, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"></td>
+                <td th:text="${item.productVariant.size.name}"></td> <td th:text="${item.productVariant.product.price != null ? #numbers.formatDecimal(item.productVariant.product.price, 1, 'COMMA', 0, 'POINT') + ' VNĐ' : 'Liên hệ'}"></td>
                 <td th:text="${item.quantity}"></td>
-                <td th:with="subtotal=${item.productVariant.product.price * item.quantity}"
-                    th:text="${#numbers.formatDecimal(subtotal, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"></td>
+                <td th:with="subtotal=${(item.productVariant.product.price != null ? item.productVariant.product.price : 0) * item.quantity}"
+                    th:text="${subtotal > 0 ? #numbers.formatDecimal(subtotal, 1, 'COMMA', 0, 'POINT') + ' VNĐ' : '0 VNĐ'}"></td>
                 <td>
                     <a th:href="@{/cart/remove/{id}(id=${item.id})}" class="btn btn-danger btn-sm">Xóa</a>
                 </td>
@@ -127,7 +127,7 @@
         </table>
 
         <div class="text-end">
-            <h4>Tổng cộng: <span th:text="${#numbers.formatDecimal(totalPrice, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"></span></h4>
+            <h4>Tổng cộng: <span th:text="${totalPrice != null && totalPrice > 0 ? #numbers.formatDecimal(totalPrice, 1, 'COMMA', 0, 'POINT') + ' VNĐ' : '0 VNĐ'}"></span></h4>
             <a href="/products" class="btn btn-outline-dark">Tiếp tục mua hàng</a>
             <a href="/checkout" class="btn btn-outline-dark">Thanh toán</a>
         </div>

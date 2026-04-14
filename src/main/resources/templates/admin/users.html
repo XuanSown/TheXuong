@@ -4,15 +4,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Trang quản lý người dùng - TheXuong Admin">
     <title>Quản lý người dùng - TheXuong</title>
+
+    <!-- CSRF Token cho Ajax calls — Spring Security inject tự động -->
+    <meta name="_csrf"        th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Russo+One&display=swap" rel="stylesheet">
+    <!-- Toastr — Thông báo góc màn hình đẹp hơn alert() -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
     <link rel="stylesheet" href="/css/style.css" th:href="@{/css/style.css}">
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+
+        /* ── Toggle Switch ── */
+        .toggle-switch { display: flex; align-items: center; gap: 8px; }
+        .toggle-switch input[type="checkbox"] { display: none; }
+        .toggle-switch .slider {
+            position: relative; width: 48px; height: 26px;
+            background: #dc3545; border-radius: 999px;
+            cursor: pointer; transition: background 0.25s ease;
+            flex-shrink: 0;
+        }
+        .toggle-switch .slider::before {
+            content: ''; position: absolute;
+            width: 20px; height: 20px; border-radius: 50%;
+            background: #fff; top: 3px; left: 3px;
+            transition: transform 0.25s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,.3);
+        }
+        .toggle-switch input:checked + .slider { background: #198754; }
+        .toggle-switch input:checked + .slider::before { transform: translateX(22px); }
+        .toggle-switch .slider.loading { opacity: .6; cursor: not-allowed; pointer-events: none; }
+        .toggle-label { font-size: .8rem; font-weight: 600; }
+        .toggle-label.active  { color: #198754; }
+        .toggle-label.locked  { color: #dc3545; }
+        .toggle-switch.disabled .slider { cursor: not-allowed; opacity: .45; }
+
+        /* ── Form card sticky bên trái ── */
+        .form-card { position: sticky; top: 90px; }
+
+        /* ── Badges đẹp hơn ── */
+        .badge-role { font-size: .72rem; letter-spacing: .02em; }
+        .badge-provider { font-size: .7rem; padding: 3px 8px; border-radius: 999px; }
+
+        /* ── Checkbox Roles ── */
+        .roles-checkbox-group { display: flex; flex-wrap: wrap; gap: 8px; }
+        .role-check-label {
+            display: flex; align-items: center; gap: 6px;
+            padding: 4px 12px; border: 1.5px solid #dee2e6;
+            border-radius: 999px; cursor: pointer; font-size: .82rem;
+            transition: all .2s; user-select: none; background: #fff;
+        }
+        .role-check-label:hover { border-color: #0d6efd; background: #f0f5ff; }
+        .role-check-label input { accent-color: #0d6efd; }
+        .role-check-label.checked { border-color: #0d6efd; background: #e7f0ff; font-weight: 600; }
+
+        /* ── Row bị khóa ── */
+        tr.row-locked td { opacity: .6; }
+        tr.row-active td { opacity: 1; }
+
+        /* ── Table action buttons căn đều ── */
+        .action-cell { white-space: nowrap; min-width: 115px; }
+
+        /* ── Toastr overrides ── */
+        #toast-container > .toast { opacity: .97 !important; border-radius: 10px !important; }
+    </style>
 </head>
 <body class="bg-light">
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
     <div class="container-fluid px-5">
         <a class="navbar-brand d-flex align-items-center fw-bold text-uppercase" th:href="@{/}">
             <img src="/img/logo.png" th:src="@{/img/logo.png}" alt="Logo" width="45" height="45" class="me-2">
@@ -24,67 +90,28 @@
         </button>
 
         <div class="collapse navbar-collapse" id="navbarContent">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0" sec:authorize="!hasAnyAuthority('ADMIN', 'ROLE_ADMIN')">
-                <li class="nav-item dropdown custom-dropdown">
-                    <a class="nav-link dropdown-toggle fw-bold text-white" href="#" id="sportDropdown">THỂ THAO</a>
-                    <ul class="dropdown-menu dropdown-menu-glass">
-                        <li><a class="dropdown-item" th:href="@{/products(sport='Bóng đá')}"><i class="fa-solid fa-futbol me-2"></i>Bóng đá</a></li>
-                        <li><a class="dropdown-item" th:href="@{/products(sport='Cầu lông')}"><i class="fa-solid fa-feather me-2"></i>Cầu lông</a></li>
-                        <li><a class="dropdown-item" th:href="@{/products}">Tất cả...</a></li>
-                    </ul>
-                </li>
-                <li class="nav-item dropdown custom-dropdown">
-                    <a class="nav-link dropdown-toggle fw-bold text-white" href="#" id="brandDropdown">THƯƠNG HIỆU</a>
-                    <ul class="dropdown-menu dropdown-menu-glass">
-                        <li><a class="dropdown-item" th:href="@{/products(brand='Nike')}">Nike</a></li>
-                        <li><a class="dropdown-item" th:href="@{/products}">Tất cả...</a></li>
-                    </ul>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link fw-bold text-white" th:href="@{/products}">TẤT CẢ SẢN PHẨM <span class="badge bg-danger ms-1" style="font-size: 0.6rem;">HOT</span></a>
-                </li>
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0" sec:authorize="hasAnyAuthority('ADMIN','BOTH')">
+                <li class="nav-item"><a class="nav-link fw-bold text-white" th:href="@{/admin/products}"><i class="fa-solid fa-box me-1"></i>Sản phẩm</a></li>
+                <li class="nav-item"><a class="nav-link fw-bold text-white" th:href="@{/admin/orders}"><i class="fa-solid fa-clipboard-list me-1"></i>Đơn hàng</a></li>
+                <li class="nav-item"><a class="nav-link fw-bold text-white" th:href="@{/admin/statistics}"><i class="fa-solid fa-chart-line me-1"></i>Thống kê</a></li>
+                <li class="nav-item"><a class="nav-link fw-bold text-white active" th:href="@{/admin/users}"><i class="fa-solid fa-users-gear me-1"></i>Người dùng</a></li>
             </ul>
-
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0" sec:authorize="hasAnyAuthority('ADMIN', 'ROLE_ADMIN')">
-                <li class="nav-item"><a class="nav-link fw-bold text-white" th:href="@{/admin/products}"><i class="fa-solid fa-box me-1"></i> Sản phẩm</a></li>
-                <li class="nav-item"><a class="nav-link fw-bold text-white" th:href="@{/admin/orders}"><i class="fa-solid fa-clipboard-list me-1"></i> Đơn hàng</a></li>
-                <li class="nav-item"><a class="nav-link fw-bold text-white" th:href="@{/admin/statistics}"><i class="fa-solid fa-chart-line me-1"></i> Thống kê</a></li>
-                <li class="nav-item"><a class="nav-link fw-bold text-white active" th:href="@{/admin/users}"><i class="fa-solid fa-users-gear me-1"></i> Người dùng</a></li>
-            </ul>
-
-            <form class="d-flex mx-auto search-form position-relative" role="search" style="width: 350px;" th:action="@{/products}" method="get" sec:authorize="!hasAnyAuthority('ADMIN', 'ROLE_ADMIN')">
-                <input class="form-control search-input" type="search" name="keyword" placeholder="Tìm tên sản phẩm..." aria-label="Search" th:value="${keyword}">
-                <button class="btn search-btn position-absolute end-0 top-0 h-100" type="submit"><i class="fa-solid fa-magnifying-glass text-white"></i></button>
-            </form>
 
             <ul class="navbar-nav ms-auto align-items-center gap-3">
-                <li class="nav-item position-relative" sec:authorize="!hasAnyAuthority('ADMIN', 'ROLE_ADMIN')">
-                    <a class="nav-link text-white" th:href="@{/cart}" style="font-size: 1.2rem;">
-                        <i class="fa-solid fa-cart-shopping"></i>
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;" th:text="${cartCount != null ? cartCount : 0}"></span>
-                    </a>
-                </li>
-
                 <li class="nav-item dropdown custom-dropdown">
-                    <a sec:authorize="!isAuthenticated()" class="nav-link text-white fw-bold" th:href="@{/login}"><i class="fa-solid fa-user me-1"></i> Đăng nhập</a>
-                    <a sec:authorize="isAuthenticated()" class="nav-link dropdown-toggle fw-bold text-white" href="#" role="button" data-bs-toggle="dropdown">
-                        <i class="fa-solid fa-user-circle" style="font-size: 1.3rem;"></i>
+                    <a sec:authorize="isAuthenticated()" class="nav-link dropdown-toggle fw-bold text-white"
+                       href="#" role="button" data-bs-toggle="dropdown">
+                        <i class="fa-solid fa-user-circle" style="font-size:1.3rem"></i>
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-glass dropdown-menu-end" sec:authorize="isAuthenticated()">
-                        <li sec:authorize="!hasAnyAuthority('ADMIN', 'ROLE_ADMIN')"><a class="dropdown-item" th:href="@{/profile}">Hồ sơ cá nhân</a></li>
-                        <li sec:authorize="!hasAnyAuthority('ADMIN', 'ROLE_ADMIN')"><a class="dropdown-item" th:href="@{/orders}">Đơn hàng của tôi</a></li>
-
-                        <li sec:authorize="hasAnyAuthority('ADMIN', 'ROLE_ADMIN', 'BOTH')"><hr class="dropdown-divider"></li>
-                        <li sec:authorize="hasAnyAuthority('ADMIN', 'ROLE_ADMIN', 'BOTH')"><h6 class="dropdown-header text-warning fw-bold">QUẢN TRỊ</h6></li>
-                        <li sec:authorize="hasAnyAuthority('ADMIN', 'ROLE_ADMIN', 'BOTH')"><a class="dropdown-item" th:href="@{/admin/products}">Quản lý Sản phẩm</a></li>
-                        <li sec:authorize="hasAnyAuthority('ADMIN', 'ROLE_ADMIN', 'BOTH')"><a class="dropdown-item" th:href="@{/admin/orders}">Quản lý Đơn hàng</a></li>
-                        <li sec:authorize="hasAnyAuthority('ADMIN', 'ROLE_ADMIN', 'BOTH')"><a class="dropdown-item" th:href="@{/admin/statistics}">Xem Thống kê</a></li>
-                        <li sec:authorize="hasAnyAuthority('ADMIN', 'ROLE_ADMIN', 'BOTH')"><a class="dropdown-item" th:href="@{/admin/users}">Quản lý Người dùng</a></li>
-
+                    <ul class="dropdown-menu dropdown-menu-end" sec:authorize="isAuthenticated()">
+                        <li sec:authorize="hasAnyAuthority('ADMIN','BOTH')"><h6 class="dropdown-header text-warning fw-bold">QUẢN TRỊ</h6></li>
+                        <li sec:authorize="hasAnyAuthority('ADMIN','BOTH')"><a class="dropdown-item" th:href="@{/admin/users}">Quản lý Người dùng</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li>
                             <form th:action="@{/logout}" method="post">
-                                <button type="submit" class="dropdown-item text-danger fw-bold"><i class="fa-solid fa-right-from-bracket me-2"></i>Đăng xuất</button>
+                                <button type="submit" class="dropdown-item text-danger fw-bold">
+                                    <i class="fa-solid fa-right-from-bracket me-2"></i>Đăng xuất
+                                </button>
                             </form>
                         </li>
                     </ul>
@@ -93,96 +120,264 @@
         </div>
     </div>
 </nav>
-<br><br><br><br>
 
-<div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h3 class="fw-bold m-0">Quản lý người dùng</h3>
+<!-- ===== NỘI DUNG CHÍNH ===== -->
+<div class="container py-4 mt-5 pt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold m-0"><i class="fa-solid fa-users-gear me-2 text-primary"></i>Quản lý người dùng</h3>
+            <p class="text-muted small m-0 mt-1">Quản lý tài khoản, chức danh và quyền hạn trong hệ thống</p>
+        </div>
+        <span class="badge bg-primary rounded-pill fs-6" th:text="${users.size()} + ' người dùng'">0 người dùng</span>
     </div>
 
-    <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
-    <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
+    <!-- Thông báo từ Thymeleaf form submit -->
+    <div id="server-success" class="alert alert-success alert-dismissible fade show" th:if="${success}">
+        <i class="fa-solid fa-circle-check me-2"></i><span th:text="${success}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <div id="server-error" class="alert alert-danger alert-dismissible fade show" th:if="${error}">
+        <i class="fa-solid fa-triangle-exclamation me-2"></i><span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
 
     <div class="row g-4">
+
+        <!-- ===== FORM THÊM / SỬA ===== -->
         <div class="col-lg-4">
-            <div class="card shadow-sm">
+            <div class="card shadow-sm border-0 form-card">
+                <div class="card-header bg-dark text-white py-3">
+                    <h6 class="m-0 fw-bold">
+                        <i class="fa-solid fa-user-plus me-2"></i>
+                        <span th:text="${isEdit} ? 'Cập nhật người dùng' : 'Thêm người dùng mới'">Thêm người dùng</span>
+                    </h6>
+                </div>
                 <div class="card-body">
-                    <h5 class="card-title fw-bold" th:text="${isEdit} ? 'Cập nhật người dùng' : 'Thêm người dùng'">Thêm người dùng</h5>
-                    <form th:action="@{/admin/users/save}" th:object="${formUser}" method="post" class="mt-3">
+                    <form th:action="@{/admin/users/save}" th:object="${formUser}" method="post" id="userForm">
                         <input type="hidden" th:field="*{id}">
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Email</label>
-                            <input type="email" class="form-control" th:field="*{email}" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Username</label>
-                            <input type="text" class="form-control" th:field="*{username}">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Họ tên</label>
-                            <input type="text" class="form-control" th:field="*{fullName}">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Mật khẩu</label>
-                            <input type="password" class="form-control" th:field="*{password}">
-                            <small class="text-muted" th:if="${isEdit}">Bỏ trống để giữ mật khẩu cũ.</small>
-                        </div>
 
                         <div class="mb-3">
-                            <label class="form-label fw-bold">Vai trò (Role)</label>
-                            <div th:if="${formUser.provider == 'GOOGLE'}">
-                                <input type="text" class="form-control text-muted" value="Khách hàng (USER)" readonly>
-                                <input type="hidden" name="role" value="USER">
-                                <small class="text-danger fw-bold"><i class="fa-solid fa-triangle-exclamation"></i> Tài khoản Google không thể làm Quản trị.</small>
+                            <label for="f-email" class="form-label fw-semibold">Email <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fa-solid fa-envelope text-muted"></i></span>
+                                <input type="email" id="f-email" class="form-control" th:field="*{email}"
+                                       placeholder="email@example.com" required>
                             </div>
-                            <select th:unless="${formUser.provider == 'GOOGLE'}" class="form-select" name="role" required>
-                                <option value="USER" th:selected="${formUser.role == 'USER' || formUser.role == null}">Khách hàng (USER)</option>
-                                <option value="ADMIN" th:selected="${formUser.role == 'ADMIN'}">Quản trị viên (ADMIN)</option>
-                                <option value="BOTH" th:selected="${formUser.role == 'BOTH'}">Quản trị & Khách hàng (BOTH)</option>
+                        </div>
+                        <div class="mb-3">
+                            <label for="f-username" class="form-label fw-semibold">Username</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fa-solid fa-at text-muted"></i></span>
+                                <input type="text" id="f-username" class="form-control" th:field="*{username}"
+                                       placeholder="Để trống → dùng email">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="f-fullname" class="form-label fw-semibold">Họ và tên</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fa-solid fa-id-card text-muted"></i></span>
+                                <input type="text" id="f-fullname" class="form-control" th:field="*{fullName}"
+                                       placeholder="Nguyễn Văn A">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="f-password" class="form-label fw-semibold">Mật khẩu</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fa-solid fa-lock text-muted"></i></span>
+                                <input type="password" id="f-password" class="form-control" th:field="*{password}"
+                                       placeholder="Nhập mật khẩu mới">
+                                <button class="btn btn-outline-secondary" type="button" id="togglePassword"
+                                        title="Hiện/ẩn mật khẩu">
+                                    <i class="fa-solid fa-eye" id="eyeIcon"></i>
+                                </button>
+                            </div>
+                            <div class="form-text">
+                                <i class="fa-solid fa-circle-info text-primary"></i>
+                                <span th:if="${isEdit}">Bỏ trống để giữ mật khẩu cũ.</span>
+                                <span th:unless="${isEdit}">Bắt buộc khi tạo tài khoản LOCAL.</span>
+                            </div>
+                        </div>
+
+                        <!-- CHỨC DANH (RoleGroup) -->
+                        <div class="mb-3">
+                            <label for="f-roleGroup" class="form-label fw-semibold">
+                                <i class="fa-solid fa-sitemap me-1 text-info"></i>Chức danh
+                            </label>
+                            <div th:if="${formUser.provider == 'GOOGLE'}" class="alert alert-warning py-2 mb-0">
+                                <i class="fa-brands fa-google me-1"></i>
+                                Tài khoản Google — Chức danh mặc định: <strong>Khách hàng</strong>.
+                            </div>
+                            <select th:unless="${formUser.provider == 'GOOGLE'}"
+                                    class="form-select" name="roleGroupId" id="f-roleGroup"
+                                    onchange="UserForm.onRoleGroupChange(this)">
+                                <option value="">-- Không gán chức danh --</option>
+                                <option th:each="rg : ${roleGroups}"
+                                        th:value="${rg.id}"
+                                        th:text="${rg.name}"
+                                        th:data-roles="${rg.roles}"
+                                        th:attr="data-role-ids=${T(java.util.stream.Collectors).joining(',', rg.roles.stream().map(r -> r.id.toString()).iterator())}"
+                                        th:selected="${formUser.roleGroup != null and formUser.roleGroup.id == rg.id}">
+                                </option>
                             </select>
+                            <div class="form-text">Quyền sẽ được kế thừa từ chức danh này.</div>
+                        </div>
+
+                        <!-- QUYỀN RIÊNG (Roles — Checkboxes) -->
+                        <div class="mb-4" th:unless="${formUser.provider == 'GOOGLE'}">
+                            <label class="form-label fw-semibold">
+                                <i class="fa-solid fa-key me-1 text-warning"></i>Quyền riêng (bổ sung)
+                                <span class="badge bg-secondary ms-1">Tùy chọn</span>
+                            </label>
+                            <div class="roles-checkbox-group" id="rolesCheckboxGroup">
+                                <!-- allRoles được truyền từ Controller nếu cần — tạm thời render cứng 3 role mặc định -->
+                                <!-- Nếu Controller truyền th:each="r : ${allRoles}" thì dùng loop bên dưới -->
+                                <th:block th:if="${allRoles != null}" th:each="r : ${allRoles}">
+                                    <label class="role-check-label"
+                                           th:classappend="${formUser.roles != null and formUser.roles.contains(r)} ? 'checked' : ''">
+                                        <input type="checkbox" name="roleIds"
+                                               th:value="${r.id}"
+                                               th:checked="${formUser.roles != null and formUser.roles.contains(r)}"
+                                               onchange="UserForm.onRoleCheckChange(this)">
+                                        <span th:text="${r.name}">ROLE</span>
+                                    </label>
+                                </th:block>
+                                <!-- Fallback: render 3 role cứng nếu allRoles chưa được inject -->
+                                <th:block th:unless="${allRoles != null}">
+                                    <label class="role-check-label">
+                                        <input type="checkbox" name="roleIds" value="1" data-role-name="USER"
+                                               onchange="UserForm.onRoleCheckChange(this)">
+                                        <span>USER</span>
+                                    </label>
+                                    <label class="role-check-label">
+                                        <input type="checkbox" name="roleIds" value="2" data-role-name="ADMIN"
+                                               onchange="UserForm.onRoleCheckChange(this)">
+                                        <span>ADMIN</span>
+                                    </label>
+                                    <label class="role-check-label">
+                                        <input type="checkbox" name="roleIds" value="3" data-role-name="BOTH"
+                                               onchange="UserForm.onRoleCheckChange(this)">
+                                        <span>BOTH</span>
+                                    </label>
+                                </th:block>
+                            </div>
+                            <div class="form-text">Các quyền này bổ sung ngoài quyền kế thừa từ Chức danh.</div>
                         </div>
 
                         <div class="d-flex gap-2">
-                            <button type="submit" class="btn btn-dark"><i class="fa-solid fa-floppy-disk me-1"></i>Lưu</button>
-                            <a class="btn btn-outline-secondary" th:href="@{/admin/users}"><i class="fa-solid fa-rotate-left me-1"></i>Hủy</a>
+                            <button type="submit" class="btn btn-dark flex-grow-1" id="saveBtn">
+                                <i class="fa-solid fa-floppy-disk me-1"></i>Lưu
+                            </button>
+                            <a class="btn btn-outline-secondary" th:href="@{/admin/users}">
+                                <i class="fa-solid fa-rotate-left"></i>
+                            </a>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
 
+        <!-- ===== DANH SÁCH USER ===== -->
         <div class="col-lg-8">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title fw-bold">Danh sách người dùng</h5>
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white border-bottom py-3 d-flex align-items-center justify-content-between">
+                    <h6 class="m-0 fw-bold">
+                        <i class="fa-solid fa-table-list me-2 text-secondary"></i>Danh sách người dùng
+                    </h6>
+                    <input type="search" class="form-control form-control-sm w-auto"
+                           id="searchInput" placeholder="Lọc nhanh..." oninput="UserTable.filter(this.value)">
+                </div>
+                <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-hover align-middle mt-3">
-                            <thead class="table-light">
+                        <table class="table table-hover align-middle mb-0" id="usersTable">
+                            <thead class="table-dark">
                             <tr>
-                                <th>ID</th>
+                                <th style="width:50px">ID</th>
                                 <th>Email</th>
                                 <th>Họ tên</th>
-                                <th>Role</th>
-                                <th>Provider</th>
-                                <th class="text-end">Hành động</th>
+                                <th>Chức danh</th>
+                                <th style="width:120px">Trạng thái</th>
+                                <th style="width:80px">Provider</th>
+                                <th style="width:120px" class="text-center">Thao tác</th>
                             </tr>
                             </thead>
                             <tbody>
-                            <tr th:each="u : ${users}">
-                                <td th:text="${u.id}">1</td>
-                                <td th:text="${u.email}">email</td>
-                                <td th:text="${u.fullName}">name</td>
-                                <td>
-                                    <span class="badge" th:classappend="${u.role == 'ADMIN'} ? 'bg-danger' : (${u.role == 'BOTH'} ? 'bg-warning text-dark' : 'bg-secondary')" th:text="${u.role}">USER</span>
-                                </td>
-                                <td th:text="${u.provider}">LOCAL</td>
-                                <td class="text-end">
-                                    <a class="btn btn-sm btn-outline-primary" th:href="@{/admin/users(editId=${u.id})}"><i class="fa-solid fa-pen-to-square"></i></a>
+                            <tr th:each="u : ${users}"
+                                th:id="'row-' + ${u.id}"
+                                th:classappend="${!u.active} ? 'row-locked' : 'row-active'">
 
-                                    <form th:action="@{/admin/users/delete/{id}(id=${u.id})}" method="post" class="d-inline">
-                                        <button type="submit" class="btn btn-sm btn-outline-danger"
-                                                th:disabled="${(currentUserId != null && currentUserId == u.id) || (currentUserRole == 'ADMIN' && u.role != 'USER')}"
-                                                onclick="return confirm('Bạn có chắc muốn xóa user này?');">
+                                <td class="fw-bold text-secondary" th:text="${u.id}">1</td>
+
+                                <td>
+                                    <div class="fw-semibold small" th:text="${u.email}">email</div>
+                                    <div class="text-muted" style="font-size:.72rem" th:text="${u.username}">username</div>
+                                </td>
+
+                                <td th:text="${u.fullName != null ? u.fullName : '—'}">name</td>
+
+                                <!-- Chức danh -->
+                                <td>
+                                    <span th:if="${u.roleGroup != null}"
+                                          class="badge badge-role bg-info text-dark rounded-pill"
+                                          th:text="${u.roleGroup.name}"></span>
+                                    <span th:unless="${u.roleGroup != null}"
+                                          class="text-muted fst-italic small">Chưa gán</span>
+                                </td>
+
+                                <!-- Toggle Switch Active — sử dụng Ajax -->
+                                <td>
+                                    <!--
+                                        data-user-id  : ID user để gọi API
+                                        data-is-self  : true nếu user này chính là người đang login (disable toggle)
+                                        checked       : trạng thái hiện tại
+                                    -->
+                                    <div class="toggle-switch"
+                                         th:classappend="${currentUserId != null and currentUserId == u.id} ? 'disabled' : ''">
+                                        <input type="checkbox"
+                                               th:id="'toggle-' + ${u.id}"
+                                               th:checked="${u.active}"
+                                               th:data-user-id="${u.id}"
+                                               th:data-is-self="${currentUserId != null and currentUserId == u.id}"
+                                               class="active-toggle"
+                                               th:disabled="${currentUserId != null and currentUserId == u.id}">
+                                        <label class="slider"
+                                               th:for="'toggle-' + ${u.id}"
+                                               title="Nhấn để bật/tắt tài khoản"></label>
+                                        <span th:id="'toggle-label-' + ${u.id}"
+                                              class="toggle-label"
+                                              th:classappend="${u.active} ? 'active' : 'locked'"
+                                              th:text="${u.active} ? 'Hoạt động' : 'Bị khóa'"></span>
+                                    </div>
+                                </td>
+
+                                <!-- Provider Badge -->
+                                <td>
+                                    <span th:if="${u.provider == 'GOOGLE'}"
+                                          class="badge badge-provider bg-danger">
+                                        <i class="fa-brands fa-google me-1"></i>Google
+                                    </span>
+                                    <span th:unless="${u.provider == 'GOOGLE'}"
+                                          class="badge badge-provider bg-secondary">
+                                        <i class="fa-solid fa-database me-1"></i>Local
+                                    </span>
+                                </td>
+
+                                <!-- Hành động -->
+                                <td class="action-cell text-center">
+                                    <!-- Nút Sửa -->
+                                    <a class="btn btn-sm btn-outline-primary"
+                                       th:href="@{/admin/users(editId=${u.id})}"
+                                       title="Chỉnh sửa thông tin">
+                                        <i class="fa-solid fa-pen-to-square"></i>
+                                    </a>
+
+                                    <!-- Nút Xóa -->
+                                    <form th:action="@{/admin/users/delete/{id}(id=${u.id})}"
+                                          method="post" class="d-inline">
+                                        <button type="submit"
+                                                class="btn btn-sm btn-outline-danger"
+                                                th:disabled="${currentUserId != null and currentUserId == u.id}"
+                                                onclick="return confirm('Bạn có chắc muốn xóa người dùng này?\nThao tác không thể hoàn tác!');"
+                                                title="Xóa người dùng">
                                             <i class="fa-solid fa-trash"></i>
                                         </button>
                                     </form>
@@ -197,6 +392,231 @@
     </div>
 </div>
 
+<!-- ===== SCRIPTS ===== -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+
+    // ────────────────────────────────────────────────
+    // CẤU HÌNH TOASTR
+    // ────────────────────────────────────────────────
+    toastr.options = {
+        positionClass: 'toast-top-right',
+        timeOut: 3500,
+        extendedTimeOut: 1500,
+        progressBar: true,
+        closeButton: true,
+        newestOnTop: true,
+        preventDuplicates: true
+    };
+
+    // ────────────────────────────────────────────────
+    // LẤY CSRF TOKEN TỪ META TAG (Spring Security)
+    // Cần thiết cho mọi Ajax call không phải GET
+    // ────────────────────────────────────────────────
+    const CSRF = {
+        token:  document.querySelector('meta[name="_csrf"]')?.content || '',
+        header: document.querySelector('meta[name="_csrf_header"]')?.content || 'X-CSRF-TOKEN'
+    };
+
+    // ────────────────────────────────────────────────
+    // MODULE: TOGGLE ACTIVE
+    // Xử lý Ajax call PATCH /api/admin/users/{id}/toggle-active
+    // ────────────────────────────────────────────────
+    const ToggleActive = {
+
+        /**
+         * Gọi được từ sự kiện 'change' của checkbox Toggle Switch.
+         * @param {HTMLInputElement} checkbox
+         */
+        handle(checkbox) {
+            const userId   = checkbox.dataset.userId;
+            const isSelf   = checkbox.dataset.isSelf === 'true';
+            const slider   = checkbox.nextElementSibling;      // .slider label
+            const label    = document.getElementById('toggle-label-' + userId);
+            const row      = document.getElementById('row-' + userId);
+
+            // Chặn tự khóa mình — double check phía client
+            if (isSelf) {
+                checkbox.checked = !checkbox.checked; // hoàn tác UI
+                toastr.error('Không thể tự khóa tài khoản của chính mình.');
+                return;
+            }
+
+            // Trạng thái sẽ toggle sau khi API phản hồi, không trước
+            // Tạm hoàn tác UI để chờ server xác nhận
+            const previousState = !checkbox.checked; // vì browser đã đổi trước khi ta bắt
+            checkbox.checked = previousState;
+
+            // Disable để tránh spam click + hiệu ứng loading
+            slider.classList.add('loading');
+            checkbox.disabled = true;
+
+            // Xác nhận từ người dùng
+            const action     = previousState ? 'KHÓA' : 'MỞ KHÓA';
+            const userEmail  = row.querySelector('td:nth-child(2) .fw-semibold')?.textContent || 'người dùng này';
+            if (!confirm(`Bạn có chắc muốn ${action} tài khoản "${userEmail}"?`)) {
+                // Hủy: re-enable và không gọi API
+                slider.classList.remove('loading');
+                checkbox.disabled = false;
+                return;
+            }
+
+            // Gọi API
+            fetch(`/api/admin/users/${userId}/toggle-active`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    [CSRF.header]: CSRF.token         // CSRF header bắt buộc
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    const isActive = data.data.active;
+
+                    // CẬP NHẬT UI KHÔNG CẦN RELOAD TRANG
+                    checkbox.checked = isActive;
+
+                    // Cập nhật label bên cạnh switch
+                    label.textContent = isActive ? 'Hoạt động' : 'Bị khóa';
+                    label.className   = 'toggle-label ' + (isActive ? 'active' : 'locked');
+
+                    // Cập nhật style row
+                    row.classList.toggle('row-locked', !isActive);
+                    row.classList.toggle('row-active',  isActive);
+
+                    // Thông báo thành công
+                    if (isActive) {
+                        toastr.success(data.message, 'Mở khóa thành công');
+                    } else {
+                        toastr.warning(data.message, 'Đã khóa tài khoản');
+                    }
+                } else {
+                    // Server trả về lỗi nghiệp vụ (VD: SelfDeactivationException)
+                    toastr.error(data.message, 'Lỗi');
+                }
+            })
+            .catch(err => {
+                // Lỗi mạng hoặc server 500
+                console.error('Toggle active error:', err);
+                toastr.error('Không thể kết nối đến máy chủ. Vui lòng thử lại.', 'Lỗi kết nối');
+            })
+            .finally(() => {
+                // Luôn re-enable sau khi xong (dù thành công hay thất bại)
+                slider.classList.remove('loading');
+                checkbox.disabled = false;
+            });
+        }
+    };
+
+    // Gắn sự kiện 'change' cho tất cả toggle switches
+    document.querySelectorAll('.active-toggle').forEach(checkbox => {
+        checkbox.addEventListener('change', function () {
+            ToggleActive.handle(this);
+        });
+    });
+
+
+    // ────────────────────────────────────────────────
+    // MODULE: FORM USER
+    // Xử lý form logic: show/hide password, role checkbox style,
+    // và auto-check roles khi chọn RoleGroup
+    // ────────────────────────────────────────────────
+    const UserForm = {
+
+        // Ẩn/hiện mật khẩu
+        togglePassword() {
+            const input   = document.getElementById('f-password');
+            const eyeIcon = document.getElementById('eyeIcon');
+            if (input.type === 'password') {
+                input.type         = 'text';
+                eyeIcon.className  = 'fa-solid fa-eye-slash';
+            } else {
+                input.type         = 'password';
+                eyeIcon.className  = 'fa-solid fa-eye';
+            }
+        },
+
+        // Cập nhật style cho checkbox label khi check/uncheck
+        onRoleCheckChange(checkbox) {
+            const label = checkbox.closest('.role-check-label');
+            label.classList.toggle('checked', checkbox.checked);
+        },
+
+        /**
+         * Khi chọn RoleGroup → tự động check các Role thuộc chức danh đó trên UI.
+         * Logic: Gọi API GET /api/admin/role-groups/{id} để lấy roleIds,
+         *        sau đó check các checkbox tương ứng.
+         * (Không submit form, chỉ cập nhật UI giúp Admin thấy quyền mặc định)
+         */
+        onRoleGroupChange(select) {
+            const roleGroupId = select.value;
+            const checkboxes  = document.querySelectorAll('#rolesCheckboxGroup input[type="checkbox"]');
+
+            if (!roleGroupId) {
+                // Bỏ chọn hết nếu không chọn chức danh
+                checkboxes.forEach(cb => {
+                    cb.checked = false;
+                    cb.closest('.role-check-label').classList.remove('checked');
+                });
+                return;
+            }
+
+            // Gọi API lấy roles của RoleGroup
+            fetch(`/api/admin/role-groups/${roleGroupId}`, {
+                headers: { [CSRF.header]: CSRF.token }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (!data.success) return;
+                const roleIds = (data.data.roles || []).map(r => String(r.id));
+
+                // Auto-check các checkbox trùng roleId
+                checkboxes.forEach(cb => {
+                    const shouldCheck = roleIds.includes(cb.value);
+                    cb.checked = shouldCheck;
+                    cb.closest('.role-check-label').classList.toggle('checked', shouldCheck);
+                });
+
+                if (roleIds.length > 0) {
+                    toastr.info(
+                        `Đã tự động chọn ${roleIds.length} quyền mặc định của chức danh này.`,
+                        'Gợi ý', { timeOut: 2500 }
+                    );
+                }
+            })
+            .catch(() => {
+                // Im lặng nếu lỗi — không block người dùng
+                console.warn('Không thể tải roles cho role group:', roleGroupId);
+            });
+        }
+    };
+
+    // Gắn nút toggle password
+    document.getElementById('togglePassword')?.addEventListener('click', UserForm.togglePassword);
+
+
+    // ────────────────────────────────────────────────
+    // MODULE: FILTER TABLE
+    // Lọc nhanh bảng user mà không cần reload
+    // ────────────────────────────────────────────────
+    const UserTable = {
+        filter(keyword) {
+            const kw   = keyword.toLowerCase().trim();
+            const rows = document.querySelectorAll('#usersTable tbody tr');
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(kw) ? '' : 'none';
+            });
+        }
+    };
+
+    /*]]>*/
+</script>
+
 </body>
 </html>

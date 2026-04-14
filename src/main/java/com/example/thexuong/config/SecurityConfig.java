@@ -5,12 +5,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity(prePostEnabled = true) // Bật @PreAuthorize/@PostAuthorize cho Method Security
 @RequiredArgsConstructor
 public class SecurityConfig {
 
@@ -32,8 +34,8 @@ public class SecurityConfig {
                         // 3. CHẶN ADMIN: Tránh trường hợp Admin gõ URL vào trang của Khách
                         .requestMatchers("/cart/**", "/checkout/**", "/orders/**", "/profile/**", "/place-order", "/order/**").hasAnyAuthority("USER", "BOTH")
 
-                        // 4. CHỈ ADMIN và BOTH mới vào được hệ thống quản trị
-                        .requestMatchers("/admin/**").hasAnyAuthority("ADMIN", "BOTH")
+                        // 4. CHỈ ADMIN và BOTH mới vào được hệ thống quản trị (Thymeleaf + REST API)
+                        .requestMatchers("/admin/**", "/api/admin/**").hasAnyAuthority("ADMIN", "BOTH")
 
                         .anyRequest().authenticated()
                 )
