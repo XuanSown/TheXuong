@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import com.example.thexuong.exception.RoleGroupInUseException;
 
 import java.util.HashSet;
 import java.util.List;
@@ -185,5 +186,12 @@ public class RoleGroupRestController {
                 "Đã gỡ quyền khỏi chức danh.",
                 RoleGroupResponse.from(updated)
         ));
+    }
+
+    // ==================== EXCEPTION HANDLER ====================
+    @ExceptionHandler(RoleGroupInUseException.class)
+    public ResponseEntity<ApiResponse<Void>> handleRoleGroupInUse(RoleGroupInUseException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ApiResponse.error(ex.getMessage()));
     }
 }

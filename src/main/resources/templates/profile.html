@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
@@ -24,7 +24,7 @@
         </button>
 
         <div class="collapse navbar-collapse" id="navbarContent">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0" sec:authorize="!hasAnyAuthority('ADMIN', 'ROLE_ADMIN')">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0" sec:authorize="!hasAnyAuthority('ADMIN', 'ROLE_ADMIN') or hasAnyAuthority('USER', 'ROLE_USER', 'BOTH')">
                 <li class="nav-item dropdown custom-dropdown">
                     <a class="nav-link dropdown-toggle fw-bold text-white" href="#" id="sportDropdown">THỂ THAO</a>
                     <ul class="dropdown-menu dropdown-menu-glass">
@@ -45,20 +45,20 @@
                 </li>
             </ul>
 
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0" sec:authorize="hasAnyAuthority('ADMIN', 'ROLE_ADMIN')">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0" sec:authorize="hasAnyAuthority('ADMIN', 'ROLE_ADMIN') and !hasAnyAuthority('USER', 'ROLE_USER', 'BOTH')">
                 <li class="nav-item"><a class="nav-link fw-bold text-white" th:href="@{/admin/products}"><i class="fa-solid fa-box me-1"></i> Sản phẩm</a></li>
                 <li class="nav-item"><a class="nav-link fw-bold text-white" th:href="@{/admin/orders}"><i class="fa-solid fa-clipboard-list me-1"></i> Đơn hàng</a></li>
                 <li class="nav-item"><a class="nav-link fw-bold text-white" th:href="@{/admin/statistics}"><i class="fa-solid fa-chart-line me-1"></i> Thống kê</a></li>
                 <li class="nav-item"><a class="nav-link fw-bold text-white active" th:href="@{/admin/users}"><i class="fa-solid fa-users-gear me-1"></i> Người dùng</a></li>
             </ul>
 
-            <form class="d-flex mx-auto search-form position-relative" role="search" style="width: 350px;" th:action="@{/products}" method="get" sec:authorize="!hasAnyAuthority('ADMIN', 'ROLE_ADMIN')">
+            <form class="d-flex mx-auto search-form position-relative" role="search" style="width: 350px;" th:action="@{/products}" method="get" sec:authorize="!hasAnyAuthority('ADMIN', 'ROLE_ADMIN') or hasAnyAuthority('USER', 'ROLE_USER', 'BOTH')">
                 <input class="form-control search-input" type="search" name="keyword" placeholder="Tìm tên sản phẩm..." aria-label="Search" th:value="${keyword}">
                 <button class="btn search-btn position-absolute end-0 top-0 h-100" type="submit"><i class="fa-solid fa-magnifying-glass text-white"></i></button>
             </form>
 
             <ul class="navbar-nav ms-auto align-items-center gap-3">
-                <li class="nav-item position-relative" sec:authorize="!hasAnyAuthority('ADMIN', 'ROLE_ADMIN')">
+                <li class="nav-item position-relative" sec:authorize="!hasAnyAuthority('ADMIN', 'ROLE_ADMIN') or hasAnyAuthority('USER', 'ROLE_USER', 'BOTH')">
                     <a class="nav-link text-white" th:href="@{/cart}" style="font-size: 1.2rem;">
                         <i class="fa-solid fa-cart-shopping"></i>
                         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;" th:text="${cartCount != null ? cartCount : 0}"></span>
@@ -71,8 +71,8 @@
                         <i class="fa-solid fa-user-circle" style="font-size: 1.3rem;"></i>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-glass dropdown-menu-end" sec:authorize="isAuthenticated()">
-                        <li sec:authorize="!hasAnyAuthority('ADMIN', 'ROLE_ADMIN')"><a class="dropdown-item" th:href="@{/profile}">Hồ sơ cá nhân</a></li>
-                        <li sec:authorize="!hasAnyAuthority('ADMIN', 'ROLE_ADMIN')"><a class="dropdown-item" th:href="@{/orders}">Đơn hàng của tôi</a></li>
+                        <li sec:authorize="!hasAnyAuthority('ADMIN', 'ROLE_ADMIN') or hasAnyAuthority('USER', 'ROLE_USER', 'BOTH')"><a class="dropdown-item" th:href="@{/profile}">Hồ sơ cá nhân</a></li>
+                        <li sec:authorize="!hasAnyAuthority('ADMIN', 'ROLE_ADMIN') or hasAnyAuthority('USER', 'ROLE_USER', 'BOTH')"><a class="dropdown-item" th:href="@{/orders}">Đơn hàng của tôi</a></li>
 
                         <li sec:authorize="hasAnyAuthority('ADMIN', 'ROLE_ADMIN', 'BOTH')"><hr class="dropdown-divider"></li>
                         <li sec:authorize="hasAnyAuthority('ADMIN', 'ROLE_ADMIN', 'BOTH')"><h6 class="dropdown-header text-warning fw-bold">QUẢN TRỊ</h6></li>
@@ -243,3 +243,4 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+

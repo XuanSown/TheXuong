@@ -1,5 +1,22 @@
 package com.example.thexuong.controller;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import com.example.thexuong.entity.Cart;
 import com.example.thexuong.entity.RoleGroup;
 import com.example.thexuong.entity.User;
@@ -10,19 +27,9 @@ import com.example.thexuong.repository.RoleRepository;
 import com.example.thexuong.repository.UserRepository;
 import com.example.thexuong.service.RoleGroupService;
 import com.example.thexuong.service.UserService;
+
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 
 @Controller
 @RequestMapping("/admin/users")
@@ -38,7 +45,6 @@ public class UserManagementController {
     private final RoleRepository roleRepository;
 
     // ==================== HIỂN THỊ DANH SÁCH ====================
-
     @GetMapping
     public String showUsers(@RequestParam(required = false) Long editId, Model model) {
         // Dùng findAllByOrderByIdAsc() có @EntityGraph để tránh N+1 khi load roleGroup
@@ -49,9 +55,10 @@ public class UserManagementController {
         boolean isEdit = false;
 
         if (editId != null) {
-            Optional<User> editUser = userRepository.findById(editId);
+            Optional<User> editUser = userRepository.findWithRolesById(editId);
             if (editUser.isPresent()) {
                 formUser = editUser.get();
+                formUser.setPassword(""); // Không đưa Hash ra ngoài giao diện, tránh đụng độ Double-Encode
                 isEdit = true;
             }
         }
@@ -69,12 +76,19 @@ public class UserManagementController {
     }
 
     // ==================== LƯU USER (TẠO MỚI / CẬP NHẬT) ====================
-
     @PostMapping("/save")
     public String saveUser(@ModelAttribute("formUser") User formUser,
-                           @RequestParam(required = false) Long roleGroupId,
-                           @RequestParam(required = false) Set<Long> roleIds,
-                           RedirectAttributes redirectAttributes) {
+            @RequestParam(required = false) Long roleGroupId,
+            @RequestParam(required = false) Set<Long> roleIds,
+            RedirectAttributes redirectAttributes) {
+
+        // Validate bắt buộc ROLE (chỉ áp dụng với tài khoản cấu hình LOCAL bằng tay)
+        if (!"GOOGLE".equals(formUser.getProvider())) {
+            if (roleIds == null || roleIds.isEmpty()) {
+                redirectAttributes.addFlashAttribute("error", "Bắt buộc phải chọn ít nhất 1 Quyền hạn (Role) cho tài khoản này.");
+                return "redirect:/admin/users";
+            }
+        }
 
         // ---- TẠO MỚI ----
         if (formUser.getId() == null) {
@@ -151,25 +165,22 @@ public class UserManagementController {
 
         userRepository.save(existing);
 
-        // Gán RoleGroup nếu có chọn (Google user không đổi được RoleGroup)
-        if (roleGroupId != null && !"GOOGLE".equals(existing.getProvider())) {
+        // Cập nhật RoleGroup (cho phép set null nếu admin chọn "-- Không gán --")
+        if (!"GOOGLE".equals(existing.getProvider())) {
             userService.assignRoleGroup(existing.getId(), roleGroupId);
         }
 
-        // Gán Roles riêng nếu có chọn
-        if (roleIds != null) {
-            userService.setRoles(existing.getId(), roleIds);
-        }
+        // Cập nhật Roles riêng (nếu rỗng thì xoá sạch)
+        userService.setRoles(existing.getId(), roleIds != null ? roleIds : java.util.Set.of());
 
         redirectAttributes.addFlashAttribute("success", "Cập nhật người dùng thành công.");
         return "redirect:/admin/users";
     }
 
     // ==================== TOGGLE ACTIVE ====================
-
     /**
-     * Bật/tắt trạng thái active của User.
-     * Chặn tự khóa tài khoản đang đăng nhập.
+     * Bật/tắt trạng thái active của User. Chặn tự khóa tài khoản đang đăng
+     * nhập.
      */
     @PostMapping("/toggle-active/{id}")
     public String toggleActive(@PathVariable Long id, RedirectAttributes redirectAttributes) {
@@ -184,7 +195,6 @@ public class UserManagementController {
     }
 
     // ==================== XÓA USER ====================
-
     @PostMapping("/delete/{id}")
     @Transactional
     public String deleteUser(@PathVariable Long id, RedirectAttributes redirectAttributes) {
@@ -216,8 +226,9 @@ public class UserManagementController {
     }
 
     // ==================== HELPER ====================
-
-    /** Lấy ID của người đang đăng nhập từ SecurityContext. */
+    /**
+     * Lấy ID của người đang đăng nhập từ SecurityContext.
+     */
     private Long getCurrentUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()

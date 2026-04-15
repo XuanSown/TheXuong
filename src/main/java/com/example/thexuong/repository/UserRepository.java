@@ -10,6 +10,9 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
+    @EntityGraph(attributePaths = {"roles", "roleGroup"})
+    Optional<User> findWithRolesById(Long id);
+
     //tìm user bằng username (dùng cho login thường)
     Optional<User> findByUsername(String username);
 
