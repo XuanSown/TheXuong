@@ -16,6 +16,8 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationSu
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -49,7 +51,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                     .password("")       // Google user không cần password
                     .provider("GOOGLE")
                     .active(true)
-                    .roleGroup(defaultGroup)
+                    .roleGroups(new HashSet<>(List.of(defaultGroup)))
                     .build();
 
             // Gán Role USER vào bảng user_roles

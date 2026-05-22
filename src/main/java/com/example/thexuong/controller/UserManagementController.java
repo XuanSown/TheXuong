@@ -78,7 +78,7 @@ public class UserManagementController {
     // ==================== LƯU USER (TẠO MỚI / CẬP NHẬT) ====================
     @PostMapping("/save")
     public String saveUser(@ModelAttribute("formUser") User formUser,
-            @RequestParam(required = false) Long roleGroupId,
+            @RequestParam(required = false) Set<Long> roleGroupIds,
             @RequestParam(required = false) Set<Long> roleIds,
             RedirectAttributes redirectAttributes) {
 
@@ -120,7 +120,7 @@ public class UserManagementController {
                     formUser.getFullName(),
                     formUser.getPassword(), // raw password, Service sẽ encode
                     provider,
-                    roleGroupId
+                    roleGroupIds
             );
 
             redirectAttributes.addFlashAttribute("success", "Thêm người dùng thành công.");
@@ -167,7 +167,7 @@ public class UserManagementController {
 
         // Cập nhật RoleGroup (cho phép set null nếu admin chọn "-- Không gán --")
         if (!"GOOGLE".equals(existing.getProvider())) {
-            userService.assignRoleGroup(existing.getId(), roleGroupId);
+            userService.assignRoleGroups(existing.getId(), roleGroupIds);
         }
 
         // Cập nhật Roles riêng (nếu rỗng thì xoá sạch)

@@ -86,18 +86,17 @@ public class UserService {
 
     /**
      * Gán chức danh (RoleGroup) cho User.
-     * Nếu roleGroupId = null → gỡ chức danh (set null).
+     * Nếu roleGroupIds rỗng → gỡ chức danh.
      */
     @Transactional
-    public void assignRoleGroup(Long userId, Long roleGroupId) {
+    public void assignRoleGroups(Long userId, Set<Long> roleGroupIds) {
         User user = getUserById(userId);
 
-        if (roleGroupId == null) {
-            user.setRoleGroup(null);
+        if (roleGroupIds == null || roleGroupIds.isEmpty()) {
+            user.getRoleGroups().clear();
         } else {
-            RoleGroup rg = roleGroupRepository.findById(roleGroupId)
-                    .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy chức danh với ID: " + roleGroupId));
-            user.setRoleGroup(rg);
+            Set<RoleGroup> rgs = new HashSet<>(roleGroupRepository.findAllById(roleGroupIds));
+            user.setRoleGroups(rgs);
         }
         userRepository.save(user);
     }
@@ -153,7 +152,7 @@ public class UserService {
      */
     @Transactional
     public User createUser(String email, String username, String fullName,
-                           String rawPassword, String provider, Long roleGroupId) {
+                           String rawPassword, String provider, Set<Long> roleGroupIds) {
         User.UserBuilder builder = User.builder()
                 .email(email)
                 .username(username != null && !username.isBlank() ? username : email)
@@ -170,9 +169,9 @@ public class UserService {
 
         User user = builder.build();
 
-        // Gán RoleGroup — ưu tiên roleGroupId được truyền vào, fallback về "Khách hàng"
-        RoleGroup rg = resolveRoleGroup(roleGroupId);
-        user.setRoleGroup(rg);
+        // Gán nhận nhiều RoleGroup thay vì 1
+        Set<RoleGroup> rgs = resolveRoleGroups(roleGroupIds);
+        user.setRoleGroups(rgs);
 
         // Gán Role mặc định từ bảng Roles (tên "USER")
         roleRepository.findByName("USER").ifPresent(userRole -> user.getRoles().add(userRole));
@@ -181,13 +180,14 @@ public class UserService {
     }
 
     /**
-     * Resolve RoleGroup: nếu có ID thì dùng, không thì lấy "Khách hàng" làm mặc định.
+     * Resolve RoleGroups: nếu có danh sách ID thì tra cứu DB, không thì lấy "Khách hàng" mặc định.
      */
-    private RoleGroup resolveRoleGroup(Long roleGroupId) {
-        if (roleGroupId != null) {
-            return roleGroupRepository.findById(roleGroupId).orElse(getDefaultRoleGroup());
+    private Set<RoleGroup> resolveRoleGroups(Set<Long> roleGroupIds) {
+        if (roleGroupIds != null && !roleGroupIds.isEmpty()) {
+            Set<RoleGroup> rgs = new HashSet<>(roleGroupRepository.findAllById(roleGroupIds));
+            if (!rgs.isEmpty()) return rgs;
         }
-        return getDefaultRoleGroup();
+        return Set.of(getDefaultRoleGroup());
     }
 
     /**

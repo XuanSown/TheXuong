@@ -50,7 +50,7 @@ public class RoleGroupService {
         RoleGroup rg = findById(id);
 
         // Kiểm tra trước ở tầng Service để báo lỗi thân thiện hơn
-        long userCount = userRepository.countByRoleGroupId(id);
+        long userCount = userRepository.countByRoleGroups_Id(id);
         if (userCount > 0) {
             throw new RoleGroupInUseException(rg.getName());
         }

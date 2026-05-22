@@ -19,7 +19,7 @@ import java.util.Set;
 // Chỉ dùng 'id' để equals/hashCode — tránh đệ quy qua roles, roleGroup
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 // Loại bỏ các trường quan hệ khỏi toString() để tránh LazyInitializationException
-@ToString(exclude = {"roles", "roleGroup", "password"})
+@ToString(exclude = {"roles", "roleGroups", "password"})
 @Entity
 @Table(name = "Users")
 public class User {
@@ -62,12 +62,17 @@ public class User {
 
     /**
      * Chức danh (VD: Giám đốc, Quản lý kho, Khách hàng).
-     * 1 User thuộc 1 RoleGroup. Nullable = chưa được gán chức danh.
+     * 1 User có thể thuộc nhiều RoleGroups (N-N).
      * LAZY để tránh query thừa khi chỉ cần thông tin cơ bản của User.
      */
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "role_group_id")
-    private RoleGroup roleGroup;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "user_role_groups",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_group_id")
+    )
+    @Builder.Default
+    private Set<RoleGroup> roleGroups = new HashSet<>();
 
     /**
      * Các quyền riêng (cá biệt) của User, override/bổ sung ngoài quyền từ RoleGroup.

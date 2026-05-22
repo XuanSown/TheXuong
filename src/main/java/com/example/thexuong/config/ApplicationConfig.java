@@ -46,13 +46,13 @@ public class ApplicationConfig {
                     .orElseThrow(() -> new UsernameNotFoundException(
                             "Không tìm thấy người dùng với email/username: " + username));
 
-            // Gom quyền = Roles riêng của User ∪ Roles kế thừa từ RoleGroup
+            // Gom quyền = Roles riêng của User ∪ Roles kế thừa từ tất cả Chức danh (RoleGroups)
             Set<GrantedAuthority> authorities = Stream.concat(
                     // Roles riêng của User
                     user.getRoles().stream(),
-                    // Roles từ Chức danh (RoleGroup) — bỏ qua nếu chưa gán chức danh
-                    user.getRoleGroup() != null
-                            ? user.getRoleGroup().getRoles().stream()
+                    // Roles từ các Chức danh (RoleGroups)
+                    user.getRoleGroups() != null && !user.getRoleGroups().isEmpty()
+                            ? user.getRoleGroups().stream().flatMap(rg -> rg.getRoles().stream())
                             : Stream.empty()
             )
             .map(role -> (GrantedAuthority) new SimpleGrantedAuthority(role.getName()))
