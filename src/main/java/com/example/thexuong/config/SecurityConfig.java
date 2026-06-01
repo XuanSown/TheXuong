@@ -29,7 +29,7 @@ public class SecurityConfig {
                 // 1. Cho phép truy cập resources
                 .requestMatchers("/css/**", "/js/**", "/img/**", "/fonts/**", "/uploads/**").permitAll()
                 // 2. Các trang Public ai cũng xem được
-                .requestMatchers("/", "/index", "/login", "/register", "/products/**", "/product-detail/**", "/forgot-password", "/vnpay-return").permitAll()
+                .requestMatchers("/", "/index", "/login", "/register", "/products/**", "/product-detail/**", "/forgot-password", "/vnpay-return", "/api/chatbot/**").permitAll()
                 // 3. Các trang yêu cầu User (hoặc Admin) đăng nhập rồi mới được vào
                 .requestMatchers("/cart", "/cart/**", "/checkout", "/checkout/**", "/orders", "/orders/**", "/profile", "/profile/**", "/place-order", "/order/**").authenticated()
                 // 4. CHỈ ADMIN và BOTH mới vào được hệ thống quản trị (Thymeleaf + REST API)
