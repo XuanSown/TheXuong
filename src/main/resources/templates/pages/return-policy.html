@@ -273,21 +273,21 @@
             <p>Trợ lý thông minh 24/7</p>
         </div>
         <div class="bot-options">
-            <a href="javascript:void(0)" onclick="openTelegramBot('Cách chọn size giày thể thao?')" class="bot-option-btn">
+            <a th:href="@{/pages/size-guide}" class="bot-option-btn">
                 <span>Hướng dẫn chọn size giày</span>
-                <i class="fa-solid fa-chevron-right"></i>
+                <i class="fa-solid fa-link text-muted"></i>
             </a>
-            <a href="javascript:void(0)" onclick="openTelegramBot('Kiểm tra trạng thái đơn hàng của tôi')" class="bot-option-btn">
+            <a th:href="@{/pages/order-tracking}" class="bot-option-btn">
                 <span>Tra cứu trạng thái đơn hàng</span>
-                <i class="fa-solid fa-chevron-right"></i>
+                <i class="fa-solid fa-link text-muted"></i>
             </a>
-            <a href="javascript:void(0)" onclick="openTelegramBot('Cho tôi hỏi về chính sách đổi trả')" class="bot-option-btn">
+            <a th:href="@{/pages/return-policy}" class="bot-option-btn">
                 <span>Chính sách đổi trả 30 ngày</span>
-                <i class="fa-solid fa-chevron-right"></i>
+                <i class="fa-solid fa-link text-muted"></i>
             </a>
             <a href="javascript:void(0)" onclick="openTelegramBot('Gặp nhân viên tư vấn')" class="bot-option-btn">
-                <span>Gặp nhân viên tư vấn trực tiếp</span>
-                <i class="fa-solid fa-chevron-right"></i>
+                <span>Gặp nhân viên tư vấn qua Telegram</span>
+                <i class="fa-brands fa-telegram text-primary fs-5"></i>
             </a>
         </div>
     </div>

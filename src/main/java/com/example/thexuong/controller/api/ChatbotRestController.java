@@ -51,7 +51,7 @@ public class ChatbotRestController {
                     .body(ApiResponse.error("Unauthorized: Invalid or missing API Key."));
         }
 
-        Pageable limit = PageRequest.of(0, 10);
+        Pageable limit = PageRequest.of(0, 50);
         List<Product> products;
 
         if (keyword != null && !keyword.trim().isEmpty()) {
