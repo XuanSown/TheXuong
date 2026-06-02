@@ -308,6 +308,58 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Khung Bot AI Widget -->
+<div class="bot-widget-container" id="botWidget">
+    <!-- Popup Menu -->
+    <div class="bot-menu-popup" id="botMenuPopup">
+        <div class="bot-header">
+            <h5>TheXuong AI Bot</h5>
+            <p>Trợ lý thông minh 24/7</p>
+        </div>
+        <div class="bot-options">
+            <a th:href="@{/pages/size-guide}" class="bot-option-btn">
+                <span>Hướng dẫn chọn size giày</span>
+                <i class="fa-solid fa-link text-muted"></i>
+            </a>
+            <a th:href="@{/pages/order-tracking}" class="bot-option-btn">
+                <span>Tra cứu trạng thái đơn hàng</span>
+                <i class="fa-solid fa-link text-muted"></i>
+            </a>
+            <a th:href="@{/pages/return-policy}" class="bot-option-btn">
+                <span>Chính sách đổi trả 30 ngày</span>
+                <i class="fa-solid fa-link text-muted"></i>
+            </a>
+            <a href="javascript:void(0)" onclick="openTelegramBot('Gặp nhân viên tư vấn')" class="bot-option-btn">
+                <span>Gặp nhân viên tư vấn qua Telegram</span>
+                <i class="fa-brands fa-telegram text-primary fs-5"></i>
+            </a>
+        </div>
+    </div>
+    
+    <!-- Nút Float Toggle -->
+    <button class="telegram-float-toggle" onclick="toggleBotMenu()" title="Mở danh sách câu hỏi AI">
+        <i class="fa-solid fa-robot"></i>
+    </button>
+</div>
+
+<script>
+    function toggleBotMenu() {
+        const widget = document.getElementById('botWidget');
+        const popup = document.getElementById('botMenuPopup');
+        widget.classList.toggle('open');
+        popup.classList.toggle('active');
+    }
+
+    function openTelegramBot(message) {
+        // Thay YOUR_TELEGRAM_BOT_USERNAME bằng username của bot bạn nhé
+        const botUsername = 'TheXuong_tananh_bot';
+        const encodedMessage = encodeURIComponent(message);
+        const url = `https://t.me/${botUsername}?text=${encodedMessage}`;
+        window.open(url, '_blank');
+        toggleBotMenu(); // Đóng menu sau khi click
+    }
+</script>
 </body>
 </html>
 

@@ -36,6 +36,24 @@ public class ChatbotRestController {
         return apiKey == null || !apiKey.equals(CHATBOT_API_KEY);
     }
 
+    // Helper method to clean and extract meaningful search keywords from natural chat
+    private String cleanKeyword(String message) {
+        if (message == null || message.trim().isEmpty()) return "";
+        String cleaned = message.toLowerCase().trim();
+        // Remove conversational stop words
+        String[] stopWords = {"tại sao", "trong", "của", "chúng tôi", "có", "không", "mà", "tôi", "hỏi", "muốn", "mua", "tìm", "xem", "bên", "shop", "cho", "mình", "cái", "chiếc", "đôi", "loại", "này", "kia", "nhé", "nha", "ạ", "thấy"};
+        for (String word : stopWords) {
+            cleaned = cleaned.replaceAll("\\b" + word + "\\b", "");
+        }
+        // Map common synonyms
+        cleaned = cleaned.replaceAll("\\bnón\\b", "mũ");
+        cleaned = cleaned.replaceAll("\\bgiầy\\b", "giày");
+        cleaned = cleaned.replaceAll("\\bbanh\\b", "bóng");
+        cleaned = cleaned.replaceAll("\\bvớ\\b", "tất");
+        
+        return cleaned.replaceAll("\\s+", " ").trim();
+    }
+
     /**
      * GET /api/chatbot/products
      * Search products by keyword, brand, or sport.
@@ -54,8 +72,14 @@ public class ChatbotRestController {
         Pageable limit = PageRequest.of(0, 50);
         List<Product> products;
 
-        if (keyword != null && !keyword.trim().isEmpty()) {
-            products = productRepository.findByNameContaining(keyword.trim(), limit).getContent();
+        String searchKey = cleanKeyword(keyword);
+
+        if (!searchKey.isEmpty()) {
+            products = productRepository.findByNameContaining(searchKey, limit).getContent();
+            // Fallback: If no products found with the cleaned keyword, return all (let AI decide)
+            if (products.isEmpty()) {
+                products = productRepository.findAll(limit).getContent();
+            }
         } else {
             products = productRepository.findAll(limit).getContent();
         }
