@@ -3,6 +3,7 @@ package com.example.thexuong.service;
 import com.example.thexuong.entity.*;
 import com.example.thexuong.repository.OrderDetailRepository;
 import com.example.thexuong.repository.OrderRepository;
+import com.example.thexuong.repository.ProductVariantRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,8 @@ public class OrderService {
     private final CartService cartService;
     @Autowired
     private final OrderDetailRepository orderDetailRepository;
+    @Autowired
+    private final ProductVariantRepository productVariantRepository;
 
     @Transactional
     public Order placeOrder(String username, String fullName, String phone, String address) {
@@ -69,10 +72,10 @@ public class OrderService {
         return savedOrder;
     }
 
-    public Order getOrderByIdAndUser(Long orderId, String username){
+    public Order getOrderByIdAndUser(Long orderId, String identifier){
         Order order = orderRepository.findByIdWithDetails(orderId).orElseThrow(() -> new RuntimeException("Order not found"));
 
-        if(!order.getUser().getUsername().equals(username)){
+        if(!order.getUser().getUsername().equals(identifier) && !identifier.equals(order.getUser().getEmail())){
             throw new RuntimeException("khong có quyền truy cập");
         }
         return order;
@@ -104,5 +107,44 @@ public class OrderService {
         order.setStatus("CANCELLED"); // Chuyển trạng thái thành Đã hủy
         orderRepository.save(order);
 
+    }
+
+    @Transactional
+    public void adminUpdateOrderStatus(Long orderId, String newStatus) {
+        Order order = orderRepository.findByIdWithDetails(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        String oldStatus = order.getStatus();
+
+        // 1. Chuyển sang ĐÃ DUYỆT (APPROVED)
+        // -> Trừ số lượng tồn kho
+        if (!"APPROVED".equals(oldStatus) && "APPROVED".equals(newStatus)) {
+            for (OrderDetail detail : order.getOrderDetails()) {
+                ProductVariant variant = productVariantRepository.findByProductIdAndSizeName(detail.getProductId(), detail.getSize()).orElse(null);
+                if (variant != null) {
+                    int newQuantity = variant.getQuantity() - detail.getQuantity();
+                    if (newQuantity < 0) {
+                        throw new RuntimeException("Sản phẩm " + detail.getProductName() + " (Size: " + detail.getSize() + ") không đủ số lượng tồn kho!");
+                    }
+                    variant.setQuantity(newQuantity);
+                    productVariantRepository.save(variant);
+                }
+            }
+        }
+
+        // 2. Chuyển sang ĐÃ HỦY (CANCELLED)
+        // -> Cộng lại số lượng tồn kho nếu trước đó đã trừ (tức là đã duyệt, hoặc đã giao)
+        if (("APPROVED".equals(oldStatus) || "SHIPPED".equals(oldStatus)) && "CANCELLED".equals(newStatus)) {
+            for (OrderDetail detail : order.getOrderDetails()) {
+                ProductVariant variant = productVariantRepository.findByProductIdAndSizeName(detail.getProductId(), detail.getSize()).orElse(null);
+                if (variant != null) {
+                    variant.setQuantity(variant.getQuantity() + detail.getQuantity());
+                    productVariantRepository.save(variant);
+                }
+            }
+        }
+
+        order.setStatus(newStatus);
+        orderRepository.save(order);
     }
 }

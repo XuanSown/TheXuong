@@ -55,7 +55,7 @@ public class ProductController {
         Pageable pageable = PageRequest.of(page, pageSize, sorting);
         Page<Product> productsPage;
         if (keyword != null && !keyword.isEmpty()) {
-            productsPage = productRepository.findByNameContaining(keyword, pageable);
+            productsPage = productRepository.findByNameContainingIgnoreCase(keyword, pageable);
         } else if (sport != null && !sport.isEmpty()) {
             productsPage = productRepository.findBySport(sport, pageable);
         } else if (brand != null && !brand.isEmpty()) {

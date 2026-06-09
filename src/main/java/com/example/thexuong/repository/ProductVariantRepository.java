@@ -20,4 +20,5 @@ public interface ProductVariantRepository extends JpaRepository<ProductVariant, 
 
     List<ProductVariant> findByProductId(Long productId);
     Optional<ProductVariant> findByProductIdAndSizeId(Long productId, Long sizeId);
+    Optional<ProductVariant> findByProductIdAndSizeName(Long productId, String sizeName);
 }

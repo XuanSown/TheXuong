@@ -159,12 +159,12 @@
 
                 <div class="mb-3">
                     <label for="phoneNumber" class="form-label">Số điện thoại</label>
-                    <input type="text" class="form-control" id="phoneNumber" name="phoneNumber" required>
+                    <input type="text" class="form-control" id="phoneNumber" name="phoneNumber" th:value="${user.phoneNumber}" required>
                 </div>
 
                 <div class="mb-3">
                     <label for="address" class="form-label">Địa chỉ nhận hàng</label>
-                    <textarea class="form-control" id="address" name="address" rows="3" required></textarea>
+                    <textarea class="form-control" id="address" name="address" rows="3" required th:text="${user.address}"></textarea>
                 </div>
 
                 <h4 class="mt-4 mb-3">Phương thức thanh toán</h4>

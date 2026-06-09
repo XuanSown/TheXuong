@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.text.Normalizer;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @RestController
@@ -30,6 +32,14 @@ public class ChatbotRestController {
     private final OrderRepository orderRepository;
 
     private static final String CHATBOT_API_KEY = "TheXuongSecretKey2026";
+
+    // Helper to remove Vietnamese accents
+    private String removeAccents(String s) {
+        if (s == null) return "";
+        String temp = Normalizer.normalize(s, Normalizer.Form.NFD);
+        Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
+        return pattern.matcher(temp).replaceAll("").replace('đ', 'd').replace('Đ', 'D');
+    }
 
     // Helper method to validate API Key
     private boolean isNotAuthorized(String apiKey) {
@@ -43,13 +53,17 @@ public class ChatbotRestController {
         // Remove conversational stop words
         String[] stopWords = {"tại sao", "trong", "của", "chúng tôi", "có", "không", "mà", "tôi", "hỏi", "muốn", "mua", "tìm", "xem", "bên", "shop", "cho", "mình", "cái", "chiếc", "đôi", "loại", "này", "kia", "nhé", "nha", "ạ", "thấy"};
         for (String word : stopWords) {
-            cleaned = cleaned.replaceAll("\\b" + word + "\\b", "");
+            cleaned = cleaned.replaceAll("(?U)\\b" + word + "(?U)\\b", "");
         }
         // Map common synonyms
-        cleaned = cleaned.replaceAll("\\bnón\\b", "mũ");
-        cleaned = cleaned.replaceAll("\\bgiầy\\b", "giày");
-        cleaned = cleaned.replaceAll("\\bbanh\\b", "bóng");
-        cleaned = cleaned.replaceAll("\\bvớ\\b", "tất");
+        cleaned = cleaned.replaceAll("(?U)\\bnón(?U)\\b", "mũ");
+        cleaned = cleaned.replaceAll("(?U)\\bgiầy(?U)\\b", "giày");
+        cleaned = cleaned.replaceAll("(?U)\\bbanh(?U)\\b", "bóng");
+        cleaned = cleaned.replaceAll("(?U)\\bvớ(?U)\\b", "tất");
+        cleaned = cleaned.replaceAll("(?U)\\bnikee(?U)\\b", "nike");
+        cleaned = cleaned.replaceAll("(?U)\\bnai(?U)\\b", "nike");
+        cleaned = cleaned.replaceAll("(?U)\\badida(?U)\\b", "adidas");
+        cleaned = cleaned.replaceAll("(?U)\\baddidas(?U)\\b", "adidas");
         
         return cleaned.replaceAll("\\s+", " ").trim();
     }
@@ -68,20 +82,46 @@ public class ChatbotRestController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(ApiResponse.error("Unauthorized: Invalid or missing API Key."));
         }
-
-        Pageable limit = PageRequest.of(0, 50);
-        List<Product> products;
+        System.out.println("RECEIVED KEYWORD: [" + keyword + "]");
 
         String searchKey = cleanKeyword(keyword);
+        List<Product> allProducts = productRepository.findAll();
+        List<Product> products = new ArrayList<>();
 
         if (!searchKey.isEmpty()) {
-            products = productRepository.findByNameContaining(searchKey, limit).getContent();
-            // Fallback: If no products found with the cleaned keyword, return all (let AI decide)
-            if (products.isEmpty()) {
-                products = productRepository.findAll(limit).getContent();
+            String[] words = searchKey.split("\\s+");
+            Map<Product, Integer> scoredProducts = new HashMap<>();
+
+            for (Product p : allProducts) {
+                String pName = removeAccents(p.getName() != null ? p.getName().toLowerCase() : "");
+                String pBrand = removeAccents(p.getBrand() != null ? p.getBrand().toLowerCase() : "");
+                String pCategory = removeAccents(p.getCategory() != null ? p.getCategory().toLowerCase() : "");
+                String pSport = removeAccents(p.getSport() != null ? p.getSport().toLowerCase() : "");
+
+                int score = 0;
+                for (String w : words) {
+                    if (w.length() > 1) {
+                        String wl = removeAccents(w.toLowerCase());
+                        if (pName.contains(wl)) score += 2;
+                        if (pBrand.contains(wl)) score += 3;
+                        if (pCategory.contains(wl)) score += 1;
+                        if (pSport.contains(wl)) score += 1;
+                    }
+                }
+                if (score > 0) {
+                    scoredProducts.put(p, score);
+                }
             }
+
+            // Sort by score descending and take top 10
+            products = scoredProducts.entrySet().stream()
+                    .sorted(Map.Entry.<Product, Integer>comparingByValue().reversed())
+                    .limit(10)
+                    .map(Map.Entry::getKey)
+                    .collect(Collectors.toList());
+
         } else {
-            products = productRepository.findAll(limit).getContent();
+            products = allProducts.stream().limit(10).collect(Collectors.toList());
         }
 
         List<Map<String, Object>> responseList = new ArrayList<>();

@@ -16,9 +16,12 @@ public class Cart {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
+    @OneToOne(optional = true)
     @JoinColumn(name = "user_id")
     private User user;
+
+    @Column(name = "token")
+    private String token;
 
     // Relationship ngược để dễ lấy items
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL)

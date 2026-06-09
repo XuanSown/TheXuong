@@ -50,6 +50,7 @@ public class ProfileController {
         try {
             currentUser.setFullName(formData.getFullName());
             currentUser.setAddress(formData.getAddress());
+            currentUser.setPhoneNumber(formData.getPhoneNumber());
 
             if (newPassword != null && !newPassword.isBlank()) {
 

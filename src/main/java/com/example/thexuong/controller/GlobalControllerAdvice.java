@@ -17,14 +17,20 @@ public class GlobalControllerAdvice {
     private final CartService cartService;
 
     @ModelAttribute("cartCount")
-    public int populateCartCount(){
+    public int populateCartCount(@org.springframework.web.bind.annotation.CookieValue(value = "cart_token", required = false) String cartToken) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null || !auth.isAuthenticated()) return 0;
+        boolean isAuthenticated = auth != null && auth.isAuthenticated() && !auth.getName().equals("anonymousUser");
 
         try {
-            Cart cart = cartService.getCartByUser(auth.getName());
-            if (cart != null && cart.getItems() != null){
-                return  cart.getItems().size();
+            Cart cart = null;
+            if (isAuthenticated) {
+                cart = cartService.getCartByUser(auth.getName());
+            } else if (cartToken != null) {
+                cart = cartService.getCartByToken(cartToken);
+            }
+
+            if (cart != null && cart.getItems() != null) {
+                return cart.getItems().size();
             }
         } catch (Exception e) {
             return 0;

@@ -43,10 +43,12 @@ public class Product {
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore // Tránh lặp vô hạn khi convert sang JSON
     @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private List<ProductVariant> variants;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     @JsonIgnore
     @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Set<Review> reviews = new HashSet<>();
 }

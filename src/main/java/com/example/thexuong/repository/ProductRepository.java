@@ -17,7 +17,7 @@ import java.util.Optional;
 public interface ProductRepository extends JpaRepository<Product, Long> {
     // SELECT * FROM product ORDER BY id DESC LIMIT 4
     List<Product> findTop4ByOrderByIdDesc();
-    Page<Product> findByNameContaining(String keyword, Pageable pageable);
+    Page<Product> findByNameContainingIgnoreCase(String keyword, Pageable pageable);
 
     Page<Product> findBySport(String sport, Pageable pageable);
     Page<Product> findByBrand(String brand, Pageable pageable);

@@ -13,12 +13,16 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.util.List;
 import java.util.Optional;
 
+import com.example.thexuong.service.OrderService;
+
 @Controller
 @RequestMapping("/admin/orders")
 @RequiredArgsConstructor
 public class OrderManagementController {
     @Autowired
     private final OrderRepository orderRepository;
+    @Autowired
+    private final OrderService orderService;
 
     @GetMapping
     public String showOrders(@RequestParam(required = false) Long editId, Model model) {
@@ -60,10 +64,19 @@ public class OrderManagementController {
             existing.setFullName(formOrder.getFullName());
             existing.setPhoneNumber(formOrder.getPhoneNumber());
             existing.setAddress(formOrder.getAddress());
-            existing.setStatus(formOrder.getStatus());
             existing.setPaymentMethod(formOrder.getPaymentMethod());
 
             orderRepository.save(existing);
+
+            if (!existing.getStatus().equals(formOrder.getStatus())) {
+                try {
+                    orderService.adminUpdateOrderStatus(existing.getId(), formOrder.getStatus());
+                } catch (Exception e) {
+                    redirectAttributes.addFlashAttribute("error", "Lỗi cập nhật trạng thái: " + e.getMessage());
+                    return "redirect:/admin/orders";
+                }
+            }
+
             redirectAttributes.addFlashAttribute("success", "Cập nhật thành công!");
         } else {
             redirectAttributes.addFlashAttribute("error", "Không tìm thấy đơn hàng trong CSDL.");
@@ -72,14 +85,25 @@ public class OrderManagementController {
         return "redirect:/admin/orders";
     }
 
+    @GetMapping("/{id}")
+    public String viewOrderDetails(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
+        Order order = orderRepository.findByIdWithDetails(id).orElse(null);
+        if (order == null) {
+            redirectAttributes.addFlashAttribute("error", "Không tìm thấy đơn hàng #" + id);
+            return "redirect:/admin/orders";
+        }
+        model.addAttribute("order", order);
+        return "admin/order-detail";
+    }
+
     @PostMapping("/status/{id}")
     public String updateStatus(@PathVariable Long id, @RequestParam("status") String status,
                                RedirectAttributes redirectAttributes) {
-        Order order = orderRepository.findById(id).orElse(null);
-        if (order != null) {
-            order.setStatus(status);
-            orderRepository.save(order);
+        try {
+            orderService.adminUpdateOrderStatus(id, status);
             redirectAttributes.addFlashAttribute("success", "Đã cập nhật trạng thái đơn hàng #" + id);
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Lỗi: " + e.getMessage());
         }
         return "redirect:/admin/orders";
     }

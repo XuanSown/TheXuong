@@ -8,7 +8,9 @@ import com.example.thexuong.repository.UserRepository;
 import com.example.thexuong.service.CartService;
 import com.example.thexuong.service.OrderService;
 import com.example.thexuong.service.VNPayService;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -34,8 +36,19 @@ public class OrderController {
     private VNPayService vnPayService;
 
     @GetMapping("/checkout")
-    public String checkoutPage(Model model, Principal principal) {
+    public String checkoutPage(Model model, Principal principal,
+                               @CookieValue(value = "cart_token", required = false) String cartToken,
+                               HttpServletResponse response) {
         if (principal == null) return "redirect:/login";
+
+        // Merge guest cart if exists
+        if (cartToken != null) {
+            cartService.mergeGuestCartToUser(cartToken, principal.getName());
+            Cookie cookie = new Cookie("cart_token", null);
+            cookie.setMaxAge(0);
+            cookie.setPath("/");
+            response.addCookie(cookie);
+        }
 
         Cart cart = cartService.getCartByUser(principal.getName());
         if (cart.getItems().isEmpty()) {
