@@ -2,6 +2,7 @@ package com.example.thexuong.controller;
 
 import com.example.thexuong.entity.Cart;
 import com.example.thexuong.entity.Order;
+import com.example.thexuong.entity.OrderStatus;
 import com.example.thexuong.entity.User;
 import com.example.thexuong.repository.OrderRepository;
 import com.example.thexuong.repository.UserRepository;
@@ -17,7 +18,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Controller
 @RequiredArgsConstructor
@@ -79,6 +83,7 @@ public class OrderController {
                              @RequestParam("phoneNumber") String phoneNumber,
                              @RequestParam("address") String address,
                              @RequestParam(value = "paymentMethod", defaultValue = "COD") String paymentMethod,
+                             @RequestParam(value = "voucherCode", required = false) String voucherCode,
                              HttpServletRequest request,
                              Principal principal) {
         if (principal == null) return "redirect:/login";
@@ -87,7 +92,11 @@ public class OrderController {
 
         if("VNPAY".equals(paymentMethod)) {
             int totalAmount = savedOrder.getTotalMoney().intValue();
-            String orderInfo = "Thanh toan don hang ma so " + savedOrder.getId();
+            // Format orderInfo chứa cả mã voucher nếu có (regex parse ở vnpayReturn)
+            // Format: "Thanh toan don hang ma so X voucher=TX-ABCDEF" hoặc "Thanh toan don hang ma so X"
+            String orderInfo = voucherCode != null && !voucherCode.isBlank()
+                    ? "Thanh toan don hang ma so " + savedOrder.getId() + " voucher=" + voucherCode.trim()
+                    : "Thanh toan don hang ma so " + savedOrder.getId();
             String vnpayUrl = vnPayService.createOrder(totalAmount, orderInfo, request);
             return "redirect:" + vnpayUrl;
         }
@@ -142,21 +151,49 @@ public class OrderController {
         return "redirect:/order/" + orderId;
     }
 
+    // ============================================================
+    // Task 0.8: User xác nhận đã nhận hàng → DELIVERED → COMPLETED
+    // ============================================================
+    @PostMapping("/order/{id}/confirm-received")
+    public String confirmReceived(@PathVariable("id") Long id,
+                                  Principal principal,
+                                  RedirectAttributes redirectAttributes) {
+        if (principal == null) return "redirect:/login";
+
+        try {
+            orderService.confirmReceived(id, principal.getName());
+            redirectAttributes.addFlashAttribute("successMessage",
+                    "Cảm ơn anh/chị đã xác nhận nhận hàng! Đơn hàng đã hoàn tất.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
+
+        return "redirect:/order/" + id;
+    }
+
     @GetMapping("/vnpay-return")
     public String vnpayReturn(HttpServletRequest request, RedirectAttributes redirectAttributes) {
         String vnp_ResponseCode = request.getParameter("vnp_ResponseCode");
         String orderInfo = request.getParameter("vnp_OrderInfo");
 
-        if("00".equals(vnp_ResponseCode)) {
+        // Task 0.7: Parse orderId + voucher code từ vnp_OrderInfo
+        // Format: "Thanh toan don hang ma so X" hoặc "Thanh toan don hang ma so X voucher=TX-XXX"
+        Pattern pattern = Pattern.compile("Thanh toan don hang ma so (\\d+)(?: voucher=(TX-[A-Z0-9]+))?");
+        Matcher matcher = orderInfo != null ? pattern.matcher(orderInfo) : null;
+
+        if ("00".equals(vnp_ResponseCode)) {
             try {
-                if (orderInfo != null && orderInfo.contains("Thanh toan don hang ma so ")) {
-                    String orderIdStr = orderInfo.replace("Thanh toan don hang ma so ", "").trim();
-                    Long orderId = Long.parseLong(orderIdStr);
+                if (matcher != null && matcher.find()) {
+                    Long orderId = Long.parseLong(matcher.group(1));
+                    String voucherCode = matcher.group(2); // có thể null
 
                     Order order = orderRepository.findById(orderId).orElse(null);
                     if (order != null) {
-                        order.setStatus("PENDING");
+                        // SỬA BUG NGHIÊM TRỌNG: set CONFIRMED + paidAt thay vì PENDING
+                        order.setStatus(OrderStatus.CONFIRMED);
+                        order.setPaidAt(LocalDateTime.now());
                         orderRepository.save(order);
+                        // TODO Batch 3: nếu voucherCode != null → voucherService.markAsUsed(code, orderId)
                     }
                 }
             } catch (Exception e) {

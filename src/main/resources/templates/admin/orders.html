@@ -187,33 +187,48 @@
                 th:text="${#numbers.formatDecimal(order.totalMoney, 0, 'COMMA', 0, 'POINT')} + ' đ'"></td>
 
             <td>
-                <span th:if="${order.status == 'PENDING'}" class="badge bg-warning text-dark">Chờ duyệt</span>
-                <span th:if="${order.status == 'APPROVED'}" class="badge bg-primary">Đã duyệt</span>
-                <span th:if="${order.status == 'SHIPPED'}" class="badge bg-success">Đã giao</span>
-                <span th:if="${order.status == 'CANCELLED'}" class="badge bg-danger">Đã hủy</span>
+                <!-- Task 0.13: 7 trạng thái chuẩn theo OrderStatus enum -->
+                <span th:if="${order.status == T(com.example.thexuong.entity.OrderStatus).PENDING}" class="badge bg-warning text-dark">Chờ thanh toán</span>
+                <span th:if="${order.status == T(com.example.thexuong.entity.OrderStatus).CONFIRMED}" class="badge bg-info text-dark">Đã xác nhận</span>
+                <span th:if="${order.status == T(com.example.thexuong.entity.OrderStatus).SHIPPING}" class="badge bg-primary">Đang giao</span>
+                <span th:if="${order.status == T(com.example.thexuong.entity.OrderStatus).DELIVERED}" class="badge bg-primary bg-opacity-75">Đã giao - chờ xác nhận</span>
+                <span th:if="${order.status == T(com.example.thexuong.entity.OrderStatus).COMPLETED}" class="badge bg-success">Hoàn thành</span>
+                <span th:if="${order.status == T(com.example.thexuong.entity.OrderStatus).CANCELLED}" class="badge bg-danger">Đã hủy</span>
+                <span th:if="${order.status == T(com.example.thexuong.entity.OrderStatus).REFUNDED}" class="badge bg-secondary">Đã hoàn tiền</span>
             </td>
             <td>
                 <div class="d-flex justify-content-center gap-1">
-                    <!-- Duyệt đơn -->
-                    <form th:if="${order.status == 'PENDING'}"
+                    <!-- Task 0.13: PENDING → CONFIRMED (thay cho APPROVED cũ) -->
+                    <form th:if="${order.status == T(com.example.thexuong.entity.OrderStatus).PENDING}"
                           th:action="@{/admin/orders/status/{id}(id=${order.id})}" method="post">
-                        <input type="hidden" name="status" value="APPROVED"/>
-                        <button type="submit" class="btn btn-success btn-sm" title="Duyệt đơn">
+                        <input type="hidden" name="status" value="CONFIRMED"/>
+                        <button type="submit" class="btn btn-info btn-sm text-white" title="Xác nhận đơn">
                             <i class="fa-solid fa-check"></i>
                         </button>
                     </form>
 
-                    <!-- Giao hàng -->
-                    <form th:if="${order.status == 'APPROVED'}"
+                    <!-- CONFIRMED → SHIPPING -->
+                    <form th:if="${order.status == T(com.example.thexuong.entity.OrderStatus).CONFIRMED}"
                           th:action="@{/admin/orders/status/{id}(id=${order.id})}" method="post">
-                        <input type="hidden" name="status" value="SHIPPED"/>
-                        <button type="submit" class="btn btn-info btn-sm text-white" title="Giao hàng">
+                        <input type="hidden" name="status" value="SHIPPING"/>
+                        <button type="submit" class="btn btn-primary btn-sm" title="Bắt đầu giao hàng">
                             <i class="fa-solid fa-truck"></i>
                         </button>
                     </form>
 
-                    <!-- Hủy đơn -->
-                    <form th:if="${order.status != 'CANCELLED' && order.status != 'SHIPPED'}"
+                    <!-- SHIPPING → DELIVERED -->
+                    <form th:if="${order.status == T(com.example.thexuong.entity.OrderStatus).SHIPPING}"
+                          th:action="@{/admin/orders/status/{id}(id=${order.id})}" method="post">
+                        <input type="hidden" name="status" value="DELIVERED"/>
+                        <button type="submit" class="btn btn-success btn-sm" title="Đánh dấu đã giao">
+                            <i class="fa-solid fa-circle-check"></i>
+                        </button>
+                    </form>
+
+                    <!-- Hủy đơn (chỉ khi chưa COMPLETED/CANCELLED/REFUNDED) -->
+                    <form th:if="${order.status != T(com.example.thexuong.entity.OrderStatus).CANCELLED
+                                   and order.status != T(com.example.thexuong.entity.OrderStatus).COMPLETED
+                                   and order.status != T(com.example.thexuong.entity.OrderStatus).REFUNDED}"
                           th:action="@{/admin/orders/status/{id}(id=${order.id})}" method="post">
                         <input type="hidden" name="status" value="CANCELLED"/>
                         <button type="submit" class="btn btn-danger btn-sm"
