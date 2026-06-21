@@ -25,11 +25,13 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("SELECT DISTINCT p FROM Product p LEFT JOIN FETCH p.variants v LEFT JOIN FETCH v.size LEFT JOIN FETCH p.reviews WHERE p.id = :id")
     Optional<Product> findByIdWithVariants(@Param("id") Long id);
 
+    // Task 0.10: Query đã đúng ('COMPLETED' đã có sẵn), chỉ thêm comment.
+    // Best-selling products: tính trên đơn COMPLETED.
     @Query("SELECT p, COALESCE(SUM(od.quantity), 0) as daBan " +
             "FROM Product p " +
             "LEFT JOIN OrderDetail od ON p.id = od.productId " +
             "LEFT JOIN od.order o " +
-            "WHERE (o.status = 'SHIPPED' OR o.status = 'COMPLETED' OR o.status IS NULL OR od.id IS NULL) " +
+            "WHERE (o.status = 'COMPLETED' OR o.status IS NULL OR od.id IS NULL) " +
             "GROUP BY p.id, p.name, p.price, p.imageUrl, p.category, p.description, p.brand, p.sport " +
             "ORDER BY daBan DESC")
     List<Object[]> findBestSellingProduct(Pageable pageable);
@@ -38,7 +40,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             "FROM Product p " +
             "LEFT JOIN OrderDetail od ON p.id = od.productId " +
             "LEFT JOIN od.order o " +
-            "WHERE (o.status = 'SHIPPED' OR o.status = 'COMPLETED' OR o.status IS NULL OR od.id IS NULL) " +
+            "WHERE (o.status = 'COMPLETED' OR o.status IS NULL OR od.id IS NULL) " +
             "GROUP BY p.id, p.name, p.price, p.imageUrl, p.category, p.description, p.brand, p.sport " +
             "ORDER BY daBan ASC")
     List<Object[]> findSlowMovingProducts(Pageable pageable);

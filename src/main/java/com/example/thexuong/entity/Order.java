@@ -42,7 +42,26 @@ public class Order {
     private BigDecimal totalMoney;
 
     @Builder.Default
-    private String status = "PENDING"; // PENDING, SHIPPING, DELIVERED, CANCELLED
+    private OrderStatus status = OrderStatus.PENDING;
+    // 7 trạng thái chuẩn (xem OrderStatus.java):
+    // PENDING → CONFIRMED → SHIPPING → DELIVERED → COMPLETED
+    //                                     ↓
+    //                                 REFUNDED (hoàn tiền)
+    // CANCELLED (huỷ trước CONFIRMED)
+
+    // Timestamp cho từng state transition (Batch 0 Task 0.4 + 0.5)
+    @Column(name = "paid_at")
+    private LocalDateTime paidAt;
+    @Column(name = "shipped_at")
+    private LocalDateTime shippedAt;
+    @Column(name = "delivered_at")
+    private LocalDateTime deliveredAt;
+    @Column(name = "completed_at")
+    private LocalDateTime completedAt;
+    @Column(name = "cancelled_at")
+    private LocalDateTime cancelledAt;
+    @Column(name = "refunded_at")
+    private LocalDateTime refundedAt;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

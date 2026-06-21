@@ -1,6 +1,7 @@
 package com.example.thexuong.service;
 
 import com.example.thexuong.entity.*;
+import com.example.thexuong.exception.IllegalOrderTransitionException;
 import com.example.thexuong.repository.OrderDetailRepository;
 import com.example.thexuong.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -43,7 +45,7 @@ public class OrderService {
                 .phoneNumber(phone)
                 .address(address)
                 .totalMoney(totalMoney)
-                .status("PENDING")
+                .status(OrderStatus.PENDING)
                 .build();
 
         Order savedOrder = orderRepository.save(order);
@@ -83,7 +85,7 @@ public class OrderService {
         Order order = getOrderByIdAndUser(orderId, username);
 
         // Chỉ cho phép sửa khi trạng thái là PENDING
-        if (!"PENDING".equals(order.getStatus())) {
+        if (order.getStatus() != OrderStatus.PENDING) {
             throw new RuntimeException("Đơn hàng đã được duyệt hoặc đang giao, không thể thay đổi thông tin!");
         }
 
@@ -97,12 +99,86 @@ public class OrderService {
         Order order = getOrderByIdAndUser(orderId, username);
 
         // Chỉ cho phép hủy khi trạng thái là PENDING
-        if (!"PENDING".equals(order.getStatus())) {
+        if (order.getStatus() != OrderStatus.PENDING) {
             throw new RuntimeException("Đơn hàng đã được duyệt, không thể hủy!");
         }
 
-        order.setStatus("CANCELLED"); // Chuyển trạng thái thành Đã hủy
+        order.setStatus(OrderStatus.CANCELLED); // Chuyển trạng thái thành Đã hủy
+        order.setCancelledAt(LocalDateTime.now());
         orderRepository.save(order);
+    }
 
+    // ============================================================
+    // Task 0.5: State machine + new methods (confirmReceived, refundOrder, adminUpdateStatus)
+    // ============================================================
+
+    /**
+     * User bấm "Đã nhận hàng" → chuyển DELIVERED → COMPLETED.
+     * Hook cộng điểm loyalty sẽ được thêm ở Batch 1 (PointService).
+     * Ở Batch 0 chỉ set status + completedAt.
+     */
+    @Transactional
+    public Order confirmReceived(Long orderId, String username) {
+        Order order = getOrderByIdAndUser(orderId, username);
+
+        if (!order.getStatus().canTransitionTo(OrderStatus.COMPLETED)) {
+            throw new IllegalOrderTransitionException(
+                    "Không thể xác nhận nhận hàng từ trạng thái " + order.getStatus()
+                            + ". Chỉ chấp nhận khi đơn đang DELIVERED.");
+        }
+
+        order.setStatus(OrderStatus.COMPLETED);
+        order.setCompletedAt(LocalDateTime.now());
+        return orderRepository.save(order);
+    }
+
+    /**
+     * Admin hoặc hệ thống hoàn tiền → CONFIRMED/SHIPPING/DELIVERED → REFUNDED.
+     * Hook trừ điểm loyalty sẽ được thêm ở Batch 1.
+     */
+    @Transactional
+    public Order refundOrder(Long orderId, String adminUsername) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found: " + orderId));
+
+        if (!order.getStatus().canTransitionTo(OrderStatus.REFUNDED)) {
+            throw new IllegalOrderTransitionException(
+                    "Không thể hoàn tiền từ trạng thái " + order.getStatus()
+                            + ". Chỉ chấp nhận khi đơn đã CONFIRMED/SHIPPING/DELIVERED.");
+        }
+
+        order.setStatus(OrderStatus.REFUNDED);
+        order.setRefundedAt(LocalDateTime.now());
+        return orderRepository.save(order);
+    }
+
+    /**
+     * Admin cập nhật trạng thái qua state machine.
+     * Áp dụng cho OrderManagementController + cron auto-transition.
+     */
+    @Transactional
+    public Order adminUpdateStatus(Long orderId, OrderStatus newStatus) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found: " + orderId));
+
+        OrderStatus current = order.getStatus();
+        if (!current.canTransitionTo(newStatus)) {
+            throw new IllegalOrderTransitionException(
+                    "Transition không hợp lệ: " + current + " → " + newStatus);
+        }
+
+        order.setStatus(newStatus);
+        // Set timestamp tương ứng
+        LocalDateTime now = LocalDateTime.now();
+        switch (newStatus) {
+            case CONFIRMED -> order.setPaidAt(now);
+            case SHIPPING -> order.setShippedAt(now);
+            case DELIVERED -> order.setDeliveredAt(now);
+            case COMPLETED -> order.setCompletedAt(now);
+            case CANCELLED -> order.setCancelledAt(now);
+            case REFUNDED -> order.setRefundedAt(now);
+            default -> {}
+        }
+        return orderRepository.save(order);
     }
 }

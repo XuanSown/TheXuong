@@ -1,7 +1,9 @@
 package com.example.thexuong.controller;
 
 import com.example.thexuong.entity.Order;
+import com.example.thexuong.entity.OrderStatus;
 import com.example.thexuong.repository.OrderRepository;
+import com.example.thexuong.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -19,6 +21,8 @@ import java.util.Optional;
 public class OrderManagementController {
     @Autowired
     private final OrderRepository orderRepository;
+    @Autowired
+    private final OrderService orderService;
 
     @GetMapping
     public String showOrders(@RequestParam(required = false) Long editId, Model model) {
@@ -56,11 +60,10 @@ public class OrderManagementController {
 
         Order existing = orderRepository.findById(formOrder.getId()).orElse(null);
         if (existing != null) {
-            // Cập nhật thông tin
+            // Cập nhật thông tin (KHÔNG cho phép set status ở đây — dùng /status/{id})
             existing.setFullName(formOrder.getFullName());
             existing.setPhoneNumber(formOrder.getPhoneNumber());
             existing.setAddress(formOrder.getAddress());
-            existing.setStatus(formOrder.getStatus());
             existing.setPaymentMethod(formOrder.getPaymentMethod());
 
             orderRepository.save(existing);
@@ -72,14 +75,19 @@ public class OrderManagementController {
         return "redirect:/admin/orders";
     }
 
+    /**
+     * Task 0.14: Admin cập nhật status phải qua OrderService.adminUpdateStatus()
+     * để áp dụng state machine (canTransitionTo).
+     */
     @PostMapping("/status/{id}")
-    public String updateStatus(@PathVariable Long id, @RequestParam("status") String status,
+    public String updateStatus(@PathVariable Long id, @RequestParam("status") OrderStatus status,
                                RedirectAttributes redirectAttributes) {
-        Order order = orderRepository.findById(id).orElse(null);
-        if (order != null) {
-            order.setStatus(status);
-            orderRepository.save(order);
-            redirectAttributes.addFlashAttribute("success", "Đã cập nhật trạng thái đơn hàng #" + id);
+        try {
+            orderService.adminUpdateStatus(id, status);
+            redirectAttributes.addFlashAttribute("success",
+                    "Đã cập nhật trạng thái đơn hàng #" + id + " → " + status);
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
         return "redirect:/admin/orders";
     }
