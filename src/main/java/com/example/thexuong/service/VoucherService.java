@@ -100,13 +100,15 @@ public class VoucherService {
             throw new VoucherInvalidException("Voucher này hiện không khả dụng.");
         }
 
-        // Check VIP-only
+        // Check VIP-only (dựa trên roles của user)
         if (Boolean.TRUE.equals(catalog.getVipOnly())) {
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> new VoucherInvalidException("User không tồn tại."));
-            // TODO Batch 4: check tier_code thay vì hardcode CUSTOMER
-            String userRole = user.getRole() != null ? user.getRole().name() : "CUSTOMER";
-            if (!"VIP".equals(userRole) && !"BOTH".equals(userRole)) {
+            // TODO Batch 4: chuyển sang check tier_code thay vì check trực tiếp roles.
+            // Hiện tại: VIP/BOTH = role.name() = "VIP" hoặc "BOTH".
+            boolean isVip = user.getRoles() != null && user.getRoles().stream()
+                    .anyMatch(r -> "VIP".equals(r.getName()) || "BOTH".equals(r.getName()));
+            if (!isVip) {
                 throw new VoucherInvalidException("Voucher này chỉ dành cho khách hàng VIP.");
             }
         }

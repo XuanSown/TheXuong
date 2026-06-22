@@ -144,6 +144,7 @@
                 <li class="list-group-item d-flex justify-content-between">
                     <span>Tổng thành tiền (VNĐ)</span>
                     <strong th:text="${#numbers.formatDecimal(totalPrice, 0, 'COMMA', 0, 'POINT')}"></strong>
+                    <input type="hidden" id="totalPriceHidden" th:value="${totalPrice}"/>
                 </li>
             </ul>
         </div>
@@ -186,12 +187,125 @@
                     </div>
                 </div>
 
+                <!-- Task 3.9-3.10: Widget voucher + điểm loyalty -->
+                <h4 class="mt-4 mb-3"><i class="fa-solid fa-star text-warning me-2"></i>Mã giảm giá & Điểm thưởng</h4>
+                <div class="card shadow-sm border-warning mb-4">
+                    <div class="card-body">
+                        <!-- Chọn voucher từ danh sách UNUSED -->
+                        <div class="mb-3" th:if="${unusedVouchers != null and !unusedVouchers.isEmpty()}">
+                            <label class="form-label fw-bold">Voucher của bạn (<span th:text="${#lists.size(unusedVouchers)}">0</span>)</label>
+                            <select class="form-select" name="voucherCodeSelect" id="voucherSelect" onchange="applyVoucher()">
+                                <option value="">-- Không dùng voucher --</option>
+                                <option th:each="v : ${unusedVouchers}"
+                                        th:value="${v.code}"
+                                        th:text="${v.code + ' (hết hạn ' + #temporals.format(v.expiresAt, 'dd/MM/yyyy') + ')'}">
+                                </option>
+                            </select>
+                        </div>
+                        <div th:if="${unusedVouchers == null or unusedVouchers.isEmpty()}" class="alert alert-light small mb-3">
+                            Bạn chưa có voucher. <a th:href="@{/loyalty/redeem}">Đổi ngay</a>
+                        </div>
+
+                        <!-- Hoặc nhập mã thủ công -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Hoặc nhập mã voucher</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" name="voucherCodeManual" id="voucherCodeInput"
+                                       placeholder="TX-XXXXXX" th:value="${param.voucher}" maxlength="20"
+                                       oninput="document.getElementById('voucherSelect').value=''">
+                                <button type="button" class="btn btn-outline-warning" onclick="validateVoucher()">
+                                    <i class="fa-solid fa-check"></i> Áp dụng
+                                </button>
+                            </div>
+                            <div id="voucherMessage" class="small mt-2"></div>
+                        </div>
+
+                        <!-- Dùng điểm -->
+                        <div class="mb-2" th:if="${currentPoints != null and currentPoints > 0}">
+                            <label class="form-label fw-bold">
+                                <i class="fa-solid fa-coins text-warning"></i> Dùng điểm
+                                <span class="badge bg-warning text-dark ms-2">
+                                    Có <span th:text="${currentPoints}">0</span> điểm
+                                </span>
+                            </label>
+                            <input type="number" class="form-control" name="pointsToUse" id="pointsToUse"
+                                   min="0" th:max="${currentPoints}" th:value="${param.pointsToUse}"
+                                   placeholder="Nhập số điểm muốn dùng (1 điểm = 1đ)">
+                            <small class="text-muted">Mỗi điểm giảm 1.000đ. Tối đa: <span th:text="${currentPoints}">0</span> điểm.</small>
+                        </div>
+                        <div th:if="${currentPoints == null or currentPoints == 0}" class="alert alert-light small mb-0">
+                            Bạn chưa có điểm. Điểm được tích khi đơn hàng hoàn tất.
+                        </div>
+                    </div>
+                </div>
+
                 <hr class="mb-4">
                 <button class="btn btn-primary btn-lg w-100" type="submit">Đặt hàng</button>
             </form>
         </div>
     </div>
 </div>
+
+<!-- Task 3.10: AJAX validate voucher + auto-fill tổng tiền -->
+<script>
+function applyVoucher() {
+    const sel = document.getElementById('voucherSelect');
+    const input = document.getElementById('voucherCodeInput');
+    if (sel && sel.value) {
+        input.value = sel.value;
+        validateVoucher();
+    } else {
+        document.getElementById('voucherMessage').innerHTML = '';
+    }
+}
+
+function validateVoucher() {
+    const code = document.getElementById('voucherCodeInput').value.trim();
+    const msg = document.getElementById('voucherMessage');
+    if (!code) { msg.innerHTML = ''; return; }
+    const total = parseFloat(document.getElementById('totalPriceHidden')?.value || 0);
+
+    fetch('/api/loyalty/validate-voucher?code=' + encodeURIComponent(code) + '&total=' + total)
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                msg.innerHTML = '<span class="text-success"><i class="fa-solid fa-check-circle"></i> ' +
+                    data.message + ' Giảm ' + data.data.discountAmount.toLocaleString('vi-VN') + 'đ</span>';
+            } else {
+                msg.innerHTML = '<span class="text-danger"><i class="fa-solid fa-circle-xmark"></i> ' + data.message + '</span>';
+            }
+        })
+        .catch(e => {
+            msg.innerHTML = '<span class="text-danger">Lỗi: ' + e.message + '</span>';
+        });
+}
+
+// Trước khi submit form: copy voucherCode từ select hoặc input vào 1 hidden field "voucherCode" duy nhất
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form[action="/place-order"]');
+    if (!form) return;
+
+    // Tạo hidden field voucherCode (sẽ được fill bằng select hoặc input trước submit)
+    const hidden = document.createElement('input');
+    hidden.type = 'hidden';
+    hidden.name = 'voucherCode';
+    hidden.id = 'voucherCodeFinal';
+    form.appendChild(hidden);
+
+    form.addEventListener('submit', function() {
+        const sel = document.getElementById('voucherSelect');
+        const input = document.getElementById('voucherCodeInput');
+        // Ưu tiên select (catalog), fallback input (nhập tay)
+        if (sel && sel.value) {
+            hidden.value = sel.value;
+        } else if (input && input.value) {
+            hidden.value = input.value.trim();
+        }
+        // Xoá field manual để không gửi duplicate
+        if (input) input.disabled = true;
+    });
+});
+</script>
 <br>
 <br>
 <br>

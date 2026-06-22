@@ -2,6 +2,7 @@ package com.example.thexuong.repository;
 
 import com.example.thexuong.entity.Order;
 import com.example.thexuong.entity.OrderDetail;
+import com.example.thexuong.entity.OrderStatus;
 import com.example.thexuong.entity.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +42,7 @@ public class OrderDetailRepositoryTest {
                 .phoneNumber("0123456789")
                 .address("Test Address")
                 .totalMoney(new BigDecimal("100.00"))
-                .status("PENDING")
+                .status(OrderStatus.PENDING)
                 .build();
         order = orderRepository.save(order);
 
