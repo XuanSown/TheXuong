@@ -87,4 +87,19 @@ public class User {
     )
     @Builder.Default
     private Set<Role> roles = new HashSet<>();
+
+    // ============================================================
+    // Batch 4: Tier fields (Phương án C + Y)
+    // ============================================================
+
+    /**
+     * Hạng thành viên: 'THUONG' / 'VIP' (FK semantic tới PointTiers.code, không có FK constraint vì PointTiers chưa có sẵn).
+     * Set khi user đặt đơn đầu tiên (OrderService.placeOrder) hoặc khi nâng/hạ hạng.
+     */
+    @Column(name = "tier_code", length = 20)
+    private String tierCode;
+
+    /** Thời điểm lên hạng gần nhất — dùng cho logic re-evaluate 365 ngày (Phương án Y). */
+    @Column(name = "tier_promoted_at")
+    private java.time.LocalDateTime tierPromotedAt;
 }

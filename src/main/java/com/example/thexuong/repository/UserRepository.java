@@ -42,4 +42,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     /** Đếm số User thuộc một RoleGroup — dùng để kiểm tra trước khi xóa RoleGroup. */
     long countByRoleGroups_Id(Long roleGroupId);
+
+    /**
+     * Batch 4: User VIP có tier_promoted_at <= threshold (để cron re-evaluate).
+     * Dùng cho TierReevaluateService.reevaluateAllActiveVip().
+     */
+    List<User> findByTierCodeAndTierPromotedAtBefore(String tierCode, java.time.LocalDateTime before);
 }
