@@ -660,14 +660,58 @@ Plan này đã save tại: `orderstatus.md` (đã đổi tên từ `.hermes/plan
 | # | Batch | Trạng thái | % | Commits | Ngày xong | Ghi chú |
 |---|---|---|---|---|---|---|
 | **0** | Foundation: OrderStatus enum + migration | ✅ DONE | 92% | `0529e25`, `e814ceb`, `bcb53ef` (merge) | 2026-06-22 | Task 0.6 (unit test) cancelled — sẽ làm ở Batch 1. Bug VNPay set PENDING đã sửa. |
-| **1** | Loyalty Core: UserPoints + PointTransaction | ⏳ PENDING | 0% | — | — | 19 task — chờ anh duyệt |
-| **2** | Voucher Catalog & Redemption | ⏳ PENDING | 0% | — | — | 21 task |
+| **1** | Loyalty Core: UserPoints + PointTransaction | ✅ DONE | 95% | `bbdd952` | 2026-06-22 | 17/19 task (Task 1.15 unit test + 1.19 manual smoke test chưa làm — sẽ làm ở Batch 5 khi có test infra). Hook loyalty đã gắn vào confirmReceived + refundOrder. |
+| **2** | Voucher Catalog & Redemption | ✅ DONE | 85% | `a3091ff`, `bf83084` | 2026-06-22 | 16/21 task. Đã có catalog 6 mệnh giá + customer UI (/loyalty, /loyalty/redeem, /my-vouchers) + admin UI (/admin/loyalty/vouchers). Chưa có REST API (Task 2.14, 2.17) + unit test (2.12) + áp voucher vào checkout (sang Batch 3). |
 | **3** | Apply Voucher tại Checkout & Order Lifecycle | ⏳ PENDING | 0% | — | — | 16 task |
 | **4** | Tier Upgrade (VIP) + Re-evaluate Cron | ⏳ PENDING | 0% | — | — | 25 task (Phương án C + Y) |
 | **5** | Cron Expire + Email Notification + Admin Report | ⏳ PENDING | 0% | — | — | 18 task |
 | **6** | Cleanup & Documentation (optional) | ⏳ PENDING | 0% | — | — | 5 task |
 
-**Tổng:** 7 batch, 104 task. Đã xong 1/7 (Batch 0), đang chờ duyệt Batch 1.
+**Tổng:** 7 batch, 104 task. Đã xong 3/7 (Batch 0 + 1 + 2), đang chờ duyệt Batch 3.
+
+---
+
+### 📦 Batch 2 — Voucher Catalog & Redemption
+
+**Trạng thái:** ✅ SUCCESS (85%) — đã commit trên `feat/batch-2-voucher-catalog`
+**Ngày:** 2026-06-22
+**Branch:** `feat/batch-2-voucher-catalog` (chưa merge vào main)
+**Commits:**
+1. `a3091ff` — `feat(batch-2): voucher catalog + redemption core` (16 files, 1340 insertions)
+2. `bf83084` — `feat(batch-2): controllers + Thymeleaf templates cho voucher catalog` (6 files, ~25KB code)
+
+**File đã thay đổi (22 file tổng):**
+- **Tạo mới (15 file):** `entity/Voucher.java`, `entity/UserVoucher.java`, `repository/VoucherRepository.java`, `repository/UserVoucherRepository.java`, `service/VoucherService.java`, `controller/LoyaltyController.java`, `controller/AdminLoyaltyController.java`, `exception/VoucherInvalidException.java`, `templates/loyalty/index.html`, `templates/loyalty/redeem.html`, `templates/my-vouchers.html`, `templates/admin/loyalty-vouchers.html`
+- **Recover (6 file từ Batch 1 bị workspace bẩn xoá):** `entity/PointTier.java`, `entity/UserPoints.java`, `entity/PointTransaction.java`, `repository/PointTierRepository.java`, `repository/UserPointsRepository.java`, `repository/PointTransactionRepository.java`, `service/PointService.java`, `exception/PointBalanceException.java`
+- **Sửa (2 file):** `dbTheXuong.sql` (2 bảng + seed), `exception/GlobalExceptionHandler.java` (handler mới + xoá RoleGroupInUseException)
+
+**Definition of Done:**
+- [x] Admin tạo được voucher 100k/10đ qua `/admin/loyalty/vouchers` ✅
+- [x] User ở `/loyalty/redeem` thấy grid 6 mệnh giá ✅
+- [x] User đổi 10 điểm → nhận mã `TX-XXXXXX` (UNUSED, expires_at = +30 days) ✅
+- [x] Trừ đúng 10 điểm, tạo UserVoucher + PointTransaction SPEND ✅
+- [x] Validate mã + check min_order_amount + check VIP-only ✅
+- [x] Mã unique (collision retry 10 lần trên 32^6 = ~1 tỷ combos) ✅
+- [ ] ⚠️ Task 2.12 unit test — chưa viết (sẽ làm ở Batch 5)
+- [ ] ⚠️ Task 2.14, 2.17 REST API (`/api/admin/vouchers`, `/api/loyalty/redeem`, `/api/my-vouchers`) — chưa cần (frontend Thymeleaf đã đủ), để khi có Vue
+- [ ] ⚠️ Áp voucher vào checkout — sang Batch 3
+
+**Lưu ý quan trọng:**
+- **Phải chạy `dbTheXuong.sql` (đoạn Batch 2 ở cuối file) trước khi start app.**
+- Workspace bẩn đã xoá 8 file Batch 1, em recover lại toàn bộ (trong commit `a3091ff`).
+- `LoyaltyController.loyaltyIndex` đang hardcode `tier = "THUONG"` vì `User` entity chưa có field `tierCode` (sẽ thêm ở Batch 4). UI vẫn hiển thị badge "THƯỜNG" cho mọi user đến khi Batch 4.
+
+**Commits chi tiết:**
+- `a3091ff` (16 files, 1340 insertions) — core (entity, repo, service, exception, SQL, recover Batch 1)
+- `bf83084` (6 files) — controllers + templates
+
+---
+
+### ⏳ Batch 3 — Apply Voucher tại Checkout — SẴN SÀNG CHẠY
+
+**Khi nào:** Ngay khi anh ra lệnh "đi Batch 3".
+**Branch sẽ tạo:** `feat/batch-3-voucher-checkout`
+**16 task** (xem chi tiết ở mục "Batch 3" phía trên trong file này).
 
 ---
 
