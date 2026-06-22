@@ -38,12 +38,33 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * 409 Conflict — Xóa RoleGroup khi vẫn còn User thuộc nhóm đó.
+     * 400 — User cố spend/reverse nhiều điểm hơn số dư (Batch 1 Loyalty).
      */
-    @ExceptionHandler(RoleGroupInUseException.class)
-    public ResponseEntity<ApiResponse<Void>> handleRoleGroupInUse(RoleGroupInUseException ex) {
+    @ExceptionHandler(PointBalanceException.class)
+    public ResponseEntity<ApiResponse<Void>> handlePointBalance(PointBalanceException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error(ex.getMessage()));
+    }
+
+    /**
+     * 409 — State machine violation (Batch 0 OrderStatus).
+     * Ví dụ: cố chuyển COMPLETED → SHIPPING, hoặc PENDING → COMPLETED.
+     */
+    @ExceptionHandler(IllegalOrderTransitionException.class)
+    public ResponseEntity<ApiResponse<Void>> handleIllegalTransition(IllegalOrderTransitionException ex) {
         return ResponseEntity
                 .status(HttpStatus.CONFLICT)
+                .body(ApiResponse.error(ex.getMessage()));
+    }
+
+    /**
+     * 400 — Voucher không hợp lệ (hết hạn, đã dùng, sai điều kiện) (Batch 2).
+     */
+    @ExceptionHandler(VoucherInvalidException.class)
+    public ResponseEntity<ApiResponse<Void>> handleVoucherInvalid(VoucherInvalidException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
                 .body(ApiResponse.error(ex.getMessage()));
     }
 
