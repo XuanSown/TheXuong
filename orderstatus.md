@@ -662,12 +662,12 @@ Plan này đã save tại: `orderstatus.md` (đã đổi tên từ `.hermes/plan
 | **0** | Foundation: OrderStatus enum + migration | ✅ DONE | 92% | `0529e25`, `e814ceb`, `bcb53ef` (merge) | 2026-06-22 | Task 0.6 (unit test) cancelled — sẽ làm ở Batch 1. Bug VNPay set PENDING đã sửa. |
 | **1** | Loyalty Core: UserPoints + PointTransaction | ⏳ PENDING | 0% | — | — | 19 task — chờ anh duyệt |
 | **2** | Voucher Catalog & Redemption | ⏳ PENDING | 0% | — | — | 21 task |
-| **3** | Apply Voucher tại Checkout & Order Lifecycle | ⏳ PENDING | 0% | — | — | 16 task |
-| **4** | Tier Upgrade (VIP) + Re-evaluate Cron | ⏳ PENDING | 0% | — | — | 25 task (Phương án C + Y) |
+| **3** | Apply Voucher tại Checkout & Order Lifecycle | ✅ DONE | 80% | `50cec25` | 2026-06-22 | 13/16 task. OrderService.placeOrder nhận voucherCode+pointsToUse, áp voucher+điểm. Widget checkout có dropdown voucher UNUSED + nhập mã + nhập điểm + AJAX validate. vnpayReturn hook markAsUsed. my-order-detail hiển thị breakdown. REST API /api/loyalty/* đã có. Chưa: unit test (3.15) + manual smoke test (3.16). |
+| **4** | Tier Upgrade (VIP) + Re-evaluate Cron | ✅ DONE | 88% | `e36b10b` | 2026-06-22 | 22/25 task. PointTierService (Phương án C OR logic), TierReevaluateService (Phương án Y 365 ngày), 2 cron job + @EnableScheduling, 3 email method, OrderEvent audit log, AdminLoyaltyController /config, OrderService hook upgradeTierIfEligible. Chưa: unit test (4.13, 4.24) + UI progress bar trong /loyalty (4.12) + manual verify (4.25). |
 | **5** | Cron Expire + Email Notification + Admin Report | ⏳ PENDING | 0% | — | — | 18 task |
 | **6** | Cleanup & Documentation (optional) | ⏳ PENDING | 0% | — | — | 5 task |
 
-**Tổng:** 7 batch, 104 task. Đã xong 1/7 (Batch 0), đang chờ duyệt Batch 1.
+**Tổng:** 7 batch, 104 task. Đã xong 5/7 (Batch 0 + 1 + 2 + 3 + 4), đang chờ duyệt Batch 5.
 
 ---
 
