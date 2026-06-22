@@ -758,3 +758,44 @@ Plan này đã save tại: `orderstatus.md` (đã đổi tên từ `.hermes/plan
 **19 task** (xem chi tiết ở mục "Batch 1 — Loyalty Core" phía trên trong file này).
 
 ---
+
+### 📦 Batch 3 — Apply Voucher tại Checkout
+
+**Trạng thái:** ✅ SUCCESS (80%) — đã commit trên `feat/batch-3-voucher-checkout`
+**Ngày:** 2026-06-22
+**Branch:** `feat/batch-3-voucher-checkout` (chưa merge vào main)
+**Commits:**
+1. `50cec25` — `feat(batch-3): apply voucher tại checkout + hook markAsUsed vào vnpayReturn` (9 files, 414 insertions)
+2. `ca47cd4` — `docs: cập nhật tracking Batch 3 (80% DONE) + báo cáo chi tiết`
+
+**File đã thay đổi (10 file):**
+- **Sửa (7):** `dbTheXuong.sql` (6 cột ALTER), `entity/Order.java` (6 field), `service/OrderService.java` (refactor placeOrder + dùng totalForPointCalc), `service/VoucherService.java` (fix getRoles), `controller/OrderController.java` (inject service + load model + vnpayReturn hook), `controller/DashboardController.java` (fix 3 query), `templates/checkout.html` (widget loyalty + JS), `templates/my-order-detail.html` (breakdown)
+- **Tạo mới (1):** `controller/LoyaltyApiController.java` (REST API 4 endpoint)
+- **Sửa test (1):** `OrderDetailRepositoryTest.java` (OrderStatus enum)
+
+**Definition of Done:**
+- [x] Checkout có ô nhập mã + button "Áp dụng" + dropdown chọn voucher UNUSED ✅
+- [x] AJAX gọi `/api/loyalty/validate-voucher` → hiển thị discount preview ✅
+- [x] Place order với voucher → `orders.voucher_code` + `discount_amount` được set ✅
+- [x] Order CONFIRMED → `voucherService.markAsUsed` được gọi trong `vnpayReturn` ✅
+- [x] 1 đơn chỉ dùng được 1 voucher, JS enforce (select hoặc input manual) ✅
+- [x] Snapshot `total_for_point_calc = subtotal` (không trừ discount, đúng rule) ✅
+- [x] REST API `/api/loyalty/*` cho AJAX + Vue tương lai ✅
+- [ ] ⚠️ Task 3.15 unit test — chưa viết (sẽ làm ở Batch 5)
+- [ ] ⚠️ Task 3.16 manual smoke test — cần DB live
+
+**Lưu ý quan trọng:**
+- **Phải chạy `dbTheXuong.sql` (đoạn Batch 3 ở cuối file) trước khi start app lần đầu.**
+- Widget checkout có 2 cách nhập voucher (select dropdown + input manual) — JS merge về 1 hidden `voucherCode` duy nhất trước submit.
+- Nếu `placeOrder` fail sau khi `spendPoints` đã commit → user bị mất điểm (TODO Batch 5: Saga pattern).
+- `confirmReceived` dùng `totalForPointCalc` thay vì `totalMoney` để earn points (đúng rule đã chốt ở voucher.md mục 1).
+
+---
+
+### ⏳ Batch 4 — Tier Upgrade (VIP) + Re-evaluate Cron — SẴN SÀNG CHẠY
+
+**Khi nào:** Ngay khi anh ra lệnh "đi Batch 4".
+**Branch sẽ tạo:** `feat/batch-4-tier-vip`
+**25 task** (xem chi tiết ở mục "Batch 4" trong `orderstatus.md`) — bao gồm Phương án C (lên VIP) + Phương án Y (re-evaluate 365 ngày).
+
+---
