@@ -14,6 +14,10 @@ java {
     }
 }
 
+// Frontend build configuration
+def nodeVersion = '20.11.0'
+def npmCommand = System.getProperty('os.name').toLowerCase().contains('windows') ? 'npm.cmd' : 'npm'
+
 configurations {
     compileOnly {
         extendsFrom annotationProcessor
@@ -22,6 +26,44 @@ configurations {
 
 repositories {
     mavenCentral()
+}
+
+// Frontend tasks
+task npmInstall(type: Exec) {
+    workingDir file('frontend')
+    commandLine npmCommand, 'install'
+    // Only run if package.json changes
+    inputs.file file('frontend/package.json')
+    outputs.dir file('frontend/node_modules')
+}
+
+task npmBuild(type: Exec) {
+    workingDir file('frontend')
+    commandLine npmCommand, 'run', 'build'
+    dependsOn npmInstall
+    inputs.file file('frontend/package.json')
+    inputs.dir file('frontend/src')
+    outputs.dir file('frontend/dist')
+}
+
+task copyFrontend(type: Copy) {
+    dependsOn npmBuild
+    from file('frontend/dist')
+    into file('src/main/resources/static/frontend')
+}
+
+processResources {
+    dependsOn copyFrontend
+}
+
+tasks.named('bootJar') {
+    // Ensure frontend is built before creating the jar
+    dependsOn copyFrontend
+}
+
+tasks.named('bootRun') {
+    // Also build frontend when running in development (optional)
+    // dependsOn copyFrontend
 }
 
 dependencies {

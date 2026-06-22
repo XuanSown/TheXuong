@@ -1,13 +1,97 @@
 /* =========================================
    1. GLOBAL & RESET (Cấu hình chung)
    ========================================= */
+:root {
+    /* Touch target minimums */
+    --touch-target-min: 44px;
+
+    /* Responsive typography using clamp */
+    --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+    --text-sm: clamp(0.875rem, 0.8rem + 0.3vw, 1rem);
+    --text-base: clamp(1rem, 0.9rem + 0.5vw, 1.125rem);
+    --text-lg: clamp(1.125rem, 1rem + 0.6vw, 1.25rem);
+    --text-xl: clamp(1.25rem, 1.1rem + 0.75vw, 1.5rem);
+    --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+    --text-3xl: clamp(1.875rem, 1.5rem + 1.5vw, 2.5rem);
+    --text-4xl: clamp(2.25rem, 1.8rem + 2vw, 3rem);
+
+    /* Spacing scale */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-2xl: 3rem;
+    --spacing-3xl: 4rem;
+}
+
 body {
-    font-family: 'Segoe UI', sans-serif;
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
     background-color: #f8f9fa;
     margin: 0;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    font-size: var(--text-base);
+    line-height: 1.6;
+    overflow-x: hidden; /* Prevent horizontal scroll */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Smooth scrolling for anchor links */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Focus visible for accessibility - keyboard navigation */
+:focus-visible {
+    outline: 2px solid #FFD700;
+    outline-offset: 2px;
+}
+
+/* Prevent Bootstrap container overflow on very small screens */
+@media (max-width: 575.98px) {
+    .container-fluid {
+        padding-left: 0.75rem !important;
+        padding-right: 0.75rem !important;
+    }
+
+    .container {
+        padding-left: 0.75rem !important;
+        padding-right: 0.75rem !important;
+    }
+}
+
+/* Better mobile tap highlight */
+* {
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Prevent text size adjustment on mobile */
+input,
+button,
+select,
+textarea {
+    font-size: 16px !important; /* Prevents iOS zoom on focus */
+}
+
+/* Ensure images don't overflow */
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Ensure minimum touch targets */
+button,
+.nav-link,
+.dropdown-item,
+a.btn {
+    min-height: var(--touch-target-min);
+    min-width: var(--touch-target-min);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* =========================================
@@ -50,6 +134,40 @@ body {
     display: inline-block;
 }
 
+/* Responsive Navbar Enhancements */
+@media (max-width: 575.98px) {
+    .navbar {
+        padding: 8px 0;
+    }
+
+    .container-fluid {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+
+    .brand-text {
+        font-size: 1.25rem;
+        letter-spacing: 1px;
+    }
+
+    .navbar-brand img {
+        width: 38px !important;
+        height: 38px !important;
+    }
+
+    /* Larger hamburger for easier touch */
+    .navbar-toggler {
+        padding: 10px;
+        width: 44px;
+        height: 44px;
+    }
+
+    .navbar-toggler-icon {
+        width: 24px;
+        height: 24px;
+    }
+}
+
 /* =========================================
    3. HERO CAROUSEL (Slide ảnh)
    ========================================= */
@@ -58,6 +176,79 @@ body {
     height: 500px;          /* Chiều cao cố định giống bản cũ */
     object-fit: cover;      /* Cắt ảnh vừa khung, không bị méo */
     object-position: center; /* Luôn lấy trung tâm ảnh */
+}
+
+/* Responsive hero images */
+@media (max-width: 575.98px) {
+    .hero-img {
+        height: 280px; /* Smaller height on mobile */
+    }
+
+    .carousel-caption {
+        padding: 1rem;
+        text-align: center;
+    }
+
+    .carousel-caption h2 {
+        font-size: 1.5rem !important;
+        text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8);
+        margin-bottom: 0.5rem;
+    }
+
+    .carousel-caption p {
+        font-size: 0.9rem !important;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        max-width: 90%;
+        margin: 0 auto;
+    }
+
+    /* Larger touch targets for carousel controls */
+    .carousel-control-prev,
+    .carousel-control-next {
+        width: 44px;
+        height: 44px;
+    }
+
+    .carousel-control-prev-icon,
+    .carousel-control-next-icon {
+        width: 24px;
+        height: 24px;
+    }
+}
+
+/* Make carousel controls easier to tap on mobile */
+@media (hover: none) and (pointer: coarse) {
+    .carousel-control-prev,
+    .carousel-control-next {
+        background-color: rgba(0, 0, 0, 0.3);
+        border-radius: 50%;
+        width: 44px;
+        height: 44px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+}
+
+/* Make carousel controls easier to tap on mobile */
+@media (hover: none) and (pointer: coarse) {
+    .carousel-control-prev,
+    .carousel-control-next {
+        background-color: rgba(0, 0, 0, 0.3);
+        border-radius: 50%;
+        width: 44px;
+        height: 44px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+}
+
+/* Carousel indicators - larger on mobile */
+@media (max-width: 575.98px) {
+    .carousel-indicators [data-bs-target] {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+    }
 }
 
 /* Hiệu ứng bóng đổ cho chữ trên ảnh (để dễ đọc trên nền sáng) */
@@ -77,9 +268,28 @@ body {
    4. PRODUCTS (Sản phẩm)
    ========================================= */
 .product-img-custom {
-    height: 250px;
+    height: 220px;
     object-fit: cover;
     transition: transform 0.3s ease;
+}
+
+/* Responsive product image heights */
+@media (max-width: 575.98px) {
+    .product-img-custom {
+        height: 180px;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 991.98px) {
+    .product-img-custom {
+        height: 200px;
+    }
+}
+
+@media (min-width: 1200px) {
+    .product-img-custom {
+        height: 240px;
+    }
 }
 
 .card {
@@ -95,6 +305,26 @@ body {
 .card:hover .card-img-top {
     transform: scale(1.05);
     transition: transform 0.3s ease;
+}
+
+/* Responsive Product Grid */
+@media (max-width: 575.98px) {
+    .product-card .card-img-top {
+        height: 180px !important; /* Smaller images on mobile */
+    }
+
+    .card-body {
+        padding: 0.75rem !important;
+    }
+
+    .card-title {
+        font-size: 0.9rem !important;
+    }
+
+    .btn {
+        padding: 0.5rem 1rem !important;
+        font-size: 0.85rem !important;
+    }
 }
 
 /* =========================================
@@ -153,14 +383,15 @@ body {
 
 /* A. Dropdown Kính mờ */
 .dropdown-menu-glass {
-    background-color: rgba(0, 0, 0, 0.9);
+    background-color: rgba(0, 0, 0, 0.95);
     backdrop-filter: blur(15px);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 10px;
     padding: 10px 0;
-    margin-top: 15px;
+    margin-top: 8px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    display: none;
+    max-height: 70vh;
+    overflow-y: auto;
 }
 
 /* Cầu nối hover */
@@ -169,18 +400,21 @@ body {
 .custom-dropdown .dropdown-menu::before {
     content: "";
     position: absolute;
-    top: -20px;
+    top: -10px;
     left: 0;
     width: 100%;
-    height: 20px;
+    height: 10px;
     background: transparent;
 }
 
 .dropdown-item {
     color: #ccc;
     font-weight: 500;
-    padding: 8px 20px;
+    padding: 10px 20px;
     transition: all 0.2s;
+    min-height: 44px; /* Touch target */
+    display: flex;
+    align-items: center;
 }
 .dropdown-item:hover {
     background-color: rgba(255, 255, 255, 0.1);
@@ -197,13 +431,46 @@ body {
 }
 @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
+/* Mobile dropdown - full width inside navbar */
+@media (max-width: 991.98px) {
+    .dropdown-menu-glass {
+        position: static !important;
+        margin-top: 8px;
+        border-radius: 8px;
+        width: 100%;
+        max-height: none;
+    }
+
+    .navbar-collapse {
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+    }
+
+    .navbar-nav {
+        gap: 0.5rem;
+    }
+
+    .nav-item {
+        width: 100%;
+    }
+
+    .dropdown-item {
+        padding-left: 1.5rem;
+    }
+
+    .dropdown-item:hover {
+        padding-left: 1.5rem;
+    }
+}
+
 /* B. Thanh Tìm kiếm Trong suốt */
 .search-input {
     background: rgba(255, 255, 255, 0.15) !important;
     border: 1px solid rgba(255, 255, 255, 0.3) !important;
-    border-radius: 20px !important;
+    border-radius: 25px !important;
     color: white !important;
-    padding-right: 40px;
+    padding-right: 45px;
+    min-height: 44px;
 }
 .search-input::placeholder { color: rgba(255, 255, 255, 0.7); }
 .search-input:focus {
@@ -211,8 +478,32 @@ body {
     box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
     border-color: #fff !important;
 }
-.search-btn { background: none; border: none; padding-right: 15px; }
+.search-btn {
+    background: none;
+    border: none;
+    padding: 0 15px;
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 .search-btn:hover i { transform: scale(1.1); color: #FFD700 !important; }
+
+/* Mobile search - hide in navbar, show in collapsed menu */
+@media (max-width: 991.98px) {
+    .search-form {
+        order: -1; /* Move search to top of menu */
+        width: 100% !important;
+        margin-bottom: 1rem;
+        padding: 0 0.5rem;
+    }
+
+    .search-input {
+        background: rgba(255, 255, 255, 0.1) !important;
+        border-color: rgba(255, 255, 255, 0.2) !important;
+    }
+}
 
 
 /* =========================================
@@ -227,10 +518,56 @@ body {
 
 .nav-item.dropdown .dropdown-item {
     color: #ccc;
+    min-height: 44px; /* Touch target */
+    display: flex;
+    align-items: center;
 }
 .nav-item.dropdown .dropdown-item:hover {
     color: #FFD700;
     background: rgba(255, 255, 255, 0.1);
+}
+
+/* Nav icon links (cart, user, language) - larger touch targets */
+.navbar-nav .nav-link {
+    min-height: 44px;
+    min-width: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem !important;
+}
+
+@media (max-width: 575.98px) {
+    .navbar-nav .nav-link {
+        font-size: 1.1rem;
+    }
+}
+
+/* Cart badge styling */
+.nav-item.position-relative .badge {
+    min-width: 18px;
+    min-height: 18px;
+    padding: 0.25em 0.5em;
+    font-size: 0.7rem;
+}
+
+@media (max-width: 575.98px) {
+    .nav-item.position-relative .badge {
+        min-width: 20px;
+        min-height: 20px;
+        font-size: 0.75rem;
+    }
+}
+
+/* User avatar/icon styling */
+.nav-item.dropdown .nav-link {
+    font-size: 1.2rem;
+}
+
+@media (max-width: 575.98px) {
+    .nav-item.dropdown .nav-link {
+        font-size: 1.3rem;
+    }
 }
 
 /* =========================================
@@ -377,6 +714,54 @@ footer {
     }
     .footer-link:hover {
         padding-left: 0; /* Tắt hiệu ứng trượt trên mobile cho gọn */
+    }
+
+    /* Mobile: Stack footer columns */
+    .footer-custom .col-md-2,
+    .footer-custom .col-md-3,
+    .footer-custom .col-md-4 {
+        margin-top: 1.5rem;
+    }
+
+    /* Social icons - larger touch targets */
+    .social-icon {
+        width: 44px !important;
+        height: 44px !important;
+    }
+
+    /* Subscribe form mobile */
+    .footer-custom .input-group {
+        flex-wrap: wrap;
+    }
+
+    .footer-custom .input-group input {
+        min-height: 44px;
+        font-size: 1rem;
+    }
+
+    .footer-custom .input-group button {
+        min-height: 44px;
+        padding: 0 1.5rem;
+    }
+
+    /* Payment icons */
+    .payment-icons {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .payment-icons i {
+        font-size: 1.5rem !important;
+    }
+}
+
+/* Tablet specific */
+@media (min-width: 576px) and (max-width: 991.98px) {
+    .social-icon {
+        width: 40px;
+        height: 40px;
     }
 }
 

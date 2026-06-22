@@ -55,4 +55,14 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             "FROM Product p " +
             "ORDER BY COALESCE(p.viewCount, 0) ASC")
     List<Object[]> findLeastViewedProducts(Pageable pageable);
+
+    // API methods
+    @Query("SELECT DISTINCT p.sport FROM Product p WHERE p.sport IS NOT NULL AND p.sport != '' ORDER BY p.sport")
+    List<String> findAllDistinctSports();
+
+    @Query("SELECT DISTINCT p.brand FROM Product p WHERE p.brand IS NOT NULL AND p.brand != '' ORDER BY p.brand")
+    List<String> findAllDistinctBrands();
+
+    // Find top N products by ID desc for new arrivals
+    List<Product> findTopNByOrderByIdDesc(int n);
 }

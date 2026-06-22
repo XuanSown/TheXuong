@@ -125,6 +125,21 @@
                     </p>
                     <p><strong>Ngày đặt:</strong> Hôm nay</p> <p><strong>Tổng tiền:</strong> <span class="text-danger fw-bold" th:text="${#numbers.formatDecimal(order.totalMoney, 0, 'COMMA', 0, 'POINT')} + ' đ'"></span></p>
 
+                    <!-- Task 3.14: Hiển thị breakdown subtotal/ship/discount/points nếu có -->
+                    <div class="small text-muted" th:if="${order.subtotal != null or order.discountAmount != null}">
+                        <div th:if="${order.subtotal != null}">
+                            <span>Tạm tính: </span>
+                            <span th:text="${#numbers.formatDecimal(order.subtotal, 0, 'COMMA', 0, 'POINT')} + ' đ'"></span>
+                        </div>
+                        <div th:if="${order.voucherCode != null and !order.voucherCode.isBlank()}" class="text-success">
+                            <i class="fa-solid fa-ticket me-1"></i>Voucher <code th:text="${order.voucherCode}"></code>:
+                            -<span th:text="${#numbers.formatDecimal(order.discountAmount, 0, 'COMMA', 0, 'POINT')} + ' đ'"></span>
+                        </div>
+                        <div th:if="${order.pointsUsed != null and order.pointsUsed > 0}" class="text-warning">
+                            <i class="fa-solid fa-coins me-1"></i>Điểm tích luỹ: <span th:text="${order.pointsUsed}"></span> điểm
+                        </div>
+                    </div>
+
                     <hr>
 
                     <form th:action="@{/order/update}" method="post">

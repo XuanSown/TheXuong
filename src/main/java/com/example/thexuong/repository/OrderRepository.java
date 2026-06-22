@@ -56,4 +56,15 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             "AND (:startDate IS NULL OR CAST(created_at AS DATE) >= :startDate) " +
             "AND (:endDate IS NULL OR CAST(created_at AS DATE) <= :endDate)", nativeQuery = true)
     Double getTotalRevenue(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
+
+    /**
+     * Batch 4: Tổng total_for_point_calc của user từ đơn COMPLETED, sau 1 ngày cụ thể.
+     * Dùng cho PointTierService tính chi tiêu 365 ngày (Phương án C).
+     */
+    @Query("SELECT COALESCE(SUM(o.totalForPointCalc), 0) FROM Order o " +
+            "WHERE o.user.id = :userId " +
+            "AND o.status = com.example.thexuong.entity.OrderStatus.COMPLETED " +
+            "AND o.completedAt >= :since")
+    java.math.BigDecimal sumTotalForPointCalcByUserSince(@Param("userId") Long userId,
+                                                        @Param("since") java.time.LocalDateTime since);
 }
