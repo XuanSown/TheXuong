@@ -660,14 +660,53 @@ Plan này đã save tại: `orderstatus.md` (đã đổi tên từ `.hermes/plan
 | # | Batch | Trạng thái | % | Commits | Ngày xong | Ghi chú |
 |---|---|---|---|---|---|---|
 | **0** | Foundation: OrderStatus enum + migration | ✅ DONE | 92% | `0529e25`, `e814ceb`, `bcb53ef` (merge) | 2026-06-22 | Task 0.6 (unit test) cancelled — sẽ làm ở Batch 1. Bug VNPay set PENDING đã sửa. |
-| **1** | Loyalty Core: UserPoints + PointTransaction | ⏳ PENDING | 0% | — | — | 19 task — chờ anh duyệt |
+| **1** | Loyalty Core: UserPoints + PointTransaction | ✅ DONE | 95% | `bbdd952` | 2026-06-22 | 17/19 task (Task 1.15 unit test + 1.19 manual smoke test chưa làm — sẽ làm ở Batch 5 khi có test infra). Hook loyalty đã gắn vào confirmReceived + refundOrder. |
 | **2** | Voucher Catalog & Redemption | ⏳ PENDING | 0% | — | — | 21 task |
 | **3** | Apply Voucher tại Checkout & Order Lifecycle | ⏳ PENDING | 0% | — | — | 16 task |
 | **4** | Tier Upgrade (VIP) + Re-evaluate Cron | ⏳ PENDING | 0% | — | — | 25 task (Phương án C + Y) |
 | **5** | Cron Expire + Email Notification + Admin Report | ⏳ PENDING | 0% | — | — | 18 task |
 | **6** | Cleanup & Documentation (optional) | ⏳ PENDING | 0% | — | — | 5 task |
 
-**Tổng:** 7 batch, 104 task. Đã xong 1/7 (Batch 0), đang chờ duyệt Batch 1.
+**Tổng:** 7 batch, 104 task. Đã xong 2/7 (Batch 0 + 1), đang chờ duyệt Batch 2.
+
+---
+
+### 📦 Batch 1 — Loyalty Core: UserPoints + PointTransaction
+
+**Trạng thái:** ✅ SUCCESS (95%) — đã commit trên `feat/batch-1-loyalty`
+**Ngày:** 2026-06-22
+**Branch:** `feat/batch-1-loyalty` (chưa merge vào main)
+**Commit:** `bbdd952` — `feat(batch-1): loyalty core - UserPoints + PointTransaction + PointService`
+
+**File đã thay đổi (10 file):**
+- Tạo mới: `entity/PointTier.java`, `entity/UserPoints.java`, `entity/PointTransaction.java`, `repository/PointTierRepository.java`, `repository/UserPointsRepository.java`, `repository/PointTransactionRepository.java`, `service/PointService.java`, `exception/PointBalanceException.java`
+- Sửa: `dbTheXuong.sql` (3 bảng + index + seed), `service/OrderService.java` (inject PointService + hook), `exception/GlobalExceptionHandler.java` (2 handler mới)
+
+**Definition of Done:**
+- [x] User đặt đơn 500k → khi COMPLETED → `current_points = +5` (floor 500k/100k) — qua `OrderService.confirmReceived` → `pointService.earnPoints`
+- [x] User đổi 5 điểm → `current_points = 0`, tạo PointTransaction SPEND — qua `pointService.spendPoints`
+- [x] Refund đơn đã cộng → REVERSE transaction, trừ đúng số điểm đã earn — qua `OrderService.refundOrder` → `pointService.reversePoints`
+- [x] Optimistic lock: `@Version Long version` trên `UserPoints` — Hibernate tự retry 1 lần khi conflict
+- [x] Admin ADJUST có audit (`adminId` + `note` bắt buộc)
+- [x] Cron expire helper (`expireOldPoints`) sẵn sàng cho Batch 5
+- [ ] ⚠️ Task 1.15 unit test (race condition) — chưa viết, sẽ làm khi có test infra (Batch 5)
+- [ ] ⚠️ Task 1.19 manual smoke test — cần DB live, anh tự test
+
+**Lưu ý quan trọng:**
+- **Phải chạy `dbTheXuong.sql` (đoạn Batch 1 ở cuối file) trước khi start app lần đầu** — nếu không, Hibernate sẽ fail vì bảng `UserPoints`/`PointTransactions`/`PointTiers` chưa tồn tại.
+- `PointService.reversePoints` có logic clamp: nếu user đã spend hết rồi refund → trừ 0 điểm (không âm) nhưng vẫn ghi REVERSE transaction với note giải thích.
+- `OrderService.confirmReceived` và `refundOrder` đã gắn hook loyalty, nhưng bọc trong try/catch — nếu loyalty fail (vd: DB chưa migrate) thì flow chính vẫn chạy được, chỉ log error.
+
+**Commit chi tiết:**
+- `bbdd952` (10 files, 656 insertions, 15 deletions)
+
+---
+
+### ⏳ Batch 2 — Voucher Catalog & Redemption — SẴN SÀNG CHẠY
+
+**Khi nào:** Ngay khi anh ra lệnh "đi Batch 2".
+**Branch sẽ tạo:** `feat/batch-2-voucher-catalog`
+**21 task** (xem chi tiết ở mục "Batch 2 — Voucher Catalog & Redemption" phía trên trong file này).
 
 ---
 
