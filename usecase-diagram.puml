@@ -1,0 +1,229 @@
+@startuml TheXuong E-commerce - Use Case Diagram
+' Author: Claude Opus 4.8
+' Date: 2026-06-23
+' Project: TheXuong Sport Apparel E-commerce
+
+' ============================================
+' STYLE SETTINGS
+' ============================================
+skinparam usecase {
+    BackgroundColor<<Customer>> LightBlue
+    BorderColor<<Customer>> DarkBlue
+    BackgroundColor<<Admin>> LightPink
+    BorderColor<<Admin>> DarkRed
+    BackgroundColor<<Both>> LightGreen
+    BorderColor<<Both>> DarkGreen
+    BackgroundColor<<System>> LightYellow
+    BorderColor<<System>> Orange
+}
+
+skinparam actor {
+    BackgroundColor<<Customer>> LightBlue
+    BorderColor<<Customer>> DarkBlue
+    BackgroundColor<<Admin>> LightPink
+    BorderColor<<Admin>> DarkRed
+    BackgroundColor<<System>> LightYellow
+    BorderColor<<System>> Orange
+}
+
+' ============================================
+' ACTORS DEFINITION
+' ============================================
+actor "Customer\n(Unauthorized)" as Customer <<Customer>>
+actor "Registered User" as RegisteredUser <<Customer>>
+actor "Admin" as Admin <<Admin>>
+actor "System\n(Cron/Email/VNPay)" as System <<System>>
+
+' Group actors
+rectangle "Customer Actors" {
+  Customer
+  RegisteredUser
+}
+
+rectangle "Admin & System" {
+  Admin
+  System
+}
+
+' ============================================
+' CUSTOMER USE CASES (Guest + Registered)
+' ============================================
+usecase "Browse Products\n(search, filter, sort)" as UC_Browse
+usecase "View Product Detail" as UC_ProductDetail
+usecase "View Homepage\n(Featured Products)" as UC_Homepage
+
+' Relationships - Available to both Guest and Registered
+Customer -- UC_Browse
+Customer -- UC_ProductDetail
+Customer -- UC_Homepage
+
+' ============================================
+' REGISTERED USER ONLY USE CASES
+' ============================================
+usecase "Register Account\n(Local/Google)" as UC_Register
+usecase "Login\n(Google OAuth2)" as UC_Login
+usecase "Logout" as UC_Logout
+usecase "View Shopping Cart" as UC_ViewCart
+usecase "Add Item to Cart" as UC_AddCart
+usecase "Update Cart Quantity" as UC_UpdateCart
+usecase "Remove from Cart" as UC_RemoveCart
+usecase "Checkout\n(Enter shipping info)" as UC_Checkout
+usecase "Place Order" as UC_PlaceOrder
+usecase "Make Payment\n(VNPay/COD)" as UC_Payment
+usecase "View My Orders" as UC_MyOrders
+usecase "View Order Detail" as UC_OrderDetail
+usecase "Cancel Order\n(PENDING only)" as UC_CancelOrder
+usecase "Confirm Received\n(DELIVERED → COMPLETED)" as UC_ConfirmReceived
+usecase "View Profile" as UC_ViewProfile
+usecase "Update Profile" as UC_UpdateProfile
+usecase "Change Password" as UC_ChangePassword
+usecase "Forgot Password\n(Reset via Email)" as UC_ForgotPassword
+usecase "Chat with Admin\n(Real-time)" as UC_Chat
+
+' Planned Loyalty Features (Batch 1-5)
+usecase "View Points Balance" as UC_ViewPoints <<Both>>
+usecase "View Points History" as UC_PointsHistory <<Both>>
+usecase "Redeem Voucher\n(Use points)" as UC_RedeemVoucher <<Both>>
+usecase "Apply Voucher at Checkout" as UC_ApplyVoucher <<Both>>
+usecase "View My Vouchers" as UC_MyVouchers <<Both>>
+
+' Relationships - Registered User only
+RegisteredUser -- UC_Register
+RegisteredUser -- UC_Login
+RegisteredUser -- UC_Logout
+RegisteredUser -- UC_ViewCart
+RegisteredUser -- UC_AddCart
+RegisteredUser -- UC_UpdateCart
+RegisteredUser -- UC_RemoveCart
+RegisteredUser -- UC_Checkout
+RegisteredUser -- UC_PlaceOrder
+RegisteredUser -- UC_Payment
+RegisteredUser -- UC_MyOrders
+RegisteredUser -- UC_OrderDetail
+RegisteredUser -- UC_CancelOrder
+RegisteredUser -- UC_ConfirmReceived
+RegisteredUser -- UC_ViewProfile
+RegisteredUser -- UC_UpdateProfile
+RegisteredUser -- UC_ChangePassword
+RegisteredUser -- UC_ForgotPassword
+RegisteredUser -- UC_Chat
+
+' Loyalty features (Both Customer types after login)
+RegisteredUser -- UC_ViewPoints
+RegisteredUser -- UC_PointsHistory
+RegisteredUser -- UC_RedeemVoucher
+RegisteredUser -- UC_ApplyVoucher
+RegisteredUser -- UC_MyVouchers
+
+' ============================================
+' ADMIN USE CASES
+' ============================================
+usecase "Admin Dashboard\n(Statistics)" as UC_Dashboard
+usecase "Manage Products\n(CRUD + Variants)" as UC_ManageProducts
+usecase "Manage Orders\n(View all, Update status)" as UC_ManageOrders
+usecase "Manage Users\n(CRUD, Roles, Active toggle)" as UC_ManageUsers
+usecase "Manage Role Groups\n(RBAC configuration)" as UC_ManageRoleGroups
+usecase "View Statistics\n(Top selling, Revenue, Inventory)" as UC_Statistics
+
+' Planned Admin Loyalty Management (Batch 2-5)
+usecase "Configure Loyalty\n(Points rate, Tier thresholds)" as UC_LoyaltyConfig <<Both>>
+usecase "Manage Voucher Catalog\n(CRUD voucher types)" as UC_VoucherCatalog <<Both>>
+usecase "View Loyalty Reports\n(Points, Vouchers, Tiers)" as UC_LoyaltyReports <<Both>>
+
+' Relationships - Admin only
+Admin -- UC_Dashboard
+Admin -- UC_ManageProducts
+Admin -- UC_ManageOrders
+Admin -- UC_ManageUsers
+Admin -- UC_ManageRoleGroups
+Admin -- UC_Statistics
+
+Admin -- UC_LoyaltyConfig
+Admin -- UC_VoucherCatalog
+Admin -- UC_LoyaltyReports
+
+' ============================================
+' SYSTEM USE CASES
+' ============================================
+usecase "Send Email Notifications\n(Order confirm, Points earned, Voucher)" as UC_SendEmail
+usecase "Handle VNPay Callback\n(Update order status)" as UC_VNPayCallback
+usecase "Cron: Expire Points\n(Daily 00:00)" as UC_ExpirePoints
+usecase "Cron: Expire Vouchers\n(Daily 00:30)" as UC_ExpireVouchers
+usecase "Cron: Tier Re-evaluate\n(Monthly 1st)" as UC_TierReevaluate
+usecase "Cron: VIP Warning\n(Daily 09:00)" as UC_VIPWarning
+
+System -- UC_SendEmail
+System -- UC_VNPayCallback
+System -- UC_ExpirePoints
+System -- UC_ExpireVouchers
+System -- UC_TierReevaluate
+System -- UC_VIPWarning
+
+' ============================================
+' SHARED / EXTENSIONS
+' ============================================
+usecase "View Order Statistics\n(Status chart)" as UC_OrderStats
+usecase "Record Order Event\n(Audit trail)" as UC_OrderEvent
+
+' These are internal, triggered by other use cases
+note top of UC_OrderEvent
+  Triggered by:
+  - Order status changes
+  - Tier upgrades
+  - Admin actions
+end note
+
+' ============================================
+' INCLUDE RELATIONSHIPS
+' ============================================
+UC_PlaceOrder ..> UC_AddCart : includes
+UC_Checkout ..> UC_ViewCart : includes
+UC_Payment ..> UC_VNPayCallback : <<extend>> (for VNPay)
+UC_ConfirmReceived ..> UC_OrderEvent : includes
+UC_CancelOrder ..> UC_OrderEvent : includes
+UC_ManageOrders ..> UC_OrderStats : includes
+UC_Statistics ..> UC_OrderStats : includes
+
+' ============================================
+' SYSTEM INTEGRATIONS (External Actors)
+' ============================================
+actor "Google OAuth2" as Google
+actor "VNPay Gateway" as VNPay
+actor "Email Server" as EmailServer
+
+Google -[hidden]-> RegisteredUser
+VNPay -[hidden]-> System
+EmailServer -[hidden]-> System
+
+usecase "OAuth2 Authentication" as UC_OAuth
+usecase "Payment Processing" as UC_VNPayProcess
+
+RegisteredUser -- UC_OAuth
+System -- UC_VNPayProcess
+System -- UC_SendEmail
+
+' ============================================
+' EXTEND RELATIONSHIPS FOR LOYALTY
+' ============================================
+UC_PlaceOrder ..> UC_ApplyVoucher : <<extend>>
+UC_ConfirmReceived ..> UC_ViewPoints : <<extend>>
+UC_RedeemVoucher ..> UC_MyVouchers : <<include>>
+UC_LoyaltyConfig ..> UC_VoucherCatalog : <<include>>
+UC_TierReevaluate ..> UC_VIPWarning : <<extend>>
+
+' ============================================
+' LEGEND
+' ============================================
+legend right
+  |<<Customer>>| Guest + Registered User|
+  |<<Admin>>| System Administrator|
+  |<<System>>| Background Processes|
+  |<<Both>>| Planned for Batch 1-5|
+  === State Machine ===
+  PENDING → CONFIRMED → SHIPPING →
+  DELIVERED → COMPLETED
+  ↳ REFUNDED (from CONFIRMED/SHIPPING/DELIVERED)
+  ↳ CANCELLED (from PENDING/CONFIRMED)
+endlegend
+
+@enduml
