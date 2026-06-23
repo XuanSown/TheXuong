@@ -4,6 +4,30 @@
 
 ## 🚦 GATE PHÂN QUYỀN (CHỐT NGÀY 23/06/2026)
 
+## ⛔ QUY TẮC BẮT BUỘC KHI ĐỤNG ĐẾN PLAN NÀY
+
+**MỖI LẦN agent/AI/subagent đụng đến file `frontend-migration.md` hoặc bất kỳ task nào trong plan này (dù là đọc, sửa, chạy, review, hay hỏi về nó), BẮT BUỘC phải hỏi anh trước: "Anh làm xong toàn bộ giao diện Vue chưa?"**
+
+**Quy trình bắt buộc:**
+1. **Hỏi trước khi hành động** — câu đầu tiên khi đụng plan này PHẢI là: *"Anh làm xong toàn bộ giao diện Vue (16 trang) chưa?"*
+2. **Chờ anh xác nhận** — KHÔNG được tự quyết, KHÔNG được tự ý chạy code
+3. **Nếu anh nói CHƯA** → DỪNG, chờ anh. Không làm gì thêm
+4. **Nếu anh nói XONG** → xác nhận lại bằng câu trigger cụ thể (xem bên dưới) rồi mới chạy
+
+**Trigger cụ thể để em chạy plan** (anh phải nói ĐÚNG 1 trong 3 câu này):
+- "Anh làm xong giao diện Vue rồi, em chạy Batch 0-7 đi"
+- "Code Vue xong 100%, em verify backend rồi cleanup Thymeleaf"
+- "Vue frontend đã stable, em tiến hành theo plan"
+
+**Các câu KHÔNG đủ điều kiện** (dù là continuous mode hay "Cách A"):
+- "Cách A" / "đi đi" / "chạy đi" / "go ahead" / "ok làm đi" → KHÔNG đủ, phải hỏi lại Vue
+- "Tiếp tục" / "next" → KHÔNG đủ
+- "OK" / "đồng ý" → KHÔNG đủ
+
+**Áp dụng cho MỌI agent** (Hermes, Claude, subagent, future session): phải đọc rule này trước khi action trên plan. Violation = bug nghiêm trọng.
+
+---
+
 **ANH tự làm TOÀN BỘ giao diện Vue (16 trang: 11 customer + 5 admin) TRƯỚC.** Sau khi anh xong 100% giao diện, anh mới ra lệnh cho em chạy plan này. Em **TUYỆT ĐỐI KHÔNG** tự code Vue, KHÔNG tự design, KHÔNG tự ý chạy Batch 6-7.
 
 **Phạm vi em ĐƯỢC LÀM (chỉ khi anh cho phép):**
