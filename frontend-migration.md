@@ -2,7 +2,29 @@
 
 > **For Hermes:** Use subagent-driven-development hoặc inline execution với Task Report sau mỗi task. Load skills: `thexuong-stack`, `spring-thymeleaf-to-vue3`, `plan`, `multi-batch-feature-implementation`, `design-fidelity-workflow` TRƯỚC khi bắt đầu batch.
 
-**Goal:** Xóa toàn bộ Thymeleaf templates + Thymeleaf controller + dependency. Backend Spring Boot chỉ còn REST API. Frontend Vue 3 + TypeScript + Tailwind CSS là SPA duy nhất. Spring Boot serve static `frontend/dist/` qua WebMvcConfigurer.
+## 🚦 GATE PHÂN QUYỀN (CHỐT NGÀY 23/06/2026)
+
+**ANH tự làm TOÀN BỘ giao diện Vue (16 trang: 11 customer + 5 admin) TRƯỚC.** Sau khi anh xong 100% giao diện, anh mới ra lệnh cho em chạy plan này. Em **TUYỆT ĐỐI KHÔNG** tự code Vue, KHÔNG tự design, KHÔNG tự ý chạy Batch 6-7.
+
+**Phạm vi em ĐƯỢC LÀM (chỉ khi anh cho phép):**
+- ✅ Backend REST (Batch 0-5) — code Java + REST API + test
+- ✅ Cleanup Thymeleaf (Task 7.6) — xóa templates, dep, controller
+- ✅ Verify + sửa backend phục vụ Vue đã có sẵn
+
+**Phạm vi em KHÔNG ĐƯỢC LÀM (chờ anh):**
+- ❌ Tự viết/sửa file `.vue` (Home, Products, Cart, Checkout, v.v.)
+- ❌ Tự design UI theo Figma/Tailwind
+- ❌ Tự ý chạy Batch 6 (Vue customer)
+- ❌ Tự ý chạy Batch 7 (Vue admin + cleanup Thymeleaf)
+
+**Trigger để em chạy plan:** Anh nói cụ thể một trong các câu:
+- "Anh làm xong giao diện Vue rồi, em chạy Batch 0-7 đi"
+- "Code Vue xong 100%, em verify backend rồi cleanup Thymeleaf"
+- "Vue frontend đã stable, em tiến hành theo plan"
+
+Nếu anh chỉ nói "Cách A" mà KHÔNG xác nhận đã làm xong Vue → em DỪNG, hỏi lại.
+
+**Goal:** Xóa toàn bộ Thymeleaf templates + Thymeleaf controller + dependency. Backend Spring Boot chỉ còn REST API. Frontend Vue 3 + TypeScript + Tailwind CSS là SPA duy nhất (anh tự code). Spring Boot serve static `frontend/dist/` qua WebMvcConfigurer.
 
 **Architecture:** Hybrid SPA — Vue 3 dev chạy `:5173` (Vite), production build copy vào `src/main/resources/static/frontend/`, Spring Boot serve qua `WebMvcConfigurer.addResourceHandlers("/**")`. Session-based auth (JSESSIONID + CSRF XSRF-TOKEN) giữ nguyên.
 
@@ -1684,10 +1706,13 @@ Tương tự các batch trước. Tạo 3-4 file test cho AdminOrder, AdminStati
 
 ### 📦 BATCH 6 — Vue Customer (11 trang) Figma-driven
 
-**Track:** Frontend only
-**Mục tiêu:** Migrate 11 trang customer từ Thymeleaf sang Vue 3
-**Phụ thuộc:** Batch 0-5
-**Definition of Done:**
+**Track:** ❌ **KHÔNG THUỘC PHẠM VI CỦA EM** — chờ anh làm xong.
+
+**Owner:** ANH (anh tự code 11 trang Vue theo Figma)
+
+**Mục tiêu:** ANH migrate 11 trang customer từ Thymeleaf sang Vue 3
+**Phụ thuộc:** Batch 0-5 (backend REST phải sẵn sàng)
+**Definition of Done (anh tự verify):**
 - ✅ 11 view Vue render đúng với Figma
 - ✅ 11 file `frontend/src/api/*.ts` (1 file/resource) consume REST từ Batch 1-5
 - ✅ Auth flow: login → token → request authenticated → logout
@@ -1696,11 +1721,16 @@ Tương tự các batch trước. Tạo 3-4 file test cho AdminOrder, AdminStati
 - ✅ `npm run build` pass
 - ✅ `./gradlew processResources` copy dist thành công
 
-**Lưu ý CỰC KỲ QUAN TRỌNG:**
+**Lưu ý cho ANH:**
 - **Figma workflow 6 bước** (skill spring-thymeleaf-to-vue3) BẮT BUỘC cho MỖI trang
-- Mỗi task = 1 trang Vue = 1 commit + 1 Task Report (format anh đã chốt ở câu 8)
-- Nếu Figma lỗi / không đọc → DỪNG + báo cáo, KHÔNG tự ý design
-- KHÔNG xóa Thymeleaf ở batch này — chỉ migrate Vue
+- Mỗi task = 1 trang Vue = 1 commit + 1 báo cáo ngắn
+- KHÔNG xóa Thymeleaf ở giai đoạn này — chỉ migrate Vue
+
+**Vai trò của EM trong Batch 6:**
+- 🟡 **Hỗ trợ backend khi anh cần** (vd: thêm field vào DTO, fix bug REST, thêm endpoint phát sinh)
+- 🟡 **Review code Vue khi anh yêu cầu** (báo cáo ✅/⚠️/❌ theo checklist)
+- 🟡 **Sửa bug backend** nếu Vue không gọi được API
+- ❌ **KHÔNG tự ý code Vue** — đó là việc của anh
 
 **Thứ tự migrate** (theo critical path + dependency):
 
@@ -1894,23 +1924,32 @@ git commit -m "feat: Home.vue theo Figma (hero + trust brands + bento + new prod
 
 ### 📦 BATCH 7 — Vue Admin (5 trang) + Cleanup Thymeleaf
 
-**Track:** Frontend + Backend
-**Mục tiêu:** Migrate 5 admin view + XÓA HẾT Thymeleaf (templates, dep, controller)
-**Phụ thuộc:** Batch 0-6 + Vue customer đã test thủ công
-**Definition of Done:**
-- ✅ 5 admin view render đúng
-- ✅ `npm run build` pass + manual test 16 view (11 customer + 5 admin)
-- ✅ Folder `src/main/resources/templates/` ĐÃ XÓA
-- ✅ `spring-boot-starter-thymeleaf` + `thymeleaf-extras-springsecurity6` ĐÃ XÓA khỏi `build.gradle`
-- ✅ Mọi `@Controller` trả String view ĐÃ XÓA
-- ✅ `SecurityConfig` đã bỏ rule cho Thymeleaf
-- ✅ `./gradlew build` pass
-- ✅ `./gradlew bootRun` chạy, truy cập `http://localhost:8080/` → thấy Vue app
+**Track:** Frontend (Admin do ANH làm) + Backend (Cleanup do EM làm)
 
-**Lưu ý CỰC KỲ QUAN TRỌNG:**
-- **GATE trước batch này:** 11 trang customer ở Batch 6 đã test thủ công + không còn bug blocker
-- Nếu Vue chưa stable → KHÔNG xóa Thymeleaf
-- Xóa Thymeleaf là 1 commit lớn cuối cùng, có thể cần chia nhỏ:
+**Owner chia việc:**
+- **ANH:** làm 5 trang admin Vue (Task 7.1-7.5)
+- **EM:** làm Cleanup Thymeleaf (Task 7.6) + verify (Task 7.7)
+
+**Mục tiêu:** ANH migrate 5 admin view + EM xóa hết Thymeleaf (templates, dep, controller)
+**Phụ thuộc:** Batch 0-6 + anh xác nhận Vue customer đã test thủ công
+**Definition of Done:**
+- ✅ 5 admin view render đúng (anh tự code + verify)
+- ✅ `npm run build` pass + manual test 16 view (11 customer + 5 admin)
+- ✅ Folder `src/main/resources/templates/` ĐÃ XÓA (em làm)
+- ✅ `spring-boot-starter-thymeleaf` + `thymeleaf-extras-springsecurity6` ĐÃ XÓA khỏi `build.gradle` (em làm)
+- ✅ Mọi `@Controller` trả String view ĐÃ XÓA (em làm)
+- ✅ `SecurityConfig` đã bỏ rule cho Thymeleaf (em làm)
+- ✅ `./gradlew build` pass (em verify)
+- ✅ `./gradlew bootRun` chạy, truy cập `http://localhost:8080/` → thấy Vue app (em verify)
+
+**GATE BẮT BUỘC trước Batch 7:**
+- ✅ ANH xác nhận 11 trang customer + 5 admin Vue đã test thủ công
+- ✅ `npm run build` pass
+- ✅ KHÔNG còn bug blocker
+
+**Lưu ý cho EM (Cleanup Thymeleaf — Task 7.6):**
+- Chỉ chạy Task 7.6 SAU KHI anh xong 5 admin view
+- Xóa Thymeleaf là 1 commit lớn cuối cùng, chia nhỏ:
   - Commit 1: xóa folder `templates/`
   - Commit 2: xóa thymeleaf dep
   - Commit 3: xóa MVC controller
@@ -2164,18 +2203,18 @@ git push origin feat/m7-vue-admin-cleanup  # nếu có remote
 
 ## 📊 TRACKING TIẾN ĐỘ CÁC BATCH
 
-| # | Batch | Track | Trạng thái | % | Commits | Ngày xong | Ghi chú |
-|---|---|---|---|---|---|---|---|
-| **0** | Foundation & Audit Gate | Backend | ⏳ PENDING | 0% | — | — | 5 task. WebMvcConfig + SecurityConfig SPA + verify Vue dev build |
-| **1** | Auth REST chuẩn hoá | Backend | ⏳ PENDING | 0% | — | — | 6 task. Login/Logout/ForgotPassword thật + 3 test |
-| **2** | Product & Category REST bổ sung | Backend | ⏳ PENDING | 0% | — | — | 4 task. Variants + categories filter |
-| **3** | Orders, Checkout, Profile REST | Backend | ⏳ PENDING | 0% | — | — | 7 task. 5 endpoint mới + 6-9 test |
-| **4** | Favorite REST (mới) | Backend | ⏳ PENDING | 0% | — | — | 5 task. Entity + repo + 3 endpoint + 3 test |
-| **5** | Admin REST bổ sung | Backend | ⏳ PENDING | 0% | — | — | 8 task. AdminOrders + AdminStatistics + AdminProductCRUD |
-| **6** | Vue Customer (11 trang) | Frontend | ⏳ PENDING | 0% | — | — | 12 task. Figma-driven, 1 commit/trang |
-| **7** | Vue Admin (5 trang) + Cleanup Thymeleaf | Frontend+Backend | ⏳ PENDING | 0% | — | — | 8 task. 5 admin view + xóa templates/dep/controller |
+| # | Batch | Track | Owner | Trạng thái | % | Commits | Ngày xong | Ghi chú |
+|---|---|---|---|---|---|---|---|---|
+| **0** | Foundation & Audit Gate | Backend | EM | ⏸ CHỜ ANH | 0% | — | — | 5 task. WebMvcConfig + SecurityConfig SPA + verify Vue dev build |
+| **1** | Auth REST chuẩn hoá | Backend | EM | ⏸ CHỜ ANH | 0% | — | — | 6 task. Login/Logout/ForgotPassword thật + 3 test |
+| **2** | Product & Category REST bổ sung | Backend | EM | ⏸ CHỜ ANH | 0% | — | — | 4 task. Variants + categories filter |
+| **3** | Orders, Checkout, Profile REST | Backend | EM | ⏸ CHỜ ANH | 0% | — | — | 7 task. 5 endpoint mới + 6-9 test |
+| **4** | Favorite REST (mới) | Backend | EM | ⏸ CHỜ ANH | 0% | — | — | 5 task. Entity + repo + 3 endpoint + 3 test |
+| **5** | Admin REST bổ sung | Backend | EM | ⏸ CHỜ ANH | 0% | — | — | 8 task. AdminOrders + AdminStatistics + AdminProductCRUD |
+| **6** | Vue Customer (11 trang) | Frontend | **ANH** | ⏸ ANH ĐANG LÀM | 0% | — | — | 12 task. ANH tự code theo Figma, EM không code |
+| **7** | Vue Admin + Cleanup | Front+Backend | **ANH + EM** | ⏸ CHỜ ANH | 0% | — | — | ANH: 5 admin view. EM: xóa templates/dep/controller |
 
-**Tổng:** 8 batch, 54 task. Đang chờ anh duyệt plan + Figma selection cho Batch 0-5 (backend có thể bắt đầu ngay, không cần Figma).
+**Tổng:** 8 batch, 54 task. **EM chỉ chạy khi anh nói "Anh làm xong giao diện Vue rồi"** — xem GATE ở đầu plan.
 
 ---
 
@@ -2216,25 +2255,31 @@ Agent DỪNG ngay và báo cáo anh khi:
 
 ## 9. Bắt đầu thế nào
 
-Anh duyệt plan này → em sẽ:
+**🚦 ANH TỰ LÀM GIAO DIỆN VUE TRƯỚC — Xem GATE ở đầu plan.**
 
-1. **Ngay bây giờ (không cần Figma):**
-   - Chạy Batch 0 (5 task) + Batch 1-5 backend (còn lại 30 task)
-   - ~5-10 ngày làm việc (mỗi ngày 5-6 task)
-   - Em sẽ báo cáo Task Report sau mỗi task, chờ anh duyệt từng batch
+**Giai đoạn 1 — ANH làm (EM KHÔNG code Vue):**
 
-2. **Khi Backend xong (sau Batch 5):**
-   - Anh gửi Figma selection cho từng trang customer
-   - Em chạy Batch 6 theo Figma workflow 6 bước
-   - ~5-7 ngày (mỗi ngày 1-2 trang)
+Anh tự code 16 trang Vue (11 customer + 5 admin) theo Figma:
+- Home, Login, Register, ForgotPassword, Products, ProductDetail, Cart, Checkout, Orders, OrderDetail, Profile, Favorite (12 customer + Favorite = 11 trang customer)
+- AdminProducts, AdminProductEdit, AdminOrders, AdminUsers, AdminStatistics (5 admin)
+- Mỗi trang = 1 commit + dùng các REST có sẵn
 
-3. **Khi Customer xong (sau Batch 6):**
-   - Test thủ công 11 trang
-   - Anh gửi Figma cho admin
-   - Em chạy Batch 7 admin + cleanup
-   - ~3-5 ngày
+Anh có thể bảo em hỗ trợ:
+- 🟡 Thêm field vào DTO backend
+- 🟡 Thêm endpoint REST mới phát sinh
+- 🟡 Fix bug backend khi Vue không gọi được API
+- 🟡 Review code Vue khi anh paste lên
 
-**Tổng thời gian ước tính:** 13-22 ngày làm việc (nếu 4-6h/ngày). Tương đương 3-5 tuần.
+**Giai đoạn 2 — ANH nói "xong Vue rồi" → EM chạy plan:**
+
+Sau khi anh xong 100% giao diện Vue + manual test pass + `npm run build` pass, anh ra lệnh:
+> "Anh làm xong giao diện Vue rồi, em chạy Batch 0-7 đi"
+
+Em sẽ chạy:
+1. **Batch 0-5 (Backend):** ~30 task, không cần Figma, ~5-10 ngày
+2. **Batch 7 (Cleanup Thymeleaf — Task 7.6):** sau khi Vue admin anh xong, em xóa templates/dep/controller ~1-2 ngày
+
+**Tổng thời gian ước tính (sau khi anh xong Vue):** 6-12 ngày làm việc.
 
 ---
 
