@@ -15,27 +15,10 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- * Service quản lý điểm thưởng loyalty.
- *
- * Quy tắc nghiệp vụ (xem voucher.md):
- * - 100.000 VND = 1 điểm (floor)
- * - EARN transaction có expires_at = now + 12 tháng (FIFO expire)
- * - current_points KHÔNG được âm (clamp về 0 nếu REVERSE vượt)
- * - total_earned cộng dồn (chỉ tăng khi EARN) — dùng cho tier check
- * - Optimistic lock: @Version trên UserPoints tự xử lý race condition
- *
- * Hook points:
- * - earnPoints() gọi từ OrderService.confirmReceived (Batch 0 đã có hook sẵn)
- * - reversePoints() gọi từ OrderService.refundOrder
- * - spendPoints() gọi từ VoucherService.redeemVoucher (Batch 2)
- * - adjustPoints() gọi từ AdminLoyaltyController (Batch 4/5)
- */
 @Service
 @RequiredArgsConstructor
 public class PointService {
 
-    /** Tỷ lệ quy đổi: 100.000 VND = 1 điểm. */
     public static final BigDecimal VND_PER_POINT = new BigDecimal("100000");
 
     @Autowired
@@ -45,20 +28,6 @@ public class PointService {
     @Autowired
     private final UserRepository userRepository;
 
-    // ============================================================
-    // EARN - Cộng điểm khi đơn COMPLETED
-    // ============================================================
-
-    /**
-     * Cộng điểm cho user khi đơn hàng hoàn tất.
-     * Tính: floor(amount / 100_000). Nếu amount < 100k → 0 điểm (không tạo transaction).
-     *
-     * @param userId user được cộng
-     * @param orderId order COMPLETED (để tracking + reverse khi refund)
-     * @param amount tổng tiền VND (đã snapshot total_for_point_calc)
-     * @param note   mô tả (VD: "Cộng điểm từ đơn #123")
-     * @return số điểm thực tế đã cộng (0 nếu amount < 100k)
-     */
     @Transactional
     public int earnPoints(Long userId, Long orderId, BigDecimal amount, String note) {
         if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
@@ -66,7 +35,7 @@ public class PointService {
         }
         int points = amount.divide(VND_PER_POINT, 0, java.math.RoundingMode.FLOOR).intValue();
         if (points <= 0) {
-            return 0;  // amount < 100k → 0 điểm
+            return 0;
         }
 
         UserPoints userPoints = getOrCreateUserPoints(userId);
@@ -75,7 +44,6 @@ public class PointService {
         userPoints.setLastActivityAt(LocalDateTime.now());
         userPointsRepository.save(userPoints);
 
-        // Tạo EARN transaction với expires_at = now + 12 tháng
         PointTransaction tx = PointTransaction.builder()
                 .userId(userId)
                 .orderId(orderId)
@@ -90,19 +58,6 @@ public class PointService {
         return points;
     }
 
-    // ============================================================
-    // SPEND - Tiêu điểm đổi voucher (Batch 2 sẽ gọi)
-    // ============================================================
-
-    /**
-     * Tiêu điểm để đổi voucher hoặc thanh toán.
-     * Throw PointBalanceException nếu user không đủ điểm.
-     *
-     * @param userId user tiêu
-     * @param points số điểm cần tiêu (dương)
-     * @param note   mô tả (VD: "Đổi voucher TX-ABC123")
-     * @return số dư còn lại sau khi tiêu
-     */
     @Transactional
     public int spendPoints(Long userId, int points, String note) {
         if (points <= 0) {
@@ -126,7 +81,7 @@ public class PointService {
         PointTransaction tx = PointTransaction.builder()
                 .userId(userId)
                 .type(PointTransaction.Type.SPEND)
-                .points(-points)  // âm
+                .points(-points)
                 .note(note)
                 .createdAt(LocalDateTime.now())
                 .build();
@@ -135,25 +90,11 @@ public class PointService {
         return userPoints.getCurrentPoints();
     }
 
-    // ============================================================
-    // REVERSE - Hoàn điểm khi refund
-    // ============================================================
-
-    /**
-     * Hoàn điểm khi đơn hàng bị refund.
-     * Tìm EARN transaction gốc theo orderId, tạo REVERSE transaction với points âm.
-     *
-     * Lưu ý: KHÔNG giảm total_earned (đã chốt ở voucher.md — tier check dựa trên tổng earn).
-     * current_points giảm nhưng clamp >= 0.
-     *
-     * @param orderId order bị refund
-     * @param note    mô tả (VD: "Hoàn điểm từ refund đơn #123")
-     */
     @Transactional
     public void reversePoints(Long orderId, String note) {
         List<PointTransaction> earnTxs = pointTransactionRepository.findEarnTransactionsByOrderId(orderId);
         if (earnTxs.isEmpty()) {
-            return;  // chưa cộng điểm (chưa COMPLETED) → không cần reverse
+            return;
         }
 
         for (PointTransaction earnTx : earnTxs) {
@@ -161,7 +102,6 @@ public class PointService {
             UserPoints userPoints = userPointsRepository.findByUserId(earnTx.getUserId())
                     .orElseThrow(() -> new RuntimeException("UserPoints không tồn tại cho user " + earnTx.getUserId()));
 
-            // Clamp về 0 (không âm)
             int newCurrent = Math.max(0, userPoints.getCurrentPoints() - pointsToReverse);
             int actualReverse = userPoints.getCurrentPoints() - newCurrent;
 
@@ -182,14 +122,6 @@ public class PointService {
         }
     }
 
-    // ============================================================
-    // ADJUST - Admin chỉnh sửa thủ công (audit)
-    // ============================================================
-
-    /**
-     * Admin chỉnh sửa điểm thủ công. Bắt buộc có note (audit).
-     * Có thể + hoặc -. Không ảnh hưởng total_earned.
-     */
     @Transactional
     public int adjustPoints(Long adminId, Long userId, int delta, String note) {
         if (note == null || note.isBlank()) {
@@ -222,16 +154,6 @@ public class PointService {
         return newCurrent;
     }
 
-    // ============================================================
-    // EXPIRE - Cron job hết hạn (Batch 5 sẽ gọi)
-    // ============================================================
-
-    /**
-     * Expire điểm cũ (>12 tháng không dùng). Tạo EXPIRE transaction âm.
-     * Được gọi bởi PointExpireJob (Batch 5).
-     *
-     * @return tổng số điểm đã expire
-     */
     @Transactional
     public int expireOldPoints(LocalDateTime now) {
         List<PointTransaction> expiredTxs = pointTransactionRepository.findExpiredEarnTransactions(now);
@@ -264,10 +186,6 @@ public class PointService {
         }
         return totalExpired;
     }
-
-    // ============================================================
-    // Query helpers
-    // ============================================================
 
     public UserPoints getOrCreateUserPoints(Long userId) {
         return userPointsRepository.findByUserId(userId)

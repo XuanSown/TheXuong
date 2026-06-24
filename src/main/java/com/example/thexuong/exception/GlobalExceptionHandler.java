@@ -38,6 +38,37 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * 400 — User cố spend/reverse nhiều điểm hơn số dư (Batch 1 Loyalty).
+     */
+    @ExceptionHandler(PointBalanceException.class)
+    public ResponseEntity<ApiResponse<Void>> handlePointBalance(PointBalanceException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error(ex.getMessage()));
+    }
+
+    /**
+     * 409 — State machine violation (Batch 0 OrderStatus).
+     * Ví dụ: cố chuyển COMPLETED → SHIPPING, hoặc PENDING → COMPLETED.
+     */
+    @ExceptionHandler(IllegalOrderTransitionException.class)
+    public ResponseEntity<ApiResponse<Void>> handleIllegalTransition(IllegalOrderTransitionException ex) {
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(ApiResponse.error(ex.getMessage()));
+    }
+
+    /**
+     * 400 — Voucher không hợp lệ (hết hạn, đã dùng, sai điều kiện) (Batch 2).
+     */
+    @ExceptionHandler(VoucherInvalidException.class)
+    public ResponseEntity<ApiResponse<Void>> handleVoucherInvalid(VoucherInvalidException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error(ex.getMessage()));
+    }
+
+    /**
      * 400 — Tham số không hợp lệ (VD: ID không tồn tại, tên trùng...).
      */
     @ExceptionHandler(IllegalArgumentException.class)
@@ -57,27 +88,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.FORBIDDEN)
                 .body(ApiResponse.error("Bạn không có quyền thực hiện thao tác này."));
-    }
-
-    /**
-     * 400 — User cố spend/reverse nhiều điểm hơn số dư (Batch 1 Loyalty).
-     */
-    @ExceptionHandler(PointBalanceException.class)
-    public ResponseEntity<ApiResponse<Void>> handlePointBalance(PointBalanceException ex) {
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(ApiResponse.error(ex.getMessage()));
-    }
-
-    /**
-     * 409 — State machine violation (Batch 0 OrderStatus).
-     * Ví dụ: cố chuyển COMPLETED → SHIPPING, hoặc PENDING → COMPLETED.
-     */
-    @ExceptionHandler(IllegalOrderTransitionException.class)
-    public ResponseEntity<ApiResponse<Void>> handleIllegalTransition(IllegalOrderTransitionException ex) {
-        return ResponseEntity
-                .status(HttpStatus.CONFLICT)
-                .body(ApiResponse.error(ex.getMessage()));
     }
 
     /**

@@ -16,7 +16,6 @@ import java.util.Optional;
  * - Lấy voucher UNUSED của user (UI /loyalty/redeem, /my-vouchers, /checkout widget)
  * - Validate mã khi checkout
  * - Cron expire (query UNUSED + expires_at < now)
- * - Đếm claimedCount cho Voucher admin (countByVoucherId)
  */
 @Repository
 public interface UserVoucherRepository extends JpaRepository<UserVoucher, Long> {
@@ -33,16 +32,4 @@ public interface UserVoucherRepository extends JpaRepository<UserVoucher, Long> 
             "WHERE uv.status = com.example.thexuong.entity.UserVoucher.Status.UNUSED " +
             "AND uv.expiresAt < :now")
     List<UserVoucher> findExpiredUnusedVouchers(@Param("now") LocalDateTime now);
-
-    /**
-     * Đếm số UserVoucher đã được issue từ 1 catalog voucher.
-     * Dùng cho VoucherResponse.claimedCount.
-     */
-    long countByVoucherId(Long voucherId);
-
-    /**
-     * Check xem catalog voucher đã có user claim chưa.
-     * Dùng để quyết định soft delete (EXPIRED) hay hard delete.
-     */
-    boolean existsByVoucherId(Long voucherId);
 }

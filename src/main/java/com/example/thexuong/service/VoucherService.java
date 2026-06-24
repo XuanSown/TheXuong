@@ -1,430 +1,269 @@
 package com.example.thexuong.service;
 
-import com.example.thexuong.dto.*;
+import com.example.thexuong.entity.PointTransaction;
+import com.example.thexuong.entity.User;
+import com.example.thexuong.entity.UserVoucher;
 import com.example.thexuong.entity.Voucher;
-import com.example.thexuong.entity.VoucherAuditLog;
+import com.example.thexuong.exception.PointBalanceException;
+import com.example.thexuong.exception.VoucherInvalidException;
+import com.example.thexuong.repository.PointTransactionRepository;
+import com.example.thexuong.repository.UserPointsRepository;
+import com.example.thexuong.repository.UserRepository;
 import com.example.thexuong.repository.UserVoucherRepository;
-import com.example.thexuong.repository.VoucherAuditLogRepository;
 import com.example.thexuong.repository.VoucherRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.List;
+import java.util.Random;
 
 /**
- * Service quản lý Voucher catalog (admin CRUD + bulk + stats).
- * Theo ADMIN_VOUCHER_REQUIREMENTS.md → Backend Service layer.
+ * Service quản lý voucher catalog + redemption + apply.
  *
- * Workflow:
- * - CREATE: validate → generate code (nếu null) → save → audit log
- * - UPDATE: validate → partial update → save → audit log
- * - DELETE: soft delete (status → EXPIRED) nếu có user đã claim, ngược lại hard delete
- * - BULK: LOCK / UNLOCK / DELETE (soft) / SET_VIP
- * - STATS: aggregate theo status, vipOnly, totalClaimed
+ * Lifecycle:
+ * 1. Admin tạo Vouchers catalog (status=ACTIVE).
+ * 2. User redeem → tạo UserVoucher (status=UNUSED, code=TX-XXXXXX unique, expires_at=+30 days).
+ * 3. User dùng UserVoucher tại checkout → set status=USED, used_at, used_in_order_id.
+ * 4. Cron expire daily → UNUSED + expires_at < now → set EXPIRED.
  *
- * NOTE về snapshot pattern (requirement: "Edit KHÔNG ảnh hưởng UserVouchers đã issue"):
- * - UserVoucher entity hiện KHÔNG có snapshot fields (discountAmountSnapshot, etc.)
- * - Edit catalog CÓ THỂ ảnh hưởng UserVoucher đã issue (vì UserVoucher chỉ lưu voucherId reference).
- * - TODO: thêm snapshot fields vào UserVoucher + migration script khi implement redeem flow.
+ * Mã code:
+ * - Voucher.code: "TX-CAT-100K" (catalog, admin nhìn).
+ * - UserVoucher.code: "TX-ABCDEF" (DUY NHẤT user nhận, dùng khi checkout).
  */
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class VoucherService {
 
+    /** Bảng chữ cái cho mã UserVoucher (loại 0/O/1/I/L dễ nhầm). */
+    private static final String CODE_CHARS = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+    private static final int CODE_LENGTH = 6;
+
+    @Autowired
     private final VoucherRepository voucherRepository;
+    @Autowired
     private final UserVoucherRepository userVoucherRepository;
-    private final VoucherAuditLogRepository auditLogRepository;
-    private final VoucherValidator validator;
+    @Autowired
+    private final UserRepository userRepository;
+    @Autowired
+    private final UserPointsRepository userPointsRepository;
+    @Autowired
+    private final PointTransactionRepository pointTransactionRepository;
 
-    // ==================== READ ====================
-
-    /**
-     * Lấy danh sách voucher (paginated + filter).
-     * @param page 1-based page number (AdminVoucher.vue gửi page=1)
-     */
-    public VoucherListResponse getVouchers(int page, int size, String search,
-                                            String status, Boolean vipOnly,
-                                            Integer minPoints, Integer maxPoints,
-                                            String sortBy, String sortDir) {
-        Voucher.Status statusEnum = parseStatus(status);
-        Pageable pageable = buildPageable(page, size, sortBy, sortDir);
-
-        Page<Voucher> voucherPage = voucherRepository.search(search, statusEnum, vipOnly, minPoints, maxPoints, pageable);
-
-        List<VoucherResponse> vouchers = voucherPage.getContent().stream()
-                .map(v -> VoucherResponse.from(v, (int) userVoucherRepository.countByVoucherId(v.getId())))
-                .toList();
-
-        return VoucherListResponse.builder()
-                .vouchers(vouchers)
-                .total(voucherPage.getTotalElements())
-                .page(page)
-                .size(size)
-                .totalPages(voucherPage.getTotalPages())
-                .build();
-    }
+    // ============================================================
+    // Task 2.8: Generate unique code TX-XXXXXX
+    // ============================================================
 
     /**
-     * Lấy chi tiết 1 voucher. Throw IllegalArgumentException nếu không tồn tại.
+     * Sinh mã UserVoucher DUY NHẤT dạng TX-XXXXXX.
+     * Thử tối đa 10 lần nếu trùng (collision rate rất thấp với 32^6 = ~1 tỷ combos).
      */
-    public VoucherResponse getVoucher(Long id) {
-        Voucher voucher = voucherRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy voucher với ID: " + id));
-        int claimedCount = (int) userVoucherRepository.countByVoucherId(id);
-        return VoucherResponse.from(voucher, claimedCount);
+    public String generateUniqueCode() {
+        Random random = new Random();
+        for (int attempt = 0; attempt < 10; attempt++) {
+            StringBuilder sb = new StringBuilder("TX-");
+            for (int i = 0; i < CODE_LENGTH; i++) {
+                sb.append(CODE_CHARS.charAt(random.nextInt(CODE_CHARS.length())));
+            }
+            String code = sb.toString();
+            if (userVoucherRepository.findByCode(code).isEmpty()
+                    && voucherRepository.findByCode(code).isEmpty()) {
+                return code;
+            }
+        }
+        throw new RuntimeException("Không thể sinh mã voucher unique sau 10 lần thử. Thử lại sau.");
     }
+
+    // ============================================================
+    // Task 2.9: Redeem voucher (user đổi điểm lấy voucher)
+    // ============================================================
 
     /**
-     * Stats tổng quan catalog.
+     * User đổi điểm lấy voucher từ catalog.
+     * Flow:
+     * 1. Check catalog ACTIVE
+     * 2. Check user đủ điểm (pointService.spendPoints sẽ throw nếu thiếu)
+     * 3. Check VIP-only (nếu có)
+     * 4. Tạo UserVoucher với mã unique
+     *
+     * @return UserVoucher mới tạo
      */
-    public VoucherStats getStats() {
-        long total = voucherRepository.count();
-        long active = voucherRepository.countByStatus(Voucher.Status.ACTIVE);
-        long locked = voucherRepository.countByStatus(Voucher.Status.LOCKED);
-        long expired = voucherRepository.countByStatus(Voucher.Status.EXPIRED);
-        long vip = voucherRepository.countByVipOnly(true);
-
-        // totalClaimed = SUM(claimedCount) — query đơn giản vì đã có countByVoucherId
-        // (optimize sau nếu cần: dùng SELECT SUM)
-        List<Voucher> all = voucherRepository.findAll();
-        int totalClaimed = all.stream()
-                .mapToInt(v -> (int) userVoucherRepository.countByVoucherId(v.getId()))
-                .sum();
-
-        Map<String, Integer> byStatus = new HashMap<>();
-        byStatus.put("ACTIVE", (int) active);
-        byStatus.put("LOCKED", (int) locked);
-        byStatus.put("EXPIRED", (int) expired);
-
-        return VoucherStats.builder()
-                .totalVouchers((int) total)
-                .activeVouchers((int) active)
-                .lockedVouchers((int) locked)
-                .expiredVouchers((int) expired)
-                .vipVouchers((int) vip)
-                .totalClaimed(totalClaimed)
-                .byStatus(byStatus)
-                .build();
-    }
-
-    // ==================== CREATE ====================
-
     @Transactional
-    public VoucherResponse createVoucher(VoucherCreateRequest request, String adminUsername) {
-        validator.validateCreate(request);
+    public UserVoucher redeemVoucher(Long userId, Long voucherCatalogId) {
+        Voucher catalog = voucherRepository.findById(voucherCatalogId)
+                .orElseThrow(() -> new VoucherInvalidException("Voucher catalog không tồn tại."));
 
-        String code = (request.getCode() == null || request.getCode().isBlank())
-                ? validator.generateUniqueCode()
-                : request.getCode();
+        if (catalog.getStatus() != Voucher.Status.ACTIVE) {
+            throw new VoucherInvalidException("Voucher này hiện không khả dụng.");
+        }
 
-        Voucher voucher = Voucher.builder()
-                .code(code)
-                .discountAmount(request.getDiscountAmount())
-                .requiredPoints(request.getRequiredPoints())
-                .minOrderAmount(request.getMinOrderAmount() != null ? request.getMinOrderAmount() : BigDecimal.ZERO)
-                .applicableCategoryIds(toJsonArray(request.getApplicableCategoryIds()))
-                .applicableProductIds(toJsonArray(request.getApplicableProductIds()))
-                .vipOnly(Boolean.TRUE.equals(request.getVipOnly()))
-                .status(parseStatusOrDefault(request.getStatus(), Voucher.Status.ACTIVE))
+        // Check VIP-only
+        if (Boolean.TRUE.equals(catalog.getVipOnly())) {
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new VoucherInvalidException("User không tồn tại."));
+            // TODO Batch 4: check tier_code thay vì hardcode CUSTOMER
+            String userRole = user.getRole() != null ? user.getRole().name() : "CUSTOMER";
+            if (!"VIP".equals(userRole) && !"BOTH".equals(userRole)) {
+                throw new VoucherInvalidException("Voucher này chỉ dành cho khách hàng VIP.");
+            }
+        }
+
+        // Trừ điểm (PointService.spendPoints sẽ check balance + throw PointBalanceException nếu thiếu)
+        int remaining = spendPointsForVoucher(userId, catalog.getRequiredPoints(),
+                "Đổi voucher " + catalog.getCode() + " (giảm " + catalog.getDiscountAmount() + "đ)");
+
+        // Tạo UserVoucher
+        LocalDateTime now = LocalDateTime.now();
+        UserVoucher userVoucher = UserVoucher.builder()
+                .userId(userId)
+                .voucherId(catalog.getId())
+                .code(generateUniqueCode())
+                .status(UserVoucher.Status.UNUSED)
+                .issuedAt(now)
+                .expiresAt(now.plusDays(30))
+                .build();
+        return userVoucherRepository.save(userVoucher);
+    }
+
+    /**
+     * Helper: trừ điểm và ghi PointTransaction SPEND.
+     * Dùng repository trực tiếp (không qua PointService) để tránh dependency cycle.
+     * Logic giống PointService.spendPoints nhưng không cần check tier.
+     */
+    private int spendPointsForVoucher(Long userId, int points, String note) {
+        if (points <= 0) {
+            throw new IllegalArgumentException("Số điểm tiêu phải > 0");
+        }
+        var userPoints = userPointsRepository.findByUserId(userId)
+                .orElseThrow(() -> new PointBalanceException("Bạn chưa có điểm thưởng."));
+
+        if (userPoints.getCurrentPoints() < points) {
+            throw new PointBalanceException(
+                    "Số dư không đủ. Bạn có " + userPoints.getCurrentPoints()
+                            + " điểm, cần " + points + " điểm.");
+        }
+
+        userPoints.setCurrentPoints(userPoints.getCurrentPoints() - points);
+        userPoints.setTotalSpent(userPoints.getTotalSpent() + points);
+        userPoints.setLastActivityAt(LocalDateTime.now());
+        userPointsRepository.save(userPoints);
+
+        PointTransaction tx = PointTransaction.builder()
+                .userId(userId)
+                .type(PointTransaction.Type.SPEND)
+                .points(-points)
+                .note(note)
                 .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
                 .build();
+        pointTransactionRepository.save(tx);
 
-        voucher = voucherRepository.save(voucher);
-
-        // Audit log
-        saveAuditLog(voucher.getId(), adminUsername, "CREATE",
-                null, snapshotVoucher(voucher), List.of("code", "discount_amount", "required_points", "status"),
-                request.getAdminNote());
-
-        log.info("Voucher created: id={}, code={}, admin={}", voucher.getId(), code, adminUsername);
-        return VoucherResponse.from(voucher, 0);
+        return userPoints.getCurrentPoints();
     }
 
-    // ==================== UPDATE ====================
-
-    @Transactional
-    public VoucherResponse updateVoucher(Long id, VoucherUpdateRequest request, String adminUsername) {
-        validator.validateUpdate(id, request);
-
-        Voucher voucher = voucherRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy voucher với ID: " + id));
-
-        Map<String, Object> oldSnapshot = snapshotVoucher(voucher);
-        List<String> changedFields = new ArrayList<>();
-
-        // Partial update — chỉ áp dụng field != null
-        if (request.getDiscountAmount() != null && !request.getDiscountAmount().equals(voucher.getDiscountAmount())) {
-            voucher.setDiscountAmount(request.getDiscountAmount());
-            changedFields.add("discount_amount");
-        }
-        if (request.getRequiredPoints() != null && !request.getRequiredPoints().equals(voucher.getRequiredPoints())) {
-            voucher.setRequiredPoints(request.getRequiredPoints());
-            changedFields.add("required_points");
-        }
-        if (request.getMinOrderAmount() != null && !request.getMinOrderAmount().equals(voucher.getMinOrderAmount())) {
-            voucher.setMinOrderAmount(request.getMinOrderAmount());
-            changedFields.add("min_order_amount");
-        }
-        if (request.getApplicableCategoryIds() != null) {
-            voucher.setApplicableCategoryIds(toJsonArray(request.getApplicableCategoryIds()));
-            changedFields.add("applicable_category_ids");
-        }
-        if (request.getApplicableProductIds() != null) {
-            voucher.setApplicableProductIds(toJsonArray(request.getApplicableProductIds()));
-            changedFields.add("applicable_product_ids");
-        }
-        if (request.getVipOnly() != null && !request.getVipOnly().equals(voucher.getVipOnly())) {
-            voucher.setVipOnly(request.getVipOnly());
-            changedFields.add("vip_only");
-        }
-        if (request.getStatus() != null && !request.getStatus().isBlank()) {
-            Voucher.Status newStatus = parseStatusOrDefault(request.getStatus(), voucher.getStatus());
-            if (newStatus != voucher.getStatus()) {
-                voucher.setStatus(newStatus);
-                changedFields.add("status");
-            }
-        }
-
-        voucher.setUpdatedAt(LocalDateTime.now());
-        voucher = voucherRepository.save(voucher);
-
-        // Audit log (chỉ log nếu có thay đổi)
-        if (!changedFields.isEmpty()) {
-            Map<String, Object> newSnapshot = snapshotVoucher(voucher);
-            saveAuditLog(voucher.getId(), adminUsername, "UPDATE",
-                    oldSnapshot, newSnapshot, changedFields, request.getAdminNote());
-        }
-
-        log.info("Voucher updated: id={}, fields={}, admin={}", id, changedFields, adminUsername);
-        int claimedCount = (int) userVoucherRepository.countByVoucherId(id);
-        return VoucherResponse.from(voucher, claimedCount);
-    }
-
-    // ==================== DELETE ====================
+    // ============================================================
+    // Task 2.10: Validate + apply voucher tại checkout
+    // ============================================================
 
     /**
-     * Soft delete: chuyển status → EXPIRED nếu có user đã claim, ngược lại hard delete.
-     * Theo ADMIN_VOUCHER_REQUIREMENTS.md → Edge Cases: "Delete voucher có claimedCount > 0 → Soft delete (EXPIRED)".
+     * Validate mã UserVoucher trước khi áp vào đơn.
+     * Trả về discount amount nếu hợp lệ, throw VoucherInvalidException nếu không.
+     *
+     * @param code         mã UserVoucher (TX-XXXXXX)
+     * @param userId       user hiện tại
+     * @param orderAmount  tổng tiền đơn hàng (chưa áp voucher)
+     * @return discount amount (VND)
+     */
+    @Transactional(readOnly = true)
+    public BigDecimal validateAndGetDiscount(String code, Long userId, BigDecimal orderAmount) {
+        UserVoucher uv = userVoucherRepository.findByCode(code)
+                .orElseThrow(() -> new VoucherInvalidException("Mã voucher không tồn tại."));
+
+        if (!uv.getUserId().equals(userId)) {
+            throw new VoucherInvalidException("Voucher này không thuộc tài khoản của anh/chị.");
+        }
+
+        if (uv.getStatus() == UserVoucher.Status.USED) {
+            throw new VoucherInvalidException("Voucher này đã được sử dụng.");
+        }
+        if (uv.getStatus() == UserVoucher.Status.EXPIRED) {
+            throw new VoucherInvalidException("Voucher này đã hết hạn.");
+        }
+        if (uv.getExpiresAt() != null && uv.getExpiresAt().isBefore(LocalDateTime.now())) {
+            throw new VoucherInvalidException("Voucher này đã quá hạn sử dụng.");
+        }
+
+        Voucher catalog = voucherRepository.findById(uv.getVoucherId())
+                .orElseThrow(() -> new VoucherInvalidException("Voucher catalog không tồn tại."));
+
+        // Check min_order_amount
+        if (catalog.getMinOrderAmount() != null && orderAmount.compareTo(catalog.getMinOrderAmount()) < 0) {
+            throw new VoucherInvalidException(
+                    "Đơn hàng phải tối thiểu " + catalog.getMinOrderAmount() + "đ để dùng voucher này.");
+        }
+
+        return catalog.getDiscountAmount();
+    }
+
+    // ============================================================
+    // Task 2.11: Mark voucher as USED sau khi đơn CONFIRMED
+    // ============================================================
+
+    /**
+     * Đánh dấu UserVoucher đã dùng. Gọi từ OrderService.vnpayReturn (khi đơn CONFIRMED).
+     *
+     * @param code    mã UserVoucher
+     * @param orderId order vừa thanh toán
      */
     @Transactional
-    public void deleteVoucher(Long id, String adminUsername) {
-        Voucher voucher = voucherRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy voucher với ID: " + id));
+    public void markAsUsed(String code, Long orderId) {
+        if (code == null || code.isBlank()) return;
 
-        boolean hasClaims = userVoucherRepository.existsByVoucherId(id);
+        UserVoucher uv = userVoucherRepository.findByCode(code)
+                .orElseThrow(() -> new VoucherInvalidException("Mã voucher không tồn tại: " + code));
 
-        if (hasClaims) {
-            // Soft delete: chuyển EXPIRED
-            Map<String, Object> oldSnapshot = snapshotVoucher(voucher);
-            voucher.setStatus(Voucher.Status.EXPIRED);
-            voucher.setUpdatedAt(LocalDateTime.now());
-            voucherRepository.save(voucher);
-
-            saveAuditLog(id, adminUsername, "DELETE",
-                    oldSnapshot, Map.of("status", "EXPIRED"), List.of("status"),
-                    "Soft delete: đã có user claim");
-            log.info("Voucher soft-deleted: id={}, admin={}", id, adminUsername);
-        } else {
-            // Hard delete
-            Map<String, Object> oldSnapshot = snapshotVoucher(voucher);
-            voucherRepository.delete(voucher);
-
-            saveAuditLog(id, adminUsername, "DELETE",
-                    oldSnapshot, null, List.of("*"), "Hard delete: chưa có user claim");
-            log.info("Voucher hard-deleted: id={}, admin={}", id, adminUsername);
+        if (uv.getStatus() != UserVoucher.Status.UNUSED) {
+            throw new VoucherInvalidException("Voucher không ở trạng thái UNUSED: " + uv.getStatus());
         }
+
+        uv.setStatus(UserVoucher.Status.USED);
+        uv.setUsedAt(LocalDateTime.now());
+        uv.setUsedInOrderId(orderId);
+        userVoucherRepository.save(uv);
     }
 
-    // ==================== BULK ====================
+    // ============================================================
+    // Task 2.11 (continued): Cron expire vouchers
+    // ============================================================
 
     /**
-     * Bulk action: LOCK / UNLOCK / DELETE / SET_VIP.
-     * Trả về danh sách failures để admin xử lý thủ công.
+     * Expire voucher UNUSED quá hạn. Được gọi bởi VoucherExpireJob (Batch 5).
      */
     @Transactional
-    public BulkVoucherResponse bulkAction(BulkVoucherRequest request, String adminUsername) {
-        String action = request.getAction();
-        if (action == null || action.isBlank()) {
-            throw new IllegalArgumentException("Action không được để trống");
+    public int expireOldVouchers(LocalDateTime now) {
+        List<UserVoucher> expired = userVoucherRepository.findExpiredUnusedVouchers(now);
+        for (UserVoucher uv : expired) {
+            uv.setStatus(UserVoucher.Status.EXPIRED);
+            userVoucherRepository.save(uv);
         }
-
-        List<BulkVoucherResponse.BulkResult> failures = new ArrayList<>();
-        int success = 0;
-
-        for (Long id : request.getIds()) {
-            try {
-                switch (action.toUpperCase()) {
-                    case "LOCK" -> setStatus(id, Voucher.Status.LOCKED, adminUsername,
-                            "BULK_LOCK", request.getAdminNote());
-                    case "UNLOCK" -> setStatus(id, Voucher.Status.ACTIVE, adminUsername,
-                            "BULK_UNLOCK", request.getAdminNote());
-                    case "DELETE" -> deleteVoucher(id, adminUsername);
-                    case "SET_VIP" -> setVip(id, Boolean.TRUE.equals(request.getValue()),
-                            adminUsername, request.getAdminNote());
-                    default -> throw new IllegalArgumentException(
-                            "Action không hợp lệ: " + action + " (LOCK/UNLOCK/DELETE/SET_VIP)");
-                }
-                success++;
-            } catch (Exception e) {
-                failures.add(BulkVoucherResponse.BulkResult.builder()
-                        .id(id)
-                        .error(e.getMessage())
-                        .build());
-            }
-        }
-
-        return BulkVoucherResponse.builder()
-                .totalRequested(request.getIds().size())
-                .successCount(success)
-                .failureCount(failures.size())
-                .failures(failures)
-                .build();
+        return expired.size();
     }
 
-    private void setStatus(Long id, Voucher.Status newStatus, String adminUsername, String action, String note) {
-        Voucher voucher = voucherRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy voucher với ID: " + id));
-        Map<String, Object> oldSnapshot = snapshotVoucher(voucher);
-        voucher.setStatus(newStatus);
-        voucher.setUpdatedAt(LocalDateTime.now());
-        voucherRepository.save(voucher);
-        saveAuditLog(id, adminUsername, action, oldSnapshot, Map.of("status", newStatus.name()),
-                List.of("status"), note);
+    // ============================================================
+    // Query helpers
+    // ============================================================
+
+    public List<Voucher> getActiveCatalog() {
+        return voucherRepository.findAllByStatus(Voucher.Status.ACTIVE);
     }
 
-    private void setVip(Long id, boolean vipOnly, String adminUsername, String note) {
-        Voucher voucher = voucherRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy voucher với ID: " + id));
-        Map<String, Object> oldSnapshot = snapshotVoucher(voucher);
-        voucher.setVipOnly(vipOnly);
-        voucher.setUpdatedAt(LocalDateTime.now());
-        voucherRepository.save(voucher);
-        saveAuditLog(id, adminUsername, "BULK_SET_VIP", oldSnapshot, Map.of("vip_only", vipOnly),
-                List.of("vip_only"), note);
+    public List<UserVoucher> getUserVouchers(Long userId) {
+        return userVoucherRepository.findByUserIdOrderByIssuedAtDesc(userId);
     }
 
-    // ==================== HELPERS ====================
-
-    private Pageable buildPageable(int page, int size, String sortBy, String sortDir) {
-        // Default sort
-        String field = sortBy != null ? sortBy : "code";
-        Sort.Direction direction = "desc".equalsIgnoreCase(sortDir) ? Sort.Direction.DESC : Sort.Direction.ASC;
-        Sort sort = Sort.by(direction, field);
-        // page 1-based (AdminVoucher.vue gửi page=1) → Spring 0-based
-        return PageRequest.of(Math.max(0, page - 1), size, sort);
-    }
-
-    private Voucher.Status parseStatus(String status) {
-        if (status == null || status.isBlank() || "all".equalsIgnoreCase(status)) {
-            return null;
-        }
-        try {
-            return Voucher.Status.valueOf(status.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Status không hợp lệ: " + status);
-        }
-    }
-
-    private Voucher.Status parseStatusOrDefault(String status, Voucher.Status fallback) {
-        if (status == null || status.isBlank()) return fallback;
-        try {
-            return Voucher.Status.valueOf(status.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Status không hợp lệ: " + status);
-        }
-    }
-
-    /**
-     * Convert List<Integer> → JSON array string "[1,2,3]". Null → null.
-     */
-    private String toJsonArray(List<Integer> ids) {
-        if (ids == null || ids.isEmpty()) return null;
-        StringBuilder sb = new StringBuilder("[");
-        for (int i = 0; i < ids.size(); i++) {
-            if (i > 0) sb.append(",");
-            sb.append(ids.get(i));
-        }
-        sb.append("]");
-        return sb.toString();
-    }
-
-    /**
-     * Snapshot entity Voucher → Map để serialize vào audit log JSON.
-     */
-    private Map<String, Object> snapshotVoucher(Voucher v) {
-        Map<String, Object> map = new HashMap<>();
-        map.put("code", v.getCode());
-        map.put("discount_amount", v.getDiscountAmount());
-        map.put("required_points", v.getRequiredPoints());
-        map.put("min_order_amount", v.getMinOrderAmount());
-        map.put("applicable_category_ids", v.getApplicableCategoryIds());
-        map.put("applicable_product_ids", v.getApplicableProductIds());
-        map.put("vip_only", v.getVipOnly());
-        map.put("status", v.getStatus() != null ? v.getStatus().name() : null);
-        return map;
-    }
-
-    /**
-     * Lưu audit log. Best-effort: nếu fail thì log warning nhưng không throw
-     * (audit log không nên block business operation).
-     */
-    private void saveAuditLog(Long voucherId, String adminId, String action,
-                              Map<String, Object> oldValues, Map<String, Object> newValues,
-                              List<String> changedFields, String note) {
-        try {
-            // changedFields: lưu dạng CSV string đơn giản (vd: "discount_amount,status")
-            // Frontend có thể split dễ dàng khi cần hiển thị.
-            String changedFieldsStr = (changedFields == null || changedFields.isEmpty())
-                    ? null
-                    : String.join(",", changedFields);
-
-            VoucherAuditLog auditLog = VoucherAuditLog.builder()
-                    .voucherId(voucherId)
-                    .adminId(adminId != null ? adminId : "unknown")
-                    .action(action)
-                    .oldValues(toJsonString(oldValues))
-                    .newValues(toJsonString(newValues))
-                    .changedFields(changedFieldsStr)
-                    .note(note)
-                    .build();
-            auditLogRepository.save(auditLog);
-        } catch (Exception e) {
-            log.warn("Failed to save voucher audit log: voucherId={}, action={}, error={}",
-                    voucherId, action, e.getMessage());
-        }
-    }
-
-    /**
-     * Convert Map → JSON string (dùng simple manual serializer tránh thêm Jackson dependency).
-     */
-    private String toJsonString(Map<String, Object> map) {
-        if (map == null) return null;
-        StringBuilder sb = new StringBuilder("{");
-        boolean first = true;
-        for (Map.Entry<String, Object> entry : map.entrySet()) {
-            if (!first) sb.append(",");
-            sb.append("\"").append(entry.getKey()).append("\":");
-            Object val = entry.getValue();
-            if (val == null) {
-                sb.append("null");
-            } else if (val instanceof Number || val instanceof Boolean) {
-                sb.append(val);
-            } else {
-                sb.append("\"").append(val.toString().replace("\"", "\\\"")).append("\"");
-            }
-            first = false;
-        }
-        sb.append("}");
-        return sb.toString();
+    public List<UserVoucher> getUserVouchersByStatus(Long userId, UserVoucher.Status status) {
+        return userVoucherRepository.findByUserIdAndStatus(userId, status);
     }
 }

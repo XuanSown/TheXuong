@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Điểm thưởng của tôi - TheXuong</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="bg-light">
+
+<div th:replace="~{index :: nav}"></div>
+
+<div class="container my-5">
+    <h2 class="mb-4"><i class="fa-solid fa-star text-warning me-2"></i>Điểm thưởng của tôi</h2>
+
+    <!-- Flash messages -->
+    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+    <!-- Card số dư -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-warning">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">Số dư hiện tại</h6>
+                    <p class="display-4 fw-bold text-warning mb-2">
+                        <i class="fa-solid fa-coins"></i>
+                        <span th:text="${currentPoints}">0</span>
+                    </p>
+                    <p class="text-muted mb-3">điểm</p>
+                    <a th:href="@{/loyalty/redeem}" class="btn btn-warning">
+                        <i class="fa-solid fa-gift me-1"></i>Đổi voucher
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">Hạng thành viên</h6>
+                    <p class="display-6 fw-bold mb-2">
+                        <span th:if="${tier == 'VIP'}" class="text-danger">
+                            <i class="fa-solid fa-crown"></i> VIP
+                        </span>
+                        <span th:unless="${tier == 'VIP'}" class="text-secondary">
+                            <i class="fa-solid fa-user"></i> THƯỜNG
+                        </span>
+                    </p>
+                    <p class="text-muted mb-0">Mua thêm để lên VIP (5M hoặc 50 điểm)</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lịch sử giao dịch -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0"><i class="fa-solid fa-clock-rotate-left me-2"></i>Lịch sử giao dịch</h5>
+        </div>
+        <div class="card-body p-0">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Ngày</th>
+                        <th>Loại</th>
+                        <th>Điểm</th>
+                        <th>Ghi chú</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${#lists.isEmpty(history)}">
+                        <td colspan="4" class="text-center text-muted py-4">Chưa có giao dịch nào.</td>
+                    </tr>
+                    <tr th:each="tx : ${history}">
+                        <td th:text="${#temporals.format(tx.createdAt, 'dd/MM/yyyy HH:mm')}"></td>
+                        <td>
+                            <span th:switch="${tx.type}">
+                                <span th:case="'EARN'" class="badge bg-success">+ Cộng điểm</span>
+                                <span th:case="'SPEND'" class="badge bg-primary">- Tiêu điểm</span>
+                                <span th:case="'REVERSE'" class="badge bg-warning text-dark">- Hoàn</span>
+                                <span th:case="'EXPIRE'" class="badge bg-secondary">- Hết hạn</span>
+                                <span th:case="'ADJUST'" class="badge bg-info">Điều chỉnh</span>
+                            </span>
+                        </td>
+                        <td th:classappend="${tx.points > 0} ? 'text-success fw-bold' : 'text-danger fw-bold'">
+                            <span th:if="${tx.points > 0}">+</span><span th:text="${tx.points}"></span>
+                        </td>
+                        <td th:text="${tx.note}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
