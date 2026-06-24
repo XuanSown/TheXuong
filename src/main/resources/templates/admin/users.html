@@ -145,19 +145,9 @@
             font-weight: 600;
         }
 
-        /* ── Checkbox RoleGroups ── */
-        .rolegroup-check-label {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 14px;
-            border: 1.5px solid #dee2e6;
-            border-radius: 8px; /* Square edges differ from Roles */
-            cursor: pointer;
-            font-size: .85rem;
-            transition: all .2s;
-            user-select: none;
-            background: #fff;
+        /* ── Role dropdown (mới thay cho RoleGroup/Roles checkbox) ── */
+        #f-role.form-select {
+            max-width: 240px;
             font-weight: 500;
         }
 
@@ -443,65 +433,35 @@
                                 </div>
                             </div>
 
-                            <!-- CHỨC DANH (RoleGroup) -->
-                            <div class="mb-3">
-                                <label for="f-roleGroup" class="form-label fw-semibold">
-                                    <i class="fa-solid fa-sitemap me-1 text-info"></i>Chức danh
-                                </label>
-                                <div th:if="${formUser.provider == 'GOOGLE'}" class="alert alert-warning py-2 mb-0">
-                                    <i class="fa-brands fa-google me-1"></i>
-                                    Tài khoản Google — Chức danh mặc định: <strong>Khách hàng</strong>.
-                                </div>
-                                <div th:unless="${formUser.provider == 'GOOGLE'}" class="roles-checkbox-group">
-                                    <label class="rolegroup-check-label" th:each="rg : ${roleGroups}"
-                                           th:classappend="${formUser.roleGroups != null and formUser.roleGroups.contains(rg)} ? 'checked' : ''">
-                                        <input type="checkbox" name="roleGroupIds" th:value="${rg.id}" styled="display:none;"
-                                               th:checked="${formUser.roleGroups != null and formUser.roleGroups.contains(rg)}"
-                                               onchange="UserForm.onRoleGroupChange(this)">
-                                        <span th:text="${rg.name}">Chức danh</span>
-                                    </label>
-                                </div>
-                                <div class="form-text">Các quyền kế thừa sẽ được cộng dồn từ những chức danh bạn chọn.</div>
-                            </div>
-
-                            <!-- QUYỀN RIÊNG (Roles — Checkboxes) -->
+                            <!-- ROLE (đơn: USER / ADMIN / BOTH) -->
                             <div class="mb-4" th:unless="${formUser.provider == 'GOOGLE'}">
                                 <label class="form-label fw-semibold">
-                                    <i class="fa-solid fa-key me-1 text-warning"></i>Quyền riêng (bổ sung)
+                                    <i class="fa-solid fa-key me-1 text-warning"></i>Vai trò (Role)
                                     <span class="badge bg-danger ms-1">Bắt buộc</span>
                                 </label>
-                                <div class="roles-checkbox-group" id="rolesCheckboxGroup">
-                                    <th:block th:if="${allRoles != null}" th:each="r : ${allRoles}">
-                                        <label class="role-check-label"
-                                            th:classappend="${(!isEdit and r.name == 'USER') or (formUser.roles != null and formUser.roles.contains(r))} ? 'checked' : ''">
-                                            <input type="checkbox" name="roleIds" th:value="${r.id}"
-                                                th:data-role-name="${r.name}"
-                                                th:checked="${(!isEdit and r.name == 'USER') or (formUser.roles != null and formUser.roles.contains(r))}"
-                                                onchange="UserForm.onRoleCheckChange(this)">
-                                            <span th:text="${r.name}">ROLE</span>
-                                        </label>
-                                    </th:block>
-                                    <!-- Fallback: render 3 role cứng nếu allRoles chưa được inject -->
-                                    <th:block th:unless="${allRoles != null}">
-                                        <label class="role-check-label" th:classappend="${!isEdit} ? 'checked' : ''">
-                                            <input type="checkbox" name="roleIds" value="1" data-role-name="USER"
-                                                th:checked="${!isEdit}" onchange="UserForm.onRoleCheckChange(this)">
-                                            <span>USER</span>
-                                        </label>
-                                        <label class="role-check-label">
-                                            <input type="checkbox" name="roleIds" value="2" data-role-name="ADMIN"
-                                                onchange="UserForm.onRoleCheckChange(this)">
-                                            <span>ADMIN</span>
-                                        </label>
-                                        <label class="role-check-label">
-                                            <input type="checkbox" name="roleIds" value="3" data-role-name="BOTH"
-                                                onchange="UserForm.onRoleCheckChange(this)">
-                                            <span>BOTH</span>
-                                        </label>
-                                    </th:block>
+                                <select name="role" class="form-select" id="f-role" required>
+                                    <option th:each="r : ${availableRoles}"
+                                            th:value="${r}"
+                                            th:text="${r}"
+                                            th:selected="${formUser.role != null and formUser.role == r}">
+                                        USER
+                                    </option>
+                                </select>
+                                <div class="form-text">
+                                    USER = khách hàng thường · ADMIN = chỉ quản trị · BOTH = vừa mua hàng vừa quản trị.
                                 </div>
-                                <div class="form-text">Các quyền này bổ sung ngoài quyền kế thừa từ Chức danh. Bắt buộc
-                                    tối thiểu 1.</div>
+                            </div>
+
+                            <!-- Hiển thị role cố định cho tài khoản Google -->
+                            <div class="mb-4" th:if="${formUser.provider == 'GOOGLE'}">
+                                <label class="form-label fw-semibold">
+                                    <i class="fa-solid fa-key me-1 text-warning"></i>Vai trò (Role)
+                                </label>
+                                <input type="text" class="form-control" value="USER" disabled>
+                                <div class="form-text">
+                                    <i class="fa-brands fa-google me-1"></i>
+                                    Tài khoản Google luôn có vai trò <strong>USER</strong> (không thể là Admin).
+                                </div>
                             </div>
 
                             <div class="d-flex gap-2">
@@ -536,7 +496,7 @@
                                         <th style="width:50px">ID</th>
                                         <th>Email</th>
                                         <th>Họ tên</th>
-                                        <th>Chức danh</th>
+                                        <th>Vai trò</th>
                                         <th style="width:120px">Trạng thái</th>
                                         <th style="width:80px">Provider</th>
                                         <th style="width:120px" class="text-center">Thao tác</th>
@@ -556,15 +516,13 @@
 
                                         <td th:text="${u.fullName != null ? u.fullName : '—'}">name</td>
 
-                                        <!-- Chức danh -->
+                                        <!-- Vai trò (Role) -->
                                         <td>
-                                            <div th:if="${u.roleGroups != null and !u.roleGroups.isEmpty()}">
-                                                <span th:each="rg : ${u.roleGroups}"
-                                                    class="badge badge-role bg-info text-dark rounded-pill me-1 mb-1"
-                                                    th:text="${rg.name}"></span>
-                                            </div>
-                                            <span th:unless="${u.roleGroups != null and !u.roleGroups.isEmpty()}"
-                                                class="text-muted fst-italic small">Chưa gán</span>
+                                            <span th:text="${u.role != null ? u.role : 'USER'}"
+                                                  class="badge rounded-pill me-1 mb-1"
+                                                  th:classappend="${u.role == 'ADMIN'} ? 'bg-danger' : (${u.role == 'BOTH'} ? 'bg-warning text-dark' : 'bg-info text-dark')">
+                                                USER
+                                            </span>
                                         </td>
 
                                         <!-- Toggle Switch Active — sử dụng Ajax -->
@@ -763,8 +721,8 @@
 
         // ────────────────────────────────────────────────
         // MODULE: FORM USER
-        // Xử lý form logic: show/hide password, role checkbox style,
-        // và auto-check roles khi chọn RoleGroup
+        // Xử lý form logic: show/hide password.
+        // (Role giờ là dropdown đơn giản, không cần checkbox logic.)
         // ────────────────────────────────────────────────
         const UserForm = {
 
@@ -779,70 +737,6 @@
                     input.type = 'password';
                     eyeIcon.classList.replace('fa-eye-slash', 'fa-eye');
                 }
-            },
-
-            // Cập nhật style cho checkbox label khi check/uncheck
-            onRoleCheckChange(checkbox) {
-                const label = checkbox.closest('.role-check-label');
-                label.classList.toggle('checked', checkbox.checked);
-            },
-
-            // Kiểm tra tối thiểu 1 role trước khi gửi Form
-            validate(formElement) {
-                // Chỉ validate khi #rolesCheckboxGroup tồn tại (không áp dụng cho Google User)
-                const group = document.getElementById('rolesCheckboxGroup');
-                if (group) {
-                    const checkedCount = group.querySelectorAll('input[type="checkbox"]:checked').length;
-                    if (checkedCount === 0) {
-                        toastr.error('Bạn phải chọn ít nhất 1 Quyền (Role) trước khi lưu.', 'Lỗi dữ liệu');
-                        return false;
-                    }
-                }
-                return true;
-            },
-
-            /**
-             * Khi chọn/bỏ chọn RoleGroup → xử lý gom tất cả ID RoleGroup đã chọn
-             * và tự động đánh dấu check trên các Roles tương ứng.
-             */
-            onRoleGroupChange(checkbox) {
-                // Update UI của checkbox RoleGroup chính nó
-                const label = checkbox.closest('.rolegroup-check-label');
-                label.classList.toggle('checked', checkbox.checked);
-
-                const groupCheckboxes = document.querySelectorAll('input[name="roleGroupIds"]:checked');
-                const roleGroupIds = Array.from(groupCheckboxes).map(cb => cb.value);
-                const roleCheckboxes = document.querySelectorAll('#rolesCheckboxGroup input[type="checkbox"]');
-
-                if (roleGroupIds.length === 0) {
-                    // Khi không có chức danh nào được chọn, mặc định check 'USER'
-                    roleCheckboxes.forEach(cb => {
-                        const isUserRole = cb.dataset.roleName === 'USER';
-                        cb.checked = isUserRole;
-                        cb.closest('.role-check-label').classList.toggle('checked', isUserRole);
-                    });
-                    return;
-                }
-
-                // Gọi API lấy roles của TẤT CẢ RoleGroups đã check
-                Promise.all(roleGroupIds.map(id => fetch(`/api/admin/role-groups/${id}`, {
-                    headers: { [CSRF.header]: CSRF.token }
-                }).then(res => res.json())))
-                .then(results => {
-                    const mergedRoleIds = new Set();
-                    results.forEach(data => {
-                        if (data.success && data.data.roles) {
-                            data.data.roles.forEach(r => mergedRoleIds.add(String(r.id)));
-                        }
-                    });
-
-                    // Auto-check các checkbox Role
-                    roleCheckboxes.forEach(cb => {
-                        const shouldCheck = mergedRoleIds.has(cb.value);
-                        cb.checked = shouldCheck;
-                        cb.closest('.role-check-label').classList.toggle('checked', shouldCheck);
-                    });
-                });
             }
         };
 

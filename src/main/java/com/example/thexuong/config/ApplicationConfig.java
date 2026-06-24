@@ -15,9 +15,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.List;
 
 @Configuration
 @RequiredArgsConstructor
@@ -28,35 +26,23 @@ public class ApplicationConfig {
     /**
      * UserDetailsService: Load User từ DB cho Spring Security.
      *
-     * Logic gom authority:
-     *   - Lấy roles riêng của User (user.roles)
-     *   - Lấy roles kế thừa từ RoleGroup (user.roleGroup.roles)
-     *   - Union 2 tập → Set<GrantedAuthority> (tự loại bỏ trùng lặp)
-     *
-     * Dùng findWithRolesByEmail() có @EntityGraph → 1 query duy nhất, tránh N+1.
+     * Phân quyền đơn giản hóa: User chỉ có 1 field {@code role} (USER / ADMIN / BOTH).
+     * → Authority = {@code SimpleGrantedAuthority(user.role)} (1 authority duy nhất).
      */
     @Bean
     public UserDetailsService userDetailsService() {
         return username -> {
             // Ưu tiên tìm bằng Email, fallback sang Username
-            // Dùng findWithRoles* để EAGER fetch roles + roleGroup.roles trong 1 query
             com.example.thexuong.entity.User user = userRepository
                     .findWithRolesByEmail(username)
                     .or(() -> userRepository.findWithRolesByUsername(username))
                     .orElseThrow(() -> new UsernameNotFoundException(
                             "Không tìm thấy người dùng với email/username: " + username));
 
-            // Gom quyền = Roles riêng của User ∪ Roles kế thừa từ tất cả Chức danh (RoleGroups)
-            Set<GrantedAuthority> authorities = Stream.concat(
-                    // Roles riêng của User
-                    user.getRoles().stream(),
-                    // Roles từ các Chức danh (RoleGroups)
-                    user.getRoleGroups() != null && !user.getRoleGroups().isEmpty()
-                            ? user.getRoleGroups().stream().flatMap(rg -> rg.getRoles().stream())
-                            : Stream.empty()
-            )
-            .map(role -> (GrantedAuthority) new SimpleGrantedAuthority(role.getName()))
-            .collect(Collectors.toSet());
+            // Authority đơn từ cột user.role (USER / ADMIN / BOTH).
+            // Nếu role null/blank (DB cũ chưa có) → fallback "USER".
+            String role = (user.getRole() == null || user.getRole().isBlank()) ? "USER" : user.getRole();
+            List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(role));
 
             // Truyền user.active vào Spring Security:
             // enabled=false → Spring từ chối login, redirect về /login?error (DisabledException)

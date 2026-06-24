@@ -6,7 +6,7 @@ Dự án TheXuong là một trang web bán đồ thể thao được phát tri�
 - **Java:** JDK 21
 - **Framework:** Spring Boot 3.5.9
 - **Database:** SQL Server
-- **Frontend:** HTML5, Bootstrap 5, Thymeleaf
+- **Frontend:** Vue 3 + TypeScript + Tailwind CSS
 - **Build Tool:** Gradle
 
 ## 🔧 Hướng dẫn chạy dự án (Getting Started)

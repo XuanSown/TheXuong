@@ -1,302 +1,127 @@
 <template>
-  <header class="bg-white shadow-sm sticky top-0 z-50">
-    <div class="container-custom">
-      <div class="flex items-center justify-between h-16 md:h-20">
-        <!-- Logo -->
-        <router-link to="/" class="flex items-center flex-shrink-0">
-          <span class="font-brand text-xl md:text-2xl text-primary-500">SPORTIFY</span>
-        </router-link>
+  <header class="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 w-[1278px] max-w-[95vw]">
+    <nav
+      class="relative bg-white/80 backdrop-blur-[6px] border-2 border-white rounded-2xl px-[24px] py-[36px] shadow-lg"
+    >
+      <!-- Logo - Center -->
+      <router-link
+        to="/"
+        class="absolute left-1/2 top-[-16px] transform -translate-x-1/2 w-[74px] h-[64px] bg-[url('@/assets/logo.png')] bg-contain bg-no-repeat bg-center z-10"
+        aria-label="Sportify Home"
+      />
 
-        <!-- Desktop Navigation -->
-        <nav class="hidden md:flex items-center space-x-8">
-          <router-link
-            to="/products"
-            class="text-gray-700 hover:text-primary-500 font-medium transition-base"
-          >
-            Sản phẩm
-          </router-link>
-
-          <!-- Sport Dropdown -->
-          <div class="relative group">
-            <button
-              class="flex items-center text-gray-700 hover:text-primary-500 font-medium transition-base"
-            >
-              Thể thao
-              <svg class="w-4 h-4 ml-1" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-              </svg>
-            </button>
-            <!-- Dropdown menu -->
-            <div class="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-              <router-link
-                v-for="sport in sports"
-                :key="sport"
-                :to="`/products?sport=${encodeURIComponent(sport)}`"
-                class="block px-4 py-2 text-gray-700 hover:bg-primary-50 hover:text-primary-500"
-              >
-                {{ sport }}
-              </router-link>
-            </div>
-          </div>
-
-          <!-- Brand Dropdown -->
-          <div class="relative group">
-            <button
-              class="flex items-center text-gray-700 hover:text-primary-500 font-medium transition-base"
-            >
-              Thương hiệu
-              <svg class="w-4 h-4 ml-1" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-              </svg>
-            </button>
-            <div class="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-              <router-link
-                v-for="brand in brands"
-                :key="brand"
-                :to="`/products?brand=${encodeURIComponent(brand)}`"
-                class="block px-4 py-2 text-gray-700 hover:bg-primary-50 hover:text-primary-500"
-              >
-                {{ brand }}
-              </router-link>
-            </div>
-          </div>
-        </nav>
-
-        <!-- Right side: Cart & User -->
-        <div class="flex items-center space-x-4">
-          <!-- Cart -->
-          <router-link
-            to="/cart"
-            class="relative p-2 text-gray-700 hover:text-primary-500 transition-base"
-          >
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-            </svg>
-            <span
-              v-if="cartCount > 0"
-              class="absolute -top-1 -right-1 bg-primary-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center"
-            >
-              {{ cartCount }}
-            </span>
-          </router-link>
-
-          <!-- User Menu (Desktop) -->
-          <div v-if="isAuthenticated" class="hidden md:block relative group">
-            <button class="flex items-center space-x-2 text-gray-700 hover:text-primary-500 transition-base">
-              <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
-              </svg>
-              <span class="text-sm font-medium">{{ user?.fullName || user?.username }}</span>
-              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-              </svg>
-            </button>
-            <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-              <router-link
-                to="/profile"
-                class="block px-4 py-2 text-gray-700 hover:bg-primary-50 hover:text-primary-500"
-              >
-                Tài khoản
-              </router-link>
-              <router-link
-                to="/orders"
-                class="block px-4 py-2 text-gray-700 hover:bg-primary-50 hover:text-primary-500"
-              >
-                Đơn hàng
-              </router-link>
-              <!-- Admin link -->
-              <router-link
-                v-if="isAdmin"
-                to="/admin/products"
-                class="block px-4 py-2 text-gray-700 hover:bg-primary-50 hover:text-primary-500"
-              >
-                Quản trị
-              </router-link>
-              <hr class="my-2 border-gray-200">
-              <button
-                @click="handleLogout"
-                class="block w-full text-left px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-500"
-              >
-                Đăng xuất
-              </button>
-            </div>
-          </div>
-
-          <!-- Login/Register (Desktop) -->
-          <div v-else class="hidden md:flex items-center space-x-2">
-            <router-link
-              to="/login"
-              class="px-4 py-2 text-gray-700 hover:text-primary-500 font-medium transition-base"
-            >
-              Đăng nhập
-            </router-link>
-            <router-link
-              to="/register"
-              class="px-4 py-2 bg-primary-500 text-white rounded-md hover:bg-primary-600 font-medium transition-base"
-            >
-              Đăng ký
-            </router-link>
-          </div>
-
-          <!-- Mobile menu button -->
-          <button
-            @click="mobileMenuOpen = !mobileMenuOpen"
-            class="md:hidden p-2 text-gray-700 hover:text-primary-500"
-            aria-label="Toggle menu"
-          >
-            <svg v-if="!mobileMenuOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-            <svg v-else class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Mobile Menu -->
-    <div v-if="mobileMenuOpen" class="md:hidden bg-white border-t border-gray-200">
-      <div class="container-custom py-4 space-y-4">
-        <!-- Mobile nav links -->
+      <!-- Left Navigation -->
+      <div class="flex items-center gap-[62px] absolute left-[24px] top-[36px]">
+        <!-- Sản phẩm Link -->
         <router-link
           to="/products"
-          class="block text-gray-700 hover:text-primary-500 font-medium py-2"
-          @click="mobileMenuOpen = false"
+          class="relative group w-[107px] h-[31.59px] flex items-center border-b-2 border-transparent hover:border-black transition-colors"
         >
-          Sản phẩm
+          <span
+            class="font-geist text-base text-[#5E5F5C] leading-[26px]"
+          >
+            SẢN PHẨM
+          </span>
         </router-link>
 
-        <!-- Mobile Sport dropdown -->
-        <div class="border-t border-gray-200 pt-4">
-          <p class="text-sm font-semibold text-gray-500 uppercase mb-2">Thể thao</p>
-          <div class="grid grid-cols-2 gap-2">
-            <router-link
-              v-for="sport in sports"
-              :key="sport"
-              :to="`/products?sport=${encodeURIComponent(sport)}`"
-              class="text-gray-700 hover:text-primary-500 py-1"
-              @click="mobileMenuOpen = false"
-            >
-              {{ sport }}
-            </router-link>
-          </div>
-        </div>
-
-        <!-- Mobile Brand dropdown -->
-        <div class="border-t border-gray-200 pt-4">
-          <p class="text-sm font-semibold text-gray-500 uppercase mb-2">Thương hiệu</p>
-          <div class="grid grid-cols-2 gap-2">
-            <router-link
-              v-for="brand in brands"
-              :key="brand"
-              :to="`/products?brand=${encodeURIComponent(brand)}`"
-              class="text-gray-700 hover:text-primary-500 py-1"
-              @click="mobileMenuOpen = false"
-            >
-              {{ brand }}
-            </router-link>
-          </div>
-        </div>
-
-        <!-- Mobile Auth -->
-        <div v-if="isAuthenticated" class="border-t border-gray-200 pt-4 space-y-2">
-          <router-link
-            to="/profile"
-            class="block text-gray-700 hover:text-primary-500 py-2"
-            @click="mobileMenuOpen = false"
+        <!-- Thể thao Link -->
+        <router-link
+          to="/products?sport=all"
+          class="relative group w-[81.28px] h-[31.59px] flex items-center border-b-2 border-transparent hover:border-black transition-colors"
+        >
+          <span
+            class="font-geist text-base text-[#5E5F5C] leading-[26px]"
           >
-            Tài khoản
-          </router-link>
-          <router-link
-            to="/orders"
-            class="block text-gray-700 hover:text-primary-500 py-2"
-            @click="mobileMenuOpen = false"
-          >
-            Đơn hàng
-          </router-link>
-          <router-link
-            v-if="isAdmin"
-            to="/admin/products"
-            class="block text-gray-700 hover:text-primary-500 py-2"
-            @click="mobileMenuOpen = false"
-          >
-            Quản trị
-          </router-link>
-          <button
-            @click="handleLogout"
-            class="block w-full text-left text-red-500 hover:text-red-600 py-2"
-          >
-            Đăng xuất
-          </button>
-        </div>
-
-        <div v-else class="border-t border-gray-200 pt-4 flex flex-col space-y-2">
-          <router-link
-            to="/login"
-            class="block text-center py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50"
-            @click="mobileMenuOpen = false"
-          >
-            Đăng nhập
-          </router-link>
-          <router-link
-            to="/register"
-            class="block text-center py-2 bg-primary-500 text-white rounded-md hover:bg-primary-600"
-            @click="mobileMenuOpen = false"
-          >
-            Đăng ký
-          </router-link>
-        </div>
+            THỂ THAO
+          </span>
+        </router-link>
       </div>
-    </div>
+
+      <!-- Right Side: Icons for logged in users -->
+      <div v-if="isAuthenticated" class="flex items-center gap-[16px] absolute right-[24px] top-[31px]">
+        <!-- Favorite Link -->
+        <router-link
+          to="/favorite"
+          class="w-[36px] h-[34px] flex items-center justify-center hover:opacity-70 transition-opacity"
+          aria-label="Favorite"
+        >
+          <svg class="w-[20px] h-[18px] text-[#5E5F5C]" viewBox="0 0 16 15" fill="currentColor">
+            <path d="M8 1C4.5 4 2 6.5 2 9C2 10.5 3 11.5 4.5 11.5C5 11.5 5.5 11.4 6 11.3C6.5 11.4 7 11.5 7.5 11.5C9 11.5 10 10.5 10 9C10 6.5 7.5 4 6 1Z"/>
+          </svg>
+        </router-link>
+
+        <!-- User Link -->
+        <router-link
+          to="/profile"
+          class="w-[34px] h-[34px] flex items-center justify-center hover:opacity-70 transition-opacity"
+          aria-label="Profile"
+        >
+          <svg class="w-[20px] h-[20px] text-[#5E5F5C]" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+          </svg>
+        </router-link>
+
+        <!-- Cart Link -->
+        <router-link
+          to="/cart"
+          class="w-[36px] h-[34px] flex items-center justify-center hover:opacity-70 transition-opacity"
+          aria-label="Cart"
+        >
+          <svg class="w-[19.98px] h-[20px] text-[#5E5F5C]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M2 3h6l4 6-4 6-6-4H2v-3z"/>
+            <path d="M22 3h-6l-4 6 4 6 6-4h2v-3z"/>
+          </svg>
+        </router-link>
+
+        <!-- Logout Button -->
+        <button
+          @click="handleLogout"
+          class="flex items-center justify-center w-[34px] h-[34px] rounded-full border border-[#CFC4C6] hover:border-black transition-colors"
+          aria-label="Logout"
+        >
+          <svg class="w-[16px] h-[16px] text-[#5E5F5C]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+            <polyline points="16 17 21 12 16 7"/>
+            <line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Right Side: Login Button for guests -->
+      <div v-else class="flex items-center gap-[16px] absolute right-[24px] top-[31px]">
+        <router-link
+          to="/login"
+          class="flex items-center justify-center w-[90px] h-[31px] bg-black rounded-sm"
+        >
+          <span class="text-white text-[10px] font-normal uppercase leading-[15px] tracking-wide">
+            ĐĂNG NHẬP
+          </span>
+        </router-link>
+      </div>
+    </nav>
   </header>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.store'
-import { useCartStore } from '@/stores/cart.store'
 
 const router = useRouter()
 const authStore = useAuthStore()
-const cartStore = useCartStore()
 
-const mobileMenuOpen = ref(false)
-
-const user = computed(() => authStore.user)
 const isAuthenticated = computed(() => authStore.isAuthenticated)
-const isAdmin = computed(() => authStore.isAdmin)
-const cartCount = computed(() => cartStore.totalItems)
-
-// Mock data - sẽ thay bằng API
-const sports = ref([
-  'Bóng đá',
-  'Bóng rổ',
-  'Tennis',
-  'Chạy bộ',
-  'Bơi lội',
-  'Gym & Fitness'
-])
-
-const brands = ref([
-  'Nike',
-  'Adidas',
-  'Puma',
-  'New Balance',
-  'Under Armour',
-  'Asics'
-])
-
-onMounted(async () => {
-  await authStore.fetchUser()
-  if (isAuthenticated.value) {
-    await cartStore.fetchCart()
-  }
-})
 
 const handleLogout = async () => {
-  mobileMenuOpen.value = false
   await authStore.logout()
+  router.push('/')
 }
 </script>
+
+<style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap') layer(fonts);
+
+.font-geist {
+  font-family: 'Inter', 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+</style>

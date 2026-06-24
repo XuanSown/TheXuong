@@ -1,20 +1,13 @@
 package com.example.thexuong.service;
 
-import com.example.thexuong.entity.Role;
-import com.example.thexuong.entity.RoleGroup;
 import com.example.thexuong.entity.User;
 import com.example.thexuong.exception.SelfDeactivationException;
 import com.example.thexuong.exception.UserNotFoundException;
-import com.example.thexuong.repository.RoleGroupRepository;
-import com.example.thexuong.repository.RoleRepository;
 import com.example.thexuong.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.HashSet;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -22,8 +15,6 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final RoleRepository roleRepository;
-    private final RoleGroupRepository roleGroupRepository;
 
     // ==================== QUERY ====================
 
@@ -33,7 +24,6 @@ public class UserService {
 
     /**
      * Tìm User theo ID — ném UserNotFoundException nếu không tìm thấy.
-     * Dùng thay cho findById().orElseThrow() rải rác ở Controller.
      */
     public User getUserById(Long id) {
         return userRepository.findById(id)
@@ -82,57 +72,17 @@ public class UserService {
         userRepository.save(target);
     }
 
-    // ==================== ROLE GROUP ====================
+    // ==================== ROLE (đơn giản) ====================
 
     /**
-     * Gán chức danh (RoleGroup) cho User.
-     * Nếu roleGroupIds rỗng → gỡ chức danh.
+     * Cập nhật role (String) cho User. Không dùng Set&lt;Role&gt; / Set&lt;RoleGroup&gt; nữa.
+     * Nếu {@code role} null/blank → giữ nguyên (không đổi).
      */
     @Transactional
-    public void assignRoleGroups(Long userId, Set<Long> roleGroupIds) {
+    public void setRole(Long userId, String role) {
+        if (role == null || role.isBlank()) return;
         User user = getUserById(userId);
-
-        if (roleGroupIds == null || roleGroupIds.isEmpty()) {
-            user.getRoleGroups().clear();
-        } else {
-            Set<RoleGroup> rgs = new HashSet<>(roleGroupRepository.findAllById(roleGroupIds));
-            user.setRoleGroups(rgs);
-        }
-        userRepository.save(user);
-    }
-
-    // ==================== INDIVIDUAL ROLES ====================
-
-    /**
-     * Thêm 1 Role riêng cho User (ngoài Role kế thừa từ RoleGroup).
-     */
-    @Transactional
-    public void addRole(Long userId, Long roleId) {
-        User user = getUserById(userId);
-        Role role = roleRepository.findById(roleId)
-                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy role với ID: " + roleId));
-        user.getRoles().add(role);
-        userRepository.save(user);
-    }
-
-    /**
-     * Gỡ 1 Role riêng khỏi User.
-     */
-    @Transactional
-    public void removeRole(Long userId, Long roleId) {
-        User user = getUserById(userId);
-        user.getRoles().removeIf(r -> r.getId().equals(roleId));
-        userRepository.save(user);
-    }
-
-    /**
-     * Đặt lại toàn bộ Roles riêng của User (dùng khi Admin chọn multi-checkbox).
-     */
-    @Transactional
-    public void setRoles(Long userId, Set<Long> roleIds) {
-        User user = getUserById(userId);
-        Set<Role> newRoles = new HashSet<>(roleRepository.findAllById(roleIds));
-        user.setRoles(newRoles);
+        user.setRole(role.toUpperCase());
         userRepository.save(user);
     }
 
@@ -147,17 +97,25 @@ public class UserService {
 
     /**
      * Tạo User mới từ form Admin.
-     * Tự động gán RoleGroup mặc định là "Khách hàng" nếu không chỉ định.
-     * Tự động gán Role "USER" vào user.roles.
+     *
+     * @param email         Email (bắt buộc, unique)
+     * @param username      Username (có thể null → tự dùng email)
+     * @param fullName      Họ tên
+     * @param rawPassword   Mật khẩu thô (sẽ được BCrypt encode)
+     * @param provider      "LOCAL" hoặc "GOOGLE"
+     * @param role          Role mong muốn (USER / ADMIN / BOTH). Null/blank → mặc định "USER".
      */
     @Transactional
     public User createUser(String email, String username, String fullName,
-                           String rawPassword, String provider, Set<Long> roleGroupIds) {
+                           String rawPassword, String provider, String role) {
+        String finalRole = (role == null || role.isBlank()) ? "USER" : role.toUpperCase();
+
         User.UserBuilder builder = User.builder()
                 .email(email)
                 .username(username != null && !username.isBlank() ? username : email)
                 .fullName(fullName)
                 .provider(provider != null ? provider : "LOCAL")
+                .role(finalRole)
                 .active(true);
 
         // Mã hóa password nếu là LOCAL, Google user không cần
@@ -167,42 +125,6 @@ public class UserService {
             builder.password("");
         }
 
-        User user = builder.build();
-
-        // Gán nhận nhiều RoleGroup thay vì 1
-        Set<RoleGroup> rgs = resolveRoleGroups(roleGroupIds);
-        user.setRoleGroups(rgs);
-
-        // Gán Role mặc định từ bảng Roles (tên "USER")
-        roleRepository.findByName("USER").ifPresent(userRole -> user.getRoles().add(userRole));
-
-        return userRepository.save(user);
-    }
-
-    /**
-     * Resolve RoleGroups: nếu có danh sách ID thì tra cứu DB, không thì lấy "Khách hàng" mặc định.
-     */
-    private Set<RoleGroup> resolveRoleGroups(Set<Long> roleGroupIds) {
-        if (roleGroupIds != null && !roleGroupIds.isEmpty()) {
-            Set<RoleGroup> rgs = new HashSet<>(roleGroupRepository.findAllById(roleGroupIds));
-            if (!rgs.isEmpty()) return rgs;
-        }
-        return Set.of(getDefaultRoleGroup());
-    }
-
-    /**
-     * Lấy RoleGroup mặc định tên "Khách hàng".
-     * Nếu chưa có trong DB thì tự tạo mới (safe fallback).
-     */
-    private RoleGroup getDefaultRoleGroup() {
-        return roleGroupRepository.findByName("Khách hàng")
-                .orElseGet(() -> {
-                    // Tự tạo nếu chưa seed — tránh lỗi khi DB mới setup
-                    RoleGroup defaultGroup = RoleGroup.builder()
-                            .name("Khách hàng")
-                            .description("Chức danh mặc định cho khách hàng thông thường")
-                            .build();
-                    return roleGroupRepository.save(defaultGroup);
-                });
+        return userRepository.save(builder.build());
     }
 }

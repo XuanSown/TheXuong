@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequiredArgsConstructor
 public class AuthController {
 
-    // FIX BUG #1: Inject UserService thay vì UserRepository trực tiếp.
-    // UserService.createUser() đã xử lý toàn bộ: hash pass, gán RoleGroup "Khách hàng", gán Role "USER".
+    // Inject UserService thay vì UserRepository trực tiếp.
+    // UserService.createUser() đã xử lý toàn bộ: hash pass, gán role mặc định "USER", set active.
     // Controller không nên biết về logic nghiệp vụ này.
     private final UserService userService;
 
@@ -59,12 +59,10 @@ public class AuthController {
         }
 
         try {
-            // FIX BUG #3: Dùng UserService.createUser() thay vì gọi thẳng repository.
-            // Bỏ user.setRole("USER") — cột role đã bị xóa sau Phase 2.
+            // Dùng UserService.createUser() thay vì gọi thẳng repository.
             // UserService tự:
             //   - Mã hóa password (BCrypt)
-            //   - Gán RoleGroup "Khách hàng" (mặc định)
-            //   - Gán Role "USER" vào bảng user_roles
+            //   - Gán role mặc định "USER" (vì role=null)
             //   - Set active = true
             userService.createUser(
                     formUser.getEmail(),
@@ -72,7 +70,7 @@ public class AuthController {
                     formUser.getFullName(),
                     formUser.getPassword(),  // raw password, Service sẽ encode
                     "LOCAL",
-                    null                     // roleGroupId = null → tự gán "Khách hàng"
+                    null                     // role = null → tự gán "USER"
             );
 
             return "redirect:/login?registerSuccess";

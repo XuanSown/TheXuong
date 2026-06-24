@@ -1,135 +1,208 @@
 <template>
-  <div class="min-h-screen bg-gray-50 flex">
-    <!-- Sidebar -->
-    <aside class="hidden md:flex flex-col w-64 bg-gray-900 text-white min-h-screen fixed left-0 top-0 pt-20">
-      <div class="flex-1 px-4 py-6 space-y-2">
-        <router-link
-          to="/admin/products"
-          class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white rounded-lg transition-base"
-          active-class="bg-gray-800 text-white"
-        >
-          <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-          </svg>
-          Quản lý sản phẩm
-        </router-link>
-
-        <router-link
-          to="/admin/orders"
-          class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white rounded-lg transition-base"
-          active-class="bg-gray-800 text-white"
-        >
-          <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-          </svg>
-          Quản lý đơn hàng
-        </router-link>
-
-        <router-link
-          to="/admin/users"
-          class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white rounded-lg transition-base"
-          active-class="bg-gray-800 text-white"
-        >
-          <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-          </svg>
-          Quản lý người dùng
-        </router-link>
-
-        <router-link
-          to="/admin/statistics"
-          class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white rounded-lg transition-base"
-          active-class="bg-gray-800 text-white"
-        >
-          <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-          </svg>
-          Thống kê
-        </router-link>
+  <div class="admin-layout">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <!-- Logo Section -->
+      <div class="logo-section">
+        <img src="@/assets/logo.png" alt="Logo" class="logo" />
       </div>
 
-      <!-- Bottom section -->
-      <div class="px-4 py-6 border-t border-gray-800">
+      <!-- Navigation Menu -->
+      <nav class="nav-menu">
         <router-link
-          to="/"
-          class="flex items-center text-gray-400 hover:text-white transition-base"
+          to="/admin/users"
+          class="nav-item"
+          :class="{ active: $route.name?.startsWith('admin-users') }"
         >
-          <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-          </svg>
-          Về trang chủ
+          <span class="nav-icon">👥</span>
+          <span class="nav-text">Quản Lý Người Dùng</span>
         </router-link>
+        <router-link
+          to="/admin/orders"
+          class="nav-item"
+          :class="{ active: $route.name?.startsWith('admin-orders') }"
+        >
+          <span class="nav-icon">📦</span>
+          <span class="nav-text">Quản Lý Đơn Hàng</span>
+        </router-link>
+        <router-link
+          to="/admin/products"
+          class="nav-item"
+          :class="{ active: $route.name?.startsWith('admin-products') }"
+        >
+          <span class="nav-icon">🏷️</span>
+          <span class="nav-text">Quản Lý Sản Phẩm</span>
+        </router-link>
+        <router-link
+          to="/admin/loyalty/vouchers"
+          class="nav-item"
+          :class="{ active: $route.name?.startsWith('admin-vouchers') }"
+        >
+          <span class="nav-icon">🎟️</span>
+          <span class="nav-text">Quản Lý Voucher</span>
+        </router-link>
+        <router-link
+          to="/admin/statistics"
+          class="nav-item active"
+          :class="{ active: $route.name?.startsWith('admin-statistics') }"
+        >
+          <span class="nav-icon">📊</span>
+          <span class="nav-text">Quản Lý Thống Kê</span>
+        </router-link>
+      </nav>
+
+      <!-- Footer Menu -->
+      <div class="footer-menu">
+        <router-link to="/help" class="nav-item">
+          <span class="nav-icon">❓</span>
+          <span class="nav-text">HELP CENTER</span>
+        </router-link>
+        <button @click="handleLogout" class="nav-item logout-btn">
+          <span class="nav-icon">🚪</span>
+          <span class="nav-text">LOGOUT</span>
+        </button>
       </div>
     </aside>
 
-    <!-- Mobile Header -->
-    <div class="md:hidden fixed top-0 left-0 right-0 bg-gray-900 text-white z-50">
-      <div class="flex items-center justify-between h-14 px-4">
-        <span class="font-brand text-lg text-primary-500">SPORTIFY Admin</span>
-        <button
-          @click="mobileMenuOpen = !mobileMenuOpen"
-          class="p-2"
-          aria-label="Toggle menu"
-        >
-          <svg v-if="!mobileMenuOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
-          <svg v-else class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-      </div>
-    </div>
-
-    <!-- Main Content -->
-    <div class="flex-1 md:ml-64 pt-14 md:pt-0">
-      <!-- Mobile Menu Overlay -->
-      <div v-if="mobileMenuOpen" class="md:hidden fixed inset-0 bg-gray-900 bg-opacity-75 z-40" @click="mobileMenuOpen = false"></div>
-
-      <!-- Mobile Menu -->
-      <div v-if="mobileMenuOpen" class="md:hidden fixed inset-y-0 left-0 w-64 bg-gray-900 text-white z-50 pt-16">
-        <div class="px-4 py-6 space-y-2">
-          <router-link
-            to="/admin/products"
-            class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-800 rounded-lg"
-            @click="mobileMenuOpen = false"
-          >
-            Quản lý sản phẩm
-          </router-link>
-          <router-link
-            to="/admin/orders"
-            class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-800 rounded-lg"
-            @click="mobileMenuOpen = false"
-          >
-            Quản lý đơn hàng
-          </router-link>
-          <router-link
-            to="/admin/users"
-            class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-800 rounded-lg"
-            @click="mobileMenuOpen = false"
-          >
-            Quản lý người dùng
-          </router-link>
-          <router-link
-            to="/admin/statistics"
-            class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-800 rounded-lg"
-            @click="mobileMenuOpen = false"
-          >
-            Thống kê
-          </router-link>
-        </div>
-      </div>
-
-      <!-- Page Content -->
-      <main class="p-4 md:p-8">
-        <slot></slot>
-      </main>
-    </div>
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <slot />
+    </main>
   </div>
 </template>
 
-<script setup lang="ts">
-import { ref } from 'vue'
+<script setup>
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 
-const mobileMenuOpen = ref(false)
+const router = useRouter()
+const authStore = useAuthStore()
+
+const handleLogout = async () => {
+  await authStore.logout()
+  router.push('/login')
+}
 </script>
+
+<style scoped>
+.admin-layout {
+  display: flex;
+  min-height: 100vh;
+  background: #F9F9F9;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 256px;
+  background: #FFFFFF;
+  border-right: 1px solid #000000;
+  display: flex;
+  flex-direction: column;
+  padding-top: 140px;
+  position: fixed;
+  height: 100vh;
+  top: 0;
+  left: 0;
+  z-index: 100;
+}
+
+.logo-section {
+  position: absolute;
+  top: 32px;
+  left: 0;
+  width: 100%;
+  height: 92px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo {
+  max-width: 150px;
+  height: auto;
+}
+
+.nav-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 0;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  padding: 16px 24px;
+  text-decoration: none;
+  color: #5E5F5C;
+  font-family: 'Geist', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1.8px;
+  transition: all 0.2s;
+  border-left: 4px solid transparent;
+  background: transparent;
+  border-top: none;
+  border-right: none;
+  border-bottom: none;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+}
+
+.nav-item:hover {
+  background: #F9F9F9;
+}
+
+.nav-item.active {
+  background: #FFFFFF;
+  border-left-color: #FFFFFF;
+  color: #000000;
+  font-weight: 700;
+}
+
+.nav-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+.nav-text {
+  flex: 1;
+}
+
+.footer-menu {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  border-top: 1px solid #E8E8E8;
+  padding: 16px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.logout-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #5E5F5C;
+}
+
+.logout-btn:hover {
+  background: #F9F9F9;
+}
+
+/* Main Content */
+.main-content {
+  margin-left: 256px;
+  padding: 120px 20px 20px;
+  width: calc(100% - 256px);
+  max-width: 1278px;
+}
+</style>

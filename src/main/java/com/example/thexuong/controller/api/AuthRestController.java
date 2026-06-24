@@ -1,15 +1,12 @@
 package com.example.thexuong.controller.api;
 
 import com.example.thexuong.entity.User;
-import com.example.thexuong.entity.Role;
 import com.example.thexuong.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -31,6 +28,10 @@ public class AuthRestController {
             String confirmPassword
     ) {}
 
+    /**
+     * UserResponse trả về cho client — role là String đơn (USER / ADMIN / BOTH),
+     * KHÔNG còn String[] roles như schema cũ.
+     */
     public record UserResponse(
             Long id,
             String username,
@@ -38,7 +39,7 @@ public class AuthRestController {
             String fullName,
             String phone,
             String address,
-            String[] roles,
+            String role,
             boolean enabled
     ) {}
 
@@ -69,9 +70,7 @@ public class AuthRestController {
                 user.getFullName(),
                 user.getPhoneNumber(),
                 user.getAddress(),
-                user.getRoles().stream()
-                        .map(Role::getName)
-                        .toArray(String[]::new),
+                user.getRole() != null ? user.getRole() : "USER",
                 Boolean.TRUE.equals(user.getActive())
         );
 
@@ -105,7 +104,7 @@ public class AuthRestController {
                     request.fullName(),
                     request.password(),
                     "LOCAL",
-                    null
+                    null  // role = null → mặc định "USER"
             );
             return ResponseEntity.ok(new MessageResponse("Registration successful"));
         } catch (Exception e) {

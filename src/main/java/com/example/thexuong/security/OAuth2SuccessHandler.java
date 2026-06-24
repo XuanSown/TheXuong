@@ -1,10 +1,6 @@
 package com.example.thexuong.security;
 
-import com.example.thexuong.entity.Role;
-import com.example.thexuong.entity.RoleGroup;
 import com.example.thexuong.entity.User;
-import com.example.thexuong.repository.RoleGroupRepository;
-import com.example.thexuong.repository.RoleRepository;
 import com.example.thexuong.repository.UserRepository;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,8 +12,6 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationSu
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -25,8 +19,6 @@ import java.util.List;
 public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
-    private final RoleGroupRepository roleGroupRepository;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -37,27 +29,17 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         String name = oAuth2User.getAttribute("name");
 
         // 2. Đồng bộ User vào Database (nếu chưa có thì tạo mới)
+        //    Role mặc định = "USER" (không có bảng Role/RoleGroup nữa).
         userRepository.findByEmail(email).orElseGet(() -> {
-            // Lấy Role "USER" từ DB (đã seed sẵn trong migration SQL)
-            Role userRole = roleRepository.findByName("USER").orElse(null);
-
-            // Lấy RoleGroup mặc định "Khách hàng"
-            RoleGroup defaultGroup = roleGroupRepository.findByName("Khách hàng").orElse(null);
-
             User newUser = User.builder()
                     .email(email)
                     .username(email)    // Dùng email làm username
                     .fullName(name)     // Lưu tên hiển thị từ Google
                     .password("")       // Google user không cần password
                     .provider("GOOGLE")
+                    .role("USER")       // Role mặc định cho tài khoản Google
                     .active(true)
-                    .roleGroups(new HashSet<>(List.of(defaultGroup)))
                     .build();
-
-            // Gán Role USER vào bảng user_roles
-            if (userRole != null) {
-                newUser.getRoles().add(userRole);
-            }
 
             return userRepository.save(newUser);
         });

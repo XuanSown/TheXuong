@@ -2,7 +2,6 @@ package com.example.thexuong.controller;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,14 +17,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.thexuong.entity.Cart;
-import com.example.thexuong.entity.RoleGroup;
 import com.example.thexuong.entity.User;
 import com.example.thexuong.exception.SelfDeactivationException;
 import com.example.thexuong.repository.CartItemRepository;
 import com.example.thexuong.repository.CartRepository;
-import com.example.thexuong.repository.RoleRepository;
 import com.example.thexuong.repository.UserRepository;
-import com.example.thexuong.service.RoleGroupService;
 import com.example.thexuong.service.UserService;
 
 import jakarta.transaction.Transactional;
@@ -41,21 +37,20 @@ public class UserManagementController {
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
     private final UserService userService;
-    private final RoleGroupService roleGroupService;
-    private final RoleRepository roleRepository;
+
+    // Danh sách role hợp lệ — dùng cho dropdown trong form Admin.
+    private static final List<String> AVAILABLE_ROLES = List.of("USER", "ADMIN", "BOTH");
 
     // ==================== HIỂN THỊ DANH SÁCH ====================
     @GetMapping
     public String showUsers(@RequestParam(required = false) Long editId, Model model) {
-        // Dùng findAllByOrderByIdAsc() có @EntityGraph để tránh N+1 khi load roleGroup
         List<User> users = userRepository.findAllByOrderByIdAsc();
-        List<RoleGroup> roleGroups = roleGroupService.getAllRoleGroups();
 
         User formUser = new User();
         boolean isEdit = false;
 
         if (editId != null) {
-            Optional<User> editUser = userRepository.findWithRolesById(editId);
+            Optional<User> editUser = userRepository.findById(editId);
             if (editUser.isPresent()) {
                 formUser = editUser.get();
                 formUser.setPassword(""); // Không đưa Hash ra ngoài giao diện, tránh đụng độ Double-Encode
@@ -66,8 +61,7 @@ public class UserManagementController {
         Long currentUserId = getCurrentUserId();
 
         model.addAttribute("users", users);
-        model.addAttribute("roleGroups", roleGroups);
-        model.addAttribute("allRoles", roleRepository.findAll()); // Cho Checkboxes Roles
+        model.addAttribute("availableRoles", AVAILABLE_ROLES);
         model.addAttribute("formUser", formUser);
         model.addAttribute("isEdit", isEdit);
         model.addAttribute("currentUserId", currentUserId);
@@ -78,16 +72,14 @@ public class UserManagementController {
     // ==================== LƯU USER (TẠO MỚI / CẬP NHẬT) ====================
     @PostMapping("/save")
     public String saveUser(@ModelAttribute("formUser") User formUser,
-            @RequestParam(required = false) Set<Long> roleGroupIds,
-            @RequestParam(required = false) Set<Long> roleIds,
+            @RequestParam(required = false) String role,
             RedirectAttributes redirectAttributes) {
 
-        // Validate bắt buộc ROLE (chỉ áp dụng với tài khoản cấu hình LOCAL bằng tay)
-        if (!"GOOGLE".equals(formUser.getProvider())) {
-            if (roleIds == null || roleIds.isEmpty()) {
-                redirectAttributes.addFlashAttribute("error", "Bắt buộc phải chọn ít nhất 1 Quyền hạn (Role) cho tài khoản này.");
-                return "redirect:/admin/users";
-            }
+        // Validate role hợp lệ (chỉ áp dụng khi tạo mới hoặc khi admin chọn role)
+        String safeRole = (role == null || role.isBlank()) ? "USER" : role.toUpperCase();
+        if (!AVAILABLE_ROLES.contains(safeRole)) {
+            redirectAttributes.addFlashAttribute("error", "Role không hợp lệ: " + role);
+            return "redirect:/admin/users";
         }
 
         // ---- TẠO MỚI ----
@@ -111,8 +103,9 @@ public class UserManagementController {
                 return "redirect:/admin/users";
             }
 
-            // Tài khoản Google bắt buộc giữ nguyên RoleGroup mặc định, không là quản trị
+            // Tài khoản Google → luôn role USER (bỏ qua role admin chọn)
             String provider = "GOOGLE".equals(formUser.getProvider()) ? "GOOGLE" : "LOCAL";
+            String finalRole = "GOOGLE".equals(provider) ? "USER" : safeRole;
 
             userService.createUser(
                     formUser.getEmail(),
@@ -120,7 +113,7 @@ public class UserManagementController {
                     formUser.getFullName(),
                     formUser.getPassword(), // raw password, Service sẽ encode
                     provider,
-                    roleGroupIds
+                    finalRole
             );
 
             redirectAttributes.addFlashAttribute("success", "Thêm người dùng thành công.");
@@ -163,15 +156,12 @@ public class UserManagementController {
             existing.setPassword(passwordEncoder.encode(formUser.getPassword()));
         }
 
-        userRepository.save(existing);
-
-        // Cập nhật RoleGroup (cho phép set null nếu admin chọn "-- Không gán --")
+        // Cập nhật Role — tài khoản Google luôn giữ USER
         if (!"GOOGLE".equals(existing.getProvider())) {
-            userService.assignRoleGroups(existing.getId(), roleGroupIds);
+            existing.setRole(safeRole);
         }
 
-        // Cập nhật Roles riêng (nếu rỗng thì xoá sạch)
-        userService.setRoles(existing.getId(), roleIds != null ? roleIds : java.util.Set.of());
+        userRepository.save(existing);
 
         redirectAttributes.addFlashAttribute("success", "Cập nhật người dùng thành công.");
         return "redirect:/admin/users";
@@ -179,8 +169,7 @@ public class UserManagementController {
 
     // ==================== TOGGLE ACTIVE ====================
     /**
-     * Bật/tắt trạng thái active của User. Chặn tự khóa tài khoản đang đăng
-     * nhập.
+     * Bật/tắt trạng thái active của User. Chặn tự khóa tài khoản đang đăng nhập.
      */
     @PostMapping("/toggle-active/{id}")
     public String toggleActive(@PathVariable Long id, RedirectAttributes redirectAttributes) {

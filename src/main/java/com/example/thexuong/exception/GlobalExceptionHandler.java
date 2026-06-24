@@ -38,16 +38,6 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * 409 Conflict — Xóa RoleGroup khi vẫn còn User thuộc nhóm đó.
-     */
-    @ExceptionHandler(RoleGroupInUseException.class)
-    public ResponseEntity<ApiResponse<Void>> handleRoleGroupInUse(RoleGroupInUseException ex) {
-        return ResponseEntity
-                .status(HttpStatus.CONFLICT)
-                .body(ApiResponse.error(ex.getMessage()));
-    }
-
-    /**
      * 400 — Tham số không hợp lệ (VD: ID không tồn tại, tên trùng...).
      */
     @ExceptionHandler(IllegalArgumentException.class)
