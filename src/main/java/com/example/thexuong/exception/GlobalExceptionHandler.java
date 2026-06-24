@@ -60,6 +60,27 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * 400 — User cố spend/reverse nhiều điểm hơn số dư (Batch 1 Loyalty).
+     */
+    @ExceptionHandler(PointBalanceException.class)
+    public ResponseEntity<ApiResponse<Void>> handlePointBalance(PointBalanceException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error(ex.getMessage()));
+    }
+
+    /**
+     * 409 — State machine violation (Batch 0 OrderStatus).
+     * Ví dụ: cố chuyển COMPLETED → SHIPPING, hoặc PENDING → COMPLETED.
+     */
+    @ExceptionHandler(IllegalOrderTransitionException.class)
+    public ResponseEntity<ApiResponse<Void>> handleIllegalTransition(IllegalOrderTransitionException ex) {
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(ApiResponse.error(ex.getMessage()));
+    }
+
+    /**
      * 500 — Tất cả lỗi không mong muốn còn lại.
      */
     @ExceptionHandler(Exception.class)

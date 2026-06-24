@@ -22,6 +22,8 @@ public class OrderService {
     private final CartService cartService;
     @Autowired
     private final OrderDetailRepository orderDetailRepository;
+    @Autowired
+    private final PointService pointService;  // Task 1.16-1.17: hook loyalty
 
     @Transactional
     public Order placeOrder(String username, String fullName, String phone, String address) {
@@ -114,8 +116,8 @@ public class OrderService {
 
     /**
      * User bấm "Đã nhận hàng" → chuyển DELIVERED → COMPLETED.
-     * Hook cộng điểm loyalty sẽ được thêm ở Batch 1 (PointService).
-     * Ở Batch 0 chỉ set status + completedAt.
+     * Task 1.16: Hook cộng điểm loyalty (PointService.earnPoints) dựa trên totalMoney.
+     * Nếu lỗi khi cộng điểm → KHÔNG block flow chính (chỉ log warn, đơn vẫn COMPLETED).
      */
     @Transactional
     public Order confirmReceived(Long orderId, String username) {
@@ -129,12 +131,34 @@ public class OrderService {
 
         order.setStatus(OrderStatus.COMPLETED);
         order.setCompletedAt(LocalDateTime.now());
-        return orderRepository.save(order);
+        Order saved = orderRepository.save(order);
+
+        // Hook loyalty: cộng điểm dựa trên totalMoney (snapshot, không bao gồm voucher discount)
+        try {
+            if (saved.getTotalMoney() != null && saved.getUser() != null) {
+                int points = pointService.earnPoints(
+                        saved.getUser().getId(),
+                        saved.getId(),
+                        saved.getTotalMoney(),
+                        "Cộng điểm từ đơn #" + saved.getId());
+                if (points > 0) {
+                    // TODO Batch 5: gửi email sendPointsEarned
+                    System.out.println("[LOYALTY] User " + saved.getUser().getId()
+                            + " earned " + points + " points from order #" + saved.getId());
+                }
+            }
+        } catch (Exception e) {
+            // Không block flow chính — loyalty là best-effort
+            System.err.println("[LOYALTY ERROR] Failed to earn points for order #"
+                    + saved.getId() + ": " + e.getMessage());
+        }
+
+        return saved;
     }
 
     /**
      * Admin hoặc hệ thống hoàn tiền → CONFIRMED/SHIPPING/DELIVERED → REFUNDED.
-     * Hook trừ điểm loyalty sẽ được thêm ở Batch 1.
+     * Task 1.17: Hook trừ điểm loyalty (PointService.reversePoints).
      */
     @Transactional
     public Order refundOrder(Long orderId, String adminUsername) {
@@ -149,7 +173,18 @@ public class OrderService {
 
         order.setStatus(OrderStatus.REFUNDED);
         order.setRefundedAt(LocalDateTime.now());
-        return orderRepository.save(order);
+        Order saved = orderRepository.save(order);
+
+        // Hook loyalty: trừ điểm đã cộng (nếu có)
+        try {
+            pointService.reversePoints(saved.getId(),
+                    "Hoàn điểm từ refund đơn #" + saved.getId());
+        } catch (Exception e) {
+            System.err.println("[LOYALTY ERROR] Failed to reverse points for order #"
+                    + saved.getId() + ": " + e.getMessage());
+        }
+
+        return saved;
     }
 
     /**
