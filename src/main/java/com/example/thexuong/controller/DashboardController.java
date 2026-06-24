@@ -9,7 +9,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Controller
@@ -36,7 +35,7 @@ public class DashboardController {
         List<Object[]> slowSelling = orderDetailRepository.findSlowSellingProducts();
         model.addAttribute("slowSelling", slowSelling.stream().limit(5).toList());
 
-        // 3. Doanh thu theo ngày (null, null = filter cả năm)
+        // 3. Doanh thu theo ngày (filter cả năm)
         List<Object[]> revenueByDay = orderRepository.getRevenueByDay(null, null);
         model.addAttribute("revenueByDay", revenueByDay);
 
@@ -52,13 +51,13 @@ public class DashboardController {
         List<Object[]> leastViewed = productRepository.findLeastViewedProducts(PageRequest.of(0, 5));
         model.addAttribute("leastViewed", leastViewed);
 
-        // 1. Biểu đồ trạng thái đơn hàng (null, null = filter cả năm)
+        // 1. Biểu đồ trạng thái đơn hàng (filter cả năm)
         List<Object[]> orderStatusStats = orderRepository.countOrdersByStatus(null, null);
         model.addAttribute("orderStatusStats", orderStatusStats);
 
         // 2. Biểu đồ người dùng (Có mua hàng vs Không mua hàng)
         long totalUsers = userRepository.count(); // Tổng số tài khoản
-        long usersWithOrders = orderRepository.countUsersWithOrders(null, null); // Số người đã từng mua (cả năm)
+        long usersWithOrders = orderRepository.countUsersWithOrders(null, null); // Số người đã từng mua
         long usersWithoutOrders = totalUsers - usersWithOrders; // Số người chưa mua bao giờ
 
         model.addAttribute("usersWithOrders", usersWithOrders);

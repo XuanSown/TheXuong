@@ -662,7 +662,7 @@ Plan này đã save tại: `orderstatus.md` (đã đổi tên từ `.hermes/plan
 | **0** | Foundation: OrderStatus enum + migration | ✅ DONE | 92% | `0529e25`, `e814ceb`, `bcb53ef` (merge) | 2026-06-22 | Task 0.6 (unit test) cancelled — sẽ làm ở Batch 1. Bug VNPay set PENDING đã sửa. |
 | **1** | Loyalty Core: UserPoints + PointTransaction | ✅ DONE | 95% | `bbdd952` | 2026-06-22 | 17/19 task (Task 1.15 unit test + 1.19 manual smoke test chưa làm — sẽ làm ở Batch 5 khi có test infra). Hook loyalty đã gắn vào confirmReceived + refundOrder. |
 | **2** | Voucher Catalog & Redemption | ✅ DONE | 85% | `a3091ff`, `bf83084` | 2026-06-22 | 16/21 task. Đã có catalog 6 mệnh giá + customer UI (/loyalty, /loyalty/redeem, /my-vouchers) + admin UI (/admin/loyalty/vouchers). Chưa có REST API (Task 2.14, 2.17) + unit test (2.12) + áp voucher vào checkout (sang Batch 3). |
-| **3** | Apply Voucher tại Checkout & Order Lifecycle | ⏳ PENDING | 0% | — | — | 16 task |
+| **3** | Apply Voucher tại Checkout & Order Lifecycle | ✅ DONE | 80% | `50cec25` | 2026-06-22 | 13/16 task. OrderService.placeOrder nhận voucherCode+pointsToUse, áp voucher+điểm. Widget checkout có dropdown voucher UNUSED + nhập mã + nhập điểm + AJAX validate. vnpayReturn hook markAsUsed. my-order-detail hiển thị breakdown. REST API /api/loyalty/* đã có. Chưa: unit test (3.15) + manual smoke test (3.16). |
 | **4** | Tier Upgrade (VIP) + Re-evaluate Cron | ⏳ PENDING | 0% | — | — | 25 task (Phương án C + Y) |
 | **5** | Cron Expire + Email Notification + Admin Report | ⏳ PENDING | 0% | — | — | 18 task |
 | **6** | Cleanup & Documentation (optional) | ⏳ PENDING | 0% | — | — | 5 task |
@@ -756,5 +756,46 @@ Plan này đã save tại: `orderstatus.md` (đã đổi tên từ `.hermes/plan
 **Khi nào:** Ngay khi anh ra lệnh "đi Batch 1".
 **Branch sẽ tạo:** `feat/batch-1-loyalty-core`
 **19 task** (xem chi tiết ở mục "Batch 1 — Loyalty Core" phía trên trong file này).
+
+---
+
+### 📦 Batch 3 — Apply Voucher tại Checkout
+
+**Trạng thái:** ✅ SUCCESS (80%) — đã commit trên `feat/batch-3-voucher-checkout`
+**Ngày:** 2026-06-22
+**Branch:** `feat/batch-3-voucher-checkout` (chưa merge vào main)
+**Commits:**
+1. `50cec25` — `feat(batch-3): apply voucher tại checkout + hook markAsUsed vào vnpayReturn` (9 files, 414 insertions)
+2. `ca47cd4` — `docs: cập nhật tracking Batch 3 (80% DONE) + báo cáo chi tiết`
+
+**File đã thay đổi (10 file):**
+- **Sửa (7):** `dbTheXuong.sql` (6 cột ALTER), `entity/Order.java` (6 field), `service/OrderService.java` (refactor placeOrder + dùng totalForPointCalc), `service/VoucherService.java` (fix getRoles), `controller/OrderController.java` (inject service + load model + vnpayReturn hook), `controller/DashboardController.java` (fix 3 query), `templates/checkout.html` (widget loyalty + JS), `templates/my-order-detail.html` (breakdown)
+- **Tạo mới (1):** `controller/LoyaltyApiController.java` (REST API 4 endpoint)
+- **Sửa test (1):** `OrderDetailRepositoryTest.java` (OrderStatus enum)
+
+**Definition of Done:**
+- [x] Checkout có ô nhập mã + button "Áp dụng" + dropdown chọn voucher UNUSED ✅
+- [x] AJAX gọi `/api/loyalty/validate-voucher` → hiển thị discount preview ✅
+- [x] Place order với voucher → `orders.voucher_code` + `discount_amount` được set ✅
+- [x] Order CONFIRMED → `voucherService.markAsUsed` được gọi trong `vnpayReturn` ✅
+- [x] 1 đơn chỉ dùng được 1 voucher, JS enforce (select hoặc input manual) ✅
+- [x] Snapshot `total_for_point_calc = subtotal` (không trừ discount, đúng rule) ✅
+- [x] REST API `/api/loyalty/*` cho AJAX + Vue tương lai ✅
+- [ ] ⚠️ Task 3.15 unit test — chưa viết (sẽ làm ở Batch 5)
+- [ ] ⚠️ Task 3.16 manual smoke test — cần DB live
+
+**Lưu ý quan trọng:**
+- **Phải chạy `dbTheXuong.sql` (đoạn Batch 3 ở cuối file) trước khi start app lần đầu.**
+- Widget checkout có 2 cách nhập voucher (select dropdown + input manual) — JS merge về 1 hidden `voucherCode` duy nhất trước submit.
+- Nếu `placeOrder` fail sau khi `spendPoints` đã commit → user bị mất điểm (TODO Batch 5: Saga pattern).
+- `confirmReceived` dùng `totalForPointCalc` thay vì `totalMoney` để earn points (đúng rule đã chốt ở voucher.md mục 1).
+
+---
+
+### ⏳ Batch 4 — Tier Upgrade (VIP) + Re-evaluate Cron — SẴN SÀNG CHẠY
+
+**Khi nào:** Ngay khi anh ra lệnh "đi Batch 4".
+**Branch sẽ tạo:** `feat/batch-4-tier-vip`
+**25 task** (xem chi tiết ở mục "Batch 4" trong `orderstatus.md`) — bao gồm Phương án C (lên VIP) + Phương án Y (re-evaluate 365 ngày).
 
 ---

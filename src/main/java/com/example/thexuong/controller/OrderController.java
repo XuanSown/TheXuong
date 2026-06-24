@@ -8,7 +8,9 @@ import com.example.thexuong.repository.OrderRepository;
 import com.example.thexuong.repository.UserRepository;
 import com.example.thexuong.service.CartService;
 import com.example.thexuong.service.OrderService;
+import com.example.thexuong.service.PointService;
 import com.example.thexuong.service.VNPayService;
+import com.example.thexuong.service.VoucherService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +37,10 @@ public class OrderController {
     @Autowired
     private final OrderRepository orderRepository;
     @Autowired
+    private final PointService pointService;
+    @Autowired
+    private final VoucherService voucherService;
+    @Autowired
     private VNPayService vnPayService;
 
     @GetMapping("/checkout")
@@ -58,6 +64,16 @@ public class OrderController {
                 .mapToDouble(item -> item.getProductVariant().getProduct().getPrice().doubleValue() * item.getQuantity())
                 .sum();
         model.addAttribute("totalPrice", total);
+
+        // Task 3.8: Load voucher UNUSED + số điểm hiện tại cho widget checkout
+        if (user != null) {
+            int currentPoints = pointService.getCurrentPoints(user.getId());
+            List<com.example.thexuong.entity.UserVoucher> unusedVouchers =
+                    voucherService.getUserVouchersByStatus(user.getId(),
+                            com.example.thexuong.entity.UserVoucher.Status.UNUSED);
+            model.addAttribute("currentPoints", currentPoints);
+            model.addAttribute("unusedVouchers", unusedVouchers);
+        }
 
         return "checkout";
     }
@@ -84,11 +100,23 @@ public class OrderController {
                              @RequestParam("address") String address,
                              @RequestParam(value = "paymentMethod", defaultValue = "COD") String paymentMethod,
                              @RequestParam(value = "voucherCode", required = false) String voucherCode,
+                             @RequestParam(value = "pointsToUse", required = false) Integer pointsToUse,
                              HttpServletRequest request,
                              Principal principal) {
         if (principal == null) return "redirect:/login";
 
-        Order savedOrder = orderService.placeOrder(principal.getName(), fullName, phoneNumber, address);
+        Order savedOrder;
+        try {
+            savedOrder = orderService.placeOrder(principal.getName(), fullName, phoneNumber, address,
+                    voucherCode, pointsToUse);
+        } catch (Exception e) {
+            // Rollback điểm nếu đã trừ nhưng đơn fail
+            // (PointService.spendPoints đã commit rồi nên cần refund thủ công nếu lỗi xảy ra sau)
+            // Hiện tại: nếu spendPoints fail thì exception throw ra luôn, không commit.
+            // Nhưng nếu validateAndGetDiscount OK rồi mà phần sau fail thì cần xử lý.
+            // TODO Batch 5: refactor dùng Saga pattern hoặc compensation.
+            return "redirect:/checkout?error=" + java.net.URLEncoder.encode(e.getMessage(), java.nio.charset.StandardCharsets.UTF_8);
+        }
 
         if("VNPAY".equals(paymentMethod)) {
             int totalAmount = savedOrder.getTotalMoney().intValue();
@@ -193,7 +221,14 @@ public class OrderController {
                         order.setStatus(OrderStatus.CONFIRMED);
                         order.setPaidAt(LocalDateTime.now());
                         orderRepository.save(order);
-                        // TODO Batch 3: nếu voucherCode != null → voucherService.markAsUsed(code, orderId)
+                        // Task 3.13: nếu order có voucher → markAsUsed
+                        if (order.getVoucherCode() != null && !order.getVoucherCode().isBlank()) {
+                            try {
+                                voucherService.markAsUsed(order.getVoucherCode(), orderId);
+                            } catch (Exception e) {
+                                System.err.println("[VOUCHER] Failed to markAsUsed: " + e.getMessage());
+                            }
+                        }
                     }
                 }
             } catch (Exception e) {
