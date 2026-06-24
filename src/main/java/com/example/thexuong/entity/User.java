@@ -73,26 +73,6 @@ public class User {
      * Hạng thành viên: 'THUONG' / 'VIP' (FK semantic tới PointTiers.code, không có FK constraint vì PointTiers chưa có sẵn).
      * Set khi user đặt đơn đầu tiên (OrderService.placeOrder) hoặc khi nâng/hạ hạng.
      */
-<<<<<<< HEAD
-=======
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "user_roles",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id")
-    )
-    @Builder.Default
-    private Set<Role> roles = new HashSet<>();
-
-    // ============================================================
-    // Batch 4: Tier fields (Phương án C + Y)
-    // ============================================================
-
-    /**
-     * Hạng thành viên: 'THUONG' / 'VIP' (FK semantic tới PointTiers.code, không có FK constraint vì PointTiers chưa có sẵn).
-     * Set khi user đặt đơn đầu tiên (OrderService.placeOrder) hoặc khi nâng/hạ hạng.
-     */
->>>>>>> feat/batch-4-tier-vip
     @Column(name = "tier_code", length = 20)
     private String tierCode;
 

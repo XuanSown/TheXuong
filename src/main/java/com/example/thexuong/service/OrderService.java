@@ -29,13 +29,10 @@ public class OrderService {
     private final VoucherService voucherService;  // Task 3.5: áp voucher trong placeOrder
     @Autowired
     private final UserRepository userRepository;  // Task 3.5: resolve user từ username
-<<<<<<< HEAD
-=======
     @Autowired
     private final PointTierService pointTierService;  // Batch 4: hook tier upgrade
     @Autowired
     private final OrderEventService orderEventService;  // Batch 4: log status transitions
->>>>>>> feat/batch-4-tier-vip
 
     @Transactional
     public Order placeOrder(String username, String fullName, String phone, String address,
@@ -202,31 +199,6 @@ public class OrderService {
         order.setStatus(OrderStatus.COMPLETED);
         order.setCompletedAt(LocalDateTime.now());
         Order saved = orderRepository.save(order);
-<<<<<<< HEAD
-
-        // Hook loyalty: cộng điểm dựa trên totalForPointCalc (snapshot, không bao gồm voucher discount)
-        try {
-            if (saved.getTotalForPointCalc() != null && saved.getUser() != null) {
-                int points = pointService.earnPoints(
-                        saved.getUser().getId(),
-                        saved.getId(),
-                        saved.getTotalForPointCalc(),
-                        "Cộng điểm từ đơn #" + saved.getId());
-                if (points > 0) {
-                    // TODO Batch 5: gửi email sendPointsEarned
-                    System.out.println("[LOYALTY] User " + saved.getUser().getId()
-                            + " earned " + points + " points from order #" + saved.getId());
-                }
-            }
-        } catch (Exception e) {
-            System.err.println("[LOYALTY ERROR] Failed to earn points for order #"
-                    + saved.getId() + ": " + e.getMessage());
-        }
-
-        return saved;
-    }
-=======
->>>>>>> feat/batch-4-tier-vip
 
         // Hook loyalty: cộng điểm dựa trên totalForPointCalc (snapshot, không bao gồm voucher discount)
         try {
