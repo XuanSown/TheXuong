@@ -54,8 +54,14 @@ public class LoyaltyController {
         model.addAttribute("user", user);
         model.addAttribute("currentPoints", currentPoints);
         model.addAttribute("history", history);
+<<<<<<< HEAD
         // TODO Batch 4: user.getTierCode() (sẽ thêm field tierCode vào User entity)
         model.addAttribute("tier", "THUONG");
+=======
+        // Batch 4: dùng tierCode thật từ User entity (set bởi PointTierService)
+        String tier = user.getTierCode() != null ? user.getTierCode() : "THUONG";
+        model.addAttribute("tier", tier);
+>>>>>>> feat/batch-4-tier-vip
         return "loyalty/index";
     }
 

@@ -29,6 +29,13 @@ public class OrderService {
     private final VoucherService voucherService;  // Task 3.5: áp voucher trong placeOrder
     @Autowired
     private final UserRepository userRepository;  // Task 3.5: resolve user từ username
+<<<<<<< HEAD
+=======
+    @Autowired
+    private final PointTierService pointTierService;  // Batch 4: hook tier upgrade
+    @Autowired
+    private final OrderEventService orderEventService;  // Batch 4: log status transitions
+>>>>>>> feat/batch-4-tier-vip
 
     @Transactional
     public Order placeOrder(String username, String fullName, String phone, String address,
@@ -122,6 +129,17 @@ public class OrderService {
             orderDetailRepository.save(detail);
         }
         cartService.clearCart(cart);
+
+        // Task 4.5: Set tier THUONG cho user lần đầu (nếu chưa có tier)
+        if (savedOrder.getUser() != null) {
+            pointTierService.setFirstOrderTier(savedOrder.getUser().getId());
+        }
+
+        // Task 4.9: Log event PENDING
+        orderEventService.recordTransition(savedOrder.getId(), null, "PENDING",
+                savedOrder.getUser() != null ? savedOrder.getUser().getId() : null, "USER",
+                "Đơn hàng mới được tạo");
+
         return savedOrder;
     }
 
@@ -184,6 +202,7 @@ public class OrderService {
         order.setStatus(OrderStatus.COMPLETED);
         order.setCompletedAt(LocalDateTime.now());
         Order saved = orderRepository.save(order);
+<<<<<<< HEAD
 
         // Hook loyalty: cộng điểm dựa trên totalForPointCalc (snapshot, không bao gồm voucher discount)
         try {
@@ -206,7 +225,45 @@ public class OrderService {
 
         return saved;
     }
+=======
+>>>>>>> feat/batch-4-tier-vip
 
+        // Hook loyalty: cộng điểm dựa trên totalForPointCalc (snapshot, không bao gồm voucher discount)
+        try {
+            if (saved.getTotalForPointCalc() != null && saved.getUser() != null) {
+                int points = pointService.earnPoints(
+                        saved.getUser().getId(),
+                        saved.getId(),
+                        saved.getTotalForPointCalc(),
+                        "Cộng điểm từ đơn #" + saved.getId());
+                if (points > 0) {
+                    System.out.println("[LOYALTY] User " + saved.getUser().getId()
+                            + " earned " + points + " points from order #" + saved.getId());
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("[LOYALTY ERROR] Failed to earn points for order #"
+                    + saved.getId() + ": " + e.getMessage());
+        }
+
+        // Task 4.5: Check nâng tier sau khi earn points
+        try {
+            boolean upgraded = pointTierService.upgradeTierIfEligible(saved.getUser().getId());
+            if (upgraded) {
+                System.out.println("[TIER] User " + saved.getUser().getId()
+                        + " upgraded to " + saved.getUser().getTierCode());
+                // TODO: gửi email sendVipWelcome nếu lần đầu lên VIP
+            }
+        } catch (Exception e) {
+            System.err.println("[TIER ERROR] Failed to upgrade tier: " + e.getMessage());
+        }
+
+        // Task 4.9: Log event COMPLETED
+        orderEventService.recordTransition(saved.getId(), "DELIVERED", "COMPLETED",
+                saved.getUser().getId(), "USER", "Khách xác nhận đã nhận hàng");
+
+        return saved;
+    }
     /**
      * Admin hoặc hệ thống hoàn tiền → CONFIRMED/SHIPPING/DELIVERED → REFUNDED.
      * Task 1.17: Hook trừ điểm loyalty (PointService.reversePoints).

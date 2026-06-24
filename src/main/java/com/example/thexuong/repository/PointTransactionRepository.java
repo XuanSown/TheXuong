@@ -36,4 +36,19 @@ public interface PointTransactionRepository extends JpaRepository<PointTransacti
             "GROUP BY pt.userId " +
             "ORDER BY total DESC")
     List<Object[]> topUsersByEarnedPoints(org.springframework.data.domain.Pageable pageable);
+<<<<<<< HEAD
+=======
+
+    /**
+     * Batch 4: Tổng điểm earn của user sau 1 ngày cụ thể.
+     * Dùng cho PointTierService tính điểm 365 ngày (Phương án C).
+     */
+    @Query("SELECT COALESCE(SUM(CAST(pt.points AS long)), 0) FROM PointTransaction pt " +
+            "WHERE pt.userId = :userId " +
+            "AND pt.type = :type " +
+            "AND pt.createdAt >= :since")
+    Long sumPointsByUserAndTypeSince(@Param("userId") Long userId,
+                                      @Param("type") com.example.thexuong.entity.PointTransaction.Type type,
+                                      @Param("since") java.time.LocalDateTime since);
+>>>>>>> feat/batch-4-tier-vip
 }

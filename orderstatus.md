@@ -660,6 +660,7 @@ Plan này đã save tại: `orderstatus.md` (đã đổi tên từ `.hermes/plan
 | # | Batch | Trạng thái | % | Commits | Ngày xong | Ghi chú |
 |---|---|---|---|---|---|---|
 | **0** | Foundation: OrderStatus enum + migration | ✅ DONE | 92% | `0529e25`, `e814ceb`, `bcb53ef` (merge) | 2026-06-22 | Task 0.6 (unit test) cancelled — sẽ làm ở Batch 1. Bug VNPay set PENDING đã sửa. |
+<<<<<<< HEAD
 | **1** | Loyalty Core: UserPoints + PointTransaction | ✅ DONE | 95% | `bbdd952` | 2026-06-22 | 17/19 task (Task 1.15 unit test + 1.19 manual smoke test chưa làm — sẽ làm ở Batch 5 khi có test infra). Hook loyalty đã gắn vào confirmReceived + refundOrder. |
 | **2** | Voucher Catalog & Redemption | ✅ DONE | 85% | `a3091ff`, `bf83084` | 2026-06-22 | 16/21 task. Đã có catalog 6 mệnh giá + customer UI (/loyalty, /loyalty/redeem, /my-vouchers) + admin UI (/admin/loyalty/vouchers). Chưa có REST API (Task 2.14, 2.17) + unit test (2.12) + áp voucher vào checkout (sang Batch 3). |
 | **3** | Apply Voucher tại Checkout & Order Lifecycle | ✅ DONE | 80% | `50cec25` | 2026-06-22 | 13/16 task. OrderService.placeOrder nhận voucherCode+pointsToUse, áp voucher+điểm. Widget checkout có dropdown voucher UNUSED + nhập mã + nhập điểm + AJAX validate. vnpayReturn hook markAsUsed. my-order-detail hiển thị breakdown. REST API /api/loyalty/* đã có. Chưa: unit test (3.15) + manual smoke test (3.16). |
@@ -712,6 +713,16 @@ Plan này đã save tại: `orderstatus.md` (đã đổi tên từ `.hermes/plan
 **Khi nào:** Ngay khi anh ra lệnh "đi Batch 3".
 **Branch sẽ tạo:** `feat/batch-3-voucher-checkout`
 **16 task** (xem chi tiết ở mục "Batch 3" phía trên trong file này).
+=======
+| **1** | Loyalty Core: UserPoints + PointTransaction | ⏳ PENDING | 0% | — | — | 19 task — chờ anh duyệt |
+| **2** | Voucher Catalog & Redemption | ⏳ PENDING | 0% | — | — | 21 task |
+| **3** | Apply Voucher tại Checkout & Order Lifecycle | ✅ DONE | 80% | `50cec25` | 2026-06-22 | 13/16 task. OrderService.placeOrder nhận voucherCode+pointsToUse, áp voucher+điểm. Widget checkout có dropdown voucher UNUSED + nhập mã + nhập điểm + AJAX validate. vnpayReturn hook markAsUsed. my-order-detail hiển thị breakdown. REST API /api/loyalty/* đã có. Chưa: unit test (3.15) + manual smoke test (3.16). |
+| **4** | Tier Upgrade (VIP) + Re-evaluate Cron | ✅ DONE | 88% | `e36b10b` | 2026-06-22 | 22/25 task. PointTierService (Phương án C OR logic), TierReevaluateService (Phương án Y 365 ngày), 2 cron job + @EnableScheduling, 3 email method, OrderEvent audit log, AdminLoyaltyController /config, OrderService hook upgradeTierIfEligible. Chưa: unit test (4.13, 4.24) + UI progress bar trong /loyalty (4.12) + manual verify (4.25). |
+| **5** | Cron Expire + Email Notification + Admin Report | ⏳ PENDING | 0% | — | — | 18 task |
+| **6** | Cleanup & Documentation (optional) | ⏳ PENDING | 0% | — | — | 5 task |
+
+**Tổng:** 7 batch, 104 task. Đã xong 5/7 (Batch 0 + 1 + 2 + 3 + 4), đang chờ duyệt Batch 5.
+>>>>>>> feat/batch-4-tier-vip
 
 ---
 
