@@ -7,7 +7,6 @@ import com.example.thexuong.service.PointService;
 import com.example.thexuong.service.VoucherService;
 import com.example.thexuong.dto.ApiResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,25 +19,22 @@ import java.util.Map;
 /**
  * REST API cho loyalty (dùng cho AJAX + Vue frontend tương lai).
  *
- * Endpoints:
- * - GET  /api/loyalty/validate-voucher?code=X&total=Y : validate + trả discount
- * - GET  /api/loyalty/points : số dư điểm hiện tại
- * - GET  /api/loyalty/history : lịch sử giao dịch
- * - GET  /api/my-vouchers : voucher của tôi (cả 3 status)
- * - GET  /api/my-vouchers?status=UNUSED : filter theo status
+ * Endpoints (all under base /api/v1):
+ * - GET  /loyalty/validate-voucher?code=X&total=Y : validate + trả discount
+ * - GET  /loyalty/points : số dư điểm hiện tại
+ * - GET  /loyalty/history : lịch sử giao dịch
+ * - GET  /my-vouchers : voucher của tôi (cả 3 status)
+ * - GET  /my-vouchers?status=UNUSED : filter theo status
  *
  * Tất cả endpoints yêu cầu user đăng nhập (session-based auth).
  */
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/v1")
 @RequiredArgsConstructor
 public class LoyaltyApiController {
 
-    @Autowired
     private final VoucherService voucherService;
-    @Autowired
     private final PointService pointService;
-    @Autowired
     private final UserRepository userRepository;
 
     @GetMapping("/loyalty/validate-voucher")

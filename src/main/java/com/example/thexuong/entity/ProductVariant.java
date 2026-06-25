@@ -1,9 +1,14 @@
 package com.example.thexuong.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -16,7 +21,6 @@ public class ProductVariant {
 
     @ManyToOne
     @JoinColumn(name = "product_id")
-    @ToString.Exclude
     private Product product;
 
     @ManyToOne

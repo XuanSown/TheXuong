@@ -2,7 +2,6 @@
 
 > **For Hermes:** Use subagent-driven-development hoặc inline execution với Task Report sau mỗi task. Load skills: `thexuong-stack`, `spring-thymeleaf-to-vue3`, `plan`, `multi-batch-feature-implementation`, `design-fidelity-workflow` TRƯỚC khi bắt đầu batch.
 
-## 🚦 GATE PHÂN QUYỀN (CHỐT NGÀY 23/06/2026)
 
 ## ⛔ QUY TẮC BẮT BUỘC KHI ĐỤNG ĐẾN PLAN NÀY
 

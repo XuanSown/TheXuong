@@ -3,23 +3,23 @@ package com.example.thexuong.entity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 /**
  * Audit log cho mỗi lần cron re-evaluate tier (Phương án Y).
- * Lưu: user, window 365 ngày, total_spent, total_points_earned, tier cũ/mới, lý do.
  */
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Entity
 @Table(name = "tier_evaluation_log")
 public class TierEvaluationLog {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

@@ -2,7 +2,6 @@ package com.example.thexuong.controller;
 
 import com.example.thexuong.repository.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,15 +14,11 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/admin")
 public class DashboardController {
-    @Autowired
     private final OrderDetailRepository orderDetailRepository;
-    @Autowired
     private final OrderRepository orderRepository;
-    @Autowired
     private final ProductVariantRepository productVariantRepository;
-    @Autowired
     private final ProductRepository productRepository;
-    @Autowired private final UserRepository userRepository;
+    private final UserRepository userRepository;
 
     @GetMapping("/statistics")
     public String showStatistics(Model model) {

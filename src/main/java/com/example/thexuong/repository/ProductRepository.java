@@ -66,3 +66,4 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     // Find top N products by ID desc for new arrivals
     List<Product> findTopNByOrderByIdDesc(int n);
 }
+

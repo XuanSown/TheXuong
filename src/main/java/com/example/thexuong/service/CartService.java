@@ -9,7 +9,6 @@ import com.example.thexuong.repository.CartRepository;
 import com.example.thexuong.repository.ProductVariantRepository;
 import com.example.thexuong.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,13 +18,9 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class CartService {
-    @Autowired
     private final CartRepository cartRepository;
-    @Autowired
     private final CartItemRepository cartItemRepository;
-    @Autowired
     private final ProductVariantRepository productVariantRepository;
-    @Autowired
     private final UserRepository userRepository;
 
     public Cart getCartByUser(String email) {

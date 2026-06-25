@@ -32,4 +32,13 @@ public interface UserVoucherRepository extends JpaRepository<UserVoucher, Long> 
             "WHERE uv.status = com.example.thexuong.entity.UserVoucher.Status.UNUSED " +
             "AND uv.expiresAt < :now")
     List<UserVoucher> findExpiredUnusedVouchers(@Param("now") LocalDateTime now);
+
+    /** Đếm số UserVoucher đã claim cho 1 catalog voucher. */
+    long countByVoucherId(Long voucherId);
+
+    /** Lấy các voucher UNUSED sắp hết hạn trong khoảng thời gian (để gửi email cảnh báo). */
+    @Query("SELECT uv FROM UserVoucher uv " +
+            "WHERE uv.status = com.example.thexuong.entity.UserVoucher.Status.UNUSED " +
+            "AND uv.expiresAt BETWEEN :from AND :to")
+    List<UserVoucher> findExpiringSoonVouchers(@Param("from") LocalDateTime from, @Param("to") LocalDateTime to);
 }

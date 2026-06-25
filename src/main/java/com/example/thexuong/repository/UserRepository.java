@@ -4,6 +4,7 @@ import com.example.thexuong.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,16 +35,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * Load toàn bộ danh sách User theo ID tăng dần (dùng cho trang Admin quản lý user).
      */
     List<User> findAllByOrderByIdAsc();
-<<<<<<< HEAD
-=======
-
-    /** Đếm số User thuộc một RoleGroup — dùng để kiểm tra trước khi xóa RoleGroup. */
-    long countByRoleGroups_Id(Long roleGroupId);
 
     /**
      * Batch 4: User VIP có tier_promoted_at <= threshold (để cron re-evaluate).
      * Dùng cho TierReevaluateService.reevaluateAllActiveVip().
      */
-    List<User> findByTierCodeAndTierPromotedAtBefore(String tierCode, java.time.LocalDateTime before);
->>>>>>> feat/batch-4-tier-vip
+    List<User> findByTierCodeAndTierPromotedAtBefore(String tierCode, LocalDateTime before);
 }

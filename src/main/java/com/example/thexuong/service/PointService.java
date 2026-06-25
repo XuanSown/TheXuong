@@ -7,7 +7,6 @@ import com.example.thexuong.repository.PointTransactionRepository;
 import com.example.thexuong.repository.UserPointsRepository;
 import com.example.thexuong.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,11 +20,8 @@ public class PointService {
 
     public static final BigDecimal VND_PER_POINT = new BigDecimal("100000");
 
-    @Autowired
     private final UserPointsRepository userPointsRepository;
-    @Autowired
     private final PointTransactionRepository pointTransactionRepository;
-    @Autowired
     private final UserRepository userRepository;
 
     @Transactional

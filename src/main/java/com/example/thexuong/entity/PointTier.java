@@ -3,9 +3,11 @@ package com.example.thexuong.entity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
@@ -13,7 +15,8 @@ import java.time.LocalDateTime;
  * Phương án C: lên hạng khi đạt min_total_spent HOẶC min_total_points.
  * Phương án Y: hạ hạng theo cron re-evaluate 365 ngày.
  */
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -33,7 +36,7 @@ public class PointTier {
 
     @Builder.Default
     @Column(name = "min_total_spent", nullable = false)
-    private java.math.BigDecimal minTotalSpent = java.math.BigDecimal.ZERO;
+    private BigDecimal minTotalSpent = BigDecimal.ZERO;
 
     @Builder.Default
     @Column(name = "min_total_points", nullable = false)
@@ -41,6 +44,9 @@ public class PointTier {
 
     @Column(name = "benefits", columnDefinition = "NVARCHAR(MAX)")
     private String benefits;
+
+    @Column(name = "bonus_percentage")
+    private Integer bonusPercentage;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

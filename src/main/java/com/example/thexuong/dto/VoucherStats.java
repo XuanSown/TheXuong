@@ -2,21 +2,20 @@ package com.example.thexuong.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.Map;
 
 /**
  * Response DTO cho GET /api/admin/loyalty/vouchers/stats.
- * Theo ADMIN_VOUCHER_REQUIREMENTS.md → VoucherStatsResponse.
- *
- * Snapshot thống kê toàn bộ catalog.
  */
-@Data
-@Builder
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class VoucherStats {
     private int totalVouchers;
     private int activeVouchers;

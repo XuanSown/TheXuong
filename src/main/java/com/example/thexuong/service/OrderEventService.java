@@ -3,7 +3,6 @@ package com.example.thexuong.service;
 import com.example.thexuong.entity.OrderEvent;
 import com.example.thexuong.repository.OrderEventRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,7 +16,6 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class OrderEventService {
 
-    @Autowired
     private final OrderEventRepository orderEventRepository;
 
     @Transactional

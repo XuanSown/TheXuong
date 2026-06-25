@@ -3,15 +3,17 @@ package com.example.thexuong.entity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
-@Data
-@AllArgsConstructor
+@Getter
+@Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
 @Entity
 @Table(name = "Reviews")
@@ -28,7 +30,7 @@ public class Review {
     @JoinColumn(name = "product_id")
     private Product product;
 
-    private Integer rating; // 1-5
+    private Integer rating;
 
     @Column(columnDefinition = "NVARCHAR(MAX)")
     private String comment;

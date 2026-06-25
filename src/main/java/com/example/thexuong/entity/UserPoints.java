@@ -3,8 +3,10 @@ package com.example.thexuong.entity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
 
@@ -12,10 +14,12 @@ import java.time.LocalDateTime;
  * Số dư điểm của user (1 user = 1 row).
  * @Version cho optimistic lock chống race condition.
  */
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString(exclude = "user")
 @Entity
 @Table(name = "UserPoints")
 public class UserPoints {

@@ -3,16 +3,16 @@ package com.example.thexuong.service;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 public class EmailService {
-    @Autowired
     private final JavaMailSender mailSender;
 
     public void sendEmail(String toEmail){
@@ -163,5 +163,84 @@ public class EmailService {
             System.err.println("[EMAIL] sendHtmlEmail failed: " + e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    // ============================================================
+    // Batch 5: Email notifications for points & vouchers
+    // ============================================================
+
+    /**
+     * Task 5.7: Gửi email khi user nhận điểm từ đơn hàng.
+     * Gọi từ OrderService.confirmReceived sau khi earnPoints.
+     */
+    public void sendPointsEarned(String toEmail, String fullName, int points, Long orderId, int currentBalance) {
+        String subject = "Bạn vừa nhận " + points + " điểm thưởng - TheXuong";
+        String html = """
+                <div style="font-family: Arial; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #e0e0e0;">
+                    <h2 style="color: #4CAF50; text-align: center;">THE XUONG - ĐIỂM THƯỞNG</h2>
+                    <p>Xin chào <strong>%s</strong>,</p>
+                    <p>Bạn vừa nhận được <strong style="color: #4CAF50; font-size: 1.2em;">%d điểm</strong> từ đơn hàng #%d!</p>
+                    <p>Tổng số dư hiện tại của bạn: <strong>%d điểm</strong>.</p>
+                    <p>Sử dụng điểm để đổi voucher hoặc giảm giá tại checkout.</p>
+                    <div style="text-align: center; margin: 30px 0;">
+                        <a href="http://localhost:8080/loyalty" style="background-color: #4CAF50; color: #fff; padding: 10px 20px; text-decoration: none; font-weight: bold;">XEM SỐ DƯ ĐIỂM</a>
+                    </div>
+                    <p style="font-size: 12px; color: #666; text-align: center;">© 2026 The Xuong Sport.</p>
+                </div>
+                """.formatted(fullName, points, orderId, currentBalance);
+        sendHtmlEmail(toEmail, subject, html);
+    }
+
+    /**
+     * Task 5.8: Gửi email khi user đổi voucher thành công.
+     * Gọi từ VoucherService.redeemVoucher sau khi tạo UserVoucher.
+     */
+    public void sendVoucherRedeemed(String toEmail, String fullName, String voucherCode, String discountAmount, LocalDateTime expiresAt) {
+        String subject = "Bạn đã đổi voucher " + discountAmount + " - TheXuong";
+        String html = """
+                <div style="font-family: Arial; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #e0e0e0;">
+                    <h2 style="color: #FFC107; text-align: center;">THE XUONG - VOUCHER ĐÃ ĐỔI</h2>
+                    <p>Xin chào <strong>%s</strong>,</p>
+                    <p>Bạn đã đổi thành công voucher giảm giá!</p>
+                    <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin: 20px 0; text-align: center;">
+                        <p style="margin: 0; font-size: 14px;">Mã voucher của bạn:</p>
+                        <p style="margin: 10px 0; font-size: 24px; font-weight: bold; color: #d32f2f; letter-spacing: 2px;">%s</p>
+                        <p style="margin: 0; color: #666;">Giảm: %s | Hết hạn: %s</p>
+                    </div>
+                    <p>Nhập mã này tại checkout để nhận ưu đãi.</p>
+                    <div style="text-align: center; margin: 30px 0;">
+                        <a href="http://localhost:8080/checkout?voucher=%s" style="background-color: #d32f2f; color: #fff; padding: 10px 20px; text-decoration: none; font-weight: bold;">ĐẾN CHECKOUT</a>
+                    </div>
+                    <p style="font-size: 12px; color: #666; text-align: center;">© 2026 The Xuong Sport.</p>
+                </div>
+                """.formatted(fullName, voucherCode, discountAmount, expiresAt.toLocalDate(), voucherCode);
+        sendHtmlEmail(toEmail, subject, html);
+    }
+
+    /**
+     * Task 5.9: Gửi email nhắc nhở voucher sắp hết hạn (trong 3 ngày).
+     * Gọi từ VoucherExpiringSoonJob (cron daily 09:00).
+     */
+    public void sendVoucherExpiring(String toEmail, String fullName, String voucherCode, String discountAmount, LocalDateTime expiresAt, int daysLeft) {
+        String subject = "Voucher " + voucherCode + " sắp hết hạn - TheXuong";
+        String html = """
+                <div style="font-family: Arial; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #e0e0e0;">
+                    <h2 style="color: #f44336; text-align: center;">THE XUONG - VOUCHER SẮP HẾT HẠN</h2>
+                    <p>Xin chào <strong>%s</strong>,</p>
+                    <p>Voucher của bạn sẽ hết hạn sau <strong style="color: #f44336;">%d ngày</strong>!</p>
+                    <div style="background: #fff3e0; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #ff9800;">
+                        <p style="margin: 0; font-size: 14px;">Mã voucher:</p>
+                        <p style="margin: 10px 0; font-size: 24px; font-weight: bold; color: #d32f2f; letter-spacing: 2px;">%s</p>
+                        <p style="margin: 0;">Giảm: %s</p>
+                        <p style="margin: 5px 0 0 0;">Hết hạn: %s</p>
+                    </div>
+                    <p>Hãy sử dụng voucher trước khi hết hạn!</p>
+                    <div style="text-align: center; margin: 30px 0;">
+                        <a href="http://localhost:8080/checkout?voucher=%s" style="background-color: #d32f2f; color: #fff; padding: 10px 20px; text-decoration: none; font-weight: bold;">ĐẾN CHECKOUT</a>
+                    </div>
+                    <p style="font-size: 12px; color: #666; text-align: center;">© 2026 The Xuong Sport.</p>
+                </div>
+                """.formatted(fullName, daysLeft, voucherCode, discountAmount, expiresAt.toLocalDate(), voucherCode);
+        sendHtmlEmail(toEmail, subject, html);
     }
 }

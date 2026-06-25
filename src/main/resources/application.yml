@@ -1,19 +1,25 @@
 spring:
+  # SQL Server Database
   datasource:
     url: jdbc:sqlserver://localhost:1444;databaseName=dbTheXuong;encrypt=true;trustServerCertificate=true
     username: sa
     password: Sontran1903@
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
   jpa:
+    database-platform: org.hibernate.dialect.SQLServerDialect
     hibernate:
-      naming:
-        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+      ddl-auto: none  # Database schema is managed by dbTheXuong.sql
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
   security:
     oauth2:
       client:
         registration:
           google:
-            client-id: 425173599446-qd901q0i2s75atio7pmqq2t8ckou3tdv.apps.googleusercontent.com # GOOGLE_CLIENT_ID
-            client-secret: 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 # GOOGLE_CLIENT_SECRET
+            client-id: 425173599446-qd901q0i2s75atio7pmqq2t8ckou3tdv.apps.googleusercontent.com
+            client-secret: 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
         provider:
           google:
             user-name-attribute: email

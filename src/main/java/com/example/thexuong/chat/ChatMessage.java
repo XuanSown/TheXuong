@@ -1,14 +1,21 @@
 package com.example.thexuong.chat;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.util.List;
 
-@Data
+/**
+ * Chat message DTO for WebSocket communication.
+ */
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class ChatMessage {
 
     public enum MessageType {

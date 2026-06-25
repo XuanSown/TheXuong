@@ -35,3 +35,47 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Frontend build artifacts (Vite/React/Vue) ###
+/frontend/dist/
+/frontend/node_modules/
+/src/main/resources/static/frontend/
+frontend/dist/
+frontend/node_modules/
+
+### Environment & Secrets ###
+.env
+.env.local
+.env.*.local
+application-local.yml
+application-dev.yml
+secrets/
+credentials/
+
+### Logs ###
+*.log
+logs/
+**/logs/
+
+### Database files ###
+*.h2.db
+*.mv.db
+*.sqlite
+*.db
+
+### OS generated files ###
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+### IDE temporary files ###
+*.swp
+*~
+.~lock.*
+
+### Misc ###
+.vault/

@@ -67,4 +67,10 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             "AND o.completedAt >= :since")
     java.math.BigDecimal sumTotalForPointCalcByUserSince(@Param("userId") Long userId,
                                                         @Param("since") java.time.LocalDateTime since);
+
+    /**
+     * Batch 0: REST API - lấy tất cả đơn của user kèm orderDetails.
+     */
+    @Query("SELECT o FROM Order o LEFT JOIN FETCH o.orderDetails WHERE o.user.id = :userId ORDER BY o.id DESC")
+    List<Order> findByUserIdWithDetails(@Param("userId") Long userId);
 }

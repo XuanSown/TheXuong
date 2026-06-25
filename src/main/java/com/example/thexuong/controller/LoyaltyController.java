@@ -8,7 +8,6 @@ import com.example.thexuong.repository.UserRepository;
 import com.example.thexuong.service.PointService;
 import com.example.thexuong.service.VoucherService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,11 +33,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class LoyaltyController {
 
-    @Autowired
     private final PointService pointService;
-    @Autowired
     private final VoucherService voucherService;
-    @Autowired
     private final UserRepository userRepository;
 
     @GetMapping("/loyalty")

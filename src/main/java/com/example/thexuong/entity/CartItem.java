@@ -1,9 +1,14 @@
 package com.example.thexuong.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -16,8 +21,6 @@ public class CartItem {
 
     @ManyToOne
     @JoinColumn(name = "cart_id")
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     private Cart cart;
 
     @ManyToOne
@@ -25,5 +28,5 @@ public class CartItem {
     private ProductVariant productVariant;
 
     @Builder.Default
-    private Integer quantity = 1;
+    private Integer quantity = 0;
 }

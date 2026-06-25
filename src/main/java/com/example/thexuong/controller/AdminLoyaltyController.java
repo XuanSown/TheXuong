@@ -1,15 +1,20 @@
 package com.example.thexuong.controller;
 
 import com.example.thexuong.entity.PointTier;
+import com.example.thexuong.entity.PointTransaction;
+import com.example.thexuong.entity.UserPoints;
 import com.example.thexuong.entity.Voucher;
 import com.example.thexuong.repository.PointTierRepository;
+import com.example.thexuong.repository.PointTransactionRepository;
+import com.example.thexuong.repository.UserPointsRepository;
 import com.example.thexuong.repository.VoucherRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.List;
 
 /**
  * Controller cho admin CRUD loyalty (Thymeleaf).
@@ -29,11 +34,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @RequiredArgsConstructor
 public class AdminLoyaltyController {
 
-    @Autowired
     private final VoucherRepository voucherRepository;
-
-    @Autowired
     private final PointTierRepository pointTierRepository;
+    private final UserPointsRepository userPointsRepository;
+    private final PointTransactionRepository pointTransactionRepository;
 
     // ============================================================
     // Voucher Catalog CRUD
@@ -130,5 +134,38 @@ public class AdminLoyaltyController {
             redirectAttributes.addFlashAttribute("error", "Lỗi: " + e.getMessage());
         }
         return "redirect:/admin/loyalty/config";
+    }
+
+    // ============================================================
+    // Batch 5: Admin Loyalty Report
+    // ============================================================
+
+    @GetMapping("/report")
+    public String loyaltyReport(Model model) {
+        // Total points stats
+        long totalEarned = pointTransactionRepository.findAll().stream()
+                .filter(t -> t.getType() == com.example.thexuong.entity.PointTransaction.Type.EARN)
+                .mapToLong(PointTransaction::getPoints)
+                .sum();
+        long totalSpent = pointTransactionRepository.findAll().stream()
+                .filter(t -> t.getType() == com.example.thexuong.entity.PointTransaction.Type.SPEND
+                        || t.getType() == com.example.thexuong.entity.PointTransaction.Type.EXPIRE)
+                .mapToLong(t -> Math.abs(t.getPoints()))
+                .sum();
+
+        // Top users by points
+        List<UserPoints> topByPoints = userPointsRepository.findAll().stream()
+                .sorted((a, b) -> Long.compare(b.getCurrentPoints(), a.getCurrentPoints()))
+                .limit(10)
+                .toList();
+
+        // Top users by spent (need User join)
+        // Simplified: just show points data
+        model.addAttribute("totalEarned", totalEarned);
+        model.addAttribute("totalSpent", totalSpent);
+        model.addAttribute("topByPoints", topByPoints);
+        model.addAttribute("totalUsersWithPoints", userPointsRepository.count());
+
+        return "admin/loyalty-report";
     }
 }

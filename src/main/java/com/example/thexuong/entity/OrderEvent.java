@@ -3,26 +3,23 @@ package com.example.thexuong.entity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 /**
  * Audit log cho mỗi status transition của Order.
- * Dùng để:
- * - Hiển thị timeline trên UI
- * - Debug khi đơn bị stuck
- * - Tính metric (vd: average time từ PENDING → CONFIRMED)
  */
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Entity
 @Table(name = "OrderEvents")
 public class OrderEvent {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -39,7 +36,6 @@ public class OrderEvent {
     @Column(name = "actor_id")
     private Long actorId;
 
-    /** 'USER' / 'ADMIN' / 'SYSTEM' (cron auto-transition) / 'VNPAY' (callback) */
     @Column(name = "actor_type", length = 20)
     private String actorType;
 

@@ -7,9 +7,10 @@ import com.example.thexuong.repository.ProductRepository;
 import com.example.thexuong.repository.ProductVariantRepository;
 import com.example.thexuong.repository.SizeRepository;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
@@ -41,20 +42,16 @@ public class AdminProductController {
         return "admin/products";
     }
 
-    // Lấy danh sách Size + Số lượng mặc định là 0
     private List<SizeQuantityDTO> getSizesWithQuantities(Long productId) {
         List<Size> allSizes = sizeRepository.findAll();
         List<SizeQuantityDTO> sizeQuantities = new ArrayList<>();
 
         if (productId == null) {
-            // Khi thêm mới, mặc định số lượng các size là rỗng (null hoặc 0)
             for (Size size : allSizes) {
                 sizeQuantities.add(new SizeQuantityDTO(size.getId(), size.getName(), null));
             }
         } else {
-            // Khi sửa, lấy số lượng hiện có từ DB
             List<ProductVariant> variants = productVariantRepository.findByProductId(productId);
-            // Chuyển List Variant thành Map<SizeId, Quantity> để lookup cho nhanh
             Map<Long, Integer> quantityMap = variants.stream()
                     .collect(Collectors.toMap(v -> v.getSize().getId(), ProductVariant::getQuantity));
 
@@ -69,7 +66,6 @@ public class AdminProductController {
     @GetMapping("/create")
     public String showCreateForm(Model model) {
         model.addAttribute("product", new Product());
-        // Lấy tất cả size, quantity mặc định rỗng
         model.addAttribute("sizeQuantities", getSizesWithQuantities(null));
         return "admin/products-edit";
     }
@@ -79,12 +75,10 @@ public class AdminProductController {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid product Id:" + id));
         model.addAttribute("product", product);
-        // Lấy tất cả size, kèm theo quantity hiện có (nếu có)
         model.addAttribute("sizeQuantities", getSizesWithQuantities(id));
         return "admin/products-edit";
     }
 
-    // LƯU SẢN PHẨM: Nhận mảng sizeIds và mảng quantities tương ứng
     @PostMapping("/save")
     public String saveProduct(@ModelAttribute("product") Product product,
                               @RequestParam(value = "sizeIds", required = false) Long[] sizeIds,
@@ -98,7 +92,6 @@ public class AdminProductController {
                     Long sizeId = sizeIds[i];
                     Integer quantity = quantities[i];
 
-                    // Bỏ qua các size không nhập số lượng hoặc nhập số lượng < 0
                     if (quantity == null || quantity < 0) continue;
 
                     Size size = sizeRepository.findById(sizeId).orElse(null);
@@ -109,7 +102,7 @@ public class AdminProductController {
                         ProductVariant variant;
                         if (existingVariant.isPresent()) {
                             variant = existingVariant.get();
-                            variant.setQuantity(quantity); // Ghi đè số lượng
+                            variant.setQuantity(quantity);
                         } else {
                             variant = new ProductVariant();
                             variant.setProduct(savedProduct);
@@ -144,8 +137,9 @@ public class AdminProductController {
         return "redirect:/admin/products";
     }
 
-    // --- DTO Class để hỗ trợ truyền dữ liệu ra màn hình ---
-    @Data
+    // --- DTO Class ---
+    @Getter
+    @Setter
     @NoArgsConstructor
     @AllArgsConstructor
     public static class SizeQuantityDTO {

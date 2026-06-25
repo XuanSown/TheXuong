@@ -3,16 +3,18 @@ package com.example.thexuong.entity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
 @Builder
+@Entity
 @Table(name = "OrderDetails")
 public class OrderDetail {
     @Id
@@ -24,9 +26,9 @@ public class OrderDetail {
     private Order order;
 
     @Column(name = "product_id")
-    private Long productId; // Chỉ lưu ID để tham chiếu, không join cứng để tránh lỗi khi xóa SP
+    private Long productId;
 
-    @Column(name = "product_name", columnDefinition = "NVARCHAR(255)") // Tên sản phẩm trong đơn hàng
+    @Column(name = "product_name", columnDefinition = "NVARCHAR(255)")
     private String productName;
 
     private String size;

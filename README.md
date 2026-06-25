@@ -9,6 +9,32 @@ Dự án TheXuong là một trang web bán đồ thể thao được phát tri�
 - **Frontend:** Vue 3 + TypeScript + Tailwind CSS
 - **Build Tool:** Gradle
 
+## 🎁 Loyalty & Voucher System
+
+### Loyalty Program
+- **Tích điểm:** Mỗi 100,000đ chi tiêu = 1 điểm (tích lũy khi đơn hàng COMPLETED)
+- **Hạng mức:** THUONG (mặc định), VIP (chi từ 5 triệu trong 365 ngày)
+- **Quyền lợi VIP:** Free shipping, bonus points
+- **Sử dụng điểm:** Dùng để đổi voucher tại `/loyalty/redeem`
+- **Điểm hết hạn:** Tự động expire sau 12 tháng (cron daily 00:00)
+
+### Voucher Catalog
+- **6 mệnh giá:** 10k/1đ, 20k/2đ, 50k/5đ, 100k/10đ, 200k/20đ, 500k/50đ
+- **Mã unique:** Mỗi user nhận mã TX-XXXXXX riêng (30 ngày hạn)
+- **Áp dụng tại checkout:** Chọn từ danh sách hoặc nhập mã
+- **Không cộng dồn:** 1 đơn chỉ dùng 1 voucher
+
+### Admin Features
+- `/admin/loyalty/vouchers` - CRUD voucher catalog
+- `/admin/loyalty/config` - Cấu hình tier thresholds
+- `/admin/loyalty/report` - Báo cáo thống kê loyalty
+
+### Cron Jobs
+- `PointExpireJob` - daily 00:00: expire điểm >12 tháng
+- `VoucherExpireJob` - daily 00:30: expire voucher UNUSED quá hạn
+- `VoucherExpiringSoonJob` - daily 09:00: gửi email cảnh báo 3 ngày
+- `TierReevaluateJob` - ngày 1 hàng tháng: đánh giá lại VIP
+
 ## 🔧 Hướng dẫn chạy dự án (Getting Started)
 
 ### 1. Cấu hình Database

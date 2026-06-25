@@ -461,8 +461,8 @@ public class Order {
 
 ### H. Câu hỏi phụ (không blocker, em sẽ default nếu anh không nói)
 
-- [ ] ⏳ Có cần **mua ít nhất 1 đơn trong 365 ngày** để giữ VIP không? — Em đề xuất: **KHÔNG cần**, chỉ cần tổng chi tiêu HOẶC điểm đạt ngưỡng.
-- [ ] ⏳ User có active session ở thời điểm hạ → có flash message trên web không? — Em đề xuất: **CÓ**, thêm field `pendingTierNotice` trong session/cookie, redirect về `/loyalty` nếu có.
+- [x] **Có cần mua ít nhất 1 đơn trong 365 ngày để giữ VIP?** → KHÔNG cần, chỉ cần tổng chi tiêu/điểm đạt ngưỡng (theo đề xuất).
+- [x] **User có active session ở thời điểm hạ → có flash message?** → CÓ (deferred - không blocker Batch 6).
 
 ---
 

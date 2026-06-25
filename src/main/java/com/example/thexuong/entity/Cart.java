@@ -1,13 +1,21 @@
 package com.example.thexuong.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 
-@Data
-@AllArgsConstructor
+/**
+ * Shopping cart - 1 user = 1 cart.
+ */
+@Getter
+@Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
 @Entity
 @Table(name = "Carts")
@@ -22,7 +30,9 @@ public class Cart {
 
     // Relationship ngược để dễ lấy items
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     private List<CartItem> items;
+
+    public Cart(User user) {
+        this.user = user;
+    }
 }

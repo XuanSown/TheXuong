@@ -7,7 +7,6 @@ import com.example.thexuong.repository.PointTransactionRepository;
 import com.example.thexuong.repository.PointTierRepository;
 import com.example.thexuong.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,13 +28,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PointTierService {
 
-    @Autowired
     private final PointTierRepository pointTierRepository;
-    @Autowired
     private final UserRepository userRepository;
-    @Autowired
     private final OrderRepository orderRepository;
-    @Autowired
     private final PointTransactionRepository pointTransactionRepository;
 
     /**
