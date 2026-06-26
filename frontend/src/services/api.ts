@@ -174,15 +174,15 @@ class ApiService {
 
   // Profile APIs
   async getProfile(): Promise<any> {
-    return (await this.client.get('/profile')).data
+    return (await this.client.get('/auth/profile')).data
   }
 
   async updateProfile(data: {
     fullName?: string
-    phone?: string
+    phoneNumber?: string
     address?: string
   }): Promise<any> {
-    return (await this.client.put('/profile', data)).data
+    return (await this.client.put('/auth/profile', data)).data
   }
 
   // Admin APIs

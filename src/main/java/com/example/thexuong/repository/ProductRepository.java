@@ -65,5 +65,26 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     // Find top N products by ID desc for new arrivals
     List<Product> findTopNByOrderByIdDesc(int n);
+
+    // ========== ADMIN: Soft Delete / Product Management ==========
+
+    /**
+     * Admin: Lấy tất cả sản phẩm kể cả inactive (đã vô hiệu hóa).
+     * Bỏ qua @SQLRestriction bằng native query.
+     */
+    @Query(value = "SELECT * FROM Products", nativeQuery = true)
+    List<Product> findAllIncludingInactive();
+
+    /**
+     * Admin: Lấy sản phẩm đã vô hiệu hóa (active = 0).
+     */
+    @Query("SELECT p FROM Product p WHERE p.active = false")
+    List<Product> findInactiveProducts(Pageable pageable);
+
+    /**
+     * Admin: Tìm kiếm tất cả sản phẩm (bao gồm inactive) theo tên.
+     */
+    @Query("SELECT p FROM Product p WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+    Page<Product> findAllIncludingInactiveByNameContaining(@Param("keyword") String keyword, Pageable pageable);
 }
 

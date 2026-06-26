@@ -66,6 +66,11 @@ const routes: RouteRecordRaw[] = [
     meta: { guestOnly: true }
   },
   {
+    path: '/oauth/callback',
+    name: 'oauth-callback',
+    component: () => import('@/views/OAuthCallback.vue')
+  },
+  {
     path: '/admin/products',
     name: 'admin-products',
     component: () => import('@/router/AdminLayoutWrapper.vue'),
@@ -191,7 +196,7 @@ router.beforeEach(async (to, from, next) => {
   // If route requires auth (except guestOnly routes)
   if (to.meta.requiresAuth !== false && !to.meta.guestOnly) {
     // Public routes that don't require auth
-    const publicRoutes = ['login', 'register', 'forgot-password', 'home', 'products', 'product-detail']
+    const publicRoutes = ['login', 'register', 'forgot-password', 'home', 'products', 'product-detail', 'cart']
     if (!publicRoutes.includes(to.name as string) && !authStore.isAuthenticated) {
       next({ name: 'login', query: { redirect: to.fullPath } })
       return

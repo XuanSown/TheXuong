@@ -35,6 +35,18 @@
             THỂ THAO
           </span>
         </router-link>
+
+        <!-- Thương hiệu Link -->
+        <router-link
+          to="/products?brand=all"
+          class="relative group w-[123px] h-[31.59px] flex items-center border-b-2 border-transparent hover:border-black transition-colors"
+        >
+          <span
+            class="font-geist text-base text-[#5E5F5C] leading-[26px]"
+          >
+            THƯƠNG HIỆU
+          </span>
+        </router-link>
       </div>
 
       <!-- Right Side: Icons for logged in users -->
@@ -64,13 +76,20 @@
         <!-- Cart Link -->
         <router-link
           to="/cart"
-          class="w-[36px] h-[34px] flex items-center justify-center hover:opacity-70 transition-opacity"
+          class="w-[36px] h-[34px] flex items-center justify-center hover:opacity-70 transition-opacity relative"
           aria-label="Cart"
         >
           <svg class="w-[19.98px] h-[20px] text-[#5E5F5C]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M2 3h6l4 6-4 6-6-4H2v-3z"/>
             <path d="M22 3h-6l-4 6 4 6 6-4h2v-3z"/>
           </svg>
+          <!-- Badge showing cart item count -->
+          <span
+            v-if="cartItemCount > 0"
+            class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold min-w-[18px] h-[18px] flex items-center justify-center rounded-full px-1"
+          >
+            {{ cartItemCount > 99 ? '99+' : cartItemCount }}
+          </span>
         </router-link>
 
         <!-- Logout Button -->
@@ -103,19 +122,29 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.store'
+import { useCartStore } from '@/stores/cart.store'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const cartStore = useCartStore()
 
 const isAuthenticated = computed(() => authStore.isAuthenticated)
+const cartItemCount = computed(() => cartStore.totalItems)
 
 const handleLogout = async () => {
   await authStore.logout()
   router.push('/')
 }
+
+// Fetch cart when user logs in (auth state changes from false to true)
+watch(isAuthenticated, (newVal, oldVal) => {
+  if (newVal && !oldVal) {
+    cartStore.fetchCart().catch(console.error)
+  }
+})
 </script>
 
 <style scoped>

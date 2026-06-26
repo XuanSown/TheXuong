@@ -173,7 +173,7 @@ public class AuthRestController {
 
     /**
      * PUT /api/auth/password
-     * Change password
+     * Change password - Only for LOCAL provider accounts
      */
     @PutMapping("/password")
     public ResponseEntity<?> changePassword(
@@ -184,6 +184,20 @@ public class AuthRestController {
                     .body(Map.of("error", "Chưa đăng nhập"));
         }
 
+        String email = authentication.getName();
+        User user = userService.getUserByEmail(email);
+
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", "Không tìm thấy người dùng"));
+        }
+
+        // Check if user is OAuth (Google) - cannot change password
+        if (user.getProvider() != null && !user.getProvider().equals("LOCAL")) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", "Tài khoản " + user.getProvider() + " không thể đổi mật khẩu. Vui lòng sử dụng tài khoản local."));
+        }
+
         String currentPassword = body.get("currentPassword");
         String newPassword = body.get("newPassword");
 
@@ -192,9 +206,16 @@ public class AuthRestController {
                     .body(Map.of("error", "Thiếu thông tin mật khẩu"));
         }
 
-        // TODO: Verify current password and update
-        // For now, placeholder
-        return ResponseEntity.ok(Map.of("message", "Đổi mật khẩu thành công"));
+        // Verify current password and update
+        try {
+            userService.changePassword(email, currentPassword, newPassword);
+            return ResponseEntity.ok(Map.of("message", "Đổi mật khẩu thành công"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Đã xảy ra lỗi: " + e.getMessage()));
+        }
     }
 
     private UserResponse toUserResponse(User user) {

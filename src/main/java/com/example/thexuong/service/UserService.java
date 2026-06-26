@@ -49,6 +49,38 @@ public class UserService {
         userRepository.save(user);
     }
 
+    /**
+     * Change password for LOCAL accounts only
+     * Throws IllegalArgumentException if:
+     * - User is OAuth (non-LOCAL provider)
+     * - Current password is incorrect
+     */
+    @Transactional
+    public void changePassword(String email, String currentPassword, String newPassword) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException(email));
+
+        // Check if user is OAuth - cannot change password
+        if (user.getProvider() != null && !"LOCAL".equals(user.getProvider())) {
+            throw new IllegalArgumentException(
+                "Tài khoản " + user.getProvider() + " không thể đổi mật khẩu. Vui lòng sử dụng tài khoản local."
+            );
+        }
+
+        // Verify current password (handle null for OAuth users who might have empty password)
+        if (user.getPassword() == null || user.getPassword().isEmpty()) {
+            throw new IllegalArgumentException("Tài khoản này không có mật khẩu để xác thực.");
+        }
+
+        if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+            throw new IllegalArgumentException("Mật khẩu hiện tại không đúng.");
+        }
+
+        // Encode and set new password
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+    }
+
     // ==================== ACTIVE STATUS ====================
 
     /**

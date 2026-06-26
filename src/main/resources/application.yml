@@ -24,6 +24,10 @@ spring:
           google:
             user-name-attribute: email
 
-jwt:  
+jwt:
   secret: KhoaBiMatPhaiRatDaiDeBaoMatJWTTheXuongProject2024
   expiration: 3600000 # 1 giờ
+
+app:
+  frontend:
+    url: http://localhost:5173

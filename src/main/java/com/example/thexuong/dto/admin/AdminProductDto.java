@@ -16,6 +16,7 @@ import java.util.Map;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class AdminProductDto {
     private Long id;

@@ -7,7 +7,8 @@ export const useAuthStore = defineStore('auth', {
     user: null as User | null,
     isAuthenticated: false,
     roles: [] as string[],
-    loading: false
+    loading: false,
+    redirectTo: null as string | null // Store redirect path after login
   }),
 
   getters: {
@@ -17,10 +18,20 @@ export const useAuthStore = defineStore('auth', {
   },
 
   actions: {
-    async login(email: string, password: string) {
+    setRedirectPath(path: string | null) {
+      this.redirectTo = path
+    },
+
+    setUser(user: User) {
+      this.user = user
+      this.isAuthenticated = true
+      this.roles = user.roles || []
+    },
+
+    async login(credentials: { email: string; password: string }) {
       this.loading = true
       try {
-        const user = await api.login({ email, password })
+        const user = await api.login({ email, credentials.password })
         this.setUser(user)
         return user
       } finally {
@@ -51,17 +62,33 @@ export const useAuthStore = defineStore('auth', {
       }
     },
 
-    setUser(user: User) {
-      this.user = user
-      this.isAuthenticated = true
-      this.roles = user.roles || []
+    async updateProfile(profileData: {
+      fullName?: string
+      phoneNumber?: string
+      address?: string
+      password?: string
+    }) {
+      this.loading = true
+      try {
+        const response = await api.updateProfile(profileData)
+        // Update local user data
+        if (response.data.user) {
+          this.setUser(response.data.user)
+        }
+        return response.data
+      } finally {
+        this.loading = false
+      }
     },
 
     clear() {
       this.user = null
       this.isAuthenticated = false
       this.roles = []
+      this.redirectTo = null
       api.clearCsrfToken()
+      // Clear guest cart on logout
+      localStorage.removeItem('guest_cart_items')
     }
   }
 })

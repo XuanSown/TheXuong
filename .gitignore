@@ -36,6 +36,11 @@ out/
 ### VS Code ###
 .vscode/
 
+### Claude Code / AI Assistant specific ###
+.claude/
+.agents/
+figma-mcp-server/
+
 ### Frontend build artifacts (Vite/React/Vue) ###
 /frontend/dist/
 /frontend/node_modules/

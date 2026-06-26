@@ -67,6 +67,19 @@
                 />
               </div>
 
+              <!-- Phone Number Field -->
+              <div class="flex flex-col gap-2">
+                <label class="font-geist text-[12px] font-semibold leading-[12px] tracking-[1.2px] uppercase text-[#4C4546] opacity-80">
+                  SỐ ĐIỆN THOẠI
+                </label>
+                <input
+                  v-model="profileForm.phoneNumber"
+                  type="tel"
+                  placeholder="Nhập số điện thoại"
+                  class="w-[308px] h-[50px] bg-white border border-[#CFC4C5] rounded-lg px-4 font-gelasio text-[16px] text-[#1A1C1C] outline-none focus:border-black transition-colors"
+                />
+              </div>
+
               <!-- Address Field -->
               <div class="flex flex-col gap-2">
                 <label class="font-geist text-[12px] font-semibold leading-[12px] tracking-[1.2px] uppercase text-[#4C4546] opacity-80">
@@ -83,8 +96,8 @@
               <!-- Separator Line -->
               <div class="w-full h-px bg-[#E8E8E8]"></div>
 
-              <!-- Change Password Section -->
-              <div class="flex flex-col gap-6">
+              <!-- Change Password Section - Only for LOCAL accounts -->
+              <div v-if="user?.provider === 'LOCAL'" class="flex flex-col gap-6">
                 <div class="flex items-center gap-3">
                   <div class="w-[23px] h-[12px] bg-[#4C4546]"></div>
                   <h3 class="font-geist text-[16px] font-bold leading-[24px] tracking-[0.8px] uppercase text-[#4C4546]">
@@ -122,6 +135,13 @@
                     />
                   </div>
                 </div>
+              </div>
+
+              <!-- Message for OAuth users -->
+              <div v-else class="flex flex-col gap-4 p-4 bg-[#F3F3F4] rounded-lg">
+                <p class="font-gelasio text-sm text-[#5E5F5C]">
+                  Tài khoản của bạn được liên kết với Google. Bạn không thể đặt lại mật khẩu thông qua tính năng này.
+                </p>
               </div>
             </div>
 
@@ -170,6 +190,7 @@ const user = computed(() => authStore.user)
 
 const profileForm = reactive({
   fullName: '',
+  phoneNumber: '',
   address: ''
 })
 
@@ -183,6 +204,7 @@ const isLoading = ref(false)
 onMounted(() => {
   if (user.value) {
     profileForm.fullName = user.value.username || ''
+    profileForm.phoneNumber = user.value.phoneNumber || ''
     profileForm.address = user.value.address || ''
   }
 })
@@ -195,15 +217,12 @@ const handleSave = async () => {
 
   isLoading.value = true
   try {
-    // TODO: Implement API call to update profile
-    // await authStore.updateProfile({
-    //   username: profileForm.fullName,
-    //   address: profileForm.address,
-    //   password: passwordForm.newPassword || undefined
-    // })
-
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500))
+    await authStore.updateProfile({
+      fullName: profileForm.fullName,
+      phoneNumber: profileForm.phoneNumber,
+      address: profileForm.address,
+      password: passwordForm.newPassword || undefined
+    })
 
     alert('Cập nhật hồ sơ thành công!')
     passwordForm.newPassword = ''
@@ -220,6 +239,7 @@ const handleCancel = () => {
   // Reset form to original values
   if (user.value) {
     profileForm.fullName = user.value.username || ''
+    profileForm.phoneNumber = user.value.phoneNumber || ''
     profileForm.address = user.value.address || ''
   }
   passwordForm.newPassword = ''

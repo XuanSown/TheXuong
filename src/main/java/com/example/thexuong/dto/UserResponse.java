@@ -1,5 +1,6 @@
 package com.example.thexuong.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,6 +20,7 @@ public class UserResponse {
     private String email;
     private String username;
     private String fullName;
+    @JsonProperty("phone")
     private String phoneNumber;
     private String address;
     private String role;

@@ -141,6 +141,12 @@ onMounted(() => {
       showSuccessAlert.value = false
     }, 5000)
   }
+
+  // Store redirect path if present
+  const redirectPath = route.query.redirect as string | undefined
+  if (redirectPath) {
+    authStore.setRedirectPath(redirectPath)
+  }
 })
 
 const handleLogin = async () => {
@@ -150,7 +156,11 @@ const handleLogin = async () => {
       email: email.value,
       password: password.value
     })
-    router.push('/')
+
+    // Redirect to stored path, cart page, or home
+    const redirectTo = authStore.redirectTo || '/cart'
+    authStore.setRedirectPath(null) // Clear after use
+    router.push(redirectTo)
   } catch (error: any) {
     console.error('Login failed:', error)
     alert('Đăng nhập thất bại. Vui lòng kiểm tra email và mật khẩu.')
@@ -160,8 +170,16 @@ const handleLogin = async () => {
 }
 
 const handleGoogleLogin = () => {
-  // TODO: Implement Google OAuth
-  console.log('Google login clicked')
+  // Store the redirect target in sessionStorage before OAuth flow
+  const redirectTarget = authStore.redirectTo || '/cart'
+  sessionStorage.setItem('oauth_redirect_target', redirectTarget)
+
+  // Clear redirect in store
+  authStore.setRedirectPath(null)
+
+  // Redirect to backend OAuth2 endpoint (no extra query params needed)
+  const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080'
+  window.location.href = `${backendUrl}/oauth2/authorization/google`
 }
 </script>
 
