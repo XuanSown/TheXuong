@@ -1,0 +1,424 @@
+4. THIET KE HE THONG
+
+4.1 Thiet ke kien truc
+
+   Mo hinh kien truc: MVC (Model - View - Controller)
+
+   He thong TheXuong duoc xay dung theo mo hinh kien truc MVC ket hop voi Spring Boot Framework:
+
+   - Model (Tang du lieu): Cac lop Entity (Products, Users, Orders...) anh xa truc tiep voi cac bang trong SQL Server thong qua JPA/Hibernate. Repository dam nhiem viec truy van CSDL.
+
+   - View (Tang giao dien): Su dung Thymeleaf Template Engine de render giao dien HTML dong. Giao dien responsive ho tro hien thi tren ca PC va Mobile.
+
+   - Controller (Tang dieu khien): Cac lop Controller nhan request tu nguoi dung, goi Service xu ly nghiep vu, tra ket qua ve View.
+
+   Ngoai ra he thong con co:
+   - Service Layer: Tang trung gian giua Controller va Repository, xu ly toan bo logic nghiep vu (tinh tien, kiem tra ton kho, ma hoa mat khau...).
+   - Security Layer: Spring Security + JWT xu ly xac thuc va phan quyen (RBAC).
+   - REST API Layer: Cung cap API cho Chatbot AI (n8n + Ollama Qwen2.5).
+
+   Cong nghe su dung:
+
+   STT | Thanh phan          | Cong nghe
+   ----|---------------------|------------------------------------------
+    1  | Ngon ngu            | Java 21
+    2  | Framework           | Spring Boot 3.x
+    3  | Template Engine     | Thymeleaf
+    4  | CSDL                | Microsoft SQL Server
+    5  | ORM                 | JPA / Hibernate
+    6  | Bao mat             | Spring Security + BCrypt + JWT
+    7  | Thanh toan          | VNPay Payment Gateway
+    8  | Dang nhap xa hoi    | Google OAuth2
+    9  | Build Tool          | Gradle
+   10  | AI Chatbot          | Ollama (Qwen2.5:3B) + n8n + Telegram Bot
+   11  | IDE                 | IntelliJ IDEA
+
+
+4.2 So do Use Case
+
+   (Da tao trong file BaoCao_UseCase rieng)
+
+
+4.3 So do Activity Diagram
+
+4.3.1 Activity Diagram: Dang ky tai khoan
+
+   [Bat dau]
+       |
+       v
+   Nguoi dung truy cap trang Dang ky (/register)
+       |
+       v
+   Nhap thong tin: Email, Ho ten, Mat khau
+       |
+       v
+   Nhan nut "Dang ky"
+       |
+       v
+   <Email co trong khong?>
+       |            |
+      Rong       Co du lieu
+       |            |
+       v            v
+   Hien thi    <Mat khau co trong khong?>
+   loi:            |            |
+   "Email khong   Rong       Co du lieu
+   duoc de          |            |
+   trong!"          v            v
+                Hien thi    <Email da ton tai trong CSDL?>
+                loi:            |              |
+                "Mat khau      Da ton tai    Chua ton tai
+                khong duoc        |              |
+                de trong!"        v              v
+                              Hien thi      Ma hoa mat khau (BCrypt)
+                              loi:              |
+                              "Email da         v
+                              duoc dang     Gan RoleGroup "Khach hang"
+                              ky"               |
+                                                v
+                                            Gan Role "USER" vao user_roles
+                                                |
+                                                v
+                                            Luu User vao CSDL
+                                                |
+                                                v
+                                            Chuyen huong ve trang Dang nhap
+                                            voi thong bao thanh cong
+                                                |
+                                                v
+                                            [Ket thuc]
+
+
+4.3.2 Activity Diagram: Dang nhap
+
+   [Bat dau]
+       |
+       v
+   Nguoi dung truy cap trang Dang nhap (/login)
+       |
+       v
+   <Chon phuong thuc dang nhap?>
+       |                          |
+   Dang nhap thuong           Dang nhap Google
+       |                          |
+       v                          v
+   Nhap Email + Mat khau      Chuyen huong den Google OAuth2
+       |                          |
+       v                          v
+   Spring Security            Google xac thuc thanh cong
+   xac thuc                       |
+       |                          v
+   <Thong tin hop le?>        <Tai khoan da ton tai trong CSDL?>
+       |           |              |              |
+     Sai        Dung          Chua co         Da co
+       |           |              |              |
+       v           v              v              v
+   Hien thi   Kiem tra        Tao User moi   Lay thong tin
+   loi:       trang thai      (provider =    User hien tai
+   "Sai tai   tai khoan       "GOOGLE")
+   khoan          |                    \         /
+   hoac           v                     \       /
+   mat khau"  <Active = true?>           v     v
+                  |         |         Tao session dang nhap
+                Bi khoa   Hoat dong       |
+                  |         |             v
+                  v         v         <User co quyen ADMIN/BOTH?>
+               Hien thi  Tao session      |              |
+               loi:      dang nhap       Co            Khong
+               "Tai khoan    |            |              |
+               bi khoa"      v            v              v
+                         Chuyen huong  Chuyen den     Chuyen den
+                         theo quyen    /admin          trang chu (/)
+                              |
+                              v
+                         [Ket thuc]
+
+
+4.3.3 Activity Diagram: Them san pham vao gio hang
+
+   [Bat dau]
+       |
+       v
+   Nguoi dung xem chi tiet san pham
+       |
+       v
+   Chon Size (S/M/L/XL hoac 36-43)
+       |
+       v
+   Chon so luong
+       |
+       v
+   Nhan nut "Them vao gio"
+       |
+       v
+   <Nguoi dung da dang nhap?>
+       |                    |
+   Chua dang nhap       Da dang nhap
+       |                    |
+       v                    v
+   <Co cart_token       Tim gio hang cua User
+   trong Cookie?>       trong CSDL
+       |         |          |
+     Khong co  Co           v
+       |         |      <San pham + size da co trong gio?>
+       v         v          |              |
+   Tao token   Lay gio  Da co           Chua co
+   moi (UUID)  hang         |              |
+   Luu vao     theo         v              v
+   Cookie      token    Cap nhat        Tao CartItem moi
+   (30 ngay)     |      so luong        voi ProductVariant
+       |         |          |              |
+       v         v          v              v
+   Tao Cart  Them vao   Luu vao CSDL
+   moi cho   gio hang       |
+   khach         |          v
+   vang lai      |     Chuyen huong ve trang Gio hang (/cart)
+       |         |          |
+       v         v          v
+   Them CartItem        [Ket thuc]
+   vao gio hang
+       |
+       v
+   [Ket thuc]
+
+
+4.3.4 Activity Diagram: Dat hang va Thanh toan
+
+   [Bat dau]
+       |
+       v
+   Nguoi dung nhan "Thanh toan" tu trang Gio hang
+       |
+       v
+   <Da dang nhap?>
+       |            |
+     Chua         Da dang nhap
+       |            |
+       v            v
+   Chuyen den   <Gio hang co san pham?>
+   trang Login      |            |
+                  Trong        Co san pham
+                    |            |
+                    v            v
+                Chuyen ve    Merge gio hang khach vang lai
+                trang Cart   (neu co cart_token)
+                                 |
+                                 v
+                             Hien thi trang Checkout:
+                             - Danh sach san pham
+                             - Tong tien
+                             - Form thong tin giao hang
+                                 |
+                                 v
+                             Nguoi dung nhap:
+                             - Ho ten nguoi nhan
+                             - So dien thoai
+                             - Dia chi giao hang
+                                 |
+                                 v
+                             <Chon phuong thuc thanh toan?>
+                                 |                    |
+                               COD                  VNPAY
+                                 |                    |
+                                 v                    v
+                             Tao don hang         Tao don hang
+                             (status=PENDING)     (status=PENDING)
+                                 |                    |
+                                 v                    v
+                             Luu OrderDetails     Tao URL thanh toan VNPay
+                             (snapshot SP)            |
+                                 |                    v
+                                 v                Chuyen huong sang
+                             Tru ton kho          cong thanh toan VNPay
+                             (ProductVariants)        |
+                                 |                    v
+                                 v                <Thanh toan thanh cong?>
+                             Xoa gio hang             |          |
+                                 |                 Thanh cong  That bai
+                                 v                    |          |
+                             Chuyen den              v          v
+                             trang Don hang      Cap nhat    Hien thi
+                                 |               status      loi
+                                 v                    |          |
+                             [Ket thuc]              v          v
+                                                 Chuyen den  Chuyen den
+                                                 trang       trang
+                                                 Don hang    Don hang
+                                                     |          |
+                                                     v          v
+                                                 [Ket thuc]  [Ket thuc]
+
+
+4.3.5 Activity Diagram: Admin quan ly don hang
+
+   [Bat dau]
+       |
+       v
+   Admin truy cap trang Quan ly don hang (/admin/orders)
+       |
+       v
+   He thong hien thi danh sach don hang (moi nhat truoc)
+       |
+       v
+   Admin chon 1 don hang de xem chi tiet
+       |
+       v
+   Hien thi thong tin don hang:
+   - Ma don, Ho ten, SDT, Dia chi
+   - Danh sach san pham da mua
+   - Tong tien, Trang thai hien tai
+       |
+       v
+   <Admin chon thao tac?>
+       |                    |                    |
+   Cap nhat trang thai   Xem chi tiet SP      Quay lai
+       |                    |                    |
+       v                    v                    v
+   <Trang thai hien tai?>  Hien thi thong tin  Quay ve danh sach
+       |                                        don hang
+   PENDING --> SHIPPING
+   SHIPPING --> DELIVERED
+   PENDING --> CANCELLED
+       |
+       v
+   Cap nhat trang thai vao CSDL
+       |
+       v
+   Hien thi thong bao thanh cong
+       |
+       v
+   [Ket thuc]
+
+
+4.4 Sequence Diagram
+
+4.4.1 Sequence Diagram: Quy trinh Dat hang (COD)
+
+   Khach hang        Controller         Service          Repository         CSDL
+       |                  |                 |                 |                |
+       |--POST /place---->|                 |                 |                |
+       |   order          |                 |                 |                |
+       |                  |--placeOrder()-->|                 |                |
+       |                  |                 |--findByEmail()->|                |
+       |                  |                 |                 |--SELECT User-->|
+       |                  |                 |                 |<--User---------|
+       |                  |                 |<--User----------|                |
+       |                  |                 |                 |                |
+       |                  |                 |--getCartByUser->|                |
+       |                  |                 |                 |--SELECT Cart-->|
+       |                  |                 |                 |<--Cart+Items---|
+       |                  |                 |<--Cart----------|                |
+       |                  |                 |                 |                |
+       |                  |                 |--Tinh tong tien |                |
+       |                  |                 |  tu CartItems   |                |
+       |                  |                 |                 |                |
+       |                  |                 |--Tao Order----->|                |
+       |                  |                 |  (PENDING,COD)  |--INSERT Order->|
+       |                  |                 |                 |<--OK-----------|
+       |                  |                 |                 |                |
+       |                  |                 |--Tao Order----->|                |
+       |                  |                 |  Details (loop) |--INSERT------->|
+       |                  |                 |  (snapshot SP)  |  OrderDetails  |
+       |                  |                 |                 |<--OK-----------|
+       |                  |                 |                 |                |
+       |                  |                 |--Tru ton kho--->|                |
+       |                  |                 |  (loop variant) |--UPDATE------->|
+       |                  |                 |                 |  ProductVariant|
+       |                  |                 |                 |<--OK-----------|
+       |                  |                 |                 |                |
+       |                  |                 |--Xoa CartItems->|                |
+       |                  |                 |                 |--DELETE------->|
+       |                  |                 |                 |  CartItems     |
+       |                  |                 |                 |<--OK-----------|
+       |                  |                 |                 |                |
+       |                  |<--Order---------|                 |                |
+       |<--redirect-------|                 |                 |                |
+       |  /orders         |                 |                 |                |
+       |                  |                 |                 |                |
+
+
+4.4.2 Sequence Diagram: Quy trinh Thanh toan VNPay
+
+   Khach hang     Controller      VNPayService     VNPay Gateway      Repository
+       |               |               |                |                |
+       |--POST /place->|               |                |                |
+       |  order        |               |                |                |
+       |  (VNPAY)      |--placeOrder-->|                |                |
+       |               |  (tao don)    |                |                |
+       |               |               |                |                |
+       |               |--createOrder->|                |                |
+       |               |  (amount,     |                |                |
+       |               |   orderInfo)  |                |                |
+       |               |               |--Tao URL------>|                |
+       |               |               |  thanh toan    |                |
+       |               |               |<--vnpayUrl-----|                |
+       |               |<--vnpayUrl----|                |                |
+       |<--redirect----|               |                |                |
+       |  to VNPay     |               |                |                |
+       |               |               |                |                |
+       |------------Nhap thong tin the/vi dien tu------>|                |
+       |               |               |                |                |
+       |<-----------redirect /vnpay-return--------------|                |
+       |               |               |                |                |
+       |--GET--------->|               |                |                |
+       |  /vnpay-return|               |                |                |
+       |  ?vnp_Response|               |                |                |
+       |  Code=00      |               |                |                |
+       |               |--Kiem tra---->|                |                |
+       |               |  ResponseCode|                |                |
+       |               |               |                |                |
+       |               |  [Neu "00" = Thanh cong]       |                |
+       |               |--findById()----------------------------------->|
+       |               |               |                |  SELECT Order  |
+       |               |<---Order----------------------------------------|
+       |               |               |                |                |
+       |               |--order.setStatus("PENDING")-------------------->|
+       |               |               |                |  UPDATE Order  |
+       |               |<---OK------------------------------------------|
+       |               |               |                |                |
+       |<--redirect----|               |                |                |
+       |  /orders      |               |                |                |
+       |  + "Thanh toan|               |                |                |
+       |  thanh cong!" |               |                |                |
+
+
+4.4.3 Sequence Diagram: Chatbot AI tu van (Telegram)
+
+   Khach hang     Telegram      n8n Workflow    Spring Boot API    Ollama (Qwen2.5)
+   (Telegram)        Bot                            (TheXuong)
+       |               |              |                |                |
+       |--Gui tin nhan->|              |                |                |
+       |  "Con giay     |              |                |                |
+       |  Nike size 41  |--Webhook---->|                |                |
+       |  khong?"       |  (message)   |                |                |
+       |               |              |                |                |
+       |               |              |--GET /api/----->|                |
+       |               |              |  chatbot/       |                |
+       |               |              |  products?      |                |
+       |               |              |  keyword=Nike   |                |
+       |               |              |                |--SELECT-------->|
+       |               |              |                |  Products       |
+       |               |              |                |  + Variants     |
+       |               |              |                |  WHERE name     |
+       |               |              |                |  LIKE '%Nike%'  |
+       |               |              |<--JSON data----|                |
+       |               |              |  (danh sach    |                |
+       |               |              |  san pham +    |                |
+       |               |              |  size + ton kho)|               |
+       |               |              |                |                |
+       |               |              |--POST /api/generate------------>|
+       |               |              |  {model: qwen2.5:3b,           |
+       |               |              |   prompt: du lieu SP            |
+       |               |              |   + cau hoi khach hang}        |
+       |               |              |                |                |
+       |               |              |<--response: "Da, TheXuong-----|
+       |               |              |   Shop con giay Nike            |
+       |               |              |   Structure Plus size 41,       |
+       |               |              |   gia 4.699.000d, con 50 doi"  |
+       |               |              |                |                |
+       |               |<--sendMessage-|                |                |
+       |               |  (chat_id,   |                |                |
+       |               |   response)  |                |                |
+       |<--Hien thi----|              |                |                |
+       |  cau tra loi  |              |                |                |
+       |  tren Telegram|              |                |                |

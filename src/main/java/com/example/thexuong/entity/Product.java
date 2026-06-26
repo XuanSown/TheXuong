@@ -9,12 +9,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.hibernate.annotations.SQLRestriction;
+
 @Entity
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "Products")
+@SQLRestriction("active = 1")
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,6 +42,9 @@ public class Product {
     @Column(name = "view_count")
     @Builder.Default
     private Integer viewCount = 0;
+
+    @Builder.Default
+    private Boolean active = true;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore // Tránh lặp vô hạn khi convert sang JSON

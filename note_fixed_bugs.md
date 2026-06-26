@@ -35,9 +35,8 @@
    - **Nguyên nhân gốc rễ lỗi giỏ hàng sau khi login Google:** Khi đăng nhập bằng tài khoản Google, thông tin Principal (đại diện cho phiên đăng nhập trong Spring Security) theo mặc định sẽ lấy mã số ID định danh của Google (một chuỗi số rất dài) làm `name`. Tuy nhiên, trong `CartService` (Giỏ hàng) và `OrderService` (Đơn hàng), hệ thống lại đang dùng `principal.getName()` và mặc định kỳ vọng đó là Email để tìm kiếm User trong Database. Kết quả là khi nhấn "Thêm vào giỏ hàng", hệ thống lấy cái ID bằng số kia đem đi tìm Email -> Không thấy User -> Báo lỗi văng ra màn hình Whitelabel Error Page.
    - **Cách đã fix:** Đã cập nhật lại `OAuth2SuccessHandler`. Từ nay trở đi, khi đăng nhập bằng Google, hệ thống ép Spring Security phải dùng Email làm tên đại diện (`getName()`) thay vì dùng ID của Google, giúp luồng thêm giỏ hàng và thanh toán hoạt động bình thường.
 
-6. **Lỗi "Invalid column name 'token'" khi thao tác với giỏ hàng:**
-   - **Nguyên nhân:** Xảy ra do thiếu cột `token` trong bảng `Carts` dưới Database. Khi làm tính năng "Giỏ hàng cho Khách (Guest)", hệ thống có bổ sung thêm cột `token` vào bảng `Carts`. Tuy nhiên do cấu hình `spring.jpa.hibernate.ddl-auto=none` (trước đó là `update`), Hibernate không tự động can thiệp sửa Database nên cột này chưa được tạo ra dưới SQL Server.
-   - **Cách khắc phục:** Xử lý thủ công qua SQL Server Management Studio (SSMS). Mở SSMS, chọn database `dbTheXuong`, mở New Query và chạy lệnh SQL thêm cột `token` vào bảng `Carts` (ví dụ: `ALTER TABLE Carts ADD token VARCHAR(255);`).
+6. **Bổ sung cột 'token' vào bảng Carts:**
+   - **Mục đích:** Hệ thống thêm cột `token` vào bảng `Carts` dưới cơ sở dữ liệu nhằm mục đích hỗ trợ tính năng "Giỏ hàng cho Khách (Guest)". Tính năng này cho phép nhận diện và lưu trữ giỏ hàng của những người dùng chưa đăng nhập thông qua một mã token ẩn, giúp họ không bị mất sản phẩm đã chọn trong phiên làm việc.
 
 7. **Hoàn thiện luồng lưu Số điện thoại và tự động điền thông tin Thanh toán:**
    - **Trang Hồ sơ cá nhân (`profile.html`):** Bổ sung thêm một ô nhập "Số điện thoại" ngay bên dưới "Họ và tên".
@@ -55,3 +54,10 @@
 
 9. **Chức năng Xem chi tiết đơn hàng:**
    - Đã bổ sung đầy đủ tính năng xem chi tiết thông tin đơn hàng dành cho cả Khách hàng (trong trang hồ sơ cá nhân) và Admin (trong trang quản lý đơn hàng).
+
+10. **Bổ sung bản ghi và mở rộng dữ liệu trong Database:**
+    - Hệ thống đã được import thêm số lượng lớn dữ liệu mẫu đa dạng (bao gồm các sản phẩm, thương hiệu, biến thể kích thước...), giúp giao diện hiển thị phong phú và chuẩn bị tốt hơn cho việc kiểm thử toàn diện các tính năng.
+
+11. **Tính năng Vô hiệu hóa / Ngừng kinh doanh sản phẩm (Ẩn sản phẩm):**
+    - Thay vì xóa vĩnh viễn dữ liệu (việc này có thể làm lỗi hoặc mất lịch sử các đơn hàng cũ), hệ thống đã được nâng cấp sang cơ chế vô hiệu hóa an toàn. 
+    - Đã bổ sung thêm thuộc tính `active` vào Entity `Product` (và dưới Database). Khi Admin thực hiện thao tác xóa, sản phẩm sẽ được chuyển sang trạng thái ngừng kinh doanh (`active = false` thông qua cấu hình `@SQLRestriction("active = 1")`). Cách này giúp ẩn sản phẩm khỏi các trang mua sắm nhưng vẫn bảo toàn trọn vẹn dữ liệu thống kê và lịch sử giao dịch của khách hàng.

@@ -1,0 +1,161 @@
+2.2.1 Sơ đồ quan hệ
+
+Các bảng đã được chuẩn hóa ở mức logic
+
+   1. Products([PK]id, name, brand, sport, category, price, image_url, description)
+
+   2. Sizes([PK]id, name)
+
+   3. ProductVariants([PK]id, quantity, sku, image_url, [FK]product_id, [FK]size_id)
+
+   4. Users([PK]id, username, password, email, provider, provider_id, full_name, phone_number, address, active)
+
+   5. RoleGroups([PK]id, name, description)
+
+   6. Roles([PK]id, name, description)
+
+   7. role_group_roles([PK][FK]role_group_id, [PK][FK]role_id)
+
+   8. user_roles([PK][FK]user_id, [PK][FK]role_id)
+
+   9. Carts([PK]id, token, [FK]user_id)
+
+   10. CartItems([PK]id, quantity, [FK]cart_id, [FK]product_variant_id)
+
+   11. Orders([PK]id, full_name, phone_number, address, total_money, status, payment_method, [FK]user_id)
+
+   12. OrderDetails([PK]id, product_id, product_name, size, price, quantity, [FK]order_id)
+
+   13. Reviews([FK]product_id, rating, comment)
+
+Ghi chú:
+   - [PK] = Khóa chính --> Khi paste sang Word: In đậm + Gạch chân
+   - [FK] = Khóa ngoại --> Khi paste sang Word: In nghiêng
+
+
+Lược đồ quan hệ
+
+BẢNG: Products
+-------------------------------------------------------------
+PK   | id
+     | name
+     | brand
+     | sport
+     | category
+     | price
+     | image_url
+     | description
+-------------------------------------------------------------
+
+
+BẢNG: Sizes
+-------------------------------------------------------------
+PK   | id
+     | name
+-------------------------------------------------------------
+
+
+BẢNG: ProductVariants
+-------------------------------------------------------------
+PK   | id
+FK1  | product_id                         --> Products
+FK2  | size_id                            --> Sizes
+     | quantity
+     | sku
+     | image_url
+-------------------------------------------------------------
+
+
+BẢNG: Users
+-------------------------------------------------------------
+PK   | id
+     | username
+     | password
+     | email
+     | provider
+     | provider_id
+     | full_name
+     | phone_number
+     | address
+     | active
+-------------------------------------------------------------
+
+
+BẢNG: RoleGroups
+-------------------------------------------------------------
+PK   | id
+     | name
+     | description
+-------------------------------------------------------------
+
+
+BẢNG: Roles
+-------------------------------------------------------------
+PK   | id
+     | name
+     | description
+-------------------------------------------------------------
+
+
+BẢNG: role_group_roles
+-------------------------------------------------------------
+PK,FK1 | role_group_id                    --> RoleGroups
+PK,FK2 | role_id                          --> Roles
+-------------------------------------------------------------
+
+
+BẢNG: user_roles
+-------------------------------------------------------------
+PK,FK1 | user_id                          --> Users
+PK,FK2 | role_id                          --> Roles
+-------------------------------------------------------------
+
+
+BẢNG: Carts
+-------------------------------------------------------------
+PK   | id
+FK   | user_id                            --> Users
+     | token
+-------------------------------------------------------------
+
+
+BẢNG: CartItems
+-------------------------------------------------------------
+PK   | id
+FK1  | cart_id                            --> Carts
+FK2  | product_variant_id                 --> ProductVariants
+     | quantity
+-------------------------------------------------------------
+
+
+BẢNG: Orders
+-------------------------------------------------------------
+PK   | id
+FK   | user_id                            --> Users
+     | full_name
+     | phone_number
+     | address
+     | total_money
+     | status
+     | payment_method
+-------------------------------------------------------------
+
+
+BẢNG: OrderDetails
+-------------------------------------------------------------
+PK   | id
+FK   | order_id                           --> Orders
+     | product_id
+     | product_name
+     | size
+     | price
+     | quantity
+-------------------------------------------------------------
+
+
+BẢNG: Reviews
+-------------------------------------------------------------
+FK   | product_id                         --> Products
+     | rating
+     | comment
+-------------------------------------------------------------

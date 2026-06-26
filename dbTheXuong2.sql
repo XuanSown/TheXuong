@@ -1,5 +1,8 @@
 ﻿--DELETE FROM Products WHERE brand IN ('Nike', 'Adidas', 'Li-Ning', 'Asics', 'Puma', 'Khác');
 
+ALTER TABLE Users 
+ADD provider VARCHAR(255) DEFAULT 'LOCAL';
+
 INSERT INTO Products (name, brand, sport, category, price, image_url, description) VALUES
 (N'Book 2 x McDonald''s EP', N'Nike', N'Khác', N'Giày', 4409000, N'https://static.nike.com/a/images/t_web_pw_592_v2/f_auto/u_9ddf04c7-2a9a-4d76-add1-d15af8f0263d,c_scale,fl_relative,w_1.0,h_1.0,fl_layer_apply/40415c3a-6d6b-443f-b8b6-1f7a0d46c1f0/BOOK+2+M+EP.png', N'Sản phẩm thể thao cao cấp chính hãng, mang lại hiệu suất tối đa.'),
 (N'Nike Air Max Plus OG Premium', N'Nike', N'Khác', N'Giày', 5279000, N'https://static.nike.com/a/images/t_web_pw_592_v2/f_auto/u_9ddf04c7-2a9a-4d76-add1-d15af8f0263d,c_scale,fl_relative,w_1.0,h_1.0,fl_layer_apply/52449336-a2b2-490e-a2e7-48e15d480cdd/NIKE+AIR+MAX+PLUS+OG+PRM.png', N'Sản phẩm thể thao cao cấp chính hãng, mang lại hiệu suất tối đa.'),

@@ -134,12 +134,13 @@ public class AdminProductController {
     @GetMapping("/delete/{id}")
     public String deleteProduct(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
-            List<ProductVariant> variants = productVariantRepository.findByProductId(id);
-            productVariantRepository.deleteAll(variants);
-            productRepository.deleteById(id);
-            redirectAttributes.addFlashAttribute("success", "Xóa sản phẩm thành công");
+            Product product = productRepository.findById(id)
+                    .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+            product.setActive(false);
+            productRepository.save(product);
+            redirectAttributes.addFlashAttribute("success", "Xóa sản phẩm thành công (Đã ẩn khỏi hệ thống)");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Không thể xóa sản phẩm này (đã có đơn hàng).");
+            redirectAttributes.addFlashAttribute("error", "Lỗi khi xóa sản phẩm: " + e.getMessage());
         }
         return "redirect:/admin/products";
     }

@@ -1,0 +1,238 @@
+2.2 THIẾT KẾ CSDL
+
+1/ Xác định các thực thể và thuộc tính
+
+   1. Thực thể 1: SẢN PHẨM (Products)
+      Thuộc tính: Mã sản phẩm, Tên sản phẩm, Thương hiệu, Môn thể thao, Danh mục, Giá, URL hình ảnh, Mô tả, Lượt xem
+
+   2. Thực thể 2: KÍCH THƯỚC (Sizes)
+      Thuộc tính: Mã kích thước, Tên kích thước
+
+   3. Thực thể 3: BIẾN THỂ SẢN PHẨM (ProductVariants)
+      Thuộc tính: Mã biến thể, Mã sản phẩm, Mã kích thước, Số lượng tồn kho, Mã SKU, URL hình ảnh biến thể
+
+   4. Thực thể 4: NGƯỜI DÙNG (Users)
+      Thuộc tính: Mã người dùng, Tên đăng nhập, Mật khẩu, Email, Nhà cung cấp xác thực, Mã nhà cung cấp, Họ tên, Số điện thoại, Địa chỉ, Trạng thái hoạt động, Mã nhóm quyền
+
+   5. Thực thể 5: QUYỀN (Roles)
+      Thuộc tính: Mã quyền, Tên quyền, Mô tả
+
+   6. Thực thể 6: NHÓM QUYỀN (RoleGroups)
+      Thuộc tính: Mã nhóm quyền, Tên nhóm, Mô tả
+
+   7. Thực thể 7: GIỎ HÀNG (Carts)
+      Thuộc tính: Mã giỏ hàng, Mã người dùng, Token (dùng cho khách vãng lai)
+
+   8. Thực thể 8: MỤC TRONG GIỎ (CartItems)
+      Thuộc tính: Mã mục, Mã giỏ hàng, Mã biến thể sản phẩm, Số lượng
+
+   9. Thực thể 9: ĐƠN HÀNG (Orders)
+      Thuộc tính: Mã đơn hàng, Mã người dùng, Họ tên người nhận, Số điện thoại, Địa chỉ giao, Tổng tiền, Trạng thái, Phương thức thanh toán, Thời gian tạo
+
+   10. Thực thể 10: CHI TIẾT ĐƠN HÀNG (OrderDetails)
+       Thuộc tính: Mã chi tiết, Mã đơn hàng, Mã sản phẩm, Tên sản phẩm, Kích thước, Đơn giá, Số lượng, Thành tiền
+
+   11. Thực thể 11: ĐÁNH GIÁ (Reviews)
+       Thuộc tính: Mã đánh giá, Mã người dùng, Mã sản phẩm, Điểm đánh giá, Bình luận, Thời gian đánh giá
+
+
+2/ Xác định mối quan hệ giữa các thực thể và loại quan hệ đó
+
+- SẢN PHẨM và BIẾN THỂ SẢN PHẨM (1-N): 1 sản phẩm có thể có nhiều biến thể (ví dụ: Giày Nike size 36, 37, 38...) và 1 biến thể chỉ thuộc về 1 sản phẩm
+
+- KÍCH THƯỚC và BIẾN THỂ SẢN PHẨM (1-N): 1 kích thước có thể được gán cho nhiều biến thể sản phẩm và 1 biến thể chỉ có 1 kích thước
+
+- NGƯỜI DÙNG và GIỎ HÀNG (1-1): 1 người dùng có 1 giỏ hàng và 1 giỏ hàng thuộc về 1 người dùng (hoặc 1 khách vãng lai có 1 giỏ hàng thông qua Token)
+
+- GIỎ HÀNG và MỤC TRONG GIỎ (1-N): 1 giỏ hàng có thể chứa nhiều mục sản phẩm và 1 mục chỉ thuộc về 1 giỏ hàng
+
+- BIẾN THỂ SẢN PHẨM và MỤC TRONG GIỎ (1-N): 1 biến thể sản phẩm có thể xuất hiện trong nhiều giỏ hàng khác nhau và 1 mục trong giỏ chỉ tham chiếu đến 1 biến thể cụ thể
+
+- NGƯỜI DÙNG và ĐƠN HÀNG (1-N): 1 người dùng có thể tạo nhiều đơn hàng và 1 đơn hàng chỉ thuộc về 1 người dùng
+
+- ĐƠN HÀNG và CHI TIẾT ĐƠN HÀNG (1-N): 1 đơn hàng có thể chứa nhiều chi tiết (nhiều sản phẩm) và 1 chi tiết đơn hàng chỉ thuộc về 1 đơn hàng
+
+- NGƯỜI DÙNG và ĐÁNH GIÁ (1-N): 1 người dùng có thể viết nhiều đánh giá cho nhiều sản phẩm khác nhau và 1 đánh giá chỉ thuộc về 1 người dùng
+
+- SẢN PHẨM và ĐÁNH GIÁ (1-N): 1 sản phẩm có thể nhận nhiều đánh giá từ nhiều người dùng khác nhau và 1 đánh giá chỉ dành cho 1 sản phẩm
+
+- NHÓM QUYỀN và NGƯỜI DÙNG (1-N): 1 nhóm quyền (chức danh) có thể được gán cho nhiều người dùng và 1 người dùng chỉ thuộc 1 nhóm quyền
+
+- NHÓM QUYỀN và QUYỀN (N-N): 1 nhóm quyền có thể chứa nhiều quyền và 1 quyền có thể thuộc nhiều nhóm quyền khác nhau, thông qua bảng trung gian role_group_roles
+
+- NGƯỜI DÙNG và QUYỀN (N-N): 1 người dùng có thể được gán nhiều quyền riêng lẻ và 1 quyền có thể được gán cho nhiều người dùng, thông qua bảng trung gian user_roles
+
+
+3/ Sơ đồ quan hệ thực thể (ERD)
+
+(Xem sơ đồ ERD trong file thexuong_database_design.md trên Antigravity)
+
+
+4/ Cấu trúc chi tiết các bảng dữ liệu
+
+Bảng 1: Products (Sản phẩm)
+
+STT | Tên cột      | Kiểu dữ liệu  | Ràng buộc          | Mô tả
+----|--------------|----------------|--------------------|---------------------------------
+ 1  | id           | BIGINT         | PK, IDENTITY(1,1)  | Mã sản phẩm (tự tăng)
+ 2  | name         | NVARCHAR(100)  | NOT NULL            | Tên sản phẩm
+ 3  | brand        | NVARCHAR(50)   |                     | Thương hiệu (Nike, Adidas, Puma...)
+ 4  | sport        | NVARCHAR(50)   |                     | Môn thể thao (Bóng đá, Chạy bộ, Cầu lông...)
+ 5  | category     | NVARCHAR(50)   |                     | Danh mục (Giày, Áo, Quần áo, Phụ kiện)
+ 6  | price        | DECIMAL(18,2)  | CHECK (price >= 0)  | Giá bán (VNĐ)
+ 7  | image_url    | NVARCHAR(MAX)  |                     | Đường dẫn hình ảnh sản phẩm
+ 8  | description  | NVARCHAR(MAX)  |                     | Mô tả chi tiết sản phẩm
+ 9  | view_count   | INT            | DEFAULT 0           | Số lượt xem sản phẩm
+
+
+Bảng 2: Sizes (Kích thước)
+
+STT | Tên cột | Kiểu dữ liệu | Ràng buộc          | Mô tả
+----|---------|---------------|--------------------|---------------------------------
+ 1  | id      | BIGINT        | PK, IDENTITY(1,1)  | Mã kích thước
+ 2  | name    | NVARCHAR(10)  | NOT NULL            | Tên kích thước (S, M, L, XL, 36-43, FreeSize)
+
+
+Bảng 3: ProductVariants (Biến thể sản phẩm)
+
+STT | Tên cột      | Kiểu dữ liệu | Ràng buộc          | Mô tả
+----|------------- |---------------|--------------------|---------------------------------
+ 1  | id           | BIGINT        | PK, IDENTITY(1,1)  | Mã biến thể
+ 2  | product_id   | BIGINT        | FK -> Products(id)  | Mã sản phẩm liên kết
+ 3  | size_id      | BIGINT        | FK -> Sizes(id)     | Mã kích thước liên kết
+ 4  | quantity     | INT           | DEFAULT 0           | Số lượng tồn kho của biến thể
+ 5  | sku          | NVARCHAR(50)  | UNIQUE              | Mã quản lý kho (VD: SKU-3-41)
+ 6  | image_url    | NVARCHAR(MAX) |                     | Hình ảnh riêng cho biến thể
+
+Lưu ý: Bảng ProductVariants là bảng trung gian giữa Products và Sizes, cho phép quản lý tồn kho theo từng Size riêng biệt. Ví dụ: Giày Nike Structure Plus có 8 biến thể (size 36 đến 43), mỗi biến thể có số lượng tồn kho và mã SKU riêng.
+
+
+Bảng 4: Users (Người dùng)
+
+STT | Tên cột        | Kiểu dữ liệu  | Ràng buộc                  | Mô tả
+----|--------------- |----------------|----------------------------|---------------------------------
+ 1  | id             | BIGINT         | PK, IDENTITY(1,1)          | Mã người dùng
+ 2  | username       | NVARCHAR(50)   | UNIQUE                     | Tên đăng nhập
+ 3  | password       | NVARCHAR(255)  |                            | Mật khẩu (mã hóa BCrypt)
+ 4  | email          | NVARCHAR(100)  | UNIQUE, NOT NULL           | Địa chỉ email
+ 5  | provider       | NVARCHAR(20)   | DEFAULT 'LOCAL'            | Phương thức xác thực (LOCAL / GOOGLE)
+ 6  | provider_id    | NVARCHAR(255)  |                            | Mã ID từ Google (nếu đăng nhập OAuth2)
+ 7  | full_name      | NVARCHAR(100)  |                            | Họ và tên hiển thị
+ 8  | phone_number   | NVARCHAR(15)   |                            | Số điện thoại
+ 9  | address        | NVARCHAR(MAX)  |                            | Địa chỉ giao hàng mặc định
+10  | active         | BIT            | NOT NULL, DEFAULT 1        | Trạng thái (1=Hoạt động, 0=Bị khóa)
+11  | role_group_id  | BIGINT         | FK -> RoleGroups(id), NULL | Mã nhóm quyền (chức danh)
+
+
+Bảng 5: RoleGroups (Nhóm quyền / Chức danh)
+
+STT | Tên cột      | Kiểu dữ liệu  | Ràng buộc          | Mô tả
+----|------------- |----------------|--------------------|---------------------------------
+ 1  | id           | BIGINT         | PK, IDENTITY(1,1)  | Mã nhóm quyền
+ 2  | name         | NVARCHAR(100)  | NOT NULL, UNIQUE   | Tên nhóm (Khách hàng, Quản trị viên)
+ 3  | description  | NVARCHAR(255)  |                    | Mô tả chức danh
+
+
+Bảng 6: Roles (Quyền)
+
+STT | Tên cột      | Kiểu dữ liệu  | Ràng buộc          | Mô tả
+----|------------- |----------------|--------------------|---------------------------------
+ 1  | id           | BIGINT         | PK, IDENTITY(1,1)  | Mã quyền
+ 2  | name         | NVARCHAR(50)   | NOT NULL, UNIQUE   | Tên quyền (USER, ADMIN, BOTH)
+ 3  | description  | NVARCHAR(255)  |                    | Mô tả quyền
+
+
+Bảng 7: role_group_roles (Trung gian: Nhóm quyền - Quyền)
+
+STT | Tên cột        | Kiểu dữ liệu | Ràng buộc             | Mô tả
+----|--------------- |---------------|-----------------------|---------------------------------
+ 1  | role_group_id  | BIGINT        | PK, FK -> RoleGroups(id) | Mã nhóm quyền
+ 2  | role_id        | BIGINT        | PK, FK -> Roles(id)      | Mã quyền
+
+
+Bảng 8: user_roles (Trung gian: Người dùng - Quyền riêng)
+
+STT | Tên cột  | Kiểu dữ liệu | Ràng buộc            | Mô tả
+----|---------|---------------|----------------------|---------------------------------
+ 1  | user_id | BIGINT        | PK, FK -> Users(id)   | Mã người dùng
+ 2  | role_id | BIGINT        | PK, FK -> Roles(id)   | Mã quyền
+
+
+Bảng 9: Carts (Giỏ hàng)
+
+STT | Tên cột  | Kiểu dữ liệu  | Ràng buộc          | Mô tả
+----|---------|----------------|--------------------|---------------------------------
+ 1  | id      | BIGINT         | PK, IDENTITY(1,1)  | Mã giỏ hàng
+ 2  | user_id | BIGINT         | FK -> Users(id)     | Mã người dùng (NULL nếu khách vãng lai)
+ 3  | token   | VARCHAR(255)   | NULL               | Token nhận diện giỏ hàng khách vãng lai
+
+
+Bảng 10: CartItems (Mục trong giỏ hàng)
+
+STT | Tên cột             | Kiểu dữ liệu | Ràng buộc                    | Mô tả
+----|-------------------- |---------------|------------------------------|---------------------------------
+ 1  | id                  | BIGINT        | PK, IDENTITY(1,1)            | Mã mục
+ 2  | cart_id             | BIGINT        | FK -> Carts(id)               | Mã giỏ hàng
+ 3  | product_variant_id  | BIGINT        | FK -> ProductVariants(id)     | Mã biến thể sản phẩm (đã bao gồm Size)
+ 4  | quantity            | INT           | DEFAULT 1                    | Số lượng mua
+
+
+Bảng 11: Orders (Đơn hàng)
+
+STT | Tên cột         | Kiểu dữ liệu  | Ràng buộc          | Mô tả
+----|---------------- |----------------|--------------------|---------------------------------
+ 1  | id              | BIGINT         | PK, IDENTITY(1,1)  | Mã đơn hàng
+ 2  | user_id         | BIGINT         | FK -> Users(id)     | Mã người dùng đặt hàng
+ 3  | full_name       | NVARCHAR(100)  |                    | Họ tên người nhận hàng
+ 4  | phone_number    | NVARCHAR(15)   |                    | Số điện thoại người nhận
+ 5  | address         | NVARCHAR(MAX)  |                    | Địa chỉ giao hàng
+ 6  | total_money     | DECIMAL(18,2)  |                    | Tổng tiền đơn hàng (VNĐ)
+ 7  | status          | NVARCHAR(20)   | DEFAULT 'PENDING'  | Trạng thái (PENDING / SHIPPING / DELIVERED / CANCELLED)
+ 8  | payment_method  | NVARCHAR(20)   |                    | Phương thức thanh toán (COD / VNPAY)
+ 9  | created_at      | DATETIME       | DEFAULT GETDATE()  | Thời gian tạo đơn hàng
+
+
+Bảng 12: OrderDetails (Chi tiết đơn hàng)
+
+STT | Tên cột       | Kiểu dữ liệu  | Ràng buộc          | Mô tả
+----|-------------- |----------------|--------------------|---------------------------------
+ 1  | id            | BIGINT         | PK, IDENTITY(1,1)  | Mã chi tiết
+ 2  | order_id      | BIGINT         | FK -> Orders(id)    | Mã đơn hàng
+ 3  | product_id    | BIGINT         |                    | Mã sản phẩm (lưu tham chiếu)
+ 4  | product_name  | NVARCHAR(100)  |                    | Tên sản phẩm tại thời điểm mua
+ 5  | size          | NVARCHAR(50)   |                    | Kích thước đã chọn
+ 6  | price         | DECIMAL(18,2)  |                    | Đơn giá tại thời điểm mua
+ 7  | quantity      | INT            |                    | Số lượng mua
+ 8  | total_price   | DECIMAL(18,2)  |                    | Thành tiền (= price x quantity)
+
+Lưu ý: Bảng OrderDetails lưu trữ snapshot thông tin sản phẩm tại thời điểm mua (tên, giá, size) thay vì chỉ tham chiếu FK, đảm bảo lịch sử đơn hàng không bị ảnh hưởng khi Admin cập nhật thông tin sản phẩm sau này.
+
+
+Bảng 13: Reviews (Đánh giá sản phẩm)
+
+STT | Tên cột      | Kiểu dữ liệu | Ràng buộc                            | Mô tả
+----|------------- |---------------|--------------------------------------|---------------------------------
+ 1  | id           | BIGINT        | PK, IDENTITY(1,1)                    | Mã đánh giá
+ 2  | user_id      | BIGINT        | FK -> Users(id)                       | Mã người dùng đánh giá
+ 3  | product_id   | BIGINT        | FK -> Products(id), ON DELETE CASCADE | Mã sản phẩm được đánh giá
+ 4  | rating       | INT           | CHECK (1 <= rating <= 5)             | Điểm đánh giá (1 đến 5 sao)
+ 5  | comment      | NVARCHAR(MAX) |                                      | Nội dung bình luận
+ 6  | created_at   | DATETIME      | DEFAULT GETDATE()                    | Thời gian đánh giá
+
+
+5/ Tổng hợp quan hệ giữa các bảng
+
+STT | Bảng 1           | Quan hệ | Bảng 2           | Mô tả
+----|------------------|---------|------------------|-----------------------------------------
+ 1  | Products         | 1 - N   | ProductVariants  | 1 sản phẩm có nhiều biến thể (theo Size)
+ 2  | Sizes            | 1 - N   | ProductVariants  | 1 kích thước được dùng trong nhiều biến thể
+ 3  | Products         | 1 - N   | Reviews          | 1 sản phẩm nhận nhiều đánh giá
+ 4  | Users            | 1 - 1   | Carts            | 1 người dùng có 1 giỏ hàng
+ 5  | Carts            | 1 - N   | CartItems        | 1 giỏ hàng chứa nhiều mục
+ 6  | ProductVariants  | 1 - N   | CartItems        | 1 biến thể có thể nằm trong nhiều giỏ
+ 7  | Users            | 1 - N   | Orders           | 1 người dùng tạo nhiều đơn hàng
+ 8  | Orders           | 1 - N   | OrderDetails     | 1 đơn hàng có nhiều chi tiết
+ 9  | Users            | 1 - N   | Reviews          | 1 người dùng viết nhiều đánh giá
+10  | RoleGroups       | 1 - N   | Users            | 1 nhóm quyền gán cho nhiều người dùng
+11  | RoleGroups       | N - N   | Roles            | Nhiều-nhiều qua bảng role_group_roles
+12  | Users            | N - N   | Roles            | Nhiều-nhiều qua bảng user_roles
