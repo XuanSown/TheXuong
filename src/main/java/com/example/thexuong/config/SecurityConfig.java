@@ -134,6 +134,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/css/**", "/js/**", "/img/**", "/fonts/**", "/uploads/**").permitAll()
                         .requestMatchers("/api/v1/products/**", "/api/v1/categories/**", "/api/v1/loyalty/catalog").permitAll()
+                        .requestMatchers("/api/v1/auth/login", "/api/v1/auth/register", "/api/v1/auth/forgot-password", "/api/v1/auth/reset-password").permitAll()
                         .requestMatchers("/api/admin/**", "/api/v1/admin/**").hasAnyAuthority("ADMIN", "BOTH")
                         .requestMatchers("/api/v1/auth/user", "/api/v1/auth/profile", "/api/v1/auth/password", "/api/v1/auth/logout", "/api/v1/cart/**", "/api/v1/checkout/**", "/api/v1/orders/**").authenticated()
                         .anyRequest().authenticated()
