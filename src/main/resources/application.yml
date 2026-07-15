@@ -1,18 +1,20 @@
+app:
+  frontend:
+    url: https://thexuong.xuansown.id.vn
+  cors:
+    # Comma-separated list of allowed origins for CORS
+    # Production: replace with real domains, e.g. https://thexuong.com,https://www.thexuong.com
+    allowed-origins: https://thexuong.xuansown.id.vn,http://localhost:5173,http://localhost:8080,http://127.0.0.1:5173,http://127.0.0.1:8080
+
+  cloudflare:
+    r2:
+      endpoint: https://e1171a0fa6f3c8a1dd3c702025523585.r2.cloudflarestorage.com
+      access-key: "893ec4cd3728fc8ae343fa89cb162db9"
+      secret-key: "0706ee997a763aabafd14029cd9c1268a24a7ef0e137f3a73cf3d64b19030851"
+      bucket-name: the-xuong-media
+      public-url: https://pub-3fbae0ca10794f42ad228e5d2cf7ce04.r2.dev # Đường dẫn subdomain public ảnh
+
 spring:
-  # SQL Server Database
-  datasource:
-    url: jdbc:sqlserver://localhost:1444;databaseName=dbTheXuong;encrypt=true;trustServerCertificate=true
-    username: sa
-    password: Sontran1903@
-    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
-  jpa:
-    database-platform: org.hibernate.dialect.SQLServerDialect
-    hibernate:
-      ddl-auto: none  # Database schema is managed by dbTheXuong.sql
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
   security:
     oauth2:
       client:
@@ -23,11 +25,3 @@ spring:
         provider:
           google:
             user-name-attribute: email
-
-jwt:
-  secret: KhoaBiMatPhaiRatDaiDeBaoMatJWTTheXuongProject2024
-  expiration: 3600000 # 1 giờ
-
-app:
-  frontend:
-    url: http://localhost:5173

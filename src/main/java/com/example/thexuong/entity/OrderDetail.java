@@ -39,4 +39,7 @@ public class OrderDetail {
 
     @Column(name = "total_price")
     private BigDecimal totalPrice;
+
+    @Column(name = "product_variant_id")
+    private Long productVariantId;
 }

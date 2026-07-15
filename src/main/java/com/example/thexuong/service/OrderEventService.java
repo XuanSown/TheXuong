@@ -3,6 +3,7 @@ package com.example.thexuong.service;
 import com.example.thexuong.entity.OrderEvent;
 import com.example.thexuong.repository.OrderEventRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,6 +15,7 @@ import java.time.LocalDateTime;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class OrderEventService {
 
     private final OrderEventRepository orderEventRepository;

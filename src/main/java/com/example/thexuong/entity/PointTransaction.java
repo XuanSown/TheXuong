@@ -53,6 +53,6 @@ public class PointTransaction {
     private LocalDateTime createdAt;
 
     public enum Type {
-        EARN, SPEND, REVERSE, EXPIRE, ADJUST
+        EARN, SPEND, REVERSE, EXPIRE, ADJUST, REFUND
     }
 }

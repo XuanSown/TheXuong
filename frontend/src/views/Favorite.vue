@@ -1,149 +1,156 @@
 <template>
   <div class="min-h-screen bg-[#F9F9F9]">
-    <main class="w-full max-w-[1280px] mx-auto px-4 pt-[120px] pb-8">
-      <div class="w-[1152px] mx-auto">
-        <!-- Header Section -->
-        <header class="flex flex-col gap-[15px] mb-16">
-          <h1 class="font-geist text-[64px] font-normal leading-[70px] tracking-[-1.28px] text-black uppercase">
-            SẢN PHẨM YÊU THÍCH
-          </h1>
-          <p class="font-gelasio text-base text-[#4C4546] max-w-[672px]">
-            Lưu lại những món đồ bạn yêu thích nhất để dễ dàng tìm kiếm và mua sắm.
-          </p>
-        </header>
+  <main class="w-full max-w-[1280px] mx-auto px-4 pt-[120px] pb-8">
+    <div class="w-[1152px] mx-auto">
+      <!-- Header Section -->
+      <header class="flex flex-col gap-[15px] mb-16">
+      <h1 class="font-geist text-[64px] font-normal leading-[70px] tracking-[-1.28px] text-black">
+        SẢN PHẨM YÊU THÍCH
+      </h1>
+      <p v-if="!authStore.isAuthenticated" class="font-gelasio text-base text-[#5E5F5C]">
+        Bạn đang xem với tư cách khách.
+        <router-link to="/login?redirect=/favorite" class="text-black font-semibold hover:underline">Đăng nhập</router-link>
+        để lưu yêu thích.
+      </p>
+      </header>
 
-        <!-- Empty State -->
-        <div class="relative w-[270px] h-[408.19px] border-2 border-dashed border-[#CFC4C5] rounded-lg flex flex-col items-center justify-center gap-4 mb-8">
-          <div class="w-10 h-10 bg-[#CFC4C5] rounded-full flex items-center justify-center">
-            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-            </svg>
-          </div>
-          <span class="font-gelasio text-sm text-[#646562]">Tiếp tục mua sắm</span>
-          <router-link to="/products" class="font-gelasio text-sm font-semibold text-black hover:underline">
-            Thêm nhiều sản phẩm yêu thích hơn
-          </router-link>
-        </div>
-
-        <!-- Product Grid -->
-        <div class="grid grid-cols-4 gap-6 mb-16">
-          <!-- Product Card 1 -->
-          <div class="relative group">
-            <div class="relative h-[270px] bg-[#F3F3F4] rounded-lg overflow-hidden mb-4">
-              <div class="w-full h-full bg-gray-200" />
-              <!-- Wishlist Heart Overlay -->
-              <button class="absolute top-[17px] right-[17px] w-8 h-8 bg-black/10 backdrop-blur-[2px] rounded-full flex items-center justify-center hover:bg-black/20 transition-colors">
-                <svg class="w-[16.67px] h-[15.29px]" viewBox="0 0 16 15" fill="black">
-                  <path d="M8 1C4.5 4 2 6.5 2 9C2 10.5 3 11.5 4.5 11.5C5 11.5 5.5 11.4 6 11.3C6.5 11.4 7 11.5 7.5 11.5C9 11.5 10 10.5 10 9C10 6.5 7.5 4 6 1Z"/>
-                </svg>
-              </button>
-            </div>
-            <div class="flex flex-col gap-2">
-              <h3 class="font-gelasio text-base font-semibold text-black uppercase leading-[26px] truncate">
-                GIÀY ĐÁ BÓNG NIKE AIR ZOOM
-              </h3>
-              <p class="font-geist text-base text-black">3.250.000đ</p>
-              <button class="w-full h-[36px] border border-black rounded flex items-center justify-center gap-2 hover:bg-black hover:text-white transition-colors">
-                <svg class="w-[13.32px] h-[13.33px]" viewBox="0 0 13 13">
-                  <rect width="13" height="13" fill="currentColor"/>
-                </svg>
-                <span class="font-geist text-[10px] text-[#1A1C1C]">THÊM VÀO GIỎ</span>
-              </button>
-            </div>
-          </div>
-
-          <!-- Product Card 2 -->
-          <div class="relative group">
-            <div class="relative h-[270px] bg-[#F3F3F4] rounded-lg overflow-hidden mb-4">
-              <div class="w-full h-full bg-gray-200" />
-              <button class="absolute top-[17px] right-[17px] w-8 h-8 bg-black/10 backdrop-blur-[2px] rounded-full flex items-center justify-center hover:bg-black/20 transition-colors">
-                <svg class="w-[16.67px] h-[15.29px]" viewBox="0 0 16 15" fill="black">
-                  <path d="M8 1C4.5 4 2 6.5 2 9C2 10.5 3 11.5 4.5 11.5C5 11.5 5.5 11.4 6 11.3C6.5 11.4 7 11.5 7.5 11.5C9 11.5 10 10.5 10 9C10 6.5 7.5 4 6 1Z"/>
-                </svg>
-              </button>
-            </div>
-            <div class="flex flex-col gap-2">
-              <h3 class="font-gelasio text-base font-semibold text-black uppercase leading-[26px] truncate">
-                ÁO TRAINING ADIDAS PREMIUM
-              </h3>
-              <p class="font-geist text-base text-black">890.000đ</p>
-              <button class="w-full h-[36px] border border-black rounded flex items-center justify-center gap-2 hover:bg-black hover:text-white transition-colors">
-                <svg class="w-[13.32px] h-[13.33px]" viewBox="0 0 13 13">
-                  <rect width="13" height="13" fill="currentColor"/>
-                </svg>
-                <span class="font-geist text-[10px] text-[#1A1C1C]">THÊM VÀO GIỎ</span>
-              </button>
-            </div>
-          </div>
-
-          <!-- Product Card 3 -->
-          <div class="relative group">
-            <div class="relative h-[270px] bg-[#F3F3F4] rounded-lg overflow-hidden mb-4">
-              <div class="w-full h-full bg-gray-200" />
-              <button class="absolute top-[17px] right-[17px] w-8 h-8 bg-black/10 backdrop-blur-[2px] rounded-full flex items-center justify-center hover:bg-black/20 transition-colors">
-                <svg class="w-[16.67px] h-[15.29px]" viewBox="0 0 16 15" fill="black">
-                  <path d="M8 1C4.5 4 2 6.5 2 9C2 10.5 3 11.5 4.5 11.5C5 11.5 5.5 11.4 6 11.3C6.5 11.4 7 11.5 7.5 11.5C9 11.5 10 10.5 10 9C10 6.5 7.5 4 6 1Z"/>
-                </svg>
-              </button>
-            </div>
-            <div class="flex flex-col gap-2">
-              <h3 class="font-gelasio text-base font-semibold text-black uppercase leading-[26px] truncate">
-                VỢT CẦU LÔNG YONEX ASTROX
-              </h3>
-              <p class="font-geist text-base text-black">4.100.000đ</p>
-              <button class="w-full h-[36px] border border-black rounded flex items-center justify-center gap-2 hover:bg-black hover:text-white transition-colors">
-                <svg class="w-[13.32px] h-[13.33px]" viewBox="0 0 13 13">
-                  <rect width="13" height="13" fill="currentColor"/>
-                </svg>
-                <span class="font-geist text-[10px] text-[#1A1C1C]">THÊM VÀO GIỎ</span>
-              </button>
-            </div>
-          </div>
-
-          <!-- Product Card 4 -->
-          <div class="relative group">
-            <div class="relative h-[270px] bg-[#F3F3F4] rounded-lg overflow-hidden mb-4">
-              <div class="w-full h-full bg-gray-200" />
-              <button class="absolute top-[17px] right-[17px] w-8 h-8 bg-black/10 backdrop-blur-[2px] rounded-full flex items-center justify-center hover:bg-black/20 transition-colors">
-                <svg class="w-[16.67px] h-[15.29px]" viewBox="0 0 16 15" fill="black">
-                  <path d="M8 1C4.5 4 2 6.5 2 9C2 10.5 3 11.5 4.5 11.5C5 11.5 5.5 11.4 6 11.3C6.5 11.4 7 11.5 7.5 11.5C9 11.5 10 10.5 10 9C10 6.5 7.5 4 6 1Z"/>
-                </svg>
-              </button>
-            </div>
-            <div class="flex flex-col gap-2">
-              <h3 class="font-gelasio text-base font-semibold text-black uppercase leading-[26px] truncate">
-                CLASSIC WHITE RUNNERS
-              </h3>
-              <p class="font-geist text-base text-black">2.100.000đ</p>
-              <button class="w-full h-[36px] border border-black rounded flex items-center justify-center gap-2 hover:bg-black hover:text-white transition-colors">
-                <svg class="w-[13.32px] h-[13.33px]" viewBox="0 0 13 13">
-                  <rect width="13" height="13" fill="currentColor"/>
-                </svg>
-                <span class="font-geist text-[10px] text-[#1A1C1C]">THÊM VÀO GIỎ</span>
-              </button>
-            </div>
-          </div>
+      <!-- Favorites Content -->
+      <div v-if="favoriteStore.loading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div v-for="i in 4" :key="i" class="w-full flex flex-col gap-4">
+        <BaseSkeleton type="image" />
+        <div class="flex flex-col gap-2">
+        <BaseSkeleton type="text" class="w-1/4" />
+        <BaseSkeleton type="title" class="w-3/4" />
+        <BaseSkeleton type="text" class="w-1/3" />
         </div>
       </div>
-    </main>
+      </div>
 
-    <!-- Footer -->
-    <Footer />
+      <!-- Favorites Grid -->
+      <div v-else-if="favoriteItems.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div v-for="product in favoriteItems" :key="product.id" class="group relative">
+        <!-- Product Card -->
+        <div class="bg-white border border-[rgba(207,196,197,0.3)] rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
+        <!-- Image -->
+        <div class="relative w-full aspect-square bg-[#F3F3F4] overflow-hidden">
+          <router-link :to="`/product-detail/${product.id}`" class="block w-full h-full">
+            <img
+            :src="product.imageUrl"
+            :alt="product.name"
+            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            loading="lazy"
+            />
+          </router-link>
+          <!-- Remove from favorite button -->
+          <button
+          @click="handleToggleFavorite(product)"
+          class="absolute top-3 right-3 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-md hover:bg-red-50 transition-colors z-10"
+          aria-label="Remove from favorites"
+          >
+          <svg class="w-4 h-4 text-red-500" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+          </svg>
+          </button>
+        </div>
+        <!-- Info -->
+        <div class="p-4 flex flex-col gap-2">
+          <p class="font-geist text-xs text-[#5E5F5C] uppercase tracking-wider">{{ product.brand || 'Khác' }}</p>
+          <router-link :to="`/product-detail/${product.id}`" class="hover:underline">
+            <h3 class="font-geist text-base text-black leading-tight line-clamp-2">{{ product.name }}</h3>
+          </router-link>
+          <p class="font-geist text-lg font-semibold text-black">{{ formatPrice(product.price) }}</p>
+          <button
+          @click="addToCart(product)"
+          class="w-full h-[40px] bg-black text-white font-geist text-xs uppercase tracking-wider hover:bg-gray-900 transition-colors mt-2"
+          >
+          Thêm vào giỏ
+          </button>
+        </div>
+        </div>
+      </div>
+      </div>
+
+      <!-- Empty State -->
+      <div v-else class="flex flex-col items-center justify-center py-20">
+      <svg class="w-24 h-24 text-[#CFC4C5] mb-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+      </svg>
+      <p class="font-gelasio text-xl text-[#5E5F5C] mb-4">Danh sách yêu thích trống</p>
+      <router-link
+        to="/products"
+        class="px-8 py-3 bg-black text-white font-geist text-sm uppercase tracking-wider hover:bg-gray-900 transition-colors"
+      >
+        Khám phá sản phẩm
+      </router-link>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  
   </div>
 </template>
 
 <script setup lang="ts">
-import Footer from '@/components/layout/Footer.vue'
+import { onMounted, computed } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth.store'
+import { useFavoriteStore } from '@/stores/favorite.store'
+import { useCartStore } from '@/stores/cart.store'
+
+import BaseSkeleton from '@/components/ui/BaseSkeleton.vue'
+import type { Product } from '@/types'
+
+const router = useRouter()
+const authStore = useAuthStore()
+const favoriteStore = useFavoriteStore()
+const cartStore = useCartStore()
+
+const favoriteItems = computed(() => favoriteStore.items)
+
+onMounted(() => {
+  favoriteStore.fetchFavorites()
+})
+
+const formatPrice = (price: number): string => {
+  return new Intl.NumberFormat('vi-VN').format(price) + ' đ'
+}
+
+const handleToggleFavorite = (product: Product) => {
+  favoriteStore.toggleFavorite(product)
+}
+
+const addToCart = (product: Product) => {
+  // Find first variant with available size
+  const firstSize = product.sizes?.[0]
+  if (firstSize) {
+    cartStore.addItem(firstSize.id, 1, {
+    productId: product.id,
+    productName: product.name,
+    productImage: product.imageUrl,
+    size: firstSize.size,
+    price: product.price,
+    }, authStore.isAuthenticated)
+  }
+  router.push('/cart')
+}
 </script>
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Gelasio:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap') layer(fonts);
 
 .font-geist {
-  font-family: 'Inter', 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+font-family: 'Geist', sans-serif;
 }
 
 .font-gelasio {
-  font-family: 'Gelasio', serif;
+font-family: 'Geist', sans-serif;
+}
+
+.line-clamp-2 {
+display: -webkit-box;
+-webkit-line-clamp: 2;
+-webkit-box-orient: vertical;
+overflow: hidden;
 }
 </style>

@@ -7,6 +7,7 @@ const GUEST_CART_KEY = 'guest_cart_items'
 interface GuestCartItem {
   variantId: number
   quantity: number
+  productId?: number
   productName?: string
   productImage?: string
   size?: string
@@ -54,7 +55,7 @@ export const useCartStore = defineStore('cart', {
     },
     items: (state) => state.cart?.items || [],
     // Get display items (from server or guest localStorage)
-    displayItems: (state): Array<CartItem & { id?: number; variantId: number }> => {
+    displayItems: (state): Array<Omit<CartItem, 'id'> & { id: number | string; variantId: number }> => {
       if (state.cart?.items) {
         return state.cart.items
       }
@@ -130,7 +131,7 @@ export const useCartStore = defineStore('cart', {
       if (this.cart) {
         // Authenticated
         await api.removeCartItem(itemId)
-        this.cart.items = this.cart.items.filter(item => item.id !== itemId)
+        await this.fetchCart()
       } else {
         // Guest: remove from localStorage
         this.removeFromGuestCart(itemId)
@@ -176,7 +177,7 @@ export const useCartStore = defineStore('cart', {
     },
 
     // Guest cart localStorage operations
-    private addToGuestCart(variantId: number, quantity: number, productInfo?: Partial<GuestCartItem>) {
+    addToGuestCart(variantId: number, quantity: number, productInfo?: Partial<GuestCartItem>) {
       const guestItemsStr = localStorage.getItem(GUEST_CART_KEY)
       let guestItems: GuestCartItem[] = guestItemsStr ? JSON.parse(guestItemsStr) : []
 
@@ -195,7 +196,7 @@ export const useCartStore = defineStore('cart', {
       localStorage.setItem(GUEST_CART_KEY, JSON.stringify(guestItems))
     },
 
-    private updateGuestCartItem(variantId: number, quantity: number) {
+    updateGuestCartItem(variantId: number, quantity: number) {
       const guestItemsStr = localStorage.getItem(GUEST_CART_KEY)
       if (!guestItemsStr) return
 
@@ -212,7 +213,7 @@ export const useCartStore = defineStore('cart', {
       }
     },
 
-    private removeFromGuestCart(variantId: number) {
+    removeFromGuestCart(variantId: number) {
       const guestItemsStr = localStorage.getItem(GUEST_CART_KEY)
       if (!guestItemsStr) return
 

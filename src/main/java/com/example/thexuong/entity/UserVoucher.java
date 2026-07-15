@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.time.LocalDateTime;
 
 /**
@@ -49,6 +51,7 @@ public class UserVoucher {
     @Column(name = "used_in_order_id")
     private Long usedInOrderId;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "voucher_id", insertable = false, updatable = false)
     private Voucher voucher;

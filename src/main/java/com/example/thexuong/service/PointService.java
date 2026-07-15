@@ -7,6 +7,7 @@ import com.example.thexuong.repository.PointTransactionRepository;
 import com.example.thexuong.repository.UserPointsRepository;
 import com.example.thexuong.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +17,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PointService {
 
     public static final BigDecimal VND_PER_POINT = new BigDecimal("100000");
@@ -34,6 +36,7 @@ public class PointService {
             return 0;
         }
 
+        log.debug("Earning {} points for user {} from order {}", points, userId, orderId);
         UserPoints userPoints = getOrCreateUserPoints(userId);
         userPoints.setCurrentPoints(userPoints.getCurrentPoints() + points);
         userPoints.setTotalEarned(userPoints.getTotalEarned() + points);
@@ -51,6 +54,7 @@ public class PointService {
                 .build();
         pointTransactionRepository.save(tx);
 
+        log.info("User {} earned {} points (order #{})", userId, points, orderId);
         return points;
     }
 
@@ -116,6 +120,28 @@ public class PointService {
                     .build();
             pointTransactionRepository.save(reverseTx);
         }
+    }
+
+    @Transactional
+    public void refundSpentPoints(Long userId, int points, Long orderId) {
+        if (points <= 0 || userId == null) return;
+        
+        UserPoints userPoints = getOrCreateUserPoints(userId);
+        userPoints.setCurrentPoints(userPoints.getCurrentPoints() + points);
+        userPoints.setTotalSpent(Math.max(0L, userPoints.getTotalSpent() - points));
+        userPoints.setLastActivityAt(LocalDateTime.now());
+        userPointsRepository.save(userPoints);
+
+        PointTransaction tx = PointTransaction.builder()
+                .userId(userId)
+                .orderId(orderId)
+                .type(PointTransaction.Type.REFUND)
+                .points(points)
+                .note("Hoàn lại " + points + " điểm đã dùng do đơn hàng bị hủy/hoàn tiền")
+                .createdAt(LocalDateTime.now())
+                .build();
+        pointTransactionRepository.save(tx);
+        log.info("Refunded {} points to user {} for order {}", points, userId, orderId);
     }
 
     @Transactional
@@ -187,12 +213,11 @@ public class PointService {
         return userPointsRepository.findByUserId(userId)
                 .orElseGet(() -> {
                     UserPoints newPoints = UserPoints.builder()
-                            .userId(userId)
+                            .user(userRepository.getReferenceById(userId))
                             .currentPoints(0)
                             .totalEarned(0L)
                             .totalSpent(0L)
                             .lastActivityAt(LocalDateTime.now())
-                            .version(0L)
                             .build();
                     return userPointsRepository.save(newPoints);
                 });

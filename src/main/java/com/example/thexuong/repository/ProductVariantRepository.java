@@ -3,6 +3,7 @@ package com.example.thexuong.repository;
 import com.example.thexuong.entity.ProductVariant;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -19,7 +20,15 @@ public interface ProductVariantRepository extends JpaRepository<ProductVariant, 
     List<Object[]> getInventoryStatistics();
 
     List<ProductVariant> findByProductId(Long productId);
+
+    // Tìm variant theo productId + sizeId (dùng cho inventory management)
     Optional<ProductVariant> findByProductIdAndSizeId(Long productId, Long sizeId);
+
+    // Tìm variant bằng productId + tên size (qua join với Sizes)
+    @Query("SELECT pv FROM ProductVariant pv " +
+            "WHERE pv.product.id = :productId AND pv.size.name = :sizeName")
+    Optional<ProductVariant> findByProductIdAndSizeName(@Param("productId") Long productId,
+                                                        @Param("sizeName") String sizeName);
 
     void deleteByProductId(Long productId);
 }

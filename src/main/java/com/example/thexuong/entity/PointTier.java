@@ -48,6 +48,12 @@ public class PointTier {
     @Column(name = "bonus_percentage")
     private Integer bonusPercentage;
 
+    @Column(name = "auto_discount_percent")
+    private BigDecimal autoDiscountPercent;
+
+    @Column(name = "reward_voucher_id")
+    private Long rewardVoucherId;
+
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 }

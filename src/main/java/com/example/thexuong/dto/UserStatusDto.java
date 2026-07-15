@@ -16,18 +16,24 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UserStatusDto {
 
-    private Long id;
-    private String email;
-    private String fullName;
-    private Boolean active;
+private Long id;
+private String email;
+private String fullName;
+private String role;
+private Boolean active;
+private String provider;
+private String tierCode;
 
-    /** Chuyển đổi từ Entity sang DTO — tránh expose trực tiếp Entity ra API. */
-    public static UserStatusDto from(User user) {
-        return UserStatusDto.builder()
-                .id(user.getId())
-                .email(user.getEmail())
-                .fullName(user.getFullName())
-                .active(user.getActive())
-                .build();
-    }
+/** Chuyển đổi từ Entity sang DTO — tránh expose trực tiếp Entity ra API. */
+public static UserStatusDto from(User user) {
+return UserStatusDto.builder()
+.id(user.getId())
+.email(user.getEmail())
+.fullName(user.getFullName())
+.role(user.getRole())
+.active(user.getActive())
+.provider(user.getProvider())
+.tierCode(user.getTierCode())
+.build();
+}
 }

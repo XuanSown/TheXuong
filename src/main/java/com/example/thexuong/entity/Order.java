@@ -64,6 +64,7 @@ public class Order {
     @Column(name = "total_for_point_calc")
     private BigDecimal totalForPointCalc;
 
+    @Enumerated(EnumType.STRING)
     @Builder.Default
     private OrderStatus status = OrderStatus.PENDING;
 
@@ -85,5 +86,6 @@ public class Order {
     private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
-    private List<OrderDetail> orderDetails;
+    @Builder.Default
+    private List<OrderDetail> orderDetails = new java.util.ArrayList<>();
 }

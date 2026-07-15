@@ -3,7 +3,7 @@
  * Batch 2: Voucher Catalog CRUD + Bulk Operations
  */
 
-import axios from 'axios'
+import api from './api'
 import type {
   VoucherResponse,
   VoucherListResponse,
@@ -15,19 +15,6 @@ import type {
   Category,
   Product
 } from '@/types/voucher'
-
-// Base URL should be configured in environment or axios default
-const API_BASE = '/api/admin/loyalty/vouchers'
-
-// Helper to get auth headers (assuming auth store exists)
-const getAuthHeaders = () => {
-  // TODO: integrate with actual auth store
-  const token = localStorage.getItem('accessToken')
-  return {
-    Authorization: token ? `Bearer ${token}` : '',
-    'Content-Type': 'application/json'
-  }
-}
 
 export const voucherService = {
   // ============================================================
@@ -46,21 +33,16 @@ export const voucherService = {
     minPoints?: number
     maxPoints?: number
   }): Promise<VoucherListResponse> {
-    const response = await axios.get<VoucherListResponse>(API_BASE, {
-      headers: getAuthHeaders(),
-      params
-    })
-    return response.data
+    const response = await api.get('/admin/loyalty/vouchers', { params })
+    return response.data?.data || response.data
   },
 
   /**
    * Get single voucher by ID
    */
   async getVoucher(id: number): Promise<VoucherResponse> {
-    const response = await axios.get<VoucherResponse>(`${API_BASE}/${id}`, {
-      headers: getAuthHeaders()
-    })
-    return response.data
+    const response = await api.get(`/admin/loyalty/vouchers/${id}`)
+    return response.data?.data || response.data
   },
 
   /**
@@ -68,10 +50,8 @@ export const voucherService = {
    * If code is empty/null, backend will auto-generate
    */
   async createVoucher(data: VoucherCreateRequest): Promise<VoucherResponse> {
-    const response = await axios.post<VoucherResponse>(API_BASE, data, {
-      headers: getAuthHeaders()
-    })
-    return response.data
+    const response = await api.post('/admin/loyalty/vouchers', data)
+    return response.data?.data || response.data
   },
 
   /**
@@ -81,10 +61,8 @@ export const voucherService = {
     id: number,
     data: VoucherUpdateRequest
   ): Promise<VoucherResponse> {
-    const response = await axios.put<VoucherResponse>(`${API_BASE}/${id}`, data, {
-      headers: getAuthHeaders()
-    })
-    return response.data
+    const response = await api.put(`/admin/loyalty/vouchers/${id}`, data)
+    return response.data?.data || response.data
   },
 
   /**
@@ -92,9 +70,7 @@ export const voucherService = {
    * Fails if voucher has claimed UserVouchers (business rule)
    */
   async deleteVoucher(id: number): Promise<void> {
-    await axios.delete(`${API_BASE}/${id}`, {
-      headers: getAuthHeaders()
-    })
+    await api.delete(`/admin/loyalty/vouchers/${id}`)
   },
 
   // ============================================================
@@ -105,12 +81,8 @@ export const voucherService = {
    * Bulk lock/unlock/delete/set-vip multiple vouchers
    */
   async bulkAction(data: BulkVoucherRequest): Promise<BulkVoucherResponse> {
-    const response = await axios.post<BulkVoucherResponse>(
-      `${API_BASE}/bulk`,
-      data,
-      { headers: getAuthHeaders() }
-    )
-    return response.data
+    const response = await api.post('/admin/loyalty/vouchers/bulk', data)
+    return response.data?.data || response.data
   },
 
   // ============================================================
@@ -121,44 +93,32 @@ export const voucherService = {
    * Get voucher statistics (optional endpoint)
    */
   async getVoucherStats(): Promise<VoucherStats> {
-    const response = await axios.get<VoucherStats>(`${API_BASE}/stats`, {
-      headers: getAuthHeaders()
-    })
-    return response.data
+    const response = await api.get('/admin/loyalty/vouchers/stats')
+    return response.data?.data || response.data
   },
 
   /**
    * Get all categories for multi-select (load once on modal open)
    */
   async getAllCategories(): Promise<Category[]> {
-    const response = await axios.get<Category[]>('/api/categories', {
-      headers: getAuthHeaders(),
-      params: { all: true }
-    })
-    return response.data
+    const response = await api.get('/categories', { params: { all: true } })
+    return response.data.content || response.data
   },
 
   /**
    * Search products (for multi-select)
-   * Implement search-on-demand or load all depending on UX decision
    */
   async searchProducts(query: string): Promise<Product[]> {
-    const response = await axios.get<Product[]>('/api/products', {
-      headers: getAuthHeaders(),
-      params: { search: query, limit: 100 }
-    })
-    return response.data
+    const response = await api.get('/products', { params: { keyword: query, size: 100 } })
+    return response.data.content || response.data
   },
 
   /**
    * Get all products (if Option A: load all on modal open)
    */
   async getAllProducts(): Promise<Product[]> {
-    const response = await axios.get<Product[]>('/api/products', {
-      headers: getAuthHeaders(),
-      params: { all: true }
-    })
-    return response.data
+    const response = await api.get('/products', { params: { size: 100 } })
+    return response.data.content || response.data
   },
 
   // ============================================================

@@ -44,9 +44,8 @@ public class UserPoints {
     private LocalDateTime lastActivityAt;
 
     @Version
-    @Builder.Default
     @Column(name = "version", nullable = false)
-    private Long version = 0L;
+    private Long version;
 
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId

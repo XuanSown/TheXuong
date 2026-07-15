@@ -8,6 +8,7 @@ import com.example.thexuong.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,6 +23,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/v1/admin/statistics")
 @RequiredArgsConstructor
+@PreAuthorize("hasAnyAuthority('ADMIN', 'BOTH')")
 public class AdminStatisticsRestController {
 
     private final OrderDetailRepository orderDetailRepository;

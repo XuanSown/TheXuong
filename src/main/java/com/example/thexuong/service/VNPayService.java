@@ -1,5 +1,7 @@
 package com.example.thexuong.service;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -9,13 +11,18 @@ import com.example.thexuong.config.VNPayConfig;
 import jakarta.servlet.http.HttpServletRequest;
 
 @Service
+@RequiredArgsConstructor
+@Slf4j
 public class VNPayService {
+    private final VNPayConfig vnPayConfig;
+
     public String createOrder(int total, String orderInfor, HttpServletRequest request) {
+        log.debug("Creating VNPay order: total={}, orderInfo={}", total, orderInfor);
         String vnp_Version = "2.1.0";
         String vnp_Command = "pay";
         String vnp_TxnRef = VNPayConfig.getRandomNumber(8); // Mã giao dịch random
         String vnp_IpAddr = VNPayConfig.getIpAddress(request);
-        String vnp_TmnCode = VNPayConfig.vnp_TmnCode;
+        String vnp_TmnCode = vnPayConfig.getVnp_TmnCode();
 
         // Số tiền nhân 100 theo chuẩn VNPAY (vd: 10000 vnđ -> 1000000)
         long amount = total * 100L;
@@ -33,7 +40,7 @@ public class VNPayService {
         vnp_Params.put("vnp_OrderInfo", orderInfor);
         vnp_Params.put("vnp_OrderType", "other");
         vnp_Params.put("vnp_Locale", "vn");
-        vnp_Params.put("vnp_ReturnUrl", VNPayConfig.vnp_ReturnUrl);
+        vnp_Params.put("vnp_ReturnUrl", vnPayConfig.getVnp_ReturnUrl());
         vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
 
         Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
@@ -46,14 +53,14 @@ public class VNPayService {
         vnp_Params.put("vnp_ExpireDate", vnp_ExpireDate);
 
         // Build dữ liệu để tạo mã băm (Hash)
-        List fieldNames = new ArrayList(vnp_Params.keySet());
+        List<String> fieldNames = new ArrayList<>(vnp_Params.keySet());
         Collections.sort(fieldNames);
         StringBuilder hashData = new StringBuilder();
         StringBuilder query = new StringBuilder();
-        Iterator itr = fieldNames.iterator();
+        Iterator<String> itr = fieldNames.iterator();
         while (itr.hasNext()) {
-            String fieldName = (String) itr.next();
-            String fieldValue = (String) vnp_Params.get(fieldName);
+            String fieldName = itr.next();
+            String fieldValue = vnp_Params.get(fieldName);
             if ((fieldValue != null) && (fieldValue.length() > 0)) {
                 //Build hash data
                 hashData.append(fieldName);
@@ -71,9 +78,10 @@ public class VNPayService {
         }
 
         String queryUrl = query.toString();
-        String vnp_SecureHash = VNPayConfig.hmacSHA512(VNPayConfig.secretKey, hashData.toString());
+        String vnp_SecureHash = vnPayConfig.hmacSHA512(vnPayConfig.getSecretKey(), hashData.toString());
         queryUrl += "&vnp_SecureHash=" + vnp_SecureHash;
 
-        return VNPayConfig.vnp_PayUrl + "?" + queryUrl;
+        log.info("VNPay order created: txnRef={}, amount={}", vnp_TxnRef, amount);
+        return vnPayConfig.getVnp_PayUrl() + "?" + queryUrl;
     }
 }

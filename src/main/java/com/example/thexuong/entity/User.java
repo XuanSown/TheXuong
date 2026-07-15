@@ -6,8 +6,8 @@ import lombok.*;
 /**
  * Entity User - Người dùng hệ thống.
  *
- * Lưu ý: schema DB hiện chỉ có cột {@code Users.role NVARCHAR(20) DEFAULT 'USER'}
- * (giá trị: USER / ADMIN / BOTH). KHÔNG còn bảng Roles / RoleGroups / user_roles
+ * Lưu ý: schema DB hiện chỉ có cột {@code Users.role NVARCHAR(20) DEFAULT 'CUSTOMER'}
+ * (giá trị: CUSTOMER / ADMIN / BOTH). KHÔNG còn bảng Roles / RoleGroups / user_roles
  * / user_role_groups / role_group_roles — phân quyền đơn giản hóa về 1 field String.
  */
 @Getter
@@ -44,12 +44,12 @@ public class User {
     private String provider = "LOCAL"; // 'LOCAL' hoặc 'GOOGLE'
 
     /**
-     * Phân quyền đơn giản: USER / ADMIN / BOTH.
-     * Bảng Users trong DB đã có sẵn cột {@code role NVARCHAR(20) DEFAULT 'USER'}.
+     * Phân quyền đơn giản: CUSTOMER / ADMIN / BOTH.
+     * Bảng Users trong DB đã có sẵn cột {@code role NVARCHAR(20) DEFAULT 'CUSTOMER'}.
      */
     @Column(name = "role", columnDefinition = "NVARCHAR(20)")
     @Builder.Default
-    private String role = "USER";
+    private String role = "CUSTOMER";
 
     @Column(name = "phone_number")
     private String phoneNumber;

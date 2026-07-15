@@ -1,12 +1,17 @@
 package com.example.thexuong.controller;
 
+import com.example.thexuong.dto.ValidateVoucherRequest;
 import com.example.thexuong.entity.User;
 import com.example.thexuong.entity.UserVoucher;
+import com.example.thexuong.exception.PointBalanceException;
+import com.example.thexuong.exception.VoucherInvalidException;
 import com.example.thexuong.repository.UserRepository;
 import com.example.thexuong.service.PointService;
 import com.example.thexuong.service.VoucherService;
 import com.example.thexuong.dto.ApiResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,6 +36,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
+@Slf4j
 public class LoyaltyApiController {
 
     private final VoucherService voucherService;
@@ -39,22 +45,25 @@ public class LoyaltyApiController {
 
     @GetMapping("/loyalty/validate-voucher")
     public ResponseEntity<ApiResponse<Map<String, Object>>> validateVoucher(
-            @RequestParam("code") String code,
-            @RequestParam("total") BigDecimal total,
+            @Valid @ModelAttribute ValidateVoucherRequest request,
             Principal principal) {
         if (principal == null) {
             return ResponseEntity.status(401).body(ApiResponse.error("Chưa đăng nhập."));
         }
         User user = resolveUser(principal);
         try {
-            BigDecimal discount = voucherService.validateAndGetDiscount(code, user.getId(), total);
+            BigDecimal discount = voucherService.validateAndGetDiscount(request.getCode(), user.getId(), request.getTotal());
             Map<String, Object> data = new HashMap<>();
-            data.put("code", code);
+            data.put("code", request.getCode());
             data.put("discountAmount", discount);
-            data.put("finalTotal", total.subtract(discount));
+            data.put("finalTotal", request.getTotal().subtract(discount));
             return ResponseEntity.ok(ApiResponse.ok("Áp dụng thành công.", data));
-        } catch (Exception e) {
+        } catch (VoucherInvalidException e) {
+            log.warn("Voucher validation failed for user {}: {}", user.getId(), e.getMessage());
             return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
+        } catch (Exception e) {
+            log.error("Unexpected error validating voucher for user {}: {}", user.getId(), e.getMessage(), e);
+            return ResponseEntity.badRequest().body(ApiResponse.error("Voucher không hợp lệ hoặc đã xảy ra lỗi."));
         }
     }
 
@@ -77,6 +86,38 @@ public class LoyaltyApiController {
         }
         User user = resolveUser(principal);
         return ResponseEntity.ok(ApiResponse.ok("OK", pointService.getHistory(user.getId())));
+    }
+
+    @GetMapping("/loyalty/catalog")
+    public ResponseEntity<ApiResponse<List<com.example.thexuong.entity.Voucher>>> getCatalog() {
+        return ResponseEntity.ok(ApiResponse.ok("OK", voucherService.getActiveCatalog()));
+    }
+
+    @PostMapping("/loyalty/redeem")
+    public ResponseEntity<ApiResponse<UserVoucher>> redeemVoucher(
+            @RequestBody Map<String, Object> payload,
+            Principal principal) {
+        if (principal == null) {
+            return ResponseEntity.status(401).body(ApiResponse.error("Chưa đăng nhập."));
+        }
+        User user = resolveUser(principal);
+        Object rawVoucherId = payload.get("voucherId");
+        if (rawVoucherId == null) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("Thiếu voucherId."));
+        }
+        try {
+            Long voucherId = Long.valueOf(rawVoucherId.toString());
+            UserVoucher uv = voucherService.redeemVoucher(user.getId(), voucherId);
+            return ResponseEntity.ok(ApiResponse.ok("Đổi voucher thành công.", uv));
+        } catch (NumberFormatException e) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("voucherId không hợp lệ."));
+        } catch (VoucherInvalidException | PointBalanceException e) {
+            log.warn("Lỗi khi đổi voucher cho user {}: {}", user.getId(), e.getMessage());
+            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
+        } catch (Exception e) {
+            log.error("Unexpected error redeeming voucher for user {}: {}", user.getId(), e.getMessage(), e);
+            return ResponseEntity.badRequest().body(ApiResponse.error("Đã xảy ra lỗi khi đổi voucher."));
+        }
     }
 
     @GetMapping("/my-vouchers")

@@ -1,16 +1,24 @@
 package com.example.thexuong.controller;
 
+import com.example.thexuong.dto.admin.UpdateOrderStatusRequest;
 import com.example.thexuong.entity.Order;
 import com.example.thexuong.entity.OrderStatus;
 import com.example.thexuong.repository.OrderRepository;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Admin REST API for Order Management.
@@ -19,67 +27,77 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/v1/admin/orders")
 @RequiredArgsConstructor
+@PreAuthorize("hasAnyAuthority('ADMIN', 'BOTH')")
 public class AdminOrderRestController {
 
     private final OrderRepository orderRepository;
 
     /**
-     * GET /api/admin/orders
-     * Query params: status, page, size
+     * GET /api/v1/admin/orders
+     * Query params: status, keyword, page, size
+     * Uses JPA Specification for DB-level filtering + pagination.
      */
     @GetMapping
     public ResponseEntity<?> getOrders(
             @RequestParam(required = false) String status,
+            @RequestParam(required = false) String keyword,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
 
-        List<Order> orders;
+        // Build Specification for DB-level filtering
+        Specification<Order> spec = (root, query, cb) -> cb.conjunction();
+
         if (status != null && !status.isEmpty()) {
             try {
                 OrderStatus orderStatus = OrderStatus.valueOf(status);
-                orders = orderRepository.findAll().stream()
-                        .filter(o -> o.getStatus() == orderStatus)
-                        .toList();
+                spec = spec.and((root, query, cb) ->
+                        cb.equal(root.get("status"), orderStatus));
             } catch (IllegalArgumentException e) {
                 return ResponseEntity.badRequest().body(Map.of("error", "Invalid status: " + status));
             }
-        } else {
-            orders = orderRepository.findAll();
         }
 
-        // Pagination manual since we're using stream
-        int start = page * size;
-        int end = Math.min(start + size, orders.size());
-        List<Order> pagedOrders = start < orders.size() ? orders.subList(start, end) : List.of();
+        if (keyword != null && !keyword.isBlank()) {
+            String kw = "%" + keyword.trim().toLowerCase() + "%";
+            spec = spec.and((root, query, cb) -> {
+                // Search in fullName, phoneNumber, id (as string)
+                return cb.or(
+                        cb.like(cb.lower(root.get("fullName")), kw),
+                        cb.like(root.get("phoneNumber"), kw),
+                        cb.like(cb.lower(root.get("id").as(String.class)), kw.replace("%", ""))
+                );
+            });
+        }
 
-        List<Map<String, Object>> orderList = pagedOrders.stream()
+        // Sort by id DESC (newest first)
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
+        Page<Order> orderPage = orderRepository.findAll(spec, pageable);
+
+        List<Map<String, Object>> orderList = orderPage.getContent().stream()
                 .map(this::toOrderSummary)
-                .collect(Collectors.toList());
+                .toList();
 
-        Map<String, Object> response = new java.util.HashMap<>();
-        response.put("content", orderList);
-        response.put("totalElements", (long) orders.size());
-        response.put("totalPages", (int) Math.ceil((double) orders.size() / size));
-        response.put("size", size);
-        response.put("number", page);
+        Map<String, Object> response = Map.of(
+                "content", orderList,
+                "totalElements", orderPage.getTotalElements(),
+                "totalPages", orderPage.getTotalPages(),
+                "size", orderPage.getSize(),
+                "number", orderPage.getNumber()
+        );
 
         return ResponseEntity.ok(response);
     }
 
     /**
-     * PATCH /api/admin/orders/{id}/status
+     * PATCH /api/v1/admin/orders/{id}/status
      * Body: { status: "CONFIRMED" | "SHIPPING" | "DELIVERED" | "COMPLETED" | "CANCELLED" | "REFUNDED" }
      */
     @PatchMapping("/{id}/status")
     public ResponseEntity<?> updateOrderStatus(
             @PathVariable Long id,
-            @RequestBody Map<String, String> body) {
+            @Valid @RequestBody UpdateOrderStatusRequest request) {
 
-        String newStatusStr = body.get("status");
-        if (newStatusStr == null) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Missing status field"));
-        }
-
+        String newStatusStr = request.getStatus();
         try {
             OrderStatus newStatus = OrderStatus.valueOf(newStatusStr);
             Order order = orderRepository.findById(id)
@@ -117,17 +135,21 @@ public class AdminOrderRestController {
     // ========== Helper Methods ==========
 
     private Map<String, Object> toOrderSummary(Order order) {
-        return new java.util.HashMap<String, Object>() {{
-            put("id", order.getId());
-            put("fullName", order.getFullName());
-            put("phoneNumber", order.getPhoneNumber());
-            put("totalMoney", order.getTotalMoney());
-            put("status", order.getStatus() != null ? order.getStatus().toString() : null);
-            put("paymentMethod", order.getPaymentMethod());
-            put("createdAt", order.getCreatedAt());
-            put("pointsUsed", order.getPointsUsed());
-            put("voucherCode", order.getVoucherCode());
-            put("discountAmount", order.getDiscountAmount());
-        }};
+        BigDecimal totalMoney = order.getTotalMoney();
+        Map<String, Object> map = new java.util.HashMap<>();
+        map.put("id", order.getId());
+        map.put("fullName", order.getFullName());
+        map.put("phoneNumber", order.getPhoneNumber());
+        map.put("totalMoney", totalMoney != null ? totalMoney : BigDecimal.ZERO);
+        map.put("status", order.getStatus() != null ? order.getStatus().toString() : null);
+        map.put("paymentMethod", order.getPaymentMethod());
+        map.put("createdAt", order.getCreatedAt());
+        map.put("pointsUsed", order.getPointsUsed() != null ? order.getPointsUsed() : 0);
+        map.put("voucherCode", order.getVoucherCode());
+        map.put("discountAmount", order.getDiscountAmount() != null ? order.getDiscountAmount() : BigDecimal.ZERO);
+        map.put("address", order.getAddress());
+        map.put("shippingFee", order.getShippingFee() != null ? order.getShippingFee() : BigDecimal.ZERO);
+        map.put("subtotal", order.getSubtotal() != null ? order.getSubtotal() : BigDecimal.ZERO);
+        return map;
     }
 }

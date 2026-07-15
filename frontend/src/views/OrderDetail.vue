@@ -24,10 +24,28 @@
                 Ngày đặt: {{ formatDate(order?.createdAt || '') }}
               </span>
             </div>
-            <div v-if="order" class="px-3 py-1 bg-[#FEF3C3] rounded">
-              <span class="font-geist text-[12px] font-semibold text-[#92400E] uppercase tracking-[0.6px]">
-                {{ getStatusLabel(order.status) }}
-              </span>
+            <div v-if="order" class="flex items-center gap-3">
+              <button
+                v-if="order.status === 'PENDING'"
+                @click="confirmCancelOrder"
+                class="px-4 py-1.5 border border-red-500 text-red-500 rounded font-geist text-[12px] font-medium hover:bg-red-50 transition-colors"
+                :disabled="isCancelling"
+              >
+                {{ isCancelling ? 'Đang xử lý...' : 'Yêu cầu hủy đơn' }}
+              </button>
+              <button
+                v-if="order.status === 'DELIVERED'"
+                @click="confirmReceivedOrder"
+                class="px-4 py-1.5 bg-black text-white rounded font-geist text-[12px] font-medium hover:bg-gray-900 transition-colors"
+                :disabled="isConfirmingReceived"
+              >
+                {{ isConfirmingReceived ? 'Đang xử lý...' : 'Đã nhận được hàng' }}
+              </button>
+              <div class="px-3 py-1 bg-[#FEF3C3] rounded">
+                <span class="font-geist text-[12px] font-semibold text-[#92400E] uppercase tracking-[0.6px]">
+                  {{ getStatusLabel(order.status) }}
+                </span>
+              </div>
             </div>
           </div>
         </header>
@@ -38,27 +56,49 @@
           <div class="flex flex-col gap-6 w-[357.33px]">
             <!-- Shipping Info Card -->
             <div class="bg-[#F9F9F9] border border-[#F0F0F0] rounded-lg p-6">
-              <h2 class="font-geist text-[14px] font-bold leading-[20px] tracking-[0.7px] uppercase text-[#111111] mb-4">
-                THÔNG TIN NGƯỜI NHẬN
-              </h2>
-              <div class="flex flex-col gap-4" v-if="order">
+              <div class="flex justify-between items-center mb-4">
+                <h2 class="font-geist text-[14px] font-bold leading-[20px] tracking-[0.7px] uppercase text-[#111111]">
+                  THÔNG TIN NGƯỜI NHẬN
+                </h2>
+                <button v-if="order?.status === 'PENDING' && !isEditing" @click="startEdit" class="text-blue-600 text-[14px] font-medium hover:underline">Sửa</button>
+              </div>
+              <div class="flex flex-col gap-4" v-if="order && !isEditing">
                 <div class="flex flex-col gap-1">
                   <span class="font-geist text-[14px] text-[#666666]">Họ và tên</span>
-                  <span class="font-geist text-[14px] font-medium text-[#111111]">{{ order.shipping.fullName }}</span>
+                  <span class="font-geist text-[14px] font-medium text-[#111111]">{{ order.fullName }}</span>
                 </div>
                 <div class="flex flex-col gap-1">
                   <span class="font-geist text-[14px] text-[#666666]">Số điện thoại</span>
-                  <span class="font-geist text-[14px] font-medium text-[#111111]">{{ order.shipping.phone }}</span>
+                  <span class="font-geist text-[14px] font-medium text-[#111111]">{{ order.phoneNumber }}</span>
                 </div>
                 <div class="flex flex-col gap-1">
                   <span class="font-geist text-[14px] text-[#666666]">Địa chỉ giao hàng</span>
                   <span class="font-geist text-[14px] font-medium text-[#111111] leading-[23px]">
-                    {{ order.shipping.address }}, {{ order.shipping.province }}
+                    {{ order.address }}
                   </span>
                 </div>
-                <div v-if="order.shipping.note" class="flex flex-col gap-1 pt-2 border-t border-[#F0F0F0]">
+                <div v-if="order.note" class="flex flex-col gap-1 pt-2 border-t border-[#F0F0F0]">
                   <span class="font-geist text-[14px] text-[#666666]">Ghi chú</span>
-                  <span class="font-geist text-[14px] font-medium text-[#111111]">{{ order.shipping.note }}</span>
+                  <span class="font-geist text-[14px] font-medium text-[#111111]">{{ order.note }}</span>
+                </div>
+              </div>
+
+              <!-- Edit Mode -->
+              <div class="flex flex-col gap-4" v-if="order && isEditing">
+                <div class="flex flex-col gap-1">
+                  <label class="text-[12px] text-[#666666]">Số điện thoại</label>
+                  <input v-model="editForm.phoneNumber" class="border border-[#E0E0E0] px-3 py-2 rounded-md w-full text-[14px] font-medium text-[#111111] outline-none focus:border-black" placeholder="Nhập số điện thoại mới" />
+                </div>
+                <div class="flex flex-col gap-1">
+                  <label class="text-[12px] text-[#666666]">Địa chỉ giao hàng</label>
+                  <textarea v-model="editForm.address" class="border border-[#E0E0E0] px-3 py-2 rounded-md w-full text-[14px] font-medium text-[#111111] outline-none focus:border-black resize-none" rows="3" placeholder="Nhập địa chỉ mới"></textarea>
+                </div>
+                <div class="flex gap-3 justify-end mt-2">
+                  <button @click="isEditing = false" class="px-4 py-2 border border-black text-black text-[14px] font-medium rounded-md hover:bg-black hover:text-white transition-colors" :disabled="isSaving">Hủy</button>
+                  <button @click="saveShippingInfo" class="px-4 py-2 bg-black text-white text-[14px] font-medium rounded-md hover:bg-gray-900 transition-colors flex items-center justify-center min-w-[80px]" :disabled="isSaving">
+                    <span v-if="!isSaving">Lưu</span>
+                    <div v-else class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  </button>
                 </div>
               </div>
             </div>
@@ -90,8 +130,9 @@
               <div v-if="order" class="flex flex-col gap-6">
                 <div v-for="(item, index) in order.items" :key="index" class="flex gap-6" :class="{ 'border-t border-[#F0F0F0] pt-6': index > 0 }">
                   <!-- Product Image -->
-                  <div class="w-[96px] h-[96px] bg-[#F9F9F9] rounded flex-shrink-0 flex items-center justify-center">
-                    <svg class="w-10 h-10 text-[#CFC4C5]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <div class="w-[96px] h-[96px] bg-[#F9F9F9] rounded flex-shrink-0 flex items-center justify-center overflow-hidden">
+                    <img v-if="item.imageUrl" :src="item.imageUrl" :alt="item.productName" class="w-full h-full object-cover" />
+                    <svg v-else class="w-10 h-10 text-[#CFC4C5]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
                       <circle cx="8.5" cy="8.5" r="1.5"/>
                       <polyline points="21 15 16 10 5 21"/>
@@ -141,7 +182,7 @@
                     <span class="font-geist text-[14px] font-bold leading-[20px] tracking-[0.7px] uppercase text-[#111111]">
                       TỔNG THANH TOÁN
                     </span>
-                    <span class="font-geist text-[20px] font-bold text-[#111111]">{{ formatPrice(order.total) }}</span>
+                    <span class="font-geist text-[20px] font-bold text-[#111111]">{{ formatPrice(order.totalMoney || order.total || 0) }}</span>
                   </div>
                 </div>
               </div>
@@ -152,14 +193,15 @@
     </main>
 
     <!-- Footer -->
-    <Footer />
+    
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useOrderStore } from '@/stores/order.store'
+import api from '@/services/api'
 
 const route = useRoute()
 const orderStore = useOrderStore()
@@ -168,13 +210,96 @@ const orderId = computed(() => route.params.id as string)
 
 const order = computed(() => orderStore.currentOrder)
 
+const isEditing = ref(false)
+const isSaving = ref(false)
+const isCancelling = ref(false)
+const editForm = ref({
+  phoneNumber: '',
+  address: ''
+})
+
+const startEdit = () => {
+  if (order.value) {
+    editForm.value = {
+      phoneNumber: order.value.phoneNumber || '',
+      address: order.value.address || ''
+    }
+    isEditing.value = true
+  }
+}
+
+const saveShippingInfo = async () => {
+  if (!order.value) return
+  if (!editForm.value.phoneNumber.trim() || !editForm.value.address.trim()) {
+    alert('Vui lòng nhập đầy đủ thông tin')
+    return
+  }
+  
+  try {
+    isSaving.value = true
+    await api.put(`/orders/${orderId.value}/update-info`, editForm.value)
+    // Refetch the order to get the updated info
+    await orderStore.fetchOrderById(orderId.value)
+    isEditing.value = false
+  } catch (error: any) {
+    console.error('Failed to update info', error)
+    alert(error?.response?.data?.error || 'Đã xảy ra lỗi khi cập nhật thông tin')
+  } finally {
+    isSaving.value = false
+  }
+}
+
+const confirmCancelOrder = async () => {
+  if (!order.value) return
+  if (!confirm('Bạn có chắc chắn muốn yêu cầu hủy đơn hàng này không?')) {
+    return
+  }
+
+  try {
+    isCancelling.value = true
+    await api.post(`/orders/${orderId.value}/cancel`)
+    alert('Yêu cầu hủy đơn hàng đã được gửi thành công.')
+    await orderStore.fetchOrderById(orderId.value)
+  } catch (error: any) {
+    console.error('Failed to cancel order:', error)
+    alert(error?.response?.data?.error || 'Đã xảy ra lỗi khi hủy đơn hàng')
+  } finally {
+    isCancelling.value = false
+  }
+}
+
+const isConfirmingReceived = ref(false)
+
+const confirmReceivedOrder = async () => {
+  if (!order.value) return
+  if (!confirm('Bạn xác nhận đã nhận được hàng? (Đơn hàng sẽ chuyển sang trạng thái Hoàn thành và bạn sẽ được cộng điểm)')) {
+    return
+  }
+
+  try {
+    isConfirmingReceived.value = true
+    await api.post(`/orders/${orderId.value}/confirm-received`)
+    alert('Cảm ơn bạn đã xác nhận nhận hàng! Đơn hàng đã hoàn tất.')
+    await orderStore.fetchOrderById(orderId.value)
+  } catch (error: any) {
+    console.error('Failed to confirm received:', error)
+    alert(error?.response?.data?.error || 'Đã xảy ra lỗi khi xác nhận nhận hàng')
+  } finally {
+    isConfirmingReceived.value = false
+  }
+}
+
 const getStatusLabel = (status: string) => {
   const labels: Record<string, string> = {
     'processing': 'ĐANG XỬ LÝ',
-    'confirmed': 'ĐÃ XÁC NHẬN',
-    'shipped': 'ĐANG VẬN CHUYỂN',
-    'delivered': 'ĐÃ GIAO',
-    'cancelled': 'ĐÃ HỦY',
+    'PENDING': 'CHỜ XỬ LÝ',
+    'CONFIRMED': 'ĐÃ XÁC NHẬN',
+    'SHIPPING': 'ĐANG VẬN CHUYỂN',
+    'DELIVERED': 'ĐÃ GIAO',
+    'COMPLETED': 'HOÀN THÀNH',
+    'CANCELLED': 'ĐÃ HỦY',
+    'CANCEL_REQUESTED': 'YÊU CẦU HỦY',
+    'REFUNDED': 'ĐÃ HOÀN TIỀN',
     'refunded': 'ĐÃ HOÀN TIỀN'
   }
   return labels[status] || status.toUpperCase()
@@ -228,15 +353,15 @@ onMounted(async () => {
 @import url('https://fonts.googleapis.com/css2?family=Gelasio:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap') layer(fonts);
 
 .font-geist {
-  font-family: 'Inter', 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: 'Geist', sans-serif;
 }
 
 .font-gelasio {
-  font-family: 'Gelasio', serif;
+  font-family: 'Geist', sans-serif;
 }
 
 .font-inter {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Geist', sans-serif;
 }
 
 /* Custom scrollbar */

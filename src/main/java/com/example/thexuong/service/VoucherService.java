@@ -20,6 +20,7 @@ import com.example.thexuong.dto.BulkVoucherResponse;
 import com.example.thexuong.dto.VoucherStats;
 import com.example.thexuong.enums.BulkAction;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,6 +45,7 @@ import java.util.Random;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class VoucherService {
 
     /** Bảng chữ cái cho mã UserVoucher (loại 0/O/1/I/L dễ nhầm). */
@@ -65,6 +67,7 @@ public class VoucherService {
      * Thử tối đa 10 lần nếu trùng (collision rate rất thấp với 32^6 = ~1 tỷ combos).
      */
     public String generateUniqueCode() {
+        log.debug("Generating unique voucher code");
         Random random = new Random();
         for (int attempt = 0; attempt < 10; attempt++) {
             StringBuilder sb = new StringBuilder("TX-");
@@ -74,6 +77,7 @@ public class VoucherService {
             String code = sb.toString();
             if (userVoucherRepository.findByCode(code).isEmpty()
                     && voucherRepository.findByCode(code).isEmpty()) {
+                log.debug("Generated unique code: {} (attempt {})", code, attempt + 1);
                 return code;
             }
         }
@@ -96,6 +100,7 @@ public class VoucherService {
      */
     @Transactional
     public UserVoucher redeemVoucher(Long userId, Long voucherCatalogId) {
+        log.debug("Redeeming voucher {} for user {}", voucherCatalogId, userId);
         Voucher catalog = voucherRepository.findById(voucherCatalogId)
                 .orElseThrow(() -> new VoucherInvalidException("Voucher catalog không tồn tại."));
 
@@ -107,7 +112,7 @@ public class VoucherService {
         if (Boolean.TRUE.equals(catalog.getVipOnly())) {
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> new VoucherInvalidException("User không tồn tại."));
-            // User giờ có String role (USER/ADMIN/BOTH), không còn Set<Role>.
+            // User giờ có String role (CUSTOMER/ADMIN/BOTH), không còn Set<Role>.
             boolean isVip = "VIP".equals(user.getRole()) || "BOTH".equals(user.getRole());
             if (!isVip) {
                 throw new VoucherInvalidException("Voucher này chỉ dành cho khách hàng VIP.");
@@ -115,7 +120,7 @@ public class VoucherService {
         }
 
         // Trừ điểm (PointService.spendPoints sẽ check balance + throw PointBalanceException nếu thiếu)
-        int remaining = spendPointsForVoucher(userId, catalog.getRequiredPoints(),
+        spendPointsForVoucher(userId, catalog.getRequiredPoints(),
                 "Đổi voucher " + catalog.getCode() + " (giảm " + catalog.getDiscountAmount() + "đ)");
 
         // Tạo UserVoucher
@@ -128,7 +133,35 @@ public class VoucherService {
                 .issuedAt(now)
                 .expiresAt(now.plusDays(30))
                 .build();
-        return userVoucherRepository.save(userVoucher);
+        UserVoucher saved = userVoucherRepository.save(userVoucher);
+        log.info("Voucher redeemed: user={}, voucherCatalogId={}, userVoucherCode={}",
+                userId, voucherCatalogId, saved.getCode());
+        return saved;
+    }
+
+    public UserVoucher issueVoucherToUser(Long voucherCatalogId, Long userId) {
+        log.debug("Issuing voucher {} for user {}", voucherCatalogId, userId);
+        Voucher catalog = voucherRepository.findById(voucherCatalogId)
+                .orElseThrow(() -> new VoucherInvalidException("Voucher catalog không tồn tại."));
+
+        if (catalog.getStatus() != Voucher.Status.ACTIVE) {
+            throw new VoucherInvalidException("Voucher này hiện không khả dụng.");
+        }
+
+        // Tạo UserVoucher (không trừ điểm vì đây là phần thưởng)
+        LocalDateTime now = LocalDateTime.now();
+        UserVoucher userVoucher = UserVoucher.builder()
+                .userId(userId)
+                .voucherId(catalog.getId())
+                .code(generateUniqueCode())
+                .status(UserVoucher.Status.UNUSED)
+                .issuedAt(now)
+                .expiresAt(now.plusDays(30))
+                .build();
+        UserVoucher saved = userVoucherRepository.save(userVoucher);
+        log.info("Voucher issued as reward: user={}, voucherCatalogId={}, userVoucherCode={}",
+                userId, voucherCatalogId, saved.getCode());
+        return saved;
     }
 
     /**
@@ -224,17 +257,36 @@ public class VoucherService {
     public void markAsUsed(String code, Long orderId) {
         if (code == null || code.isBlank()) return;
 
+        log.debug("Marking voucher {} as used for order {}", code, orderId);
         UserVoucher uv = userVoucherRepository.findByCode(code)
                 .orElseThrow(() -> new VoucherInvalidException("Mã voucher không tồn tại: " + code));
 
         if (uv.getStatus() != UserVoucher.Status.UNUSED) {
-            throw new VoucherInvalidException("Voucher không ở trạng thái UNUSED: " + uv.getStatus());
+            throw new VoucherInvalidException("Voucher này không hợp lệ hoặc đã được sử dụng.");
         }
 
         uv.setStatus(UserVoucher.Status.USED);
         uv.setUsedAt(LocalDateTime.now());
         uv.setUsedInOrderId(orderId);
         userVoucherRepository.save(uv);
+        log.info("Voucher {} marked as used for order {}", code, orderId);
+    }
+
+    /**
+     * Phục hồi voucher đã dùng (do đơn bị hủy/hoàn)
+     */
+    @Transactional
+    public void restoreVoucher(String code) {
+        if (code == null || code.isBlank()) return;
+        userVoucherRepository.findByCode(code).ifPresent(uv -> {
+            if (uv.getStatus() == UserVoucher.Status.USED) {
+                uv.setStatus(UserVoucher.Status.UNUSED);
+                uv.setUsedAt(null);
+                uv.setUsedInOrderId(null);
+                userVoucherRepository.save(uv);
+                log.info("Voucher {} restored", code);
+            }
+        });
     }
 
     // ============================================================
@@ -246,10 +298,14 @@ public class VoucherService {
      */
     @Transactional
     public int expireOldVouchers(LocalDateTime now) {
+        log.debug("Expiring old unused vouchers as of {}", now);
         List<UserVoucher> expired = userVoucherRepository.findExpiredUnusedVouchers(now);
         for (UserVoucher uv : expired) {
             uv.setStatus(UserVoucher.Status.EXPIRED);
             userVoucherRepository.save(uv);
+        }
+        if (!expired.isEmpty()) {
+            log.info("Expired {} vouchers", expired.size());
         }
         return expired.size();
     }

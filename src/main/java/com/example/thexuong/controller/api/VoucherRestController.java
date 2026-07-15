@@ -2,6 +2,8 @@ package com.example.thexuong.controller.api;
 
 import com.example.thexuong.dto.*;
 import com.example.thexuong.service.VoucherService;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -31,7 +33,7 @@ import org.springframework.web.bind.annotation.*;
  * @PreAuthorize ở class-level — không cần lặp lại trên từng method.
  */
 @RestController
-@RequestMapping("/api/admin/loyalty/vouchers")
+@RequestMapping("/api/v1/admin/loyalty/vouchers")
 @RequiredArgsConstructor
 @PreAuthorize("hasAnyAuthority('ADMIN', 'BOTH')")
 public class VoucherRestController {
@@ -44,8 +46,8 @@ public class VoucherRestController {
      */
     @GetMapping
     public ResponseEntity<ApiResponse<VoucherListResponse>> getVouchers(
-            @RequestParam(defaultValue = "1") Integer page,
-            @RequestParam(defaultValue = "5") Integer size,
+            @RequestParam(defaultValue = "1") @Min(1) Integer page,
+            @RequestParam(defaultValue = "5") @Min(1) @Max(100) Integer size,
             @RequestParam(required = false) String search,
             @RequestParam(defaultValue = "all") String status,
             @RequestParam(required = false) Boolean vipOnly,

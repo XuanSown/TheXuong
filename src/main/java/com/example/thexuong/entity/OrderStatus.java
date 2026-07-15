@@ -19,6 +19,7 @@ public enum OrderStatus {
     SHIPPING,     // đang giao
     DELIVERED,    // đã giao, chờ user confirm
     COMPLETED,    // user đã nhận → hook cộng điểm loyalty
+    CANCEL_REQUESTED, // user xin hủy đơn, chờ admin duyệt
     CANCELLED,    // huỷ trước khi CONFIRMED
     REFUNDED;     // hoàn tiền sau thanh toán → hook trừ điểm loyalty
 
@@ -29,7 +30,8 @@ public enum OrderStatus {
     public boolean canTransitionTo(OrderStatus next) {
         if (next == null) return false;
         return switch (this) {
-            case PENDING    -> next == CONFIRMED || next == CANCELLED;
+            case PENDING    -> next == CONFIRMED || next == CANCEL_REQUESTED || next == CANCELLED;
+            case CANCEL_REQUESTED -> next == PENDING || next == CONFIRMED || next == CANCELLED;
             case CONFIRMED  -> next == SHIPPING   || next == CANCELLED || next == REFUNDED;
             case SHIPPING   -> next == DELIVERED  || next == REFUNDED;
             case DELIVERED  -> next == COMPLETED  || next == REFUNDED;

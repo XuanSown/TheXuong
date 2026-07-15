@@ -3,6 +3,7 @@ package com.example.thexuong.job;
 import com.example.thexuong.service.PointService;
 import com.example.thexuong.service.VoucherService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +15,7 @@ import java.time.LocalDateTime;
  */
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class PointExpireJob {
 
     private final PointService pointService;
@@ -23,9 +25,9 @@ public class PointExpireJob {
     public void expireOldPoints() {
         try {
             int total = pointService.expireOldPoints(LocalDateTime.now());
-            System.out.println("[CRON] PointExpireJob done. Expired: " + total);
+            log.info("[CRON] PointExpireJob done. Expired: {} points", total);
         } catch (Exception e) {
-            System.err.println("[CRON] PointExpireJob failed: " + e.getMessage());
+            log.error("[CRON] PointExpireJob failed", e);
         }
     }
 
@@ -33,9 +35,9 @@ public class PointExpireJob {
     public void expireOldVouchers() {
         try {
             int count = voucherService.expireOldVouchers(LocalDateTime.now());
-            System.out.println("[CRON] VoucherExpireJob done. Expired: " + count);
+            log.info("[CRON] VoucherExpireJob done. Expired: {} vouchers", count);
         } catch (Exception e) {
-            System.err.println("[CRON] VoucherExpireJob failed: " + e.getMessage());
+            log.error("[CRON] VoucherExpireJob failed", e);
         }
     }
 }

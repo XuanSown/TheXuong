@@ -2,6 +2,7 @@ package com.example.thexuong.dto;
 
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -27,6 +28,10 @@ public class VoucherUpdateRequest {
 
     @Min(value = 1, message = "Điểm cần tối thiểu 1")
     private Integer requiredPoints;
+
+    @Pattern(regexp = "^$|^TX-[A-Z0-9]{6}$",
+             message = "Code phải định dạng TX-XXXXXX")
+    private String code;
 
     @DecimalMin(value = "0", message = "Min order không được âm")
     private BigDecimal minOrderAmount;

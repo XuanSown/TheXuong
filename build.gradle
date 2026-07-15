@@ -1,7 +1,7 @@
 plugins {
-    id 'java'
-    id 'org.springframework.boot' version '3.5.9'
-    id 'io.spring.dependency-management' version '1.1.7'
+  id 'java'
+  id 'org.springframework.boot' version '3.5.9'
+  id 'io.spring.dependency-management' version '1.1.7'
 }
 
 group = 'com.example.thexuong'
@@ -9,88 +9,95 @@ version = '0.0.1-SNAPSHOT'
 description = 'TheXuong'
 
 java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
-    }
+  toolchain {
+    languageVersion = JavaLanguageVersion.of(21)
+  }
 }
+
+tasks.withType(JavaCompile) {
+  options.compilerArgs << "-Xlint:deprecation"
+}
+
 
 // Frontend build configuration
 def nodeVersion = '20.11.0'
 def npmCommand = System.getProperty('os.name').toLowerCase().contains('windows') ? 'npm.cmd' : 'npm'
 
 configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
-    }
+  compileOnly {
+    extendsFrom annotationProcessor
+  }
 }
 
 repositories {
-    mavenCentral()
+  mavenCentral()
 }
 
 // Frontend tasks
 task npmInstall(type: Exec) {
-    workingDir file('frontend')
-    commandLine npmCommand, 'install'
-    // Only run if package.json changes
-    inputs.file file('frontend/package.json')
-    outputs.dir file('frontend/node_modules')
+  workingDir file('frontend')
+  commandLine npmCommand, 'install', '--legacy-peer-deps'
+  inputs.file file('frontend/package.json')
+  outputs.dir file('frontend/node_modules')
 }
 
 task npmBuild(type: Exec) {
-    workingDir file('frontend')
-    commandLine npmCommand, 'run', 'build'
-    dependsOn npmInstall
-    inputs.file file('frontend/package.json')
-    inputs.dir file('frontend/src')
-    outputs.dir file('frontend/dist')
+  workingDir file('frontend')
+  commandLine npmCommand, 'run', 'build'
+  dependsOn npmInstall
+  inputs.file file('frontend/package.json')
+  inputs.dir file('frontend/src')
+  outputs.dir file('frontend/dist')
 }
 
 task copyFrontend(type: Copy) {
-    dependsOn npmBuild
-    from file('frontend/dist')
-    into file('src/main/resources/static/frontend')
+  dependsOn npmBuild
+  from file('frontend/dist')
+  into file('src/main/resources/static/frontend')
 }
 
 processResources {
-    dependsOn copyFrontend
+  dependsOn copyFrontend
 }
 
 tasks.named('bootJar') {
-    // Ensure frontend is built before creating the jar
-    dependsOn copyFrontend
+  dependsOn copyFrontend
 }
 
 tasks.named('bootRun') {
-    // Also build frontend when running in development (optional)
-    // dependsOn copyFrontend
+  // dependsOn copyFrontend
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-mail'
-    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-websocket'
-    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    runtimeOnly 'com.microsoft.sqlserver:mssql-jdbc'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.springframework.security:spring-security-test'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+  implementation 'org.springframework.boot:spring-boot-starter-mail'
+  implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+  implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+  implementation 'org.springframework.boot:spring-boot-starter-security'
+  implementation 'org.springframework.boot:spring-boot-starter-web'
+  implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+  implementation 'org.springframework.boot:spring-boot-starter-validation'
+  implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
 
-    // JWT Library
-    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
-    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
-    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+  compileOnly 'org.projectlombok:lombok'
+  annotationProcessor 'org.projectlombok:lombok'
+
+  developmentOnly 'org.springframework.boot:spring-boot-devtools'
+  runtimeOnly 'com.microsoft.sqlserver:mssql-jdbc'
+
+  testImplementation 'org.springframework.boot:spring-boot-starter-test'
+  testImplementation 'org.springframework.security:spring-security-test'
+  testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+  // JWT Library
+  implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+  runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+  runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
+  // Cloudflare R2 (S3-compatible)
+  implementation 'software.amazon.awssdk:s3:2.29.51'
+  implementation 'software.amazon.awssdk:apache-client:2.29.51'
 }
 
 tasks.named('test') {
-    useJUnitPlatform()
+  useJUnitPlatform()
 }

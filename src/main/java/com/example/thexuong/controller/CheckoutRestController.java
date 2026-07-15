@@ -12,7 +12,9 @@ import com.example.thexuong.repository.VoucherRepository;
 import com.example.thexuong.service.CartService;
 import com.example.thexuong.service.PointService;
 import com.example.thexuong.service.UserService;
+import com.example.thexuong.service.VoucherService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -30,6 +32,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/v1/checkout")
 @RequiredArgsConstructor
+@Slf4j
 public class CheckoutRestController {
 
     private final CartService cartService;
@@ -38,6 +41,7 @@ public class CheckoutRestController {
     private final UserVoucherRepository userVoucherRepository;
     private final VoucherRepository voucherRepository;
     private final com.example.thexuong.service.VoucherService voucherService;
+    private final com.example.thexuong.repository.PointTierRepository pointTierRepository;
 
     /**
      * GET /api/checkout
@@ -87,7 +91,7 @@ public class CheckoutRestController {
                                     .id(product.getId())
                                     .name(product.getName())
                                     .price(product.getPrice() != null ? product.getPrice().doubleValue() : null)
-                                    .image(product.getImageUrl())
+                                    .imageUrl(product.getImageUrl())
                                     .build()
                     );
                 })
@@ -125,6 +129,19 @@ public class CheckoutRestController {
                 .filter(v -> v != null)
                 .collect(Collectors.toList());
 
+        // Get tier info
+        String tierCode = user.getTierCode() != null ? user.getTierCode() : "THUONG";
+        BigDecimal autoDiscountPercent = BigDecimal.ZERO;
+        BigDecimal tierDiscountAmount = BigDecimal.ZERO;
+
+        com.example.thexuong.entity.PointTier tier = pointTierRepository.findByCode(tierCode).orElse(null);
+        if (tier != null && tier.getAutoDiscountPercent() != null && tier.getAutoDiscountPercent().compareTo(BigDecimal.ZERO) > 0) {
+            autoDiscountPercent = tier.getAutoDiscountPercent();
+            tierDiscountAmount = BigDecimal.valueOf(cartTotal)
+                    .multiply(autoDiscountPercent)
+                    .divide(new BigDecimal("100"), 0, java.math.RoundingMode.HALF_UP);
+        }
+
         Map<String, Object> response = new java.util.HashMap<>();
         response.put("cart", Map.of(
                 "id", cart.getId(),
@@ -141,6 +158,9 @@ public class CheckoutRestController {
                 .build());
         response.put("currentPoints", currentPoints);
         response.put("availableVouchers", checkoutVouchers);
+        response.put("tierCode", tierCode);
+        response.put("autoDiscountPercent", autoDiscountPercent);
+        response.put("tierDiscountAmount", tierDiscountAmount);
 
         return ResponseEntity.ok(response);
     }
@@ -180,9 +200,10 @@ public class CheckoutRestController {
                     "data", data
             ));
         } catch (Exception e) {
+            log.error("Voucher validation failed for user {}: {}", user.getId(), e.getMessage(), e);
             return ResponseEntity.badRequest().body(Map.of(
                     "success", false,
-                    "message", e.getMessage()
+                    "message", "Voucher không hợp lệ hoặc đã xảy ra lỗi."
             ));
         }
     }

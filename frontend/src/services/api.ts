@@ -1,7 +1,7 @@
 import axios, { AxiosInstance, AxiosError } from 'axios'
 import type { User } from '@/types'
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api/v1'
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api/v1'
 
 class ApiService {
   private client: AxiosInstance
@@ -35,8 +35,10 @@ class ApiService {
       (response) => response,
       async (error: AxiosError) => {
         if (error.response?.status === 401) {
-          // Unauthorized - redirect to login
-          window.location.href = '/login'
+          // Unauthorized - redirect to login (but not if it's the initial fetchUser or already on login page)
+          if (error.config?.url && !error.config.url.includes('/auth/user') && window.location.pathname !== '/login') {
+            window.location.href = '/login'
+          }
           return Promise.reject(error)
         }
         if (error.response?.status === 403) {
@@ -155,28 +157,11 @@ class ApiService {
     return (await this.client.get(`/orders/${id}`)).data
   }
 
-  async createOrder(): Promise<{ orderId: number; vnpayUrl: string }> {
-    return (await this.client.post('/orders/place')).data
-  }
-
   async cancelOrder(id: number): Promise<void> {
     await this.client.post(`/orders/${id}/cancel`)
   }
 
-  // Checkout APIs
-  async createCheckout(): Promise<{ vnpayUrl: string }> {
-    return (await this.client.post('/checkout/create')).data
-  }
-
-  async confirmPayment(orderId: number): Promise<void> {
-    await this.client.post(`/checkout/confirm`, { orderId })
-  }
-
   // Profile APIs
-  async getProfile(): Promise<any> {
-    return (await this.client.get('/auth/profile')).data
-  }
-
   async updateProfile(data: {
     fullName?: string
     phoneNumber?: string
@@ -232,6 +217,52 @@ class ApiService {
 
   async getStatistics(): Promise<any> {
     return (await this.client.get('/admin/statistics')).data
+  }
+
+  async getAdminProduct(id: number): Promise<any> {
+    return (await this.client.get(`/admin/products/${id}`)).data
+  }
+
+  async getSizeCatalog(sizeType?: string): Promise<any> {
+    return (await this.client.get('/admin/products/size-catalog', { params: { sizeType } })).data
+  }
+
+  // Auth extras
+  async changePassword(data: {
+    currentPassword: string
+    newPassword: string
+    confirmPassword?: string
+  }): Promise<any> {
+    return (await this.client.put('/auth/password', data)).data
+  }
+
+  async resetPassword(data: {
+    token: string
+    password: string
+    confirmPassword: string
+  }): Promise<any> {
+    return (await this.client.post('/auth/reset-password', data)).data
+  }
+
+  // Generic HTTP verbs (for services/views calling api.get/post/... directly)
+  get<T = any>(url: string, config?: any) {
+    return this.client.get<T>(url, config)
+  }
+
+  post<T = any>(url: string, data?: any, config?: any) {
+    return this.client.post<T>(url, data, config)
+  }
+
+  put<T = any>(url: string, data?: any, config?: any) {
+    return this.client.put<T>(url, data, config)
+  }
+
+  patch<T = any>(url: string, data?: any, config?: any) {
+    return this.client.patch<T>(url, data, config)
+  }
+
+  delete<T = any>(url: string, config?: any) {
+    return this.client.delete<T>(url, config)
   }
 }
 

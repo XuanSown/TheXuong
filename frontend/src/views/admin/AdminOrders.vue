@@ -1,609 +1,698 @@
 <template>
   <div class="orders-manager">
-    <div class="main-container">
-      <!-- Toolbar & Filters Section -->
-      <div class="toolbar-section">
-        <div class="toolbar-content">
-          <!-- Search -->
-          <div class="search-container">
-            <svg class="search-icon" width="18" height="18" viewBox="0 0 18 18" fill="none">
-              <circle cx="8" cy="8" r="6" stroke="#5E5F5C" stroke-width="1.66667"/>
-              <path d="M12.5 12.5L16.5 16.5" stroke="#5E5F5C" stroke-width="1.66667" stroke-linecap="round"/>
-            </svg>
-            <input
-              type="text"
-              v-model="searchQuery"
-              class="search-input"
-              placeholder="Tìm mã đơn hoặc khách hàng..."
-            />
-          </div>
-
-          <!-- Filter Buttons -->
-          <div class="filter-buttons">
-            <button
-              class="filter-btn"
-              :class="{ active: statusFilter === 'all' }"
-              @click="statusFilter = 'all'"
-            >
-              TẤT CẢ
-            </button>
-            <button
-              class="filter-btn"
-              :class="{ active: statusFilter === 'Đã đặt' }"
-              @click="statusFilter = 'Đã đặt'"
-            >
-              ĐÃ ĐẶT
-            </button>
-            <button
-              class="filter-btn"
-              :class="{ active: statusFilter === 'Đang giao' }"
-              @click="statusFilter = 'Đang giao'"
-            >
-              ĐANG GIAO
-            </button>
-            <button
-              class="filter-btn"
-              :class="{ active: statusFilter === 'Đã giao' }"
-              @click="statusFilter = 'Đã giao'"
-            >
-              ĐÃ GIAO
-            </button>
-            <button
-              class="filter-btn"
-              :class="{ active: statusFilter === 'Đã hủy' }"
-              @click="statusFilter = 'Đã hủy'"
-            >
-              ĐÃ HỦY
-            </button>
-          </div>
-        </div>
+  <div class="main-container">
+    <!-- Toolbar & Filters Section -->
+    <div class="toolbar-section">
+    <div class="toolbar-content">
+      <!-- Search -->
+      <div class="search-container">
+      <svg class="search-icon" width="18" height="18" viewBox="0 0 18 18" fill="none">
+        <circle cx="8" cy="8" r="6" stroke="#5E5F5C" stroke-width="1.66667"/>
+        <path d="M12.5 12.5L16.5 16.5" stroke="#5E5F5C" stroke-width="1.66667" stroke-linecap="round"/>
+      </svg>
+      <input
+        type="text"
+        v-model="searchQuery"
+        class="search-input"
+        placeholder="Tìm mã đơn hoặc khách hàng..."
+        @input="onSearch"
+      />
       </div>
 
-      <!-- Order Table -->
-      <div class="order-table-container">
-        <div class="table-wrapper">
-          <!-- Table Header -->
-          <div class="table-header">
-            <div class="header-cell" style="width: 114.94px;">MÃ ĐƠN</div>
-            <div class="header-cell" style="width: 143.05px;">KHÁCH HÀNG</div>
-            <div class="header-cell" style="width: 134.88px;">SĐT</div>
-            <div class="header-cell" style="width: 164.73px;">NGÀY ĐẶT</div>
-            <div class="header-cell" style="width: 130.23px;">TỔNG TIỀN</div>
-            <div class="header-cell" style="width: 126.11px;">TRẠNG THÁI</div>
-            <div class="header-cell" style="width: 132px; text-align: right;">HÀNH ĐỘNG</div>
-          </div>
+      <!-- Filter Buttons -->
+      <div class="filter-buttons">
+      <button
+        v-for="filter in filters"
+        :key="filter.value"
+        class="filter-btn"
+        :class="{ active: statusFilter === filter.value }"
+        @click="applyFilter(filter.value)"
+      >
+        {{ filter.label }}
+      </button>
+      </div>
+    </div>
+    </div>
 
-          <!-- Table Body -->
-          <div class="table-body">
-            <div v-for="order in paginatedOrders" :key="order.id" class="table-row">
-              <div class="cell" style="width: 114.94px;">
-                <span class="order-id">{{ order.id }}</span>
-              </div>
-              <div class="cell" style="width: 143.05px;">
-                <span class="customer-name">{{ order.customerName }}</span>
-              </div>
-              <div class="cell" style="width: 134.88px;">
-                <span class="phone-number">{{ order.phone }}</span>
-              </div>
-              <div class="cell" style="width: 164.73px;">
-                <span class="date">{{ order.date }}</span>
-              </div>
-              <div class="cell" style="width: 130.23px;">
-                <span class="total-price">{{ formatPrice(order.total) }}</span>
-              </div>
-              <div class="cell" style="width: 126.11px;">
-                <span
-                  class="status-badge"
-                  :class="getStatusClass(order.status)"
-                >
-                  {{ order.status }}
-                </span>
-              </div>
-              <div class="cell" style="width: 132px; text-align: right;">
-                <div class="action-buttons">
-                  <button class="action-btn view-btn" title="Xem chi tiết">
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                      <path d="M10 5C10 10 15 15 15 15C15 15 10 20 10 20C10 20 5 15 5 15C5 15 10 10 10 5Z" stroke="#9CA3AF" stroke-width="1.66667" stroke-linejoin="round"/>
-                      <circle cx="10" cy="10" r="3" stroke="#9CA3AF" stroke-width="1.66667"/>
-                    </svg>
-                  </button>
-                  <button class="action-btn edit-btn" title="Chỉnh sửa" @click="editOrder(order.id)">
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                      <path d="M17.5 3.75L16.25 2.5M14.58 5.42L15.75 6.59C16.63 7.47 17.08 8.82 16.82 10.25C16.56 11.68 15.68 12.91 14.55 13.54L5.24 22.85C4.75 23.34 4.02 23.44 3.41 23.17C2.8 22.9 2.46 22.09 2.59 21.46L3.76 15.05" stroke="#9CA3AF" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                  </button>
-                  <button class="action-btn delete-btn" title="Xóa" @click="deleteOrder(order.id)">
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                      <path d="M4 4.375L16 16.25M4 16.25L16 4.375" stroke="#9CA3AF" stroke-width="1.66667" stroke-linecap="round"/>
-                    </svg>
-                  </button>
+    <!-- Order Table -->
+    <div class="order-table-container">
+    <div class="table-wrapper">
+      <!-- Table Header -->
+      <div class="table-header">
+      <div class="header-cell" style="width: 10%;">MÃ ĐƠN</div>
+      <div class="header-cell" style="width: 16%;">KHÁCH HÀNG</div>
+      <div class="header-cell" style="width: 12%;">SĐT</div>
+      <div class="header-cell" style="width: 15%;">NGÀY ĐẶT</div>
+      <div class="header-cell" style="width: 13%;">THANH TOÁN</div>
+      <div class="header-cell" style="width: 13%;">TỔNG TIỀN</div>
+      <div class="header-cell" style="width: 13%;">TRẠNG THÁI</div>
+      <div class="header-cell" style="width: 8%; justify-content: flex-end;">HÀNH ĐỘNG</div>
+      </div>
+
+      <!-- Table Body -->
+      <div class="table-body">
+      <div v-if="isLoading" class="loading-cell">
+        Đang tải...
+      </div>
+      <div v-else-if="orders.length === 0" class="empty-cell">
+        Không có đơn hàng nào
+      </div>
+        <div v-else>
+        <div v-for="order in paginatedOrders" :key="order.id" class="table-row">
+        <div class="cell" style="width: 10%;">
+        <span class="order-id">{{ order.id }}</span>
+        </div>
+        <div class="cell" style="width: 16%;">
+        <span class="customer-name">{{ order.customerName }}</span>
+        </div>
+        <div class="cell" style="width: 12%;">
+        <span class="phone-number">{{ order.phone }}</span>
+        </div>
+        <div class="cell" style="width: 15%;">
+        <span class="date">{{ order.date }}</span>
+        </div>
+        <div class="cell" style="width: 13%;">
+        <span class="payment-method">{{ order.paymentMethod }}</span>
+        </div>
+        <div class="cell" style="width: 13%;">
+        <span class="total-price">{{ formatPrice(order.total) }}</span>
+        </div>
+        <div class="cell" style="width: 13%;">
+        <span
+          class="status-badge"
+          :class="getStatusClass(order.status)"
+        >
+          {{ getStatusLabel(order.status) }}
+        </span>
+        </div>
+        <div class="cell" style="width: 8%; justify-content: flex-end;">
+        <div class="action-buttons">
+          <button class="action-btn view-btn" title="Xem chi tiết" @click="viewOrderDetails(order.id)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+          </button>
+          <button class="action-btn edit-btn" title="Chỉnh sửa trạng thái" @click="editOrderStatus(order)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+          </svg>
+          </button>
+        </div>
+        </div>
+      </div>
+      </div>
+      </div> <!-- table-body -->
+    </div> <!-- table-wrapper -->
+ <!-- Pagination -->
+    <div class="pagination-section">
+    <div class="pagination-info">
+        Hiển thị {{ pageNumber === 0 ? 1 : pageNumber * size + 1 }} - {{ Math.min((pageNumber + 1) * size, totalElements) }} của {{ totalElements }} kết quả
+    </div>
+    <div class="pagination-controls">
+      <button
+      class="page-btn prev-btn"
+      :disabled="currentPage === 1"
+        @click="changePage(pageNumber + 1)"
+      >
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <path d="M12.5 5L7.5 10L12.5 15" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      </button>
+
+      <button
+      v-for="page in visiblePages"
+      :key="page"
+      class="page-btn page-number"
+      :class="{ active: currentPage === page }"
+        @click="changePage(Number(page))"
+      >
+      {{ page === '...' ? '...' : page }}
+      </button>
+
+      <button
+      class="page-btn next-btn"
+      :disabled="currentPage === totalPages"
+        @click="changePage(pageNumber + 2)"
+      >
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <path d="M7.5 5L12.5 10L7.5 15" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      </button>
+    </div>
+    </div>
+    </div> <!-- order-table-container -->
+
+    <!-- View Details Modal -->
+    <div v-if="showViewModal" class="modal-overlay" @click.self="showViewModal = false">
+      <div class="confirm-dialog view-dialog">
+        <div class="confirm-header">
+          <h3>Chi tiết đơn hàng #{{ viewingOrder?.id }}</h3>
+        </div>
+        <div class="confirm-body" style="max-height: 400px; overflow-y: auto;">
+          <div v-if="viewingOrder" class="order-details-content">
+            <p><strong>Khách hàng:</strong> {{ viewingOrder.fullName }}</p>
+            <p><strong>SĐT:</strong> {{ viewingOrder.phoneNumber }}</p>
+            <p><strong>Địa chỉ:</strong> {{ viewingOrder.address }}</p>
+            <p><strong>Ngày đặt:</strong> {{ new Date(viewingOrder.createdAt).toLocaleString('vi-VN') }}</p>
+            <p style="margin-bottom: 16px;"><strong>Tổng thanh toán:</strong> <span style="color: #d32f2f; font-weight: bold;">{{ formatPrice(viewingOrder.totalMoney) }}</span></p>
+            
+            <h4 style="font-weight: 700; text-transform: uppercase; margin-bottom: 8px;">Sản phẩm:</h4>
+            <div class="items-list" style="display: flex; flex-direction: column; gap: 10px;">
+              <div v-for="item in viewingOrder.items" :key="item.id" style="display: flex; gap: 16px; border-bottom: 1px solid #eee; padding-bottom: 8px; align-items: center;">
+                <img :src="item.imageUrl" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;" v-if="item.imageUrl" />
+                <div style="flex: 1;">
+                  <p style="font-weight: 600; margin: 0;">{{ item.productName }}</p>
+                  <p style="font-size: 13px; color: #666; margin: 4px 0 0;">Size: {{ item.size }} | SL: {{ item.quantity }}</p>
                 </div>
+                <div style="font-weight: 600;">{{ formatPrice(item.totalPrice) }}</div>
               </div>
             </div>
           </div>
+          <div v-else style="text-align: center; padding: 20px;">Đang tải...</div>
         </div>
-
-        <!-- Pagination -->
-        <div class="pagination-section">
-          <div class="pagination-info">
-            Hiển thị {{ startIndex + 1 }} - {{ Math.min(endIndex, filteredOrders.length) }} của {{ filteredOrders.length }} kết quả
-          </div>
-          <div class="pagination-controls">
-            <button
-              class="page-btn prev-btn"
-              :disabled="currentPage === 1"
-              @click="currentPage--"
-            >
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                <path d="M12.5 5L7.5 10L12.5 15" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </button>
-
-            <button
-              v-for="page in visiblePages"
-              :key="page"
-              class="page-btn page-number"
-              :class="{ active: currentPage === page }"
-              @click="currentPage = page"
-            >
-              {{ page === '...' ? '...' : page }}
-            </button>
-
-            <button
-              class="page-btn next-btn"
-              :disabled="currentPage === totalPages"
-              @click="currentPage++"
-            >
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                <path d="M7.5 5L12.5 10L7.5 15" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </button>
-          </div>
+        <div class="confirm-actions" style="margin-top: 16px;">
+          <button @click="showViewModal = false" class="btn-secondary">ĐÓNG</button>
         </div>
       </div>
     </div>
+
+    <!-- Status Edit Modal -->
+    <div v-if="showStatusModal" class="modal-overlay" @click.self="cancelStatusChange">
+    <div class="confirm-dialog">
+      <div class="confirm-header">
+      <span class="confirm-icon">&#9998;</span>
+      <h3>Chỉnh sửa trạng thái đơn hàng</h3>
+      </div>
+      <div class="confirm-body">
+      <p class="mb-4">Đơn #{{ editingOrder?.id }} — {{ editingOrder?.customerName }}</p>
+      <div class="form-group">
+        <label>Trạng thái mới</label>
+        <select v-model="newStatus" class="form-input">
+        <option value="PENDING">Đã đặt (PENDING)</option>
+        <option value="CONFIRMED">Đã xác nhận (CONFIRMED)</option>
+        <option value="SHIPPING">Đang giao (SHIPPING)</option>
+        <option value="DELIVERED">Đã giao (DELIVERED)</option>
+        <option value="COMPLETED">Hoàn thành (COMPLETED)</option>
+        <option value="CANCEL_REQUESTED">Yêu cầu hủy (CANCEL_REQUESTED)</option>
+        <option value="CANCELLED">Đã hủy (CANCELLED)</option>
+        <option value="REFUNDED">Hoàn tiền (REFUNDED)</option>
+        </select>
+      </div>
+      </div>
+      <div class="confirm-actions">
+      <button @click="cancelStatusChange" class="btn-secondary">HỦY</button>
+      <button @click="submitStatusChange" class="btn-confirm primary">CẬP NHẬT</button>
+      </div>
+    </div>
+    </div>
+  </div>
   </div>
 </template>
 
-<script setup>
-import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
+<script setup lang="ts">
+import { ref, computed, onMounted } from 'vue'
+import { useToast } from 'vue-toastification'
+import api from '@/services/api'
 
-const router = useRouter()
-
-// Search and filter state
 const searchQuery = ref('')
 const statusFilter = ref('all')
-const currentPage = ref(1)
-const itemsPerPage = 4
+const currentPage = ref(1) // 1-based for display
 
-// Mock order data
-const orders = ref([
-  {
-    id: '#TX-1005',
-    customerName: 'Nguyễn Văn A',
-    phone: '0901234567',
-    date: '24/10/2023 14:30',
-    total: 2500000,
-    status: 'Đã đặt'
-  },
-  {
-    id: '#TX-1004',
-    customerName: 'Trần Thị B',
-    phone: '0987654321',
-    date: '23/10/2023 09:15',
-    total: 850000,
-    status: 'Đang giao'
-  },
-  {
-    id: '#TX-1003',
-    customerName: 'Lê Văn C',
-    phone: '0912345678',
-    date: '22/10/2023 16:45',
-    total: 1200000,
-    status: 'Đã giao'
-  },
-  {
-    id: '#TX-1002',
-    customerName: 'Phạm Thị D',
-    phone: '0933445566',
-    date: '21/10/2023 10:00',
-    total: 3100000,
-    status: 'Đã hủy'
-  },
-  {
-    id: '#TX-1001',
-    customerName: 'Hoàng Văn E',
-    phone: '0977889900',
-    date: '20/10/2023 08:20',
-    total: 1800000,
-    status: 'Đã đặt'
-  },
-  {
-    id: '#TX-1000',
-    customerName: 'Vũ Thị F',
-    phone: '0966554433',
-    date: '19/10/2023 15:45',
-    total: 4200000,
-    status: 'Đang giao'
-  },
-  {
-    id: '#TX-999',
-    customerName: 'Đỗ Văn G',
-    phone: '0944333221',
-    date: '18/10/2023 11:30',
-    total: 980000,
-    status: 'Đã giao'
-  },
-  {
-    id: '#TX-998',
-    customerName: 'Mai Thị H',
-    phone: '0922113344',
-    date: '17/10/2023 14:15',
-    total: 5600000,
-    status: 'Đã đặt'
+const filters = [
+  { label: 'TẤT CẢ', value: 'all' },
+  { label: 'ĐÃ ĐẶT', value: 'PENDING' },
+  { label: 'ĐÃ XÁC NHẬN', value: 'CONFIRMED' },
+  { label: 'ĐANG GIAO', value: 'SHIPPING' },
+  { label: 'ĐÃ GIAO', value: 'DELIVERED' },
+  { label: 'HOÀN THÀNH', value: 'COMPLETED' },
+  { label: 'YÊU CẦU HỦY', value: 'CANCEL_REQUESTED' },
+  { label: 'ĐÃ HỦY', value: 'CANCELLED' },
+  { label: 'HOÀN TIỀN', value: 'REFUNDED' }
+]
+
+const applyFilter = (status: string) => {
+  statusFilter.value = status
+  currentPage.value = 1
+  fetchOrders()
+}
+const itemsPerPage = 10
+const size = computed(() => itemsPerPage)
+const isLoading = ref(false)
+const orders = ref<any[]>([])
+const totalElements = ref(0)
+const totalPages = ref(1)
+const pageNumber = ref(0) // 0-based from backend
+const toast = useToast()
+
+// View modal state
+const showViewModal = ref(false)
+const viewingOrder = ref<any>(null)
+
+const viewOrderDetails = async (orderId: number) => {
+  showViewModal.value = true
+  viewingOrder.value = null
+  try {
+    const res = await api.get(`/orders/${orderId}`)
+    viewingOrder.value = res.data
+  } catch (err) {
+    toast.error('Không thể lấy chi tiết đơn hàng')
+    showViewModal.value = false
   }
-])
+}
 
-// Computed: Filtered orders
-const filteredOrders = computed(() => {
-  let result = orders.value
+// Status edit modal state
+const showStatusModal = ref(false)
+const editingOrder = ref<any>(null)
+const newStatus = ref('')
 
-  // Filter by search query
-  if (searchQuery.value.trim()) {
-    const query = searchQuery.value.toLowerCase()
-    result = result.filter(
-      o =>
-        o.id.toLowerCase().includes(query) ||
-        o.customerName.toLowerCase().includes(query) ||
-        o.phone.includes(query)
-    )
+const STATUS_LABELS: Record<string, string> = {
+  PENDING: 'Đã đặt',
+  CONFIRMED: 'Đã xác nhận',
+  SHIPPING: 'Đang giao',
+  DELIVERED: 'Đã giao',
+  COMPLETED: 'Hoàn thành',
+  CANCEL_REQUESTED: 'Yêu cầu hủy',
+  CANCELLED: 'Đã hủy',
+  REFUNDED: 'Hoàn tiền'
+}
+
+const STATUS_CLASSES: Record<string, string> = {
+  PENDING: 'status-pending',
+  CONFIRMED: 'status-confirmed',
+  SHIPPING: 'status-delivering',
+  DELIVERED: 'status-delivered',
+  COMPLETED: 'status-completed',
+  CANCEL_REQUESTED: 'status-cancel-requested',
+  CANCELLED: 'status-cancelled',
+  REFUNDED: 'status-refunded'
+}
+
+// Fetch orders from API (backend handles filtering + pagination)
+const fetchOrders = async () => {
+  isLoading.value = true
+  try {
+    const params: any = { page: currentPage.value - 1, size: itemsPerPage }
+    if (statusFilter.value !== 'all') {
+      params.status = statusFilter.value
+    }
+    if (searchQuery.value.trim()) {
+      params.keyword = searchQuery.value.trim()
+    }
+    const response = await api.get('/admin/orders', { params })
+    const data = response.data
+    const items = data.content || data || []
+    orders.value = items.map((o: any) => ({
+      id: o.id || 0,
+      customerName: o.fullName || 'N/A',
+      phone: o.phoneNumber || '',
+      date: o.createdAt ? new Date(o.createdAt).toLocaleString('vi-VN') : '',
+      paymentMethod: getPaymentMethodLabel(o.paymentMethod || 'COD'),
+      total: o.totalMoney || 0,
+      status: o.status || '',
+      raw: o
+    }))
+    totalElements.value = (data.totalElements as number) || items.length
+    totalPages.value = (data.totalPages as number) || 1
+    pageNumber.value = (data.number as number) || 0
+    currentPage.value = pageNumber.value + 1
+  } catch (error) {
+    console.error('Failed to fetch orders:', error)
+    toast.error('Không tải được danh sách đơn hàng')
+    orders.value = []
+  } finally {
+    isLoading.value = false
   }
+}
 
-  // Filter by status
-  if (statusFilter.value !== 'all') {
-    result = result.filter(o => o.status === statusFilter.value)
-  }
+const onSearch = () => {
+  currentPage.value = 1
+  fetchOrders()
+}
 
-  return result
+onMounted(() => {
+  fetchOrders()
 })
 
-// Computed: Pagination
-const totalPages = computed(() => Math.max(1, Math.ceil(filteredOrders.value.length / itemsPerPage)))
-
-const startIndex = computed(() => (currentPage.value - 1) * itemsPerPage)
-const endIndex = computed(() => startIndex.value + itemsPerPage)
-
-const paginatedOrders = computed(() => {
-  return filteredOrders.value.slice(startIndex.value, endIndex.value)
-})
+// Backend already returns the correct page
+const paginatedOrders = computed(() => orders.value)
 
 // Visible page numbers (show max 5 pages)
 const visiblePages = computed(() => {
-  const pages = []
+  const pages: (number | string)[] = []
   const total = totalPages.value
   const current = currentPage.value
-
   if (total <= 5) {
-    for (let i = 1; i <= total; i++) {
-      pages.push(i)
-    }
+    for (let i = 1; i <= total; i++) pages.push(i)
   } else {
     if (current <= 3) {
-      for (let i = 1; i <= 4; i++) {
-        pages.push(i)
-      }
+      for (let i = 1; i <= 4; i++) pages.push(i)
       pages.push('...', total)
     } else if (current >= total - 2) {
       pages.push(1, '...')
-      for (let i = total - 3; i <= total; i++) {
-        pages.push(i)
-      }
+      for (let i = total - 3; i <= total; i++) pages.push(i)
     } else {
       pages.push(1, '...')
-      for (let i = current - 1; i <= current + 1; i++) {
-        pages.push(i)
-      }
+      for (let i = current - 1; i <= current + 1; i++) pages.push(i)
       pages.push('...', total)
     }
   }
   return pages
 })
 
-// Get status badge class
-const getStatusClass = (status) => {
-  switch (status) {
-    case 'Đã đặt':
-      return 'status-placed'
-    case 'Đang giao':
-      return 'status-delivering'
-    case 'Đã giao':
-      return 'status-delivered'
-    case 'Đã hủy':
-      return 'status-cancelled'
-    default:
-      return ''
+// Navigate to a specific page (1-based)
+const changePage = (page: number) => {
+  if (page < 1 || page > totalPages.value) return
+  currentPage.value = page
+  fetchOrders()
+}
+
+const getStatusLabel = (status: string) => STATUS_LABELS[status] || status
+const getStatusClass = (status: string) => STATUS_CLASSES[status] || ''
+
+const getPaymentMethodLabel = (method: string) => {
+  if (method === 'COD') return 'Tiền mặt'
+  if (method === 'VNPAY') return 'VNPay'
+  return method
+}
+
+const formatPrice = (price: number) => {
+  return new Intl.NumberFormat('vi-VN').format(price) + ' d'
+}
+
+const editOrderStatus = (order: any) => {
+  editingOrder.value = order
+  newStatus.value = order.status
+  showStatusModal.value = true
+}
+
+const submitStatusChange = async () => {
+  if (!editingOrder.value || newStatus.value === editingOrder.value.status) {
+    showStatusModal.value = false
+    editingOrder.value = null
+    return
   }
-}
-
-// Format price
-const formatPrice = (price) => {
-  return new Intl.NumberFormat('vi-VN').format(price) + ' đ'
-}
-
-// Action handlers
-const editOrder = (orderId) => {
-  console.log('Edit order:', orderId)
-  // Navigate to edit page or open modal
-}
-
-const deleteOrder = (orderId) => {
-  if (confirm('Bạn có chắc chắn muốn xóa đơn hàng này?')) {
-    console.log('Delete order:', orderId)
-    // Implement delete logic
+  const currentStatus = editingOrder.value.status
+  editingOrder.value.status = newStatus.value
+  showStatusModal.value = false
+  try {
+    await api.patch(`/admin/orders/${editingOrder.value.id}/status`, { status: newStatus.value })
+    toast.success('Cập nhật trạng thái thành công')
+    fetchOrders()
+  } catch (err: any) {
+    editingOrder.value.status = currentStatus
+    toast.error('Cập nhật trạng thái thất bại: ' + (err.response?.data?.error || err.message))
   }
+  editingOrder.value = null
+}
+
+const cancelStatusChange = () => {
+  showStatusModal.value = false
+  editingOrder.value = null
 }
 </script>
-
 <style scoped>
 .orders-manager {
-  width: 1280px;
-  min-height: 1120px;
-  background: #F9F9F9;
-  display: flex;
-  flex-direction: column;
+width: 100%;
+min-height: 1120px;
+background: #F9F9F9;
+display: flex;
+flex-direction: column;
 }
 
 .main-container {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 0;
+display: flex;
+flex-direction: column;
+gap: 10px;
+padding: 0;
 }
 
 /* Toolbar Section */
 .toolbar-section {
-  position: absolute;
-  left: 267px;
-  right: 16px;
-  top: 13px;
-  height: 131px;
-  background: #FFFFFF;
-  border: 1px solid #E2E2E2;
-  box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05);
-  border-radius: 12px;
-  padding: 24px;
+position: relative;
+left: 0;
+right: 0;
+top: 0;
+height: auto;
+min-height: 131px;
+background: #FFFFFF;
+border: 1px solid #E2E2E2;
+box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05);
+border-radius: 12px;
+padding: 24px;
+margin-bottom: 10px;
 }
 
 .toolbar-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 947px;
-  height: 73px;
+display: flex;
+flex-direction: column;
+gap: 16px;
+width: 100%;
+height: auto;
 }
 
 /* Search */
 .search-container {
-  position: relative;
-  width: 373.25px;
-  height: 50.59px;
+position: relative;
+width: 373.25px;
+height: 40px;
 }
 
 .search-input {
-  width: 100%;
-  height: 100%;
-  padding: 14px 16px 15.59px 48px;
-  background: #F3F3F3;
-  border: none;
-  border-radius: 9999px;
-  font-family: 'Geist', sans-serif;
-  font-size: 16px;
-  color: #6B7280;
-  box-sizing: border-box;
+width: 100%;
+height: 100%;
+padding: 10px 16px 10px 40px;
+background: #F3F3F3;
+border: none;
+border-radius: 9999px;
+font-family: 'Geist', sans-serif;
+font-size: 14px;
+color: #6B7280;
+box-sizing: border-box;
 }
 
 .search-input::placeholder {
-  color: #6B7280;
+color: #6B7280;
 }
 
 .search-input:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+outline: none;
+box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
 }
 
 .search-icon {
-  position: absolute;
-  left: 16px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 18px;
-  height: 18px;
+position: absolute;
+left: 16px;
+top: 50%;
+transform: translateY(-50%);
+width: 18px;
+height: 18px;
 }
 
 /* Filter Buttons */
 .filter-buttons {
-  display: flex;
-  gap: 8px;
-  width: 448.75px;
-  height: 73px;
-  position: relative;
+display: flex;
+flex-wrap: wrap;
+gap: 8px;
+width: 100%;
 }
 
 .filter-btn {
-  position: absolute;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 8px 16px;
-  height: 33px;
-  background: #EEEEEE;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-family: 'Gelasio', serif;
-  font-size: 11px;
-  font-weight: 400;
-  line-height: 16px;
-  letter-spacing: 1.1px;
-  text-transform: uppercase;
-  color: #1A1C1C;
-  transition: all 0.2s;
+display: flex;
+align-items: center;
+justify-content: center;
+padding: 8px 16px;
+height: 33px;
+background: #EEEEEE;
+border: none;
+border-radius: 8px;
+cursor: pointer;
+font-family: 'Geist', sans-serif;
+font-size: 11px;
+font-weight: 400;
+line-height: 16px;
+letter-spacing: 1.1px;
+text-transform: uppercase;
+color: #1A1C1C;
+transition: all 0.2s;
+white-space: nowrap;
 }
 
 .filter-btn:hover {
-  background: #E5E7EB;
+background: #E5E7EB;
 }
 
 .filter-btn.active {
-  background: #000000;
-  color: #FFFFFF;
+background: #000000;
+color: #FFFFFF;
 }
-
-.filter-btn:nth-child(1) { left: 0px; top: 0px; width: 76px; }
-.filter-btn:nth-child(2) { left: 87.11px; top: 0px; width: 79px; }
-.filter-btn:nth-child(3) { left: 175.25px; top: 0px; width: 104px; }
-.filter-btn:nth-child(4) { left: 287.2px; top: 0px; width: 85px; }
-.filter-btn:nth-child(5) { left: 0px; top: 40.5px; width: 80px; }
 
 /* Order Table */
 .order-table-container {
-  position: absolute;
-  left: 267px;
-  right: 26px;
-  top: 163px;
-  bottom: 163px;
-  background: #FFFFFF;
-  border: 1px solid #E5E7EB;
-  box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05);
-  border-radius: 16px;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
+position: relative;
+left: 0;
+right: 0;
+top: 0;
+bottom: auto;
+background: #FFFFFF;
+border: 1px solid #E5E7EB;
+box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05);
+border-radius: 16px;
+display: flex;
+flex-direction: column;
+overflow: hidden;
+min-height: 400px;
 }
 
 .table-wrapper {
-  flex: 1;
-  overflow-y: auto;
+flex: 1;
+overflow-y: auto;
 }
 
 .table-header {
-  display: flex;
-  width: 985px;
-  min-width: 934px;
-  height: 64.5px;
-  background: #F9FAFB;
-  border-bottom: 1px solid #E5E7EB;
-  position: sticky;
-  top: 0;
-  z-index: 1;
+display: flex;
+width: 100%;
+min-width: 934px;
+height: 64.5px;
+background: #F9FAFB;
+border-bottom: 1px solid #E5E7EB;
+position: sticky;
+top: 0;
+z-index: 1;
 }
 
 .header-cell {
-  display: flex;
-  align-items: center;
-  padding: 23.5px 24px 25px;
-  font-family: 'Geist', sans-serif;
-  font-size: 12px;
-  font-weight: 600;
-  line-height: 16px;
-  letter-spacing: 0.6px;
-  text-transform: uppercase;
-  color: #6B7280;
-  box-sizing: border-box;
+display: flex;
+align-items: center;
+padding: 23.5px 24px 25px;
+font-family: 'Geist', sans-serif;
+font-size: 12px;
+font-weight: 600;
+line-height: 16px;
+letter-spacing: 0.6px;
+text-transform: uppercase;
+color: #6B7280;
+box-sizing: border-box;
 }
 
 .table-body {
-  display: flex;
-  flex-direction: column;
+display: flex;
+flex-direction: column;
 }
 
 .table-row {
-  display: flex;
-  width: 985px;
-  min-width: 934px;
-  height: 57px;
-  border-top: 1px solid #F3F4F6;
-  box-sizing: border-box;
+display: flex;
+width: 100%;
+min-width: 934px;
+min-height: 57px;
+border-top: 1px solid #F3F4F6;
+box-sizing: border-box;
 }
 
 .table-row:hover {
-  background: #F9FAFB;
+background: #F9FAFB;
 }
 
 .cell {
-  display: flex;
-  align-items: center;
-  padding: 18px 24px 19px;
-  box-sizing: border-box;
+display: flex;
+align-items: center;
+padding: 18px 24px 19px;
+box-sizing: border-box;
+}
+
+.loading-cell, .empty-cell {
+padding: 48px 24px;
+text-align: center;
+color: #6B7280;
+font-family: 'Geist', sans-serif;
+font-size: 14px;
 }
 
 .order-id {
-  font-family: 'Geist', sans-serif;
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 20px;
-  color: #111827;
+font-family: 'Geist', sans-serif;
+font-weight: 500;
+font-size: 14px;
+line-height: 20px;
+color: #111827;
 }
 
 .customer-name {
-  font-family: 'Inter', sans-serif;
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 20px;
-  color: #374151;
+font-family: 'Geist', sans-serif;
+font-weight: 400;
+font-size: 14px;
+line-height: 20px;
+color: #374151;
 }
 
 .phone-number {
-  font-family: 'Geist', sans-serif;
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 20px;
-  color: #6B7280;
+font-family: 'Geist', sans-serif;
+font-weight: 400;
+font-size: 14px;
+line-height: 20px;
+color: #6B7280;
 }
 
 .date {
-  font-family: 'Geist', sans-serif;
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 20px;
-  color: #6B7280;
+font-family: 'Geist', sans-serif;
+font-weight: 400;
+font-size: 14px;
+line-height: 20px;
+color: #6B7280;
+}
+
+.payment-method {
+font-family: 'Geist', sans-serif;
+font-weight: 500;
+font-size: 13px;
+line-height: 20px;
+color: #4B5563;
 }
 
 .total-price {
-  font-family: 'Geist', sans-serif;
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 20px;
-  color: #111827;
+font-family: 'Geist', sans-serif;
+font-weight: 500;
+font-size: 14px;
+line-height: 20px;
+color: #111827;
 }
 
 /* Status Badges */
 .status-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 4px 10px;
-  border-radius: 9999px;
-  font-family: 'Geist', sans-serif;
-  font-size: 12px;
-  font-weight: 500;
-  line-height: 16px;
+display: inline-flex;
+align-items: center;
+justify-content: center;
+padding: 4px 10px;
+border-radius: 9999px;
+font-family: 'Geist', sans-serif;
+font-size: 12px;
+font-weight: 500;
+line-height: 16px;
 }
 
-.status-placed {
-  background: #DBEAFE;
-  color: #1E40AF;
+.status-pending {
+background: #DBEAFE;
+color: #1E40AF;
+}
+
+.status-confirmed {
+background: #E0E7FF;
+color: #3730A3;
 }
 
 .status-delivering {
-  background: #FEF9C3;
-  color: #854D0E;
+background: #FEF9C3;
+color: #854D0E;
 }
 
 .status-delivered {
-  background: #DCFCE7;
-  color: #166534;
+background: #DCFCE7;
+color: #166534;
+}
+
+.status-completed {
+background: #D1FAE5;
+color: #065F46;
 }
 
 .status-cancelled {
@@ -611,146 +700,252 @@ const deleteOrder = (orderId) => {
   color: #991B1B;
 }
 
+.status-cancel-requested {
+  background: #FFEDD5;
+  color: #C2410C;
+}
+
+.status-refunded {
+background: #F3E8FF;
+color: #6B21A8;
+}
+
 /* Action Buttons */
 .action-buttons {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 12px;
-  margin-left: auto;
+display: flex;
+align-items: center;
+justify-content: flex-end;
+gap: 12px;
+margin-left: auto;
 }
 
 .action-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 20px;
-  height: 20px;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 0;
+display: flex;
+align-items: center;
+justify-content: center;
+width: 20px;
+height: 20px;
+background: transparent;
+border: none;
+cursor: pointer;
+padding: 0;
 }
 
-.action-btn:hover svg path {
-  stroke: #374151;
+.action-btn:hover svg path,
+.action-btn:hover svg circle {
+  stroke: #111827;
 }
 
 /* Pagination */
 .pagination-section {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 24px;
-  width: 985px;
-  height: 71px;
-  background: #FFFFFF;
-  border-top: 1px solid #E5E7EB;
-  box-sizing: border-box;
+display: flex;
+justify-content: space-between;
+align-items: center;
+padding: 16px 24px;
+width: 100%;
+height: 71px;
+background: #FFFFFF;
+border-top: 1px solid #E5E7EB;
+box-sizing: border-box;
 }
 
 .pagination-info {
-  width: 198px;
-  height: 20px;
-  font-family: 'Geist', sans-serif;
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 20px;
-  color: #374151;
+width: 198px;
+height: 20px;
+font-family: 'Geist', sans-serif;
+font-weight: 400;
+font-size: 14px;
+line-height: 20px;
+color: #374151;
 }
 
 .pagination-controls {
-  position: relative;
-  width: 242.98px;
-  height: 38px;
-  background: rgba(255, 255, 255, 0.002);
-  box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05);
-  border-radius: 6px;
+position: relative;
+width: auto;
+min-width: 242.98px;
+height: 38px;
+display: flex;
+gap: 4px;
+align-items: center;
 }
 
 .page-btn {
-  position: absolute;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #FFFFFF;
-  border: 1px solid #D1D5DB;
-  cursor: pointer;
-  font-family: 'Inter', sans-serif;
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 20px;
-  color: #6B7280;
-  box-sizing: border-box;
-  transition: all 0.2s;
+display: flex;
+align-items: center;
+justify-content: center;
+background: #FFFFFF;
+border: 1px solid #D1D5DB;
+cursor: pointer;
+font-family: 'Geist', sans-serif;
+font-size: 14px;
+font-weight: 500;
+line-height: 20px;
+color: #6B7280;
+box-sizing: border-box;
+transition: all 0.2s;
+min-width: 38px;
+height: 38px;
+padding: 8px;
 }
 
 .page-btn:hover:not(:disabled) {
-  background: #F9FAFB;
+background: #F9FAFB;
 }
 
 .page-btn.active {
-  background: #000000;
-  border-color: #000000;
-  color: #FFFFFF;
+background: #000000;
+border-color: #000000;
+color: #FFFFFF;
 }
 
 .page-btn:disabled {
-  cursor: not-allowed;
-  opacity: 0.5;
+cursor: not-allowed;
+opacity: 0.5;
 }
 
 .page-btn.prev-btn {
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 38px;
-  height: 38px;
-  padding: 8px;
-  border-radius: 6px 0 0 6px;
+border-radius: 6px 0 0 6px;
 }
 
 .page-btn.next-btn {
-  left: 204.98px;
-  top: 0;
-  bottom: 0;
-  width: 38px;
-  height: 38px;
-  padding: 8px;
-  border-radius: 0 6px 6px 0;
+border-radius: 0 6px 6px 0;
 }
 
 .page-btn.page-number {
-  height: 38px;
-  padding: 7.5px 16px 8.5px;
+border-radius: 4px;
+padding: 7.5px 16px 8.5px;
 }
 
-.page-btn.page-number:nth-of-type(2) { left: 38px; width: 42.64px; }
-.page-btn.page-number:nth-of-type(3) { left: 80.64px; width: 42.64px; }
-.page-btn.page-number:nth-of-type(4) { left: 122.28px; width: 42.78px; }
-.page-btn.page-number:nth-of-type(5) { left: 164.06px; width: 41.92px; }
+/* Modal Overlay */
+.modal-overlay {
+position: fixed;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+background: rgba(0, 0, 0, 0.5);
+display: flex;
+align-items: center;
+justify-content: center;
+z-index: 1000;
+}
 
-.page-btn.page-number.active {
-  background: #000000;
-  border-color: #000000;
-  color: #FFFFFF;
+.confirm-dialog {
+background: #FFFFFF;
+border: 1px solid #000000;
+width: 90%;
+max-width: 450px;
+padding: 24px;
+}
+
+.view-dialog {
+max-width: 600px;
+}
+
+.confirm-header {
+display: flex;
+align-items: center;
+gap: 12px;
+margin-bottom: 16px;
+}
+
+.confirm-icon {
+font-size: 28px;
+}
+
+.confirm-header h3 {
+margin: 0;
+font-size: 18px;
+font-weight: 700;
+}
+
+.confirm-body {
+margin-bottom: 24px;
+color: #333333;
+line-height: 1.6;
+}
+
+.confirm-actions {
+display: flex;
+justify-content: flex-end;
+gap: 12px;
+}
+
+.btn-confirm {
+padding: 10px 24px;
+border: none;
+font-size: 14px;
+font-weight: 600;
+cursor: pointer;
+}
+
+.btn-confirm.primary {
+background: #000000;
+color: #FFFFFF;
+}
+
+.btn-confirm.primary:hover {
+background: #333333;
+}
+
+.btn-secondary {
+background: #FFFFFF;
+color: #000000;
+border: 1px solid #000000;
+padding: 10px 24px;
+font-size: 14px;
+font-weight: 600;
+cursor: pointer;
+}
+
+.btn-secondary:hover {
+background: #F9F9F9;
+}
+
+.form-group {
+margin-bottom: 16px;
+}
+
+.form-group label {
+display: block;
+margin-bottom: 6px;
+font-size: 14px;
+font-weight: 600;
+color: #000000;
+}
+
+.form-input {
+width: 100%;
+padding: 10px 12px;
+border: 1px solid #000000;
+font-size: 14px;
+outline: none;
+box-sizing: border-box;
+}
+
+.form-input:focus {
+border-color: #666666;
+}
+
+.mb-4 {
+margin-bottom: 16px;
 }
 
 /* Scrollbar */
 .table-wrapper::-webkit-scrollbar {
-  width: 8px;
+width: 8px;
 }
 
 .table-wrapper::-webkit-scrollbar-track {
-  background: #F3F3F4;
+background: #F3F3F4;
 }
 
 .table-wrapper::-webkit-scrollbar-thumb {
-  background: #D1D5DB;
-  border-radius: 4px;
+background: #D1D5DB;
+border-radius: 4px;
 }
 
 .table-wrapper::-webkit-scrollbar-thumb:hover {
-  background: #9CA3AF;
+background: #9CA3AF;
 }
 </style>

@@ -6,7 +6,7 @@
 
 /* Custom base styles */
 html {
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: 'Geist', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -17,7 +17,7 @@ body {
 
 /* Brand font */
 .font-brand {
-  font-family: 'Russo One', sans-serif;
+  font-family: 'Geist', sans-serif;
 }
 
 /* Custom container */

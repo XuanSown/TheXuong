@@ -1,19 +1,21 @@
 <template>
-  <div class="min-h-screen bg-[#F9F9F9]">
-    <main class="w-full max-w-[1280px] mx-auto px-4 pt-[120px] pb-8">
+  <div class="min-h-screen">
+    <main class="w-full max-w-[1280px] mx-auto px-4 pb-8">
       <!-- Breadcrumbs -->
       <nav class="w-[1152px] mx-auto mb-8 flex items-center gap-2">
-        <router-link to="/" class="font-geist text-[12px] font-semibold uppercase tracking-[1.8px] text-[#646562] hover:text-black transition-colors">
+        <router-link to="/"
+          class="font-geist text-[12px] font-semibold uppercase tracking-[1.8px] text-[#646562] hover:text-black transition-colors">
           TRANG CHỦ
         </router-link>
         <svg class="w-[4.32px] h-[7px]" viewBox="0 0 4 7" fill="currentColor">
-          <path d="M0 3.5L4 0V7L0 3.5Z" fill="black"/>
+          <path d="M0 3.5L4 0V7L0 3.5Z" fill="black" />
         </svg>
-        <router-link to="/products" class="font-geist text-[12px] font-semibold uppercase tracking-[1.8px] text-[#646562] hover:text-black transition-colors">
+        <router-link to="/products"
+          class="font-geist text-[12px] font-semibold uppercase tracking-[1.8px] text-[#646562] hover:text-black transition-colors">
           SẢN PHẨM
         </router-link>
         <svg class="w-[4.32px] h-[7px]" viewBox="0 0 4 7" fill="currentColor">
-          <path d="M0 3.5L4 0V7L0 3.5Z" fill="black"/>
+          <path d="M0 3.5L4 0V7L0 3.5Z" fill="black" />
         </svg>
         <span class="font-geist text-[12px] font-semibold uppercase tracking-[1.8px] text-black">
           {{ productName }}
@@ -27,25 +29,38 @@
           <div class="flex gap-4">
             <!-- Thumbnail Column -->
             <div class="flex flex-col gap-4">
-              <div v-for="(img, idx) in product.images" :key="idx" class="w-[80px] h-[80px] bg-[#F3F3F4] border border-[rgba(207,196,197,0.3)] flex items-center justify-center">
+              <div v-for="(img, idx) in product.images" :key="idx" @click="mainImage = img; zoomLevel = 1"
+                class="w-[80px] h-[80px] bg-[#F3F3F4] border flex items-center justify-center cursor-pointer transition-colors"
+                :class="mainImage === img ? 'border-black' : 'border-[rgba(207,196,197,0.3)] hover:border-black'">
                 <img :src="img" :alt="product.name" class="w-[78px] h-[78px] object-cover" />
               </div>
             </div>
 
             <!-- Main Image -->
-            <div class="relative w-[556px] h-[556px] bg-[#F3F3F4] border border-[rgba(207,196,197,0.3)] flex items-center justify-center">
-              <img :src="product.imageUrl" :alt="product.name" class="w-[554px] h-[554px] object-cover" />
+            <div
+              class="relative overflow-hidden w-[556px] h-[556px] bg-[#F3F3F4] border border-[rgba(207,196,197,0.3)] flex items-center justify-center">
+              <img :src="mainImage" :alt="product.name"
+                class="w-[554px] h-[554px] object-cover transition-transform duration-300 origin-center"
+                :style="{ transform: `scale(${zoomLevel})` }" />
 
               <!-- Zoom Controls -->
               <div class="absolute right-4 bottom-4 flex gap-2">
-                <button class="w-10 h-10 bg-white/80 backdrop-blur-[4px] rounded-full flex items-center justify-center shadow hover:bg-white transition-colors" aria-label="Zoom in">
-                  <svg class="w-[7.4px] h-[12px]" viewBox="0 0 8 12" fill="currentColor">
-                    <path d="M4 2V0M6 4H4M4 8C4 8 2 10 2 12H6C6 10 4 8 4 8Z" stroke="black" stroke-width="1.5" stroke-linecap="round"/>
+                <button @click="handleZoomIn"
+                  class="w-10 h-10 bg-white/80 backdrop-blur-[4px] rounded-full flex items-center justify-center shadow hover:bg-white transition-colors"
+                  aria-label="Zoom in">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                    stroke="currentColor" class="w-5 h-5 text-black">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607zM10.5 7.5v6m3-3h-6" />
                   </svg>
                 </button>
-                <button class="w-10 h-10 bg-white/80 backdrop-blur-[4px] rounded-full flex items-center justify-center shadow hover:bg-white transition-colors" aria-label="Zoom out">
-                  <svg class="w-[7.4px] h-[12px]" viewBox="0 0 8 12" fill="currentColor">
-                    <path d="M2 6H6M4 2C4 2 6 4 6 6C6 8 4 10 4 10" stroke="black" stroke-width="1.5" stroke-linecap="round"/>
+                <button @click="handleZoomOut"
+                  class="w-10 h-10 bg-white/80 backdrop-blur-[4px] rounded-full flex items-center justify-center shadow hover:bg-white transition-colors"
+                  aria-label="Zoom out">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                    stroke="currentColor" class="w-5 h-5 text-black">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607zM13.5 10.5h-6" />
                   </svg>
                 </button>
               </div>
@@ -57,7 +72,12 @@
             <!-- Header -->
             <div class="flex flex-col gap-[15px]">
               <div class="flex items-center gap-3">
-                <div class="w-[16.5px] h-[11.25px] bg-[#4C4546]" />
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                  stroke="currentColor" class="w-4 h-4 text-[#4C4546]">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
                 <span class="font-geist text-base text-[#4C4546]">{{ product.viewCount }} lượt xem</span>
               </div>
 
@@ -66,10 +86,20 @@
               </h1>
 
               <div class="flex items-center gap-4">
-                <span class="font-inter text-[32px] font-semibold leading-[38px] text-black">{{ formatPrice(product.price) }}</span>
-                <button class="w-[23.33px] h-[21.41px] bg-black flex items-center justify-center rounded-full" aria-label="Add to wishlist">
-                  <svg class="w-3 h-2" viewBox="0 0 12 10" fill="white">
-                    <path d="M6 1C4.5 4 2 6.5 2 9C2 10.5 3 11.5 4.5 11.5C5 11.5 5.5 11.4 6 11.3C6.5 11.4 7 11.5 7.5 11.5C9 11.5 10 10.5 10 9C10 6.5 7.5 4 6 1Z"/>
+                <span class="font-inter text-[32px] font-semibold leading-[38px] text-black">{{
+                  formatPrice(product.price) }}</span>
+                <button @click="handleToggleFavorite"
+                  class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition-all active:scale-90"
+                  aria-label="Toggle wishlist">
+                  <svg xmlns="http://www.w3.org/2000/svg"
+                    :fill="product && favoriteStore.isFavorite(product.id) ? 'currentColor' : 'none'"
+                    viewBox="0 0 24 24" 
+                    :stroke-width="product && favoriteStore.isFavorite(product.id) ? '0' : '1.5'" 
+                    stroke="currentColor" 
+                    class="w-6 h-6 transition-colors"
+                    :class="product && favoriteStore.isFavorite(product.id) ? 'text-[#FF4A4A]' : 'text-[#4C4546]'">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
                   </svg>
                 </button>
               </div>
@@ -90,18 +120,13 @@
               </div>
 
               <div class="flex gap-2">
-                <button
-                  v-for="size in product.sizes"
-                  :key="size.id"
-                  @click="selectedSize = size.size"
-                  :class="[
-                    'w-[81px] h-[48px] border flex items-center justify-center font-geist text-base text-[#1A1C1C] transition-colors',
-                    selectedSize === size.size
-                      ? 'border-black bg-black text-white hover:bg-gray-900'
-                      : 'border-[#7E7576] hover:border-black hover:bg-black hover:text-white'
-                  ]"
-                >
-                  {{ size.size }}
+                <button v-for="size in product.sizes" :key="size.id" @click="selectedSize = size.name" :class="[
+                  'w-[81px] h-[48px] border flex items-center justify-center font-geist text-base text-[#1A1C1C] transition-colors',
+                  selectedSize === size.name
+                    ? 'border-black bg-black text-white hover:bg-gray-900'
+                    : 'border-[#7E7576] hover:border-black hover:bg-black hover:text-white'
+                ]">
+                  {{ size.name }}
                 </button>
               </div>
               <p v-if="!selectedSize" class="text-red-500 text-sm">Vui lòng chọn kích cỡ</p>
@@ -116,18 +141,16 @@
               </div>
               <div class="flex items-center gap-4">
                 <div class="flex items-center border border-[rgba(207,196,197,0.3)] w-[98px] h-[34px]">
-                  <button
-                    @click="quantity > 1 && (quantity--)"
-                    class="w-8 h-8 flex items-center justify-center border-r border-[rgba(207,196,197,0.3)] hover:bg-gray-50 transition-colors"
-                  >
-                    <span class="text-[#5E5F5C] font-inter text-sm" style="font-weight: 600; letter-spacing: 0.7px; text-transform: uppercase;">-</span>
+                  <button @click="quantity > 1 && (quantity--)"
+                    class="w-8 h-8 flex items-center justify-center border-r border-[rgba(207,196,197,0.3)] hover:bg-gray-50 transition-colors">
+                    <span class="text-[#5E5F5C] font-inter text-sm"
+                      style="font-weight: 600; letter-spacing: 0.7px; text-transform: uppercase;">-</span>
                   </button>
                   <span class="flex-1 text-center font-inter text-base text-[#1A1C1C]">{{ quantity }}</span>
-                  <button
-                    @click="quantity++"
-                    class="w-8 h-8 flex items-center justify-center border-l border-[rgba(207,196,197,0.3)] hover:bg-gray-50 transition-colors"
-                  >
-                    <span class="text-[#5E5F5C] font-inter text-sm" style="font-weight: 600; letter-spacing: 0.7px; text-transform: uppercase;">+</span>
+                  <button @click="quantity++"
+                    class="w-8 h-8 flex items-center justify-center border-l border-[rgba(207,196,197,0.3)] hover:bg-gray-50 transition-colors">
+                    <span class="text-[#5E5F5C] font-inter text-sm"
+                      style="font-weight: 600; letter-spacing: 0.7px; text-transform: uppercase;">+</span>
                   </button>
                 </div>
               </div>
@@ -135,25 +158,22 @@
 
             <!-- Action Buttons -->
             <div class="flex flex-col gap-3">
-              <button
-                @click="handleAddToCart"
+              <button @click="handleAddToCart"
                 class="w-full h-[56px] bg-white border-2 border-black text-black font-geist text-base flex items-center justify-center hover:bg-black hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                :disabled="isAdding || !selectedSize"
-              >
+                :disabled="isAdding || !selectedSize">
                 <span v-if="!isAdding">THÊM VÀO GIỎ HÀNG</span>
                 <span v-else class="flex items-center gap-2">
                   <svg class="animate-spin w-5 h-5" viewBox="0 0 24 24" fill="none">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    <path class="opacity-75" fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                   </svg>
                   Đang thêm...
                 </span>
               </button>
-              <button
-                @click="handleBuyNow"
+              <button @click="handleBuyNow"
                 class="w-full h-[56px] bg-black text-white font-geist text-base flex items-center justify-center hover:bg-gray-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                :disabled="!selectedSize"
-              >
+                :disabled="!selectedSize">
                 MUA NGAY
               </button>
             </div>
@@ -162,7 +182,11 @@
             <div class="w-full bg-[#F3F3F4] p-4 flex justify-between items-center">
               <!-- 30-day returns -->
               <div class="flex flex-col items-center gap-3 flex-1">
-                <div class="w-[18px] h-[18px] bg-black" />
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                  stroke="currentColor" class="w-6 h-6 text-black">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                </svg>
                 <span class="font-geist text-[10px] leading-[12px] text-center text-[#1A1C1C]">
                   ĐỔI TRẢ<br>TRONG 30 NGÀY
                 </span>
@@ -170,7 +194,11 @@
 
               <!-- Warranty -->
               <div class="flex flex-col items-center gap-3 flex-1">
-                <div class="w-[16px] h-[20px] bg-black" />
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                  stroke="currentColor" class="w-6 h-6 text-black">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+                </svg>
                 <span class="font-geist text-[10px] leading-[12px] text-center text-[#1A1C1C]">
                   BẢO HÀNH<br>CHÍNH HÃNG
                 </span>
@@ -178,7 +206,11 @@
 
               <!-- Free Shipping -->
               <div class="flex flex-col items-center gap-3 flex-1">
-                <div class="w-[22px] h-[16px] bg-black" />
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                  stroke="currentColor" class="w-6 h-6 text-black">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
+                </svg>
                 <span class="font-geist text-[10px] leading-[12px] text-center text-[#1A1C1C]">
                   FREESHIP<br>TOÀN QUỐC
                 </span>
@@ -189,8 +221,24 @@
       </section>
 
       <!-- Loading State -->
-      <div v-else-if="loading" class="text-center py-16">
-        <p class="font-gelasio text-xl text-[#5E5F5C]">Đang tải sản phẩm...</p>
+      <div v-else-if="loading" class="w-[1152px] mx-auto bg-white mb-8 p-8 flex gap-8">
+        <div class="flex gap-4">
+          <div class="flex flex-col gap-4">
+            <BaseSkeleton type="image" class="w-[80px] h-[80px]" v-for="i in 3" :key="i" />
+          </div>
+          <BaseSkeleton type="image" class="w-[556px] h-[556px]" />
+        </div>
+        <div class="flex-1 flex flex-col gap-8 max-w-[452px]">
+          <div class="flex flex-col gap-[15px]">
+            <BaseSkeleton type="text" class="w-1/4" />
+            <BaseSkeleton type="title" class="w-3/4" />
+            <BaseSkeleton type="title" class="w-1/3 h-10" />
+            <BaseSkeleton type="text" class="w-full h-24" />
+          </div>
+          <BaseSkeleton type="text" class="w-full h-12" />
+          <BaseSkeleton type="text" class="w-full h-12" />
+          <BaseSkeleton type="text" class="w-full h-32" />
+        </div>
       </div>
 
       <!-- Not Found -->
@@ -199,9 +247,6 @@
         <router-link to="/products" class="text-black hover:underline">Quay lại danh sách sản phẩm</router-link>
       </div>
     </main>
-
-    <!-- Footer -->
-    <Footer />
   </div>
 </template>
 
@@ -210,44 +255,36 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useCartStore } from '@/stores/cart.store'
 import { useAuthStore } from '@/stores/auth.store'
-import Footer from '@/components/layout/Footer.vue'
+import { useFavoriteStore } from '@/stores/favorite.store'
+import BaseSkeleton from '@/components/ui/BaseSkeleton.vue'
+import { productService } from '@/services/product.service'
+import { useToast } from 'vue-toastification'
 
 const route = useRoute()
 const router = useRouter()
 const cartStore = useCartStore()
 const authStore = useAuthStore()
+const favoriteStore = useFavoriteStore()
+const toast = useToast()
 
 const product = ref<any>(null)
 const loading = ref(true)
 const selectedSize = ref<string | null>(null)
 const quantity = ref(1)
 const isAdding = ref(false)
-const successMessage = ref('')
+
+const mainImage = ref<string>('')
+const zoomLevel = ref<number>(1)
+
+const handleZoomIn = () => {
+  if (zoomLevel.value < 2.5) zoomLevel.value += 0.5
+}
+const handleZoomOut = () => {
+  if (zoomLevel.value > 1) zoomLevel.value -= 0.5
+}
 
 // Get product ID from route
-const productId = computed(() => route.params.id)
-
-// Mock product data - replace with actual API call
-const mockProduct = {
-  id: 1,
-  name: 'MŨ TRUCKER STADIUM',
-  price: 450000,
-  imageUrl: 'https://via.placeholder.com/556x556?text=Product+Image',
-  images: [
-    'https://via.placeholder.com/80x80?text=Thumb1',
-    'https://via.placeholder.com/80x80?text=Thumb2',
-    'https://via.placeholder.com/80x80?text=Thumb3'
-  ],
-  description: 'Mũ Trucker Stadium là phụ kiện không thể thiếu, hoàn hảo cho phong cách thư giãn hằng ngày. Thiết kế dáng trucker thời thượng, chiếc mũ lưỡi trai này là sự kết hợp hoàn hảo với tủ đồ thể thao của bạn.',
-  viewCount: 2,
-  sizes: [
-    { id: 1, size: 'S', quantity: 10 },
-    { id: 2, size: 'M', quantity: 15 },
-    { id: 3, size: 'L', quantity: 20 },
-    { id: 4, size: 'XL', quantity: 5 },
-    { id: 5, size: 'FreeSize', quantity: 8 }
-  ]
-}
+const productId = computed(() => Number(route.params.id))
 
 const productName = computed(() => product.value?.name || 'Sản phẩm')
 
@@ -255,9 +292,20 @@ const formatPrice = (price: number): string => {
   return new Intl.NumberFormat('vi-VN').format(price) + 'đ'
 }
 
+const handleToggleFavorite = () => {
+  if (product.value) {
+    favoriteStore.toggleFavorite(product.value)
+    if (favoriteStore.isFavorite(product.value.id)) {
+      toast.success('Đã thêm vào danh sách yêu thích!')
+    } else {
+      toast.info('Đã xóa khỏi danh sách yêu thích.')
+    }
+  }
+}
+
 const getSelectedVariant = computed(() => {
   if (!product.value || !selectedSize.value) return null
-  return product.value.sizes.find((s: any) => s.size === selectedSize.value)
+  return product.value.sizes.find((s: any) => s.name === selectedSize.value)
 })
 
 const handleAddToCart = async () => {
@@ -273,13 +321,10 @@ const handleAddToCart = async () => {
       size: selectedSize.value,
       price: product.value.price
     }, authStore.isAuthenticated)
-    successMessage.value = 'Đã thêm vào giỏ hàng!'
-    setTimeout(() => {
-      successMessage.value = ''
-    }, 3000)
+    toast.success('Đã thêm vào giỏ hàng!')
   } catch (error) {
     console.error('Failed to add to cart:', error)
-    alert('Không thể thêm vào giỏ hàng. Vui lòng thử lại.')
+    toast.error('Không thể thêm vào giỏ hàng. Vui lòng thử lại.')
   } finally {
     isAdding.value = false
   }
@@ -288,7 +333,6 @@ const handleAddToCart = async () => {
 const handleBuyNow = async () => {
   if (!selectedSize.value || !product.value) return
 
-  // Add to cart first
   isAdding.value = true
   try {
     const variant = getSelectedVariant.value
@@ -300,7 +344,6 @@ const handleBuyNow = async () => {
       price: product.value.price
     }, authStore.isAuthenticated)
 
-    // Check if authenticated, if not redirect to login
     if (!authStore.isAuthenticated) {
       authStore.setRedirectPath('/checkout')
       router.push('/login')
@@ -309,22 +352,29 @@ const handleBuyNow = async () => {
     }
   } catch (error) {
     console.error('Failed to add to cart:', error)
-    alert('Không thể thêm vào giỏ hàng. Vui lòng thử lại.')
+    toast.error('Không thể thêm vào giỏ hàng. Vui lòng thử lại.')
   } finally {
     isAdding.value = false
   }
 }
 
 onMounted(async () => {
+  if (!productId.value) {
+    loading.value = false
+    return
+  }
+
   loading.value = true
   try {
-    // In real app, fetch from API using productId
-    // const productData = await api.getProduct(productId.value)
-    // product.value = productData
+    const productData = await productService.getProduct(productId.value)
 
-    // Using mock data for now
-    await new Promise(resolve => setTimeout(resolve, 500)) // Simulate API delay
-    product.value = mockProduct
+    // API now returns real images array from ProductImage table
+    if (productData && !productData.images && productData.imageUrl) {
+      productData.images = [productData.imageUrl]
+    }
+
+    product.value = productData
+    mainImage.value = productData.imageUrl
   } catch (error) {
     console.error('Failed to fetch product:', error)
   } finally {
@@ -337,14 +387,14 @@ onMounted(async () => {
 @import url('https://fonts.googleapis.com/css2?family=Gelasio:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap') layer(fonts);
 
 .font-geist {
-  font-family: 'Inter', 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: 'Geist', sans-serif;
 }
 
 .font-gelasio {
-  font-family: 'Gelasio', serif;
+  font-family: 'Geist', sans-serif;
 }
 
 .font-inter {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Geist', sans-serif;
 }
 </style>

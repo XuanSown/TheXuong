@@ -67,6 +67,7 @@ logs/
 *.mv.db
 *.sqlite
 *.db
+dbTheXuong.sql
 
 ### OS generated files ###
 .DS_Store

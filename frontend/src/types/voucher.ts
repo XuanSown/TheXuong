@@ -26,6 +26,17 @@ export interface Voucher {
 
 export type VoucherStatus = 'ACTIVE' | 'LOCKED' | 'EXPIRED'
 
+export interface UserVoucher {
+  id: number
+  code: string
+  discountAmount: number
+  minOrderAmount: number
+  status: 'UNUSED' | 'USED' | 'EXPIRED'
+  expiresAt: string | null
+  usedAt?: string | null
+  createdAt: string
+}
+
 export interface VoucherCreateRequest {
   code?: string // optional: if null, auto-generate
   discountAmount: number

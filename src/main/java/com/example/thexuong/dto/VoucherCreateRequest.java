@@ -1,6 +1,7 @@
 package com.example.thexuong.dto;
 
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -24,8 +25,8 @@ import java.util.List;
 @Builder
 public class VoucherCreateRequest {
 
-    @Pattern(regexp = "^$|^TX-[A-HJ-NP-RT-Z0-9]{6}$",
-             message = "Code phải định dạng TX-XXXXXX (không chứa 0/O/1/I/L)")
+    @Pattern(regexp = "^$|^TX-[A-Z0-9]{6}$",
+             message = "Code phải định dạng TX-XXXXXX")
     private String code;
 
     @NotNull(message = "Mệnh giá không được để trống")
@@ -34,6 +35,7 @@ public class VoucherCreateRequest {
 
     @NotNull(message = "Điểm cần không được để trống")
     @Min(value = 1, message = "Điểm cần tối thiểu 1")
+    @Max(value = 1000000, message = "Điểm cần tối đa 1,000,000")
     private Integer requiredPoints;
 
     @DecimalMin(value = "0", message = "Min order không được âm")

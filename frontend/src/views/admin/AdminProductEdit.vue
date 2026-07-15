@@ -21,7 +21,7 @@
             />
           </div>
 
-          <!-- Price and Image URL (2 columns) -->
+          <!-- Price and Image Upload (2 columns) -->
           <div class="field-row">
             <div class="field-group half">
               <label class="field-label">GIÁ (VNĐ)</label>
@@ -33,12 +33,68 @@
               />
             </div>
             <div class="field-group half">
-              <label class="field-label">ĐƯỜNG DẪN HÌNH ẢNH (URL)</label>
+              <label class="field-label">HÌNH ẢNH SẢN PHẨM</label>
+              <div
+                class="image-gallery"
+                :class="{ 'is-dragging': isDragging }"
+                @dragover.prevent="handleDragOver"
+                @dragleave.prevent="handleDragLeave"
+                @drop.prevent="handleDrop"
+              >
+                <Transition name="fade">
+                  <div v-if="isDragging" class="drop-overlay">
+                    <svg class="drop-icon" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                      <polyline points="17 8 12 3 7 8"/>
+                      <line x1="12" y1="3" x2="12" y2="15"/>
+                    </svg>
+                    <span class="drop-text">Thả ảnh vào đây</span>
+                  </div>
+                </Transition>
+
+                <!-- Image previews -->
+                <div
+                  v-for="(preview, idx) in imagePreviews"
+                  :key="idx"
+                  class="image-gallery-item"
+                  :class="{ 'is-primary': idx === 0 }"
+                >
+                  <img :src="preview" class="gallery-image" />
+                  <span v-if="idx === 0" class="primary-badge">CHÍNH</span>
+                  <button
+                    type="button"
+                    @click="removeImage(idx)"
+                    class="gallery-remove-btn"
+                    title="Xóa ảnh"
+                  >
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                      <path d="M2.5 2.5L9.5 9.5M9.5 2.5L2.5 9.5" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                  </button>
+                </div>
+
+                <!-- Add button -->
+                <button
+                  v-if="imageFiles.length < 5"
+                  type="button"
+                  @click="triggerFileInput"
+                  class="image-add-btn"
+                >
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"/>
+                    <line x1="5" y1="12" x2="19" y2="12"/>
+                  </svg>
+                  <span class="add-btn-text">Thêm ảnh</span>
+                </button>
+              </div>
+              <p class="image-hint">Kéo thả ảnh hoặc click để chọn từ máy (tối đa 5 ảnh)</p>
               <input
-                type="text"
-                v-model="productForm.imageUrl"
-                class="field-input"
-                placeholder="https://example.com/image.jpg"
+                ref="fileInputRef"
+                type="file"
+                accept="image/*"
+                multiple
+                class="hidden-file-input"
+                @change="handleFileSelect"
               />
             </div>
           </div>
@@ -50,10 +106,12 @@
               <div class="select-wrapper">
                 <select v-model="productForm.category" class="field-select">
                   <option value="" disabled>Chọn danh mục</option>
-                  <option value="Footwear">Footwear</option>
-                  <option value="Apparel">Apparel</option>
-                  <option value="Accessories">Accessories</option>
-                  <option value="Equipment">Equipment</option>
+                  <option value="Áo">Áo</option>
+                  <option value="Quần">Quần</option>
+                  <option value="Giày">Giày</option>
+                  <option value="Phụ kiện">Phụ kiện</option>
+                  <option value="Balo">Balo</option>
+                  <option value="Khác">Khác</option>
                 </select>
                 <svg class="select-arrow" width="21" height="21" viewBox="0 0 21 21" fill="none">
                   <path d="M6.5 8.25L10.5 12.25L14.5 8.25" stroke="#6B7280" stroke-width="1.575" stroke-linecap="round" stroke-linejoin="round"/>
@@ -62,24 +120,45 @@
             </div>
             <div class="field-group half">
               <label class="field-label">THƯƠNG HIỆU</label>
-              <input
-                type="text"
-                v-model="productForm.brand"
-                class="field-input"
-                placeholder="Nike, Adidas, Puma..."
-              />
+              <div class="select-wrapper">
+                <select v-model="productForm.brand" class="field-select">
+                  <option value="" disabled>Chọn thương hiệu</option>
+                  <option value="Nike">Nike</option>
+                  <option value="Adidas">Adidas</option>
+                  <option value="Puma">Puma</option>
+                  <option value="Li-Ning">Li-Ning</option>
+                  <option value="ASICS">ASICS</option>
+                  <option value="Fila">Fila</option>
+                  <option value="Decathlon">Decathlon</option>
+                  <option value="Mizuno">Mizuno</option>
+                  <option value="Yonex">Yonex</option>
+                  <option value="Khác">Khác</option>
+                </select>
+                <svg class="select-arrow" width="21" height="21" viewBox="0 0 21 21" fill="none">
+                  <path d="M6.5 8.25L10.5 12.25L14.5 8.25" stroke="#6B7280" stroke-width="1.575" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
             </div>
           </div>
 
           <!-- Sport -->
           <div class="field-group">
             <label class="field-label">BỘ MÔN THỂ THAO</label>
-            <input
-              type="text"
-              v-model="productForm.sport"
-              class="field-input"
-              placeholder="Bóng đá, Chạy bộ, Gym..."
-            />
+            <div class="select-wrapper">
+              <select v-model="productForm.sport" class="field-select">
+                <option value="" disabled>Chọn bộ môn</option>
+                <option value="Bóng đá">Bóng đá</option>
+                <option value="Chạy bộ">Chạy bộ</option>
+                <option value="Cầu lông & Pickleball">Cầu lông & Pickleball</option>
+                <option value="Cầu lông">Cầu lông</option>
+                <option value="Đua xe">Đua xe</option>
+                <option value="Bóng rổ">Bóng rổ</option>
+                <option value="Khác">Khác</option>
+              </select>
+              <svg class="select-arrow" width="21" height="21" viewBox="0 0 21 21" fill="none">
+                <path d="M6.5 8.25L10.5 12.25L14.5 8.25" stroke="#6B7280" stroke-width="1.575" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
           </div>
         </div>
 
@@ -94,18 +173,35 @@
           </div>
           <p class="section-description">Chỉ cần điền số lượng cho những size mà bạn muốn bán. Để trống nếu size đó không kinh doanh.</p>
 
-          <div class="size-grid">
-            <!-- Size cards for each size -->
-            <div v-for="(quantity, size) in productForm.sizes" :key="size" class="size-card">
+          <!-- Loading state -->
+          <div v-if="isLoadingSizes" class="size-loading">
+            <div class="size-spinner"></div>
+            <span>Đang tải danh sách size...</span>
+          </div>
+
+          <!-- Size error state -->
+          <div v-else-if="sizeLoadError" class="size-error">
+            <span>{{ sizeLoadError }}</span>
+            <button type="button" class="size-retry-btn" @click="fetchSizes">Thử lại</button>
+          </div>
+
+          <!-- Size cards -->
+          <div v-else-if="availableSizes.length > 0" class="size-grid">
+            <div v-for="size in availableSizes" :key="size" class="size-card">
               <div class="size-header">{{ size }}</div>
               <input
                 type="number"
                 v-model.number="productForm.sizes[size]"
                 class="size-input"
-                :placeholder="quantity !== null ? quantity : 'Số lượng'"
+                placeholder="Số lượng"
                 min="0"
               />
             </div>
+          </div>
+
+          <!-- No category selected -->
+          <div v-else class="size-empty">
+            <span>Vui lòng chọn danh mục sản phẩm để hiển thị các size phù hợp.</span>
           </div>
         </div>
 
@@ -125,11 +221,11 @@
         <!-- Action Buttons -->
         <div class="action-buttons">
           <button class="btn-cancel" @click="handleCancel">HỦY</button>
-          <button class="btn-save" @click="handleSave">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <button class="btn-save" @click="handleSave" :disabled="isSubmitting">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" v-if="!isSubmitting">
               <path d="M13.5 4.5L6 12L2.5 8.5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
-            LƯU SẢN PHẨM
+            {{ isSubmitting ? 'ĐANG LƯU...' : 'LƯU SẢN PHẨM' }}
           </button>
         </div>
       </div>
@@ -137,97 +233,213 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import api from '@/services/api'
+
+const props = defineProps({
+  isModal: {
+    type: Boolean,
+    default: false
+  }
+})
+
+const emit = defineEmits(['close', 'saved'])
 
 const route = useRoute()
 const router = useRouter()
 
-// Determine if we're in edit mode
-const isEditMode = computed(() => route.name === 'admin-product-edit')
+// Determine if we're in edit mode based on URL params
+const isEditMode = computed(() => !!route.params.id)
 
 // Form data structure
-const productForm = ref({
+const productForm = ref<Record<string, any>>({
   name: '',
   price: '',
   imageUrl: '',
   category: '',
   brand: '',
   sport: '',
-  sizes: {
-    'S': null,
-    'M': null,
-    'L': null,
-    'XL': null,
-    'XXL': null
-  },
+  sizes: {} as Record<string, number>,
   description: ''
 })
 
-// Mock product data for editing
-const mockProducts = {
-  1: {
-    name: 'Giày Đá Bóng Nike Air Zoom',
-    price: '2450000',
-    imageUrl: '',
-    category: 'Footwear',
-    brand: 'Nike',
-    sport: 'Bóng đá',
-    sizes: { 'S': 10, 'M': 25, 'L': 30, 'XL': 15, 'XXL': 5 },
-    description: 'Giày đá bóng cao cấp với công nghệ Air Zoom, mang lại cảm giác thoải mái và hỗ trợ tối ưu trong thi đấu.'
-  },
-  2: {
-    name: 'Mũ Trucker Stadium',
-    price: '450000',
-    imageUrl: '',
-    category: 'Accessories',
-    brand: 'Nike',
-    sport: 'Bóng đá',
-    sizes: { 'S': 50, 'M': 80, 'L': 60, 'XL': null, 'XXL': null },
-    description: 'Mũ lưỡi trai thể thao thiết kế hiện đại, chất liệu cotton thoáng mát.'
-  }
-})
+// ── Size catalog state ──────────────────────────────────────────
+const availableSizes = ref<string[]>([])
+const isLoadingSizes = ref(false)
+const sizeLoadError = ref('')
 
-// Load product data if editing
-onMounted(() => {
-  if (isEditMode.value && route.params.id) {
-    const productId = parseInt(route.params.id)
-    const existingProduct = mockProducts[productId]
-    if (existingProduct) {
-      productForm.value = { ...existingProduct }
+const CATEGORY_TO_SIZE_TYPE: Record<string, string> = {
+  'Áo': 'CLOTHING',
+  'Quần': 'CLOTHING',
+  'Giày': 'SHOES',
+  'Phụ kiện': 'ACCESSORIES',
+  'Balo': 'ACCESSORIES',
+  'Khác': 'CUSTOM'
+}
+
+function getSizeTypeForCategory(category: string): string | undefined {
+  return CATEGORY_TO_SIZE_TYPE[category]
+}
+
+async function fetchSizes() {
+  const category = productForm.value.category
+  if (!category) {
+    availableSizes.value = []
+    return
+  }
+
+  const sizeType = getSizeTypeForCategory(category)
+  isLoadingSizes.value = true
+  sizeLoadError.value = ''
+
+  try {
+    const response: any = await api.getSizeCatalog(sizeType)
+    // Expect response shape: { data: [{ sizeName: 'S', sizeType: 'CLOTHING', ... }, ...] }
+    // or a plain array. Handle both.
+    const items: any[] = Array.isArray(response) ? response : (response?.data ?? response?.content ?? [])
+    availableSizes.value = items
+      .map((item: any) => item.sizeName ?? item.name ?? item)
+      .filter((s: any) => typeof s === 'string' && s.trim().length > 0)
+  } catch (error) {
+    console.error('Failed to fetch size catalog:', error)
+    sizeLoadError.value = 'Không thể tải danh sách size. Vui lòng thử lại.'
+    availableSizes.value = []
+  } finally {
+    isLoadingSizes.value = false
+  }
+}
+
+// Fetch sizes whenever the category changes
+watch(
+  () => productForm.value.category,
+  (newCategory, oldCategory) => {
+    if (newCategory && newCategory !== oldCategory) {
+      productForm.value.sizes = {}
+      fetchSizes()
     }
+  }
+)
+
+// ── Image upload state ──────────────────────────────────────────
+const imageFiles = ref<File[]>([])
+const imagePreviews = ref<string[]>([])
+const isDragging = ref(false)
+const fileInputRef = ref<HTMLInputElement | null>(null)
+
+const loadProductData = async (productId: number) => {
+  try {
+    const existingProduct = await api.getAdminProduct(productId)
+    if (existingProduct) {
+      productForm.value = { 
+        ...existingProduct,
+        sizes: existingProduct.sizeQuantities || {}
+      }
+      if (existingProduct.images && existingProduct.images.length > 0) {
+        imagePreviews.value = [...existingProduct.images]
+      } else if (existingProduct.imageUrl) {
+        imagePreviews.value = [existingProduct.imageUrl]
+      } else {
+        imagePreviews.value = []
+      }
+      
+      // Fetch sizes for the existing product's category
+      await fetchSizes()
+    }
+  } catch (error) {
+    console.error('Failed to load product for editing:', error)
+  }
+}
+
+onMounted(async () => {
+  if (isEditMode.value && route.params.id) {
+    const productId = parseInt(route.params.id as string)
+    await loadProductData(productId)
   }
 })
 
 // Watch for route changes to reload product if needed
 watch(
   () => route.params.id,
-  (newId) => {
+  async (newId) => {
     if (isEditMode.value && newId) {
-      const productId = parseInt(newId)
-      const existingProduct = mockProducts[productId]
-      if (existingProduct) {
-        productForm.value = { ...existingProduct }
-      }
+      const productId = parseInt(newId as string)
+      await loadProductData(productId)
     }
   }
 )
 
-// Format price for display
-const formatPrice = (value) => {
-  if (!value) return ''
-  return new Intl.NumberFormat('vi-VN').format(value)
+// Image Upload Handlers
+const triggerFileInput = () => {
+  fileInputRef.value?.click()
+}
+
+const handleFileSelect = (event: any) => {
+  const files = Array.from(event.target.files || []) as File[]
+  addImageFiles(files)
+  event.target.value = ''
+}
+
+const handleDragOver = (event: any) => {
+  event.preventDefault()
+  event.stopPropagation()
+  isDragging.value = true
+}
+
+const handleDragLeave = (event: any) => {
+  event.preventDefault()
+  event.stopPropagation()
+  isDragging.value = false
+}
+
+const handleDrop = (event: any) => {
+  event.preventDefault()
+  event.stopPropagation()
+  isDragging.value = false
+  const files = Array.from(event.dataTransfer?.files || []) as File[]
+  const imageFilesOnly = files.filter((f: File) => f.type.startsWith('image/'))
+  if (imageFilesOnly.length === 0) {
+    alert('Vui lòng chỉ kéo thả file ảnh!')
+    return
+  }
+  addImageFiles(imageFilesOnly)
+}
+
+const addImageFiles = (newFiles: File[]) => {
+  const remainingSlots = 5 - imageFiles.value.length
+  if (remainingSlots <= 0) return
+  const filesToAdd = newFiles.slice(0, remainingSlots)
+  for (const file of filesToAdd) {
+    imageFiles.value.push(file)
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      if (e.target?.result) {
+        imagePreviews.value.push(e.target.result as string)
+      }
+    }
+    reader.readAsDataURL(file)
+  }
+  if (imageFiles.value.length > 0) {
+    productForm.value.imageUrl = ''
+  }
+}
+
+const removeImage = (index: any) => {
+  imageFiles.value.splice(index, 1)
+  imagePreviews.value.splice(index, 1)
 }
 
 // Handle save
-const handleSave = () => {
+const isSubmitting = ref(false)
+
+const handleSave = async () => {
   // Validate form
   if (!productForm.value.name.trim()) {
     alert('Vui lòng nhập tên sản phẩm')
     return
   }
-  if (!productForm.value.price || parseFloat(productForm.value.price) <= 0) {
+  if (!productForm.value.price || parseFloat(productForm.value.price.toString().replace(/\D/g, '')) <= 0) {
     alert('Vui lòng nhập giá sản phẩm hợp lệ')
     return
   }
@@ -236,20 +448,62 @@ const handleSave = () => {
     return
   }
 
-  // Here you would typically send data to backend API
-  const productData = {
-    ...productForm.value,
-    price: parseFloat(productForm.value.price.toString().replace(/\D/g, '')) || 0
-  }
-  console.log('Saving product:', productData)
+  isSubmitting.value = true
 
-  // Navigate back to products list
-  router.push('/admin/products')
+  try {
+    const formData = new FormData()
+    formData.append('name', productForm.value.name.trim())
+    formData.append('description', productForm.value.description || '')
+    formData.append('price', String(parseFloat(productForm.value.price.toString().replace(/\D/g, '')) || 0))
+    formData.append('sport', productForm.value.sport || '')
+    formData.append('brand', productForm.value.brand || '')
+    formData.append('category', productForm.value.category || '')
+
+    const sizesObj: Record<string, any> = {}
+    for (const [size, qty] of Object.entries(productForm.value.sizes as Record<string, any>)) {
+      if (qty !== null && qty > 0) {
+        sizesObj[size] = qty
+      }
+    }
+    formData.append('sizeQuantities', JSON.stringify(sizesObj))
+
+    if (imageFiles.value.length > 0) {
+      imageFiles.value.forEach(file => {
+        formData.append('files', file)
+      })
+    }
+
+    if (isEditMode.value && route.params.id) {
+      await api.put(`/admin/products/${route.params.id}`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      })
+    } else {
+      await api.post('/admin/products', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      })
+    }
+
+    if (props.isModal) {
+      emit('saved')
+      emit('close')
+    } else {
+      router.push('/admin/products')
+    }
+  } catch (error: any) {
+    console.error('Failed to save product:', error)
+    alert('Lưu sản phẩm thất bại: ' + (error.response?.data?.error || error.message))
+  } finally {
+    isSubmitting.value = false
+  }
 }
 
 // Handle cancel
 const handleCancel = () => {
-  router.push('/admin/products')
+  if (props.isModal) {
+    emit('close')
+  } else {
+    router.push('/admin/products')
+  }
 }
 </script>
 
@@ -452,6 +706,69 @@ const handleCancel = () => {
   color: #6B7280;
 }
 
+/* Size loading / error / empty states */
+.size-loading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 832px;
+  padding: 24px 0;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  color: #64748B;
+}
+
+.size-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #E2E8F0;
+  border-top-color: #0F172A;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.size-error {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 832px;
+  padding: 16px 0;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  color: #EF4444;
+}
+
+.size-retry-btn {
+  padding: 4px 14px;
+  background: #0F172A;
+  color: #FFF;
+  border: none;
+  border-radius: 4px;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.size-retry-btn:hover {
+  background: #1E293B;
+}
+
+.size-empty {
+  display: flex;
+  align-items: center;
+  width: 832px;
+  padding: 24px 0;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-style: italic;
+  color: #94A3B8;
+}
+
+/* Size grid */
 .size-grid {
   display: flex;
   flex-wrap: wrap;
@@ -609,5 +926,156 @@ const handleCancel = () => {
 
 .btn-save:hover {
   background: #1E293B;
+}
+
+/* ── Drag & Drop Image Gallery ────────────────────────────── */
+.image-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 12px;
+  width: 100%;
+  position: relative;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  min-height: 80px;
+  padding: 4px;
+}
+
+.image-gallery.is-dragging {
+  border: 2px dashed #0F172A;
+  background: rgba(15, 23, 42, 0.03);
+}
+
+.drop-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: rgba(15, 23, 42, 0.06);
+  border: 2px dashed #0F172A;
+  border-radius: 8px;
+  pointer-events: none;
+}
+
+.drop-icon {
+  color: #0F172A;
+}
+
+.drop-text {
+  font-family: 'Geist', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #0F172A;
+  letter-spacing: 0.3px;
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
+}
+
+.image-gallery-item {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid #E2E8F0;
+  background: #F8FAFC;
+}
+
+.image-gallery-item.is-primary {
+  border-color: #0F172A;
+  border-width: 2px;
+}
+
+.gallery-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.primary-badge {
+  position: absolute;
+  bottom: 4px;
+  left: 4px;
+  background: #0F172A;
+  color: white;
+  font-family: 'Geist', sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 3px;
+  letter-spacing: 0.5px;
+}
+
+.gallery-remove-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(239, 68, 68, 0.9);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.image-gallery-item:hover .gallery-remove-btn {
+  opacity: 1;
+}
+
+.gallery-remove-btn:hover {
+  background: #EF4444;
+}
+
+.image-add-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 100%;
+  aspect-ratio: 1;
+  border: 2px dashed #E2E8F0;
+  border-radius: 8px;
+  background: #F8FAFC;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.image-add-btn:hover {
+  border-color: #94A3B8;
+  background: #F1F5F9;
+}
+
+.add-btn-text {
+  font-family: 'Geist', sans-serif;
+  font-size: 11px;
+  color: #94A3B8;
+}
+
+.image-hint {
+  font-family: 'Geist', sans-serif;
+  font-size: 11px;
+  color: #94A3B8;
+  margin-top: 4px;
+}
+
+.hidden-file-input {
+  display: none;
 }
 </style>

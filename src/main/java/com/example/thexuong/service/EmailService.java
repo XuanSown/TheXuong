@@ -3,6 +3,7 @@ package com.example.thexuong.service;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class EmailService {
     private final JavaMailSender mailSender;
 
@@ -30,7 +32,7 @@ public class EmailService {
                                     <li>Mã giảm giá dành riêng cho thành viên.</li>
                                 </ul>
                                 <div style="text-align: center; margin: 30px 0;">
-                                    <a href="http://localhost:8080/products" style="background-color: #000; color: #fff; padding: 10px 20px; text-decoration: none; font-weight: bold;">MUA SẮM NGAY</a>
+                                    <a href="https://thexuong.xuansown.id.vn/products" style="background-color: #000; color: #fff; padding: 10px 20px; text-decoration: none; font-weight: bold;">MUA SẮM NGAY</a>
                                 </div>
                                 <p style="font-size: 12px; color: #666; text-align: center;">
                                     Nếu bạn không yêu cầu email này, vui lòng bỏ qua.<br>
@@ -65,6 +67,56 @@ public class EmailService {
     }
 
     // ============================================================
+    // Password Reset (ForgotPasswordController)
+    // ============================================================
+
+    public void sendPasswordResetLink(String toEmail, String resetUrl) {
+        String subject = "Đặt lại mật khẩu - TheXuong";
+        String html = """
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0;">
+                    <h2 style="color: #333; text-align: center;">THE XUONG SPORT</h2>
+                    <p>Xin chào,</p>
+                    <p>Bạn (hoặc ai đó) đã yêu cầu đặt lại mật khẩu cho tài khoản <strong>%s</strong>.</p>
+                    <p>Nhấn vào nút bên dưới để đặt mật khẩu mới:</p>
+                    <div style="text-align: center; margin: 30px 0;">
+                        <a href="%s" style="background-color: #000; color: #fff; padding: 12px 24px; text-decoration: none; font-weight: bold; border-radius: 4px;">ĐẶT LẠI MẬT KHẨU</a>
+                    </div>
+                    <p>Hoặc copy link này vào trình duyệt:</p>
+                    <p style="background: #f5f5f5; padding: 10px; word-break: break-all; border-radius: 4px;">%s</p>
+                    <p><strong>Lưu ý:</strong> Link này có hiệu lực trong <strong>2 giờ</strong>. Nếu bạn không yêu cầu, vui lòng bỏ qua email này.</p>
+                    <p style="font-size: 12px; color: #666; text-align: center;">
+                        Nếu bạn gặp vấn đề, liên hệ support@thexuong.com.<br>
+                        © 2026 The Xuong Sport. All rights reserved.
+                    </p>
+                </div>
+                """.formatted(toEmail, resetUrl, resetUrl);
+        sendHtmlEmail(toEmail, subject, html);
+    }
+
+    public void sendPasswordChangedConfirmation(String toEmail) {
+        String subject = "Mật khẩu đã được thay đổi - TheXuong";
+        String html = """
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0;">
+                    <h2 style="color: #4CAF50; text-align: center;">THE XUONG SPORT</h2>
+                    <p>Xin chào,</p>
+                    <p>Mật khẩu của tài khoản bạn vừa được <strong style="color: #4CAF50;">thay đổi thành công</strong>.</p>
+                    <p>Nếu bạn thực hiện thay đổi này, mọi thứ đều ổn. Nếu <strong>KHÔNG</strong> phải bạn, vui lòng:</p>
+                    <ol>
+                        <li>Ngay lập tức đặt lại mật khẩu</li>
+                        <li>Liên hệ với chúng tôi qua support@thexuong.com</li>
+                    </ol>
+                    <div style="text-align: center; margin: 30px 0;">
+                        <a href="https://thexuong.xuansown.id.vn/forgot-password" style="background-color: #f44336; color: #fff; padding: 10px 20px; text-decoration: none; font-weight: bold;">ĐẶT LẠI MẬT KHẨU KHẨN CẤP</a>
+                    </div>
+                    <p style="font-size: 12px; color: #666; text-align: center;">
+                        © 2026 The Xuong Sport. All rights reserved.
+                    </p>
+                </div>
+                """;
+        sendHtmlEmail(toEmail, subject, html);
+    }
+
+    // ============================================================
     // Batch 4: Tier email notifications
     // ============================================================
 
@@ -88,7 +140,7 @@ public class EmailService {
                     </ul>
                     <p>Để giữ hạng VIP, anh/chị cần duy trì tổng chi tiêu 5 triệu đồng HOẶC 50 điểm tích luỹ trong 365 ngày. Hệ thống sẽ tự động re-evaluate vào ngày 1 hàng tháng.</p>
                     <div style="text-align: center; margin: 30px 0;">
-                        <a href="http://localhost:8080/loyalty" style="background-color: #d4af37; color: #fff; padding: 10px 20px; text-decoration: none; font-weight: bold;">XEM ĐIỂM THƯỞNG</a>
+                        <a href="https://thexuong.xuansown.id.vn/loyalty" style="background-color: #d4af37; color: #fff; padding: 10px 20px; text-decoration: none; font-weight: bold;">XEM ĐIỂM THƯỞNG</a>
                     </div>
                     <p style="font-size: 12px; color: #666; text-align: center;">© 2026 The Xuong Sport. All rights reserved.</p>
                 </div>
@@ -115,7 +167,7 @@ public class EmailService {
                     </ul>
                     <p>Hệ thống sẽ tự động nâng hạng khi anh/chị đạt ngưỡng (không cần đăng ký).</p>
                     <div style="text-align: center; margin: 30px 0;">
-                        <a href="http://localhost:8080/products" style="background-color: #000; color: #fff; padding: 10px 20px; text-decoration: none; font-weight: bold;">MUA SẮM NGAY</a>
+                        <a href="https://thexuong.xuansown.id.vn/products" style="background-color: #000; color: #fff; padding: 10px 20px; text-decoration: none; font-weight: bold;">MUA SẮM NGAY</a>
                     </div>
                     <p style="font-size: 12px; color: #666; text-align: center;">© 2026 The Xuong Sport.</p>
                 </div>
@@ -143,7 +195,7 @@ public class EmailService {
                     <p>Nếu không đạt, hạng sẽ tự động chuyển về <strong>Khách hàng thường</strong> vào ngày đánh giá.</p>
                     <p>👉 Hãy mua sắm thêm hoặc giới thiệu bạn bè để tích điểm và giữ hạng!</p>
                     <div style="text-align: center; margin: 30px 0;">
-                        <a href="http://localhost:8080/products" style="background-color: #d4af37; color: #fff; padding: 10px 20px; text-decoration: none; font-weight: bold;">MUA SẮM NGAY</a>
+                        <a href="https://thexuong.xuansown.id.vn/products" style="background-color: #d4af37; color: #fff; padding: 10px 20px; text-decoration: none; font-weight: bold;">MUA SẮM NGAY</a>
                     </div>
                     <p style="font-size: 12px; color: #666; text-align: center;">© 2026 The Xuong Sport.</p>
                 </div>
@@ -183,7 +235,7 @@ public class EmailService {
                     <p>Tổng số dư hiện tại của bạn: <strong>%d điểm</strong>.</p>
                     <p>Sử dụng điểm để đổi voucher hoặc giảm giá tại checkout.</p>
                     <div style="text-align: center; margin: 30px 0;">
-                        <a href="http://localhost:8080/loyalty" style="background-color: #4CAF50; color: #fff; padding: 10px 20px; text-decoration: none; font-weight: bold;">XEM SỐ DƯ ĐIỂM</a>
+                        <a href="https://thexuong.xuansown.id.vn/loyalty" style="background-color: #4CAF50; color: #fff; padding: 10px 20px; text-decoration: none; font-weight: bold;">XEM SỐ DƯ ĐIỂM</a>
                     </div>
                     <p style="font-size: 12px; color: #666; text-align: center;">© 2026 The Xuong Sport.</p>
                 </div>
@@ -209,7 +261,7 @@ public class EmailService {
                     </div>
                     <p>Nhập mã này tại checkout để nhận ưu đãi.</p>
                     <div style="text-align: center; margin: 30px 0;">
-                        <a href="http://localhost:8080/checkout?voucher=%s" style="background-color: #d32f2f; color: #fff; padding: 10px 20px; text-decoration: none; font-weight: bold;">ĐẾN CHECKOUT</a>
+                        <a href="https://thexuong.xuansown.id.vn/checkout?voucher=%s" style="background-color: #d32f2f; color: #fff; padding: 10px 20px; text-decoration: none; font-weight: bold;">ĐẾN CHECKOUT</a>
                     </div>
                     <p style="font-size: 12px; color: #666; text-align: center;">© 2026 The Xuong Sport.</p>
                 </div>
@@ -236,7 +288,7 @@ public class EmailService {
                     </div>
                     <p>Hãy sử dụng voucher trước khi hết hạn!</p>
                     <div style="text-align: center; margin: 30px 0;">
-                        <a href="http://localhost:8080/checkout?voucher=%s" style="background-color: #d32f2f; color: #fff; padding: 10px 20px; text-decoration: none; font-weight: bold;">ĐẾN CHECKOUT</a>
+                        <a href="https://thexuong.xuansown.id.vn/checkout?voucher=%s" style="background-color: #d32f2f; color: #fff; padding: 10px 20px; text-decoration: none; font-weight: bold;">ĐẾN CHECKOUT</a>
                     </div>
                     <p style="font-size: 12px; color: #666; text-align: center;">© 2026 The Xuong Sport.</p>
                 </div>

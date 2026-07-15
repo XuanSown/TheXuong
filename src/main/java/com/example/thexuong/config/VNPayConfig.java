@@ -1,32 +1,59 @@
 package com.example.thexuong.config;
 
-import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.context.annotation.Configuration;
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-import java.nio.charset.StandardCharsets;
-import java.util.Random;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
-@Configuration
+@Component
+@ConfigurationProperties(prefix = "vnpay")
 public class VNPayConfig {
-    // Đăng ký VNPAY Sandbox để lấy 2 mã này (Tạm thời dùng mã test này để chạy thử)
-    public static String vnp_TmnCode = "VSU1QOMH";
-    public static String secretKey = "W3KWLMYBGF7SN8JRFTAQNUXN6F2U5OUS";
+    private String tmnCode;
+    private String secretKey;
+    private String payUrl;
+    private String returnUrl;
 
-    public static String vnp_PayUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-    public static String vnp_ReturnUrl = "http://localhost:8080/vnpay-return"; // Đường dẫn trả về sau khi thanh toán
+    public String getVnp_TmnCode() {
+        return tmnCode;
+    }
+
+    public void setVnp_TmnCode(String tmnCode) {
+        this.tmnCode = tmnCode;
+    }
+
+    public String getSecretKey() {
+        return secretKey;
+    }
+
+    public void setSecretKey(String secretKey) {
+        this.secretKey = secretKey;
+    }
+
+    public String getVnp_PayUrl() {
+        return payUrl;
+    }
+
+    public void setVnp_PayUrl(String payUrl) {
+        this.payUrl = payUrl;
+    }
+
+    public String getVnp_ReturnUrl() {
+        return returnUrl;
+    }
+
+    public void setVnp_ReturnUrl(String returnUrl) {
+        this.returnUrl = returnUrl;
+    }
 
     // Hàm mã hóa SHA512 theo chuẩn VNPAY
-    public static String hmacSHA512(final String key, final String data) {
+    public String hmacSHA512(final String key, final String data) {
         try {
             if (key == null || data == null) {
-                throw new NullPointerException();
+                throw new NullPointerException("Key and data must not be null");
             }
-            final Mac hmac512 = Mac.getInstance("HmacSHA512");
-            byte[] hmacKeyBytes = key.getBytes();
-            final SecretKeySpec secretKey = new SecretKeySpec(hmacKeyBytes, "HmacSHA512");
-            hmac512.init(secretKey);
-            byte[] dataBytes = data.getBytes(StandardCharsets.UTF_8);
+            final javax.crypto.Mac hmac512 = javax.crypto.Mac.getInstance("HmacSHA512");
+            byte[] hmacKeyBytes = key.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+            final javax.crypto.spec.SecretKeySpec keySpec = new javax.crypto.spec.SecretKeySpec(hmacKeyBytes, "HmacSHA512");
+            hmac512.init(keySpec);
+            byte[] dataBytes = data.getBytes(java.nio.charset.StandardCharsets.UTF_8);
             byte[] result = hmac512.doFinal(dataBytes);
             StringBuilder sb = new StringBuilder(2 * result.length);
             for (byte b : result) {
@@ -35,27 +62,27 @@ public class VNPayConfig {
             return sb.toString();
 
         } catch (Exception ex) {
-            return "";
+            throw new RuntimeException("Failed to generate HMAC SHA512", ex);
         }
     }
 
     // Hàm lấy IP của khách hàng
-    public static String getIpAddress(HttpServletRequest request) {
-        String ipAdress;
+    public static String getIpAddress(jakarta.servlet.http.HttpServletRequest request) {
+        String ipAddress;
         try {
-            ipAdress = request.getHeader("X-FORWARDED-FOR");
-            if (ipAdress == null) {
-                ipAdress = request.getRemoteAddr();
+            ipAddress = request.getHeader("X-FORWARDED-FOR");
+            if (ipAddress == null) {
+                ipAddress = request.getRemoteAddr();
             }
         } catch (Exception e) {
-            ipAdress = "Invalid IP";
+            ipAddress = "Invalid IP";
         }
-        return ipAdress;
+        return ipAddress;
     }
 
     // Hàm random mã giao dịch
     public static String getRandomNumber(int len) {
-        Random rnd = new Random();
+        java.util.Random rnd = new java.util.Random();
         String chars = "0123456789";
         StringBuilder sb = new StringBuilder(len);
         for (int i = 0; i < len; i++) {

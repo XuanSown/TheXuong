@@ -2,7 +2,7 @@ package com.example.thexuong.job;
 
 import com.example.thexuong.service.TierReevaluateService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -12,19 +12,18 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class TierReevaluateJob {
 
-    @Autowired
     private final TierReevaluateService tierReevaluateService;
 
     @Scheduled(cron = "0 0 0 1 * *", zone = "Asia/Ho_Chi_Minh")
     public void reevaluateAllVip() {
         try {
             int changed = tierReevaluateService.reevaluateAllActiveVip();
-            System.out.println("[CRON] TierReevaluateJob done. Changed: " + changed);
+            log.info("[CRON] TierReevaluateJob done. Changed: {} tiers", changed);
         } catch (Exception e) {
-            System.err.println("[CRON] TierReevaluateJob failed: " + e.getMessage());
-            e.printStackTrace();
+            log.error("[CRON] TierReevaluateJob failed", e);
         }
     }
 }

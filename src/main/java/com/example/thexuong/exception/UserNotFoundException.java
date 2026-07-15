@@ -5,10 +5,10 @@ package com.example.thexuong.exception;
  */
 public class UserNotFoundException extends RuntimeException {
     public UserNotFoundException(Long id) {
-        super("Không tìm thấy người dùng với ID: " + id);
+        super("Không tìm thấy người dùng.");
     }
 
     public UserNotFoundException(String email) {
-        super("Không tìm thấy người dùng với email: " + email);
+        super("Không tìm thấy người dùng.");
     }
 }

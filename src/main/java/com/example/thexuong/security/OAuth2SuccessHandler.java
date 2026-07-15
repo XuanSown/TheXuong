@@ -41,7 +41,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                     .fullName(name)     // Lưu tên hiển thị từ Google
                     .password("")       // Google user không cần password
                     .provider("GOOGLE")
-                    .role("USER")       // Role mặc định cho tài khoản Google
+                    .role("CUSTOMER")   // Role mặc định (theo CHECK CHK_Users_role)
                     .active(true)
                     .build();
 

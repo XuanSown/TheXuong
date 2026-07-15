@@ -1,23 +1,18 @@
 <template>
-  <section class="dashboard-admin">
+  <div class="dashboard-admin">
     <!-- Key Metrics Section -->
     <section class="metrics-section">
       <!-- Revenue Card -->
       <div class="metric-card">
         <div class="metric-header">
           <span class="metric-label">DOANH THU</span>
-          <button class="filter-btn">
-            <div class="filter-icon"></div>
-            <span>LỌC</span>
+          <button class="filter-btn" @click="refreshData">
+            <span>LÀM MỚI</span>
           </button>
         </div>
         <div class="metric-value">
-          <h2>1.250.000.000 đ</h2>
+          <h2>{{ formatPrice(stats.totalRevenue) }}</h2>
           <p class="metric-period">THEO KHOẢNG THỜI GIAN ĐÃ CHỌN</p>
-        </div>
-        <div class="metric-change positive">
-          <div class="change-icon up"></div>
-          <span>+12%</span>
         </div>
       </div>
 
@@ -25,18 +20,10 @@
       <div class="metric-card">
         <div class="metric-header">
           <span class="metric-label">ĐƠN HÀNG</span>
-          <button class="filter-btn">
-            <div class="filter-icon"></div>
-            <span>LỌC</span>
-          </button>
         </div>
         <div class="metric-value">
-          <h2>850</h2>
-          <p class="metric-period">THEO KHOẢNG THỜI GIAN ĐÃ CHỌN</p>
-        </div>
-        <div class="metric-change positive">
-          <div class="change-icon up"></div>
-          <span>+5.2%</span>
+          <h2>{{ stats.totalOrders }}</h2>
+          <p class="metric-period">TỔNG SỐ ĐƠN HÀNG</p>
         </div>
       </div>
 
@@ -44,18 +31,14 @@
       <div class="metric-card">
         <div class="metric-header">
           <span class="metric-label">KHÁCH HÀNG</span>
-          <button class="filter-btn">
-            <div class="filter-icon"></div>
-            <span>LỌC</span>
-          </button>
         </div>
         <div class="metric-value">
-          <h2>420</h2>
-          <p class="metric-period">THEO KHOẢNG THỜI GIAN ĐÃ CHỌN</p>
+          <h2>{{ stats.totalUsers }}</h2>
+          <p class="metric-period">ĐÃ ĐĂNG KÝ</p>
         </div>
-        <div class="metric-change positive">
-          <div class="change-icon up"></div>
-          <span>+8.4%</span>
+        <div class="metric-sub">
+          <span>{{ stats.usersWithOrders }} có đơn hàng</span>
+          <span>{{ stats.usersWithoutOrders }} chưa có đơn</span>
         </div>
       </div>
 
@@ -65,8 +48,8 @@
           <span class="metric-label">SẢN PHẨM</span>
         </div>
         <div class="metric-value">
-          <h2>128</h2>
-          <p class="metric-period">ACTIVE</p>
+          <h2>{{ stats.totalProducts }}</h2>
+          <p class="metric-period">TRONG KHO</p>
         </div>
       </div>
     </section>
@@ -74,16 +57,25 @@
     <!-- Orders Chart Section -->
     <section class="chart-section">
       <div class="section-header">
-        <h3>Biểu đồ đơn hàng theo năm</h3>
-        <button class="year-selector">
-          <span>Năm 2024</span>
-          <div class="dropdown-icon"></div>
-        </button>
+        <h3>Doanh thu theo ngày</h3>
       </div>
       <div class="chart-container">
-        <div class="chart-placeholder">
-          <img src="" alt="Orders Chart" />
-        </div>
+        <div v-if="isLoading" class="chart-placeholder">Đang tải...</div>
+        <div v-else-if="stats.revenueByDay.length === 0" class="chart-placeholder">Chưa có dữ liệu</div>
+        <table v-else class="revenue-table">
+          <thead>
+            <tr>
+              <th>Ngày</th>
+              <th>Doanh thu</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="row in stats.revenueByDay" :key="row[0]">
+              <td>{{ row[0] }}</td>
+              <td>{{ formatPrice(row[1]) }}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </section>
 
@@ -93,242 +85,176 @@
       <div class="top-products">
         <div class="section-header">
           <h3>Top sản phẩm bán chạy</h3>
-          <router-link to="/admin/products" class="view-all">Xem tất cả</router-link>
         </div>
-        <div class="products-list">
-          <div v-for="product in topProducts" :key="product.id" class="product-item">
-            <div class="product-image">
-              <img :src="product.image" :alt="product.name" />
-            </div>
+        <div v-if="isLoading" class="loading-text">Đang tải...</div>
+        <div v-else class="products-list">
+          <div v-for="product in stats.topSelling" :key="product[0]" class="product-item">
             <div class="product-info">
-              <h4>{{ product.name }}</h4>
-              <p class="product-category">{{ product.category }}</p>
+              <h4>{{ product[0] }}</h4>
+              <p class="product-category">Đã bán: {{ product[1] }} sản phẩm</p>
             </div>
             <div class="product-sales">
-              <span class="sales-count">{{ product.sold }}</span>
-              <span class="sales-label">ĐÃ BÁN</span>
+              <span class="sales-count">{{ formatPrice(product[2]) }}</span>
+              <span class="sales-label">DOANH THU</span>
             </div>
           </div>
+          <div v-if="stats.topSelling.length === 0" class="empty-text">Chưa có dữ liệu</div>
         </div>
       </div>
 
       <!-- Order Status Distribution -->
       <div class="order-status">
         <h3>Đơn hàng theo trạng thái</h3>
-        <div class="pie-chart-container">
-          <div class="pie-chart">
-            <div class="pie-segment total">
-              <span class="pie-value">850</span>
-              <span class="pie-label">TỔNG ĐƠN</span>
+        <div v-if="isLoading" class="loading-text">Đang tải...</div>
+        <div v-else class="status-list">
+          <div v-for="item in stats.orderStatusStats" :key="item[0]" class="status-item">
+            <div class="status-color" :class="getStatusColor(item[0])"></div>
+            <div class="status-info">
+              <span class="status-label">{{ getStatusLabel(item[0]) }}</span>
+              <span class="status-count">{{ item[1] }} đơn</span>
             </div>
           </div>
-          <div class="status-legend">
-            <div class="status-item">
-              <div class="status-color completed"></div>
-              <div class="status-info">
-                <span class="status-percent">Hoàn thành (72%)</span>
-                <span class="status-count">612 đơn</span>
-              </div>
-            </div>
-            <div class="status-item">
-              <div class="status-color delivering"></div>
-              <div class="status-info">
-                <span class="status-percent">Đang giao (18%)</span>
-                <span class="status-count">153 đơn</span>
-              </div>
-            </div>
-            <div class="status-item">
-              <div class="status-color pending"></div>
-              <div class="status-info">
-                <span class="status-percent">Chờ xử lý (7%)</span>
-                <span class="status-count">60 đơn</span>
-              </div>
-            </div>
-            <div class="status-item">
-              <div class="status-color cancelled"></div>
-              <div class="status-info">
-                <span class="status-percent">Đã hủy (3%)</span>
-                <span class="status-count">25 đơn</span>
-              </div>
-            </div>
-          </div>
+          <div v-if="stats.orderStatusStats.length === 0" class="empty-text">Chưa có dữ liệu</div>
         </div>
       </div>
     </section>
 
-    <!-- Low Stock & Top Customers -->
+    <!-- Low Stock & Top Viewed -->
     <section class="analytics-section">
       <!-- Low Stock Inventory -->
       <div class="low-stock">
-        <h3>Sản phẩm tồn kho thấp</h3>
-        <div class="table-container">
+        <h3>Tồn kho thấp</h3>
+        <div v-if="isLoading" class="loading-text">Đang tải...</div>
+        <div v-else class="table-container">
           <table class="inventory-table">
             <thead>
               <tr>
                 <th>SẢN PHẨM</th>
-                <th>SKU</th>
-                <th>CÒN LẠI</th>
+                <th>TỒN KHO</th>
                 <th>TRẠNG THÁI</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="item in lowStockItems" :key="item.sku">
-                <td>{{ item.product }}</td>
-                <td>{{ item.sku }}</td>
-                <td class="stock-count">{{ item.remaining }} units</td>
+              <tr v-for="item in stats.lowStock" :key="item[0]">
+                <td>{{ item[0] }}</td>
+                <td>{{ item[1] }}</td>
                 <td>
-                  <span :class="['status-badge', item.statusClass]">
-                    {{ item.status }}
+                  <span :class="['status-badge', item[1] <= 5 ? 'urgent' : 'warning']">
+                    {{ item[1] <= 5 ? 'KHẨN CẤP' : 'CẢNH BÁO' }}
                   </span>
                 </td>
+              </tr>
+              <tr v-if="stats.lowStock.length === 0">
+                <td colspan="3" class="empty-text">Không có sản phẩm tồn kho thấp</td>
               </tr>
             </tbody>
           </table>
         </div>
       </div>
 
-      <!-- Top Customers -->
+      <!-- Top Viewed Products -->
       <div class="top-customers">
-        <h3>Top khách hàng</h3>
-        <div class="customers-list">
-          <div v-for="customer in topCustomers" :key="customer.id" class="customer-item">
-            <div class="customer-avatar">
-              <img :src="customer.avatar" :alt="customer.name" />
-            </div>
+        <h3>Top sản phẩm xem nhiều</h3>
+        <div v-if="isLoading" class="loading-text">Đang tải...</div>
+        <div v-else class="customers-list">
+          <div v-for="product in stats.topViewed" :key="product[0]" class="customer-item">
             <div class="customer-info">
-              <h4>{{ customer.name }}</h4>
-              <p class="customer-orders">{{ customer.orders }} đơn hàng</p>
-            </div>
-            <div class="customer-spent">
-              <span class="spent-amount">{{ customer.spent }}</span>
+              <h4>{{ product[0] }}</h4>
+              <p class="customer-orders">{{ product[1] }} lượt xem</p>
             </div>
           </div>
+          <div v-if="stats.topViewed.length === 0" class="empty-text">Chưa có dữ liệu</div>
         </div>
       </div>
     </section>
-
-    <!-- Additional Analytics -->
-    <section class="additional-analytics">
-      <!-- Inventory Breakdown -->
-      <div class="inventory-breakdown">
-        <h3>Trạng thái tồn kho</h3>
-        <div class="progress-bars">
-          <div class="progress-item">
-            <div class="progress-label">
-              <span>Sportswear / Shoes</span>
-              <span>82% Tồn kho</span>
-            </div>
-            <div class="progress-bar">
-              <div class="progress-fill" style="width: 82%"></div>
-            </div>
-          </div>
-          <div class="progress-item">
-            <div class="progress-label">
-              <span>Equipment</span>
-              <span>42% Tồn kho</span>
-            </div>
-            <div class="progress-bar">
-              <div class="progress-fill" style="width: 42%"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Product Reviews -->
-      <div class="product-reviews">
-        <h3>Top đánh giá sản phẩm</h3>
-        <div class="reviews-list">
-          <div class="review-item">
-            <div class="rating-stars">★★★★★</div>
-            <p class="review-text">"Chất lượng vải tuyệt vời, form dáng rất chuẩn."</p>
-            <p class="review-author">— Adidas Premium Tee bởi Anh Khoa</p>
-          </div>
-          <div class="review-item">
-            <div class="rating-stars">★★★★★</div>
-            <p class="review-text">"Giày rất nhẹ và êm, hỗ trợ chạy bộ tốt."</p>
-            <p class="review-author">— Nike Air Zoom bởi Minh Hạnh</p>
-          </div>
-        </div>
-      </div>
-    </section>
-  </section>
+  </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
+import api from '@/services/api'
 
-// Mock data
-const topProducts = ref([
-  {
-    id: 1,
-    name: 'Nike Air Zoom Performance',
-    category: 'SPORTSWEAR / SHOES',
-    sold: 312,
-    image: ''
-  },
-  {
-    id: 2,
-    name: 'Adidas Premium Training Tee',
-    category: 'APPAREL / TOPS',
-    sold: 245,
-    image: ''
-  },
-  {
-    id: 3,
-    name: 'Pro Tech Compression',
-    category: 'APPAREL / BOTTOMS',
-    sold: 198,
-    image: ''
-  }
-])
+const isLoading = ref(false)
 
-const lowStockItems = ref([
-  {
-    product: 'Elite Comp Jacket (Black)',
-    sku: 'TX-JK-042',
-    remaining: 2,
-    status: 'KHẨN CẤP',
-    statusClass: 'urgent'
-  },
-  {
-    product: 'Pro Running Leggings (S)',
-    sku: 'TX-LG-88',
-    remaining: 5,
-    status: 'CẢNH BÁO',
-    statusClass: 'warning'
-  },
-  {
-    product: 'Ultra Mesh Gloves (M)',
-    sku: 'TX-GL-09',
-    remaining: 8,
-    status: 'CẢNH BÁO',
-    statusClass: 'warning'
-  }
-])
+const stats = reactive({
+  totalRevenue: 0,
+  totalOrders: 0,
+  totalUsers: 0,
+  usersWithOrders: 0,
+  usersWithoutOrders: 0,
+  totalProducts: 0,
+  topSelling: [],
+  slowSelling: [],
+  revenueByDay: [],
+  lowStock: [],
+  topViewed: [],
+  leastViewed: [],
+  orderStatusStats: []
+})
 
-const topCustomers = ref([
-  {
-    id: 1,
-    name: 'Trần Văn An',
-    orders: 24,
-    spent: '18.5M đ',
-    avatar: ''
-  },
-  {
-    id: 2,
-    name: 'Lê Thu Thảo',
-    orders: 18,
-    spent: '14.2M đ',
-    avatar: ''
-  },
-  {
-    id: 3,
-    name: 'Nguyễn Minh Quân',
-    orders: 15,
-    spent: '11.0M đ',
-    avatar: ''
+const fetchStatistics = async () => {
+  isLoading.value = true
+  try {
+    const response = await api.get('/admin/statistics')
+    const data = response.data
+
+    stats.totalRevenue = data.revenueByDay?.reduce((sum, row) => sum + (Number(row[1]) || 0), 0) || 0
+    stats.totalOrders = data.orderStatusStats?.reduce((sum, row) => sum + (Number(row[1]) || 0), 0) || 0
+    stats.totalUsers = data.totalUsers || 0
+    stats.usersWithOrders = data.usersWithOrders || 0
+    stats.usersWithoutOrders = data.usersWithoutOrders || 0
+    stats.totalProducts = data.inventory?.length || 0
+    stats.topSelling = data.topSelling || []
+    stats.slowSelling = data.slowSelling || []
+    stats.revenueByDay = data.revenueByDay || []
+    stats.lowStock = (data.inventory || []).filter((item) => Number(item[1]) <= 10)
+    stats.topViewed = data.topViewed || []
+    stats.leastViewed = data.leastViewed || []
+    stats.orderStatusStats = data.orderStatusStats || []
+  } catch (error) {
+    console.error('Failed to fetch statistics:', error)
+  } finally {
+    isLoading.value = false
   }
-])
+}
+
+const refreshData = () => {
+  fetchStatistics()
+}
+
+const formatPrice = (value) => {
+  return new Intl.NumberFormat('vi-VN').format(value) + ' đ'
+}
+
+const getStatusLabel = (status) => {
+  const labels = {
+    PENDING: 'Chờ xử lý',
+    CONFIRMED: 'Đã xác nhận',
+    SHIPPING: 'Đang giao',
+    DELIVERED: 'Đã giao',
+    COMPLETED: 'Hoàn thành',
+    CANCELLED: 'Đã hủy',
+    REFUNDED: 'Hoàn tiền'
+  }
+  return labels[status] || status
+}
+
+const getStatusColor = (status) => {
+  const colors = {
+    PENDING: 'status-pending',
+    CONFIRMED: 'status-confirmed',
+    SHIPPING: 'status-delivering',
+    DELIVERED: 'status-delivered',
+    COMPLETED: 'status-completed',
+    CANCELLED: 'status-cancelled',
+    REFUNDED: 'status-refunded'
+  }
+  return colors[status] || ''
+}
+
+onMounted(() => {
+  fetchStatistics()
+})
 </script>
 
 <style scoped>
@@ -370,25 +296,6 @@ const topCustomers = ref([
   color: #848484;
 }
 
-.filter-btn {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: #5E5F5C;
-  font-family: 'Geist', sans-serif;
-  font-size: 10px;
-  font-weight: 700;
-}
-
-.filter-icon {
-  width: 10.5px;
-  height: 7px;
-  background: #5E5F5C;
-}
-
 .metric-value h2 {
   font-family: 'Geist', sans-serif;
   font-size: 20px;
@@ -406,32 +313,23 @@ const topCustomers = ref([
   text-transform: uppercase;
 }
 
-.metric-change {
-  position: absolute;
-  bottom: 24px;
-  left: 24px;
+.metric-sub {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: 4px;
+  margin-top: 8px;
 }
 
-.metric-change.positive .change-icon.up {
-  width: 11.67px;
-  height: 7px;
-  background: #16A34A;
-}
-
-.metric-change span {
+.metric-sub span {
   font-family: 'Geist', sans-serif;
-  font-size: 12px;
-  font-weight: 700;
-  color: #16A34A;
+  font-size: 11px;
+  color: #6B7280;
 }
 
 /* Chart Section */
 .chart-section {
   background: #FFFFFF;
-  border: 1px solid #000000;
+  border: 1px solid #E8E8E8;
   padding: 32px;
   margin-bottom: 30px;
 }
@@ -440,49 +338,56 @@ const topCustomers = ref([
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 40px;
+  margin-bottom: 24px;
 }
 
 .section-header h3 {
-  font-family: 'Gelasio', serif;
-  font-size: 24px;
+  font-family: 'Geist', sans-serif;
+  font-size: 20px;
   font-weight: 700;
   color: #1A1C1C;
   margin: 0;
 }
 
-.year-selector {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: none;
-  border: 1px solid #000000;
-  padding: 8px 24px;
-  cursor: pointer;
-  font-family: 'Inter', sans-serif;
-  font-size: 12px;
-  font-weight: 600;
-  color: #000000;
-}
-
-.dropdown-icon {
-  width: 7px;
-  height: 4.32px;
-  background: #000000;
-}
-
 .chart-container {
   width: 100%;
-  height: 384px;
+  min-height: 200px;
 }
 
 .chart-placeholder {
   width: 100%;
-  height: 100%;
+  min-height: 100px;
   background: #F3F3F4;
   display: flex;
   align-items: center;
   justify-content: center;
+  color: #6B7280;
+  font-family: 'Geist', sans-serif;
+  font-size: 14px;
+}
+
+.revenue-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Geist', sans-serif;
+  font-size: 14px;
+}
+
+.revenue-table th {
+  text-align: left;
+  padding: 12px 16px;
+  background: #F9FAFB;
+  border-bottom: 1px solid #E5E7EB;
+  font-weight: 600;
+  color: #6B7280;
+  text-transform: uppercase;
+  font-size: 12px;
+}
+
+.revenue-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #F3F4F6;
+  color: #374151;
 }
 
 /* Insights Section */
@@ -493,56 +398,33 @@ const topCustomers = ref([
   margin-bottom: 30px;
 }
 
-.top-products,
-.order-status,
-.low-stock,
-.top-customers,
-.inventory-breakdown,
-.product-reviews {
+.top-products, .order-status, .low-stock, .top-customers {
   background: #FFFFFF;
   border: 1px solid #E8E8E8;
-}
-
-.top-products {
   padding: 32px;
 }
 
 .top-products .section-header {
-  margin-bottom: 32px;
-}
-
-.view-all {
-  font-family: 'Geist', sans-serif;
-  font-size: 12px;
-  font-weight: 600;
-  color: #5E5F5C;
-  text-decoration: underline;
+  margin-bottom: 24px;
 }
 
 .products-list {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 16px;
 }
 
 .product-item {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 16px;
+  padding: 12px 0;
+  border-bottom: 1px solid #F3F4F6;
 }
 
-.product-image {
-  width: 64px;
-  height: 64px;
-  background: #F3F3F4;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.product-image img {
-  max-width: 100%;
-  max-height: 100%;
+.product-item:last-child {
+  border-bottom: none;
 }
 
 .product-info {
@@ -551,19 +433,17 @@ const topCustomers = ref([
 
 .product-info h4 {
   font-family: 'Geist', sans-serif;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 700;
   color: #000000;
-  margin: 0 0 0 0;
-  line-height: 24px;
+  margin: 0 0 4px 0;
 }
 
 .product-category {
   font-family: 'Geist', sans-serif;
-  font-size: 10px;
+  font-size: 12px;
   color: #848484;
   margin: 0;
-  text-transform: uppercase;
 }
 
 .product-sales {
@@ -573,10 +453,9 @@ const topCustomers = ref([
 .sales-count {
   display: block;
   font-family: 'Geist', sans-serif;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 700;
   color: #000000;
-  line-height: 24px;
 }
 
 .sales-label {
@@ -587,139 +466,75 @@ const topCustomers = ref([
 }
 
 /* Order Status */
-.order-status {
-  padding: 32px;
-  position: relative;
-}
-
 .order-status h3 {
-  position: absolute;
-  top: 33px;
-  left: 33px;
-  font-family: 'Gelasio', serif;
-  font-size: 24px;
-  font-weight: 700;
-  color: #1A1C1C;
-}
-
-.pie-chart-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 32px;
-  padding-top: 80px;
-}
-
-.pie-chart {
-  width: 192px;
-  height: 224px;
-  position: relative;
-  background: conic-gradient(
-    #000000 0% 72%,
-    #5E5F5C 72% 90%,
-    #DADADA 90% 97%,
-    #BA1A1A 97% 100%
-  );
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.pie-segment.total {
-  position: absolute;
-  text-align: center;
-}
-
-.pie-value {
-  display: block;
-  font-size: 28px;
-  font-weight: 700;
-  color: #1A1C1C;
-  line-height: 42px;
-}
-
-.pie-label {
   font-family: 'Geist', sans-serif;
-  font-size: 10px;
+  font-size: 20px;
+  font-weight: 700;
   color: #1A1C1C;
+  margin: 0 0 24px 0;
 }
 
-.status-legend {
-  width: 141px;
+.status-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .status-item {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 20px;
-}
-
-.status-item:last-child {
-  margin-bottom: 0;
 }
 
 .status-color {
-  width: 13.58px;
-  height: 16px;
+  width: 13px;
+  height: 13px;
+  border-radius: 3px;
+  flex-shrink: 0;
 }
 
-.status-color.completed {
-  background: #000000;
-}
-
-.status-color.delivering {
-  background: #5E5F5C;
-}
-
-.status-color.pending {
-  background: #DADADA;
-}
-
-.status-color.cancelled {
-  background: #BA1A1A;
-}
+.status-color.pending { background: #DBEAFE; }
+.status-color.confirmed { background: #E0E7FF; }
+.status-color.delivering { background: #FEF9C3; }
+.status-color.delivered { background: #DCFCE7; }
+.status-color.completed { background: #D1FAE5; }
+.status-color.cancelled { background: #FEE2E2; }
+.status-color.refunded { background: #F3E8FF; }
 
 .status-info {
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  flex: 1;
 }
 
-.status-percent {
+.status-label {
   font-family: 'Geist', sans-serif;
-  font-size: 16px;
-  font-weight: 700;
-  color: #1A1C1C;
-  line-height: 24px;
+  font-size: 14px;
+  font-weight: 400;
+  color: #374151;
 }
 
 .status-count {
-  font-family: 'Geist Mono', monospace;
-  font-size: 12px;
-  color: #5E5F5C;
-  line-height: 16px;
+  font-family: 'Geist', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #000000;
 }
 
 /* Analytics Section */
 .analytics-section {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: 1fr 1fr;
   gap: 30px;
-  margin-bottom: 30px;
 }
 
-.low-stock {
-  grid-column: span 2;
-  padding: 32px;
-}
-
-.low-stock h3 {
-  font-family: 'Gelasio', serif;
-  font-size: 24px;
+.low-stock h3, .top-customers h3 {
+  font-family: 'Geist', sans-serif;
+  font-size: 20px;
   font-weight: 700;
   color: #1A1C1C;
-  margin: 0 0 32px 0;
+  margin: 0 0 24px 0;
 }
 
 .table-container {
@@ -729,32 +544,25 @@ const topCustomers = ref([
 .inventory-table {
   width: 100%;
   border-collapse: collapse;
+  font-family: 'Geist', sans-serif;
+  font-size: 14px;
 }
 
 .inventory-table th {
-  font-family: 'Geist', sans-serif;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 1.8px;
-  color: #1A1C1C;
   text-align: left;
-  padding: 15.5px 1px 17.5px;
-  border-bottom: 2px solid #000000;
+  padding: 12px 16px;
+  background: #F9FAFB;
+  border-bottom: 1px solid #E5E7EB;
+  font-weight: 600;
+  color: #6B7280;
+  text-transform: uppercase;
+  font-size: 12px;
 }
 
 .inventory-table td {
-  font-family: 'Geist', sans-serif;
-  padding: 16.5px 1px;
-  border-top: 1px solid #F3F3F4;
-}
-
-.inventory-table tr:first-child td {
-  border-top: none;
-}
-
-.stock-count {
-  font-weight: 700;
-  color: #BA1A1A;
+  padding: 12px 16px;
+  border-top: 1px solid #F3F4F6;
+  color: #374151;
 }
 
 .status-badge {
@@ -763,6 +571,7 @@ const topCustomers = ref([
   font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
+  border-radius: 9999px;
 }
 
 .status-badge.urgent {
@@ -771,52 +580,26 @@ const topCustomers = ref([
 }
 
 .status-badge.warning {
-  background: #FFDAD6;
-  color: #93000A;
-}
-
-/* Top Customers */
-.top-customers {
-  padding: 32px;
-}
-
-.top-customers h3 {
-  font-family: 'Gelasio', serif;
-  font-size: 24px;
-  font-weight: 700;
-  color: #1A1C1C;
-  margin: 0 0 32px 0;
+  background: #FEF9C3;
+  color: #854D0E;
 }
 
 .customers-list {
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  gap: 16px;
 }
 
 .customer-item {
   display: flex;
   align-items: center;
-  gap: 16px;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid #F3F4F6;
 }
 
-.customer-avatar {
-  width: 48px;
-  height: 48px;
-  border: 1px solid #000000;
-  border-radius: 9999px;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 4px;
-}
-
-.customer-avatar img {
-  width: 38px;
-  height: 38px;
-  border-radius: 9999px;
-  object-fit: cover;
+.customer-item:last-child {
+  border-bottom: none;
 }
 
 .customer-info {
@@ -824,141 +607,25 @@ const topCustomers = ref([
 }
 
 .customer-info h4 {
-  font-family: 'Gelasio', serif;
-  font-size: 16px;
+  font-family: 'Geist', sans-serif;
+  font-size: 14px;
   font-weight: 700;
-  color: #1A1C1C;
-  margin: 0 0 0 0;
-  line-height: 24px;
+  color: #000000;
+  margin: 0 0 4px 0;
 }
 
 .customer-orders {
   font-family: 'Geist', sans-serif;
   font-size: 12px;
-  color: #5E5F5C;
+  color: #848484;
   margin: 0;
 }
 
-.customer-spent {
-  text-align: right;
-}
-
-.spent-amount {
+.loading-text, .empty-text {
   font-family: 'Geist', sans-serif;
-  font-size: 16px;
-  font-weight: 700;
-  color: #1A1C1C;
-}
-
-/* Additional Analytics */
-.additional-analytics {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 30px;
-}
-
-.inventory-breakdown {
-  padding: 32px;
-}
-
-.inventory-breakdown h3 {
-  font-family: 'Gelasio', serif;
-  font-size: 24px;
-  font-weight: 700;
-  color: #1A1C1C;
-  margin: 0 0 32px 0;
-}
-
-.progress-bars {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-
-.progress-item {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.progress-label {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.progress-label span:first-child {
-  font-family: 'Geist', sans-serif;
-  font-size: 16px;
-  font-weight: 700;
-  color: #1A1C1C;
-}
-
-.progress-label span:last-child {
-  font-family: 'Geist', sans-serif;
-  font-size: 12px;
-  font-weight: 600;
-  color: #5E5F5C;
-  letter-spacing: 1.8px;
-}
-
-.progress-bar {
-  width: 100%;
-  height: 8px;
-  background: #F3F3F4;
-  position: relative;
-}
-
-.progress-fill {
-  height: 100%;
-  background: #000000;
-  position: absolute;
-  left: 0;
-  top: 0;
-}
-
-.product-reviews {
-  padding: 32px;
-}
-
-.product-reviews h3 {
-  font-family: 'Gelasio', serif;
-  font-size: 24px;
-  font-weight: 700;
-  color: #1A1C1C;
-  margin: 0 0 32px 0;
-}
-
-.reviews-list {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-
-.review-item {
-  padding-left: 16px;
-  border-left: 4px solid #000000;
-}
-
-.rating-stars {
-  color: #000000;
   font-size: 14px;
-  margin-bottom: 8px;
-}
-
-.review-text {
-  font-family: 'Gelasio', serif;
-  font-size: 16px;
-  font-weight: 700;
-  color: #1A1C1C;
-  margin: 0 0 8px 0;
-  line-height: 24px;
-}
-
-.review-author {
-  font-family: 'Geist', sans-serif;
-  font-size: 12px;
-  color: #5E5F5C;
-  margin: 0;
+  color: #6B7280;
+  padding: 24px 0;
+  text-align: center;
 }
 </style>

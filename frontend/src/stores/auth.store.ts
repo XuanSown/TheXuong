@@ -6,6 +6,7 @@ export const useAuthStore = defineStore('auth', {
   state: () => ({
     user: null as User | null,
     isAuthenticated: false,
+    isInitialized: false,
     roles: [] as string[],
     loading: false,
     redirectTo: null as string | null // Store redirect path after login
@@ -31,12 +32,21 @@ export const useAuthStore = defineStore('auth', {
     async login(credentials: { email: string; password: string }) {
       this.loading = true
       try {
-        const user = await api.login({ email, credentials.password })
+        const user = await api.login({ email: credentials.email, password: credentials.password })
         this.setUser(user)
         return user
       } finally {
         this.loading = false
       }
+    },
+
+    async register(data: {
+      fullName: string
+      email: string
+      password: string
+      confirmPassword: string
+    }) {
+      return await api.register(data)
     },
 
     async logout() {
@@ -53,9 +63,11 @@ export const useAuthStore = defineStore('auth', {
       try {
         const user = await api.getCurrentUser()
         this.setUser(user)
+        this.isInitialized = true
         return user
       } catch (error) {
         this.clear()
+        this.isInitialized = true
         throw error
       } finally {
         this.loading = false

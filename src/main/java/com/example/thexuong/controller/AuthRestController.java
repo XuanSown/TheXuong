@@ -6,9 +6,11 @@ import com.example.thexuong.dto.auth.LoginRequest;
 import com.example.thexuong.dto.auth.RegisterRequest;
 import com.example.thexuong.dto.auth.UpdateProfileRequest;
 import com.example.thexuong.entity.User;
+import com.example.thexuong.service.PasswordResetService;
 import com.example.thexuong.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -27,10 +29,12 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
+@Slf4j
 public class AuthRestController {
 
     private final AuthenticationManager authenticationManager;
     private final UserService userService;
+    private final PasswordResetService passwordResetService;
 
     /**
      * POST /api/auth/login
@@ -130,11 +134,42 @@ public class AuthRestController {
      */
     @PostMapping("/forgot-password")
     public ResponseEntity<?> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
-        // TODO: Implement email sending with reset token
-        // For now, return generic success
+        try {
+            passwordResetService.createPasswordResetToken(request.getEmail());
+        } catch (Exception e) {
+            log.warn("Forgot password failed for email {}: {}", request.getEmail(), e.getMessage());
+        }
         return ResponseEntity.ok(Map.of(
                 "message", "Nếu email tồn tại, hướng dẫn đặt lại mật khẩu sẽ được gửi."
         ));
+    }
+
+    /**
+     * POST /api/auth/reset-password
+     * Body: { token, password, confirmPassword }
+     */
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> body) {
+        String token = body.get("token");
+        String password = body.get("password");
+        String confirmPassword = body.get("confirmPassword");
+
+        if (token == null || password == null) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", "Thiếu thông tin"));
+        }
+
+        if (!password.equals(confirmPassword)) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", "Xác nhận mật khẩu không khớp"));
+        }
+
+        try {
+            passwordResetService.resetPassword(token, password);
+            return ResponseEntity.ok(Map.of("message", "Đặt lại mật khẩu thành công"));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
     }
 
     /**

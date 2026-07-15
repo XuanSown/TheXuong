@@ -2,219 +2,551 @@ package com.example.thexuong.controller;
 
 import com.example.thexuong.dto.admin.AdminProductDto;
 import com.example.thexuong.entity.Product;
+import com.example.thexuong.entity.ProductImage;
 import com.example.thexuong.entity.ProductVariant;
-import com.example.thexuong.entity.Size;
+import com.example.thexuong.entity.SizeCatalog;
+import com.example.thexuong.entity.SizeType;
+import com.example.thexuong.repository.ProductImageRepository;
 import com.example.thexuong.repository.ProductRepository;
-import com.example.thexuong.repository.SizeRepository;
 import com.example.thexuong.repository.ProductVariantRepository;
-import lombok.RequiredArgsConstructor;
+import com.example.thexuong.repository.SizeCatalogRepository;
+import com.example.thexuong.repository.SizeTypeRepository;
+import com.example.thexuong.repository.SportRepository;
+import com.example.thexuong.repository.BrandRepository;
+import com.example.thexuong.repository.CategoryRepository;
+import com.example.thexuong.service.CloudflareR2Service;
+import com.example.thexuong.service.SizeService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.math.BigDecimal;
+import java.util.*;
 import java.util.stream.Collectors;
 
-/**
- * Admin REST API for Product Management (Vue frontend consumption).
- * Base path: /api/v1/admin/products
- */
 @RestController
 @RequestMapping("/api/v1/admin/products")
-@RequiredArgsConstructor
+@Slf4j
 public class AdminProductRestController {
 
-    private final ProductRepository productRepository;
-    private final SizeRepository sizeRepository;
-    private final ProductVariantRepository productVariantRepository;
+	private static final int MAX_IMAGES = 5;
+	private static final int MIN_IMAGES = 1;
 
-    /**
-     * GET /api/admin/products
-     * Query params: page, size, keyword
-     */
-    @GetMapping
-    public ResponseEntity<?> getProducts(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String keyword) {
+	private final ProductRepository productRepository;
+	private final ProductVariantRepository productVariantRepository;
+	private final ProductImageRepository productImageRepository;
+	private final CloudflareR2Service r2Service;
+	private final SizeService sizeService;
+	private final SizeTypeRepository sizeTypeRepository;
+	private final SizeCatalogRepository sizeCatalogRepository;
+	private final SportRepository sportRepository;
+	private final BrandRepository brandRepository;
+	private final CategoryRepository categoryRepository;
 
-        Pageable pageable = PageRequest.of(page, size);
-        Page<Product> productsPage;
+	public AdminProductRestController(
+			ProductRepository productRepository,
+			ProductVariantRepository productVariantRepository,
+			ProductImageRepository productImageRepository,
+			CloudflareR2Service r2Service,
+			SizeService sizeService,
+			SizeTypeRepository sizeTypeRepository,
+			SizeCatalogRepository sizeCatalogRepository,
+			SportRepository sportRepository,
+			BrandRepository brandRepository,
+			CategoryRepository categoryRepository) {
+		this.productRepository = productRepository;
+		this.productVariantRepository = productVariantRepository;
+		this.productImageRepository = productImageRepository;
+		this.r2Service = r2Service;
+		this.sizeService = sizeService;
+		this.sizeTypeRepository = sizeTypeRepository;
+		this.sizeCatalogRepository = sizeCatalogRepository;
+		this.sportRepository = sportRepository;
+		this.brandRepository = brandRepository;
+		this.categoryRepository = categoryRepository;
+	}
 
-        if (keyword != null && !keyword.isEmpty()) {
-            productsPage = productRepository.findByNameContaining(keyword, pageable);
-        } else {
-            productsPage = productRepository.findAll(pageable);
-        }
+	// ── List ────────────────────────────────────────────────
 
-        List<AdminProductDto> productDtos = productsPage.getContent().stream()
-                .map(this::toAdminProductDto)
-                .collect(Collectors.toList());
+	@Transactional(readOnly = true)
+	@GetMapping
+	public ResponseEntity<?> getProducts(
+			@RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "10") int size,
+			@RequestParam(required = false) String keyword) {
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("content", productDtos);
-        response.put("totalElements", productsPage.getTotalElements());
-        response.put("totalPages", productsPage.getTotalPages());
-        response.put("size", productsPage.getSize());
-        response.put("number", productsPage.getNumber());
+		Pageable pageable = PageRequest.of(page, size);
+		Page<Product> productsPage;
 
-        return ResponseEntity.ok(response);
-    }
+		if (keyword != null && !keyword.isEmpty()) {
+			productsPage = productRepository.findAllIncludingInactiveByNameContainingPageable(keyword, pageable);
+		} else {
+			productsPage = productRepository.findAllIncludingInactivePageable(pageable);
+		}
 
-    /**
-     * POST /api/admin/products
-     * Create new product with variants
-     * Body: { name, description, price, imageUrl, sport, brand, category, sizeQuantities: {sizeName: quantity} }
-     */
-    @PostMapping
-    public ResponseEntity<?> createProduct(@RequestBody AdminProductDto dto) {
-        try {
-            Product product = new Product();
-            product.setName(dto.getName());
-            product.setDescription(dto.getDescription());
-            product.setPrice(dto.getPrice());
-            product.setImageUrl(dto.getImageUrl());
-            product.setSport(dto.getSport());
-            product.setBrand(dto.getBrand());
-            product.setCategory(dto.getCategory());
-            product.setViewCount(0);
+		List<AdminProductDto> productDtos = productsPage.getContent().stream()
+				.map(this::toAdminProductDto)
+				.collect(Collectors.toList());
 
-            Product savedProduct = productRepository.save(product);
+		Map<String, Object> response = new HashMap<>();
+		response.put("content", productDtos);
+		response.put("totalElements", productsPage.getTotalElements());
+		response.put("totalPages", productsPage.getTotalPages());
+		response.put("size", productsPage.getSize());
+		response.put("number", productsPage.getNumber());
 
-            // Save variants if provided
-            if (dto.getSizeQuantities() != null) {
-                for (Map.Entry<String, Integer> entry : dto.getSizeQuantities().entrySet()) {
-                    String sizeName = entry.getKey();
-                    Integer quantity = entry.getValue();
+		return ResponseEntity.ok(response);
+	}
 
-                    if (quantity == null || quantity <= 0) continue;
+	@Transactional(readOnly = true)
+	@GetMapping("/{id}")
+	public ResponseEntity<?> getProduct(@PathVariable Long id) {
+		Product product = productRepository.findByIdIncludingInactive(id)
+				.orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm: " + id));
 
-                    // Find or create Size
-                    Size size = sizeRepository.findByName(sizeName)
-                            .orElseGet(() -> {
-                                Size s = new Size();
-                                s.setName(sizeName);
-                                return sizeRepository.save(s);
-                            });
+		AdminProductDto dto = toAdminProductDto(product);
 
-                    ProductVariant variant = ProductVariant.builder()
-                            .product(savedProduct)
-                            .size(size)
-                            .quantity(quantity)
-                            .sku("SKU-" + savedProduct.getId() + "-" + size.getId() + "-" + System.currentTimeMillis())
-                            .build();
-                    productVariantRepository.save(variant);
-                }
-            }
+		List<ProductVariant> variants = productVariantRepository.findByProductId(id);
+		Map<String, Integer> sizeQuantities = new LinkedHashMap<>();
+		for (ProductVariant v : variants) {
+			if (v.getSize() != null) {
+				sizeQuantities.put(v.getSize().getName(), v.getQuantity());
+			}
+		}
+		dto.setSizeQuantities(sizeQuantities);
 
-            return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(Map.of("message", "Tạo sản phẩm thành công", "product", toAdminProductDto(savedProduct)));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", e.getMessage()));
-        }
-    }
+		List<ProductImage> productImages = productImageRepository.findByProductIdOrderBySortOrderAsc(id);
+		List<String> imageUrls = productImages.stream()
+				.map(ProductImage::getImageUrl)
+				.collect(Collectors.toList());
+		dto.setImages(imageUrls);
 
-    /**
-     * PUT /api/admin/products/{id}
-     * Update product and variants
-     */
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateProduct(
-            @PathVariable Long id,
-            @RequestBody AdminProductDto dto) {
+		if (!imageUrls.isEmpty()) {
+			dto.setImageUrl(imageUrls.get(0));
+		}
 
-        try {
-            Product product = productRepository.findById(id)
-                    .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm: " + id));
+		return ResponseEntity.ok(dto);
+	}
 
-            product.setName(dto.getName());
-            product.setDescription(dto.getDescription());
-            product.setPrice(dto.getPrice());
-            product.setImageUrl(dto.getImageUrl());
-            product.setSport(dto.getSport());
-            product.setBrand(dto.getBrand());
-            product.setCategory(dto.getCategory());
+	// ── Create ──────────────────────────────────────────────
 
-            Product savedProduct = productRepository.save(product);
+	@Transactional
+	@PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
+	public ResponseEntity<?> createProduct(
+			@RequestParam(value = "files", required = false) MultipartFile[] files,
+			@RequestParam(value = "name", required = false) String name,
+			@RequestParam(value = "description", required = false) String description,
+			@RequestParam(value = "price", required = false) String priceStr,
+			@RequestParam(value = "imageUrl", required = false, defaultValue = "") String imageUrl,
+			@RequestParam(value = "sport", required = false, defaultValue = "") String sport,
+			@RequestParam(value = "brand", required = false, defaultValue = "") String brand,
+			@RequestParam(value = "category", required = false, defaultValue = "") String category,
+			@RequestParam(value = "sizeQuantities", required = false) String sizeQuantitiesJson) {
 
-            // Clear existing variants and create new ones from sizeQuantities
-            if (dto.getSizeQuantities() != null) {
-                // Delete existing variants
-                productVariantRepository.deleteByProductId(id);
+		try {
+			// Validate required fields
+			if (!StringUtils.hasText(name)) {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+						.body(Map.of("error", "Tên sản phẩm là bắt buộc"));
+			}
+			if (!StringUtils.hasText(description)) {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+						.body(Map.of("error", "Mô tả sản phẩm là bắt buộc"));
+			}
+			if (!StringUtils.hasText(priceStr)) {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+						.body(Map.of("error", "Giá sản phẩm là bắt buộc"));
+			}
 
-                // Create new variants
-                for (Map.Entry<String, Integer> entry : dto.getSizeQuantities().entrySet()) {
-                    String sizeName = entry.getKey();
-                    Integer quantity = entry.getValue();
+			Map<String, Integer> sizeQuantities = sizeService.parseSizeQuantities(sizeQuantitiesJson);
 
-                    if (quantity == null || quantity <= 0) continue;
+			List<String> uploadedUrls = new ArrayList<>();
 
-                    Size size = sizeRepository.findByName(sizeName)
-                            .orElseGet(() -> {
-                                Size s = new Size();
-                                s.setName(sizeName);
-                                return sizeRepository.save(s);
-                            });
+			if (files != null && files.length > 0) {
+				if (files.length > MAX_IMAGES) {
+					return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+							.body(Map.of("error", "Tối đa " + MAX_IMAGES + " ảnh cho mỗi sản phẩm"));
+				}
+				uploadedUrls.addAll(r2Service.uploadMultiple(files));
+			}
 
-                    ProductVariant variant = ProductVariant.builder()
-                            .product(savedProduct)
-                            .size(size)
-                            .quantity(quantity)
-                            .sku("SKU-" + savedProduct.getId() + "-" + size.getId() + "-" + System.currentTimeMillis())
-                            .build();
-                    productVariantRepository.save(variant);
-                }
-            }
+			if (uploadedUrls.isEmpty() && StringUtils.hasText(imageUrl)) {
+				uploadedUrls.add(imageUrl);
+			}
 
-            return ResponseEntity.ok(Map.of("message", "Cập nhật sản phẩm thành công", "product", toAdminProductDto(savedProduct)));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", e.getMessage()));
-        }
-    }
+			if (uploadedUrls.isEmpty()) {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+						.body(Map.of("error", "Sản phẩm cần có ít nhất " + MIN_IMAGES + " ảnh"));
+			}
+			if (uploadedUrls.size() > MAX_IMAGES) {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+						.body(Map.of("error", "Tối đa " + MAX_IMAGES + " ảnh cho mỗi sản phẩm"));
+			}
 
-    /**
-     * DELETE /api/admin/products/{id}
-     */
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteProduct(@PathVariable Long id) {
-        try {
-            Product product = productRepository.findById(id)
-                    .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm: " + id));
+			Product product = new Product();
+			product.setName(name);
+			product.setDescription(description);
+			product.setPrice(new BigDecimal(priceStr));
+			product.setSport(getSportEntity(sport));
+			product.setBrand(getBrandEntity(brand));
+			product.setCategory(getCategoryEntity(category));
+			product.setViewCount(0);
+			product.setImageUrl(uploadedUrls.get(0));
 
-            // Delete variants first
-            productVariantRepository.deleteByProductId(id);
+			Product savedProduct = productRepository.save(product);
 
-            // Delete product
-            productRepository.delete(product);
+			for (int i = 0; i < uploadedUrls.size(); i++) {
+				ProductImage pi = new ProductImage(savedProduct.getId(), i, uploadedUrls.get(i));
+				productImageRepository.save(pi);
+			}
 
-            return ResponseEntity.ok(Map.of("message", "Xóa sản phẩm thành công"));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", e.getMessage()));
-        }
-    }
+			if (sizeQuantities != null && !sizeQuantities.isEmpty()) {
+				List<ProductVariant> variants = sizeService.createVariants(savedProduct, sizeQuantities);
+				savedProduct.setVariants(variants);
+			}
 
-    // ========== Helper Methods ==========
+			return ResponseEntity.status(HttpStatus.CREATED)
+					.body(Map.of("message", "Tạo sản phẩm thành công", "product", toAdminProductDto(savedProduct)));
+		} catch (Exception e) {
+			log.error("Create product failed", e);
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body(Map.of("error", e.getMessage()));
+		}
+	}
 
-    private AdminProductDto toAdminProductDto(Product product) {
-        return AdminProductDto.builder()
-                .id(product.getId())
-                .name(product.getName())
-                .description(product.getDescription())
-                .price(product.getPrice())
-                .imageUrl(product.getImageUrl())
-                .sport(product.getSport())
-                .brand(product.getBrand())
-                .category(product.getCategory())
-                .viewCount(product.getViewCount())
-                .sizeQuantities(null) // Not included in list view
-                .build();
-    }
+	// ── Update ──────────────────────────────────────────────
+
+	@Transactional
+	@PutMapping(value = "/{id}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
+	public ResponseEntity<?> updateProduct(
+			@PathVariable Long id,
+			@RequestParam(value = "files", required = false) MultipartFile[] files,
+			@RequestParam(value = "name", required = false) String name,
+			@RequestParam(value = "description", required = false) String description,
+			@RequestParam(value = "price", required = false) String priceStr,
+			@RequestParam(value = "imageUrl", required = false, defaultValue = "") String imageUrl,
+			@RequestParam(value = "sport", required = false, defaultValue = "") String sport,
+			@RequestParam(value = "brand", required = false, defaultValue = "") String brand,
+			@RequestParam(value = "category", required = false, defaultValue = "") String category,
+			@RequestParam(value = "sizeQuantities", required = false) String sizeQuantitiesJson) {
+
+		try {
+			Product product = productRepository.findByIdIncludingInactive(id)
+					.orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm: " + id));
+
+			// Validate required fields
+			if (!StringUtils.hasText(name)) {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+						.body(Map.of("error", "Tên sản phẩm là bắt buộc"));
+			}
+			if (!StringUtils.hasText(description)) {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+						.body(Map.of("error", "Mô tả sản phẩm là bắt buộc"));
+			}
+			if (!StringUtils.hasText(priceStr)) {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+						.body(Map.of("error", "Giá sản phẩm là bắt buộc"));
+			}
+
+			Map<String, Integer> sizeQuantities = sizeService.parseSizeQuantities(sizeQuantitiesJson);
+
+			List<String> finalImageUrls;
+
+			if (files != null && files.length > 0) {
+				if (files.length > MAX_IMAGES) {
+					return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+							.body(Map.of("error", "Tối đa " + MAX_IMAGES + " ảnh cho mỗi sản phẩm"));
+				}
+				List<ProductImage> oldImages = productImageRepository.findByProductIdOrderBySortOrderAsc(id);
+				for (ProductImage oldImg : oldImages) {
+					r2Service.deleteFile(oldImg.getImageUrl());
+				}
+				productImageRepository.deleteByProductId(id);
+				finalImageUrls = r2Service.uploadMultiple(files);
+
+			} else if (StringUtils.hasText(imageUrl) && !imageUrl.equals(product.getImageUrl())) {
+				List<ProductImage> oldImages = productImageRepository.findByProductIdOrderBySortOrderAsc(id);
+				for (ProductImage oldImg : oldImages) {
+					r2Service.deleteFile(oldImg.getImageUrl());
+				}
+				productImageRepository.deleteByProductId(id);
+				finalImageUrls = new ArrayList<>();
+				finalImageUrls.add(imageUrl);
+			} else {
+				List<ProductImage> existingImages = productImageRepository.findByProductIdOrderBySortOrderAsc(id);
+				finalImageUrls = existingImages.stream()
+						.map(ProductImage::getImageUrl)
+						.collect(Collectors.toList());
+			}
+
+			if (finalImageUrls.isEmpty()) {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+						.body(Map.of("error", "Sản phẩm cần có ít nhất " + MIN_IMAGES + " ảnh"));
+			}
+
+			product.setName(name);
+			product.setDescription(description);
+			product.setPrice(new BigDecimal(priceStr));
+			product.setSport(getSportEntity(sport));
+			product.setBrand(getBrandEntity(brand));
+			product.setCategory(getCategoryEntity(category));
+			product.setImageUrl(finalImageUrls.get(0));
+
+			Product savedProduct = productRepository.save(product);
+
+			for (int i = 0; i < finalImageUrls.size(); i++) {
+				ProductImage pi = new ProductImage(savedProduct.getId(), i, finalImageUrls.get(i));
+				productImageRepository.save(pi);
+			}
+
+			if (sizeQuantities != null && !sizeQuantities.isEmpty()) {
+				// updateVariants đã xóa hết variants cũ và tạo mới trong 1 lần gọi
+				sizeService.updateVariants(id, sizeQuantities);
+			}
+
+			return ResponseEntity.ok(Map.of("message", "Cập nhật sản phẩm thành công", "product", toAdminProductDto(savedProduct)));
+		} catch (Exception e) {
+			log.error("Update product failed", e);
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body(Map.of("error", e.getMessage()));
+		}
+	}
+
+	// ── Delete ──────────────────────────────────────────────
+
+	@Transactional
+	@DeleteMapping("/{id}")
+	public ResponseEntity<?> deleteProduct(@PathVariable Long id) {
+		try {
+			Product product = productRepository.findByIdIncludingInactive(id)
+					.orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm: " + id));
+
+			List<ProductImage> images = productImageRepository.findByProductIdOrderBySortOrderAsc(id);
+			for (ProductImage img : images) {
+				r2Service.deleteFile(img.getImageUrl());
+			}
+			productImageRepository.deleteByProductId(id);
+			productVariantRepository.deleteByProductId(id);
+			productRepository.delete(product);
+
+			return ResponseEntity.ok(Map.of("message", "Xóa sản phẩm thành công"));
+		} catch (Exception e) {
+			log.error("Delete product failed", e);
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body(Map.of("error", e.getMessage()));
+		}
+	}
+
+	// ── Toggle Active ───────────────────────────────────────
+
+	@Transactional
+	@PatchMapping("/{id}/toggle-active")
+	public ResponseEntity<?> toggleProductActive(@PathVariable Long id) {
+		try {
+			Product product = productRepository.findByIdIncludingInactive(id)
+					.orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm: " + id));
+			product.setActive(!product.isActive());
+			productRepository.save(product);
+			return ResponseEntity.ok(Map.of("message", "Đã " + (product.isActive() ? "hiện" : "ẩn") + " sản phẩm thành công"));
+		} catch (Exception e) {
+			log.error("Toggle product active failed", e);
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body(Map.of("error", e.getMessage()));
+		}
+	}
+
+	// ══════════════════════════════════════════════════════════
+	// ── Size Catalog Management ──────────────────────────────
+	// ══════════════════════════════════════════════════════════
+
+	/**
+	 * GET /admin/size-types
+	 * Returns all active size types.
+	 */
+	@GetMapping("/size-types")
+	public ResponseEntity<?> getAllSizeTypes() {
+		try {
+			List<SizeType> sizeTypes = sizeTypeRepository.findByActiveTrue();
+			return ResponseEntity.ok(sizeTypes);
+		} catch (Exception e) {
+			log.error("Get size types failed", e);
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body(Map.of("error", e.getMessage()));
+		}
+	}
+
+	/**
+	 * GET /admin/size-catalog
+	 * Returns all active catalog items, optionally filtered by size type.
+	 * Accepts either typeId (Long) or typeCode (String, e.g. "CLOTHING").
+	 *
+	 * @param typeId   optional size type ID to filter by
+	 * @param typeCode optional size type code to filter by
+	 */
+	@GetMapping("/size-catalog")
+	public ResponseEntity<?> getSizeCatalog(
+			@RequestParam(required = false) Long typeId,
+			@RequestParam(required = false) String typeCode) {
+		try {
+			List<SizeCatalog> catalogItems;
+			if (typeId != null) {
+				catalogItems = sizeCatalogRepository.findBySizeTypeIdAndActiveTrueOrderByDisplayOrderAsc(typeId);
+			} else if (typeCode != null && !typeCode.isBlank()) {
+				// Look up SizeType by code, then filter catalog
+				SizeType sizeType = sizeTypeRepository.findByCode(typeCode.trim().toUpperCase())
+						.orElse(null);
+				if (sizeType != null) {
+					catalogItems = sizeCatalogRepository
+							.findBySizeTypeIdAndActiveTrueOrderByDisplayOrderAsc(sizeType.getId());
+				} else {
+					catalogItems = List.of();
+				}
+			} else {
+				catalogItems = sizeCatalogRepository.findByActiveTrueOrderByDisplayOrderAsc();
+			}
+			return ResponseEntity.ok(catalogItems);
+		} catch (Exception e) {
+			log.error("Get size catalog failed", e);
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body(Map.of("error", e.getMessage()));
+		}
+	}
+
+	/**
+	 * POST /admin/size-catalog
+	 * Create a new size catalog item.
+	 *
+	 * Request body: { "sizeTypeId": Long, "name": String, "displayOrder": Integer }
+	 */
+	@Transactional
+	@PostMapping("/size-catalog")
+	public ResponseEntity<?> createSizeCatalogItem(@RequestBody Map<String, Object> body) {
+		try {
+			Long sizeTypeId = body.containsKey("sizeTypeId") ? Long.valueOf(body.get("sizeTypeId").toString()) : null;
+			String name = (String) body.get("name");
+			Integer displayOrder = body.containsKey("displayOrder") ? Integer.valueOf(body.get("displayOrder").toString()) : 0;
+
+			if (sizeTypeId == null) {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+						.body(Map.of("error", "sizeTypeId là bắt buộc"));
+			}
+			if (!StringUtils.hasText(name)) {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+						.body(Map.of("error", "name là bắt buộc"));
+			}
+
+			SizeType sizeType = sizeTypeRepository.findById(sizeTypeId)
+					.orElseThrow(() -> new RuntimeException("Không tìm thấy loại size: " + sizeTypeId));
+
+			SizeCatalog catalogItem = new SizeCatalog();
+			catalogItem.setSizeType(sizeType);
+			catalogItem.setName(name.trim());
+			catalogItem.setDisplayOrder(displayOrder != null ? displayOrder : 0);
+			catalogItem.setActive(true);
+
+			SizeCatalog saved = sizeCatalogRepository.save(catalogItem);
+
+			return ResponseEntity.status(HttpStatus.CREATED)
+					.body(Map.of("message", "Tạo size catalog thành công", "item", saved));
+		} catch (Exception e) {
+			log.error("Create size catalog item failed", e);
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body(Map.of("error", e.getMessage()));
+		}
+	}
+
+	/**
+	 * PUT /admin/size-catalog/{id}/toggle-active
+	 * Toggle the active status of a size catalog item (soft delete / restore).
+	 */
+	@Transactional
+	@PutMapping("/size-catalog/{id}/toggle-active")
+	public ResponseEntity<?> toggleSizeCatalogActive(@PathVariable Long id) {
+		try {
+			SizeCatalog catalogItem = sizeCatalogRepository.findById(id)
+					.orElseThrow(() -> new RuntimeException("Không tìm thấy size catalog: " + id));
+
+			catalogItem.setActive(!catalogItem.getActive());
+			sizeCatalogRepository.save(catalogItem);
+
+			String status = catalogItem.getActive() ? "hiện" : "ẩn";
+			return ResponseEntity.ok(Map.of("message", "Đã " + status + " size catalog thành công", "item", catalogItem));
+		} catch (Exception e) {
+			log.error("Toggle size catalog active failed", e);
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body(Map.of("error", e.getMessage()));
+		}
+	}
+
+	/**
+	 * DELETE /admin/size-catalog/{id}
+	 * Soft delete a size catalog item by setting active = false.
+	 */
+	@Transactional
+	@DeleteMapping("/size-catalog/{id}")
+	public ResponseEntity<?> deleteSizeCatalogItem(@PathVariable Long id) {
+		try {
+			SizeCatalog catalogItem = sizeCatalogRepository.findById(id)
+					.orElseThrow(() -> new RuntimeException("Không tìm thấy size catalog: " + id));
+
+			catalogItem.setActive(false);
+			sizeCatalogRepository.save(catalogItem);
+
+			return ResponseEntity.ok(Map.of("message", "Xóa size catalog thành công"));
+		} catch (Exception e) {
+			log.error("Delete size catalog item failed", e);
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body(Map.of("error", e.getMessage()));
+		}
+	}
+
+	// ── Helpers ─────────────────────────────────────────────
+
+	private AdminProductDto toAdminProductDto(Product product) {
+		List<String> imageUrls = productImageRepository
+				.findByProductIdOrderBySortOrderAsc(product.getId())
+				.stream()
+				.map(ProductImage::getImageUrl)
+				.collect(Collectors.toList());
+
+		return AdminProductDto.builder()
+				.id(product.getId())
+				.name(product.getName())
+				.description(product.getDescription())
+				.price(product.getPrice())
+				.imageUrl(product.getImageUrl())
+				.images(imageUrls)
+				.sport(product.getSport() != null ? product.getSport().getName() : null)
+				.brand(product.getBrand() != null ? product.getBrand().getName() : null)
+				.category(product.getCategory() != null ? product.getCategory().getName() : null)
+				.viewCount(product.getViewCount())
+				.active(product.isActive())
+				.sizeQuantities(null)
+				.build();
+	}
+	private com.example.thexuong.entity.Sport getSportEntity(String str) {
+		if (!StringUtils.hasText(str)) return null;
+		try { return sportRepository.findById(Long.valueOf(str)).orElseGet(() -> sportRepository.findByName(str).orElse(null)); }
+		catch (NumberFormatException e) { return sportRepository.findByName(str).orElse(null); }
+	}
+
+	private com.example.thexuong.entity.Brand getBrandEntity(String str) {
+		if (!StringUtils.hasText(str)) return null;
+		try { return brandRepository.findById(Long.valueOf(str)).orElseGet(() -> brandRepository.findByName(str).orElse(null)); }
+		catch (NumberFormatException e) { return brandRepository.findByName(str).orElse(null); }
+	}
+
+	private com.example.thexuong.entity.Category getCategoryEntity(String str) {
+		if (!StringUtils.hasText(str)) return null;
+		try { return categoryRepository.findById(Long.valueOf(str)).orElseGet(() -> categoryRepository.findByName(str).orElse(null)); }
+		catch (NumberFormatException e) { return categoryRepository.findByName(str).orElse(null); }
+	}
 }

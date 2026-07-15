@@ -19,6 +19,7 @@ import lombok.Setter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -32,6 +33,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/v1/cart")
 @RequiredArgsConstructor
+@Transactional
 public class CartRestController {
 
     private final CartService cartService;
@@ -88,10 +90,7 @@ public class CartRestController {
 
         // Return updated cart
         Cart cart = cartService.getCartByUser(email);
-        return ResponseEntity.ok(Map.of(
-                "message", "Thêm vào giỏ hàng thành công",
-                "cart", toCartResponse(cart)
-        ));
+        return ResponseEntity.ok(toCartResponse(cart));
     }
 
     /**
@@ -109,15 +108,12 @@ public class CartRestController {
                     .body(Map.of("error", "Chưa đăng nhập"));
         }
 
-        cartService.updateCartItemQuantity(id, request.getQuantity());
+        String email = authentication.getName();
+        cartService.updateCartItemQuantity(email, id, request.getQuantity());
 
         // Return updated cart
-        String email = authentication.getName();
         Cart cart = cartService.getCartByUser(email);
-        return ResponseEntity.ok(Map.of(
-                "message", "Cập nhật số lượng thành công",
-                "cart", toCartResponse(cart)
-        ));
+        return ResponseEntity.ok(toCartResponse(cart));
     }
 
     /**
@@ -133,15 +129,12 @@ public class CartRestController {
                     .body(Map.of("error", "Chưa đăng nhập"));
         }
 
-        cartService.removeCartItem(id);
+        String email = authentication.getName();
+        cartService.removeCartItem(email, id);
 
         // Return updated cart
-        String email = authentication.getName();
         Cart cart = cartService.getCartByUser(email);
-        return ResponseEntity.ok(Map.of(
-                "message", "Xóa khỏi giỏ hàng thành công",
-                "cart", toCartResponse(cart)
-        ));
+        return ResponseEntity.ok(toCartResponse(cart));
     }
 
     /**
@@ -160,10 +153,7 @@ public class CartRestController {
         cart.getItems().clear();
         cartRepository.save(cart);
 
-        return ResponseEntity.ok(Map.of(
-                "message", "Đã xóa toàn bộ giỏ hàng",
-                "cart", toCartResponse(cart)
-        ));
+        return ResponseEntity.ok(toCartResponse(cart));
     }
 
     // ========== Helper Methods ==========
@@ -191,17 +181,15 @@ public class CartRestController {
         BigDecimal price = variant.getProduct().getPrice();
         BigDecimal subtotal = price != null ? price.multiply(BigDecimal.valueOf(item.getQuantity())) : BigDecimal.ZERO;
 
-        ProductDto productDto = ProductDto.builder()
-                .id(variant.getProduct().getId())
-                .name(variant.getProduct().getName())
-                .price(price != null ? price.doubleValue() : null)
-                .image(variant.getProduct().getImageUrl())
-                .build();
-
         return CartItemDto.builder()
                 .id(item.getId())
-                .product(productDto)
+                .productId(variant.getProduct().getId())
+                .productName(variant.getProduct().getName())
+                .productImage(variant.getProduct().getImageUrl())
+                .variantId(variant.getId())
+                .size(variant.getSize() != null ? variant.getSize().getName() : "")
                 .quantity(item.getQuantity())
+                .price(price)
                 .subtotal(subtotal)
                 .build();
     }

@@ -26,7 +26,7 @@ public class ApplicationConfig {
     /**
      * UserDetailsService: Load User từ DB cho Spring Security.
      *
-     * Phân quyền đơn giản hóa: User chỉ có 1 field {@code role} (USER / ADMIN / BOTH).
+     * Phân quyền đơn giản hóa: User chỉ có 1 field {@code role} (CUSTOMER / ADMIN / BOTH).
      * → Authority = {@code SimpleGrantedAuthority(user.role)} (1 authority duy nhất).
      */
     @Bean
@@ -39,22 +39,21 @@ public class ApplicationConfig {
                     .orElseThrow(() -> new UsernameNotFoundException(
                             "Không tìm thấy người dùng với email/username: " + username));
 
-            // Authority đơn từ cột user.role (USER / ADMIN / BOTH).
-            // Nếu role null/blank (DB cũ chưa có) → fallback "USER".
-            String role = (user.getRole() == null || user.getRole().isBlank()) ? "USER" : user.getRole();
+            // Authority đơn từ cột user.role (CUSTOMER / ADMIN / BOTH).
+            // Nếu role null/blank (DB cũ chưa có) → fallback "CUSTOMER".
+            String role = (user.getRole() == null || user.getRole().isBlank()) ? "CUSTOMER" : user.getRole();
             List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(role));
 
             // Truyền user.active vào Spring Security:
             // enabled=false → Spring từ chối login, redirect về /login?error (DisabledException)
-            return new org.springframework.security.core.userdetails.User(
-                    user.getEmail(),
-                    user.getPassword() == null ? "" : user.getPassword(),
-                    Boolean.TRUE.equals(user.getActive()),  // enabled
-                    true,  // accountNonExpired
-                    true,  // credentialsNonExpired
-                    true,  // accountNonLocked
-                    authorities
-            );
+            return org.springframework.security.core.userdetails.User.withUsername(user.getEmail())
+                    .password(user.getPassword() == null ? "" : user.getPassword())
+                    .disabled(!Boolean.TRUE.equals(user.getActive()))
+                    .accountExpired(false)
+                    .credentialsExpired(false)
+                    .accountLocked(false)
+                    .authorities(authorities)
+                    .build();
         };
     }
 
@@ -68,12 +67,15 @@ public class ApplicationConfig {
 
     /**
      * AuthenticationProvider: Kết hợp UserDetailsService + PasswordEncoder
+     * Lưu ý: DaoAuthenticationProvider mặc định gọi loadUserByUsername() 1 lần duy nhất.
+     * Nếu vẫn thấy double query, nguyên nhân từ JPA Session flush hoặc Spring Session filter.
      */
     @Bean
     public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService());
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userDetailsService());
         authProvider.setPasswordEncoder(passwordEncoder());
+        // Tắt hide exception để dễ debug lỗi đăng nhập
+        authProvider.setHideUserNotFoundExceptions(false);
         return authProvider;
     }
 

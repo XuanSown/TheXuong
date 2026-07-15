@@ -1,7 +1,12 @@
 <template>
   <div class="min-h-screen flex">
+    <!-- Blank Layout: no Navbar, no Footer (for login/register) -->
+    <div v-if="layout === 'blank'" class="w-full">
+      <slot />
+    </div>
+
     <!-- Admin Layout: Sidebar only (no Navbar/Footer) -->
-    <div v-if="layout === 'admin'" class="w-full flex">
+    <div v-else-if="layout === 'admin'" class="w-full flex">
       <slot />
     </div>
 
@@ -25,6 +30,6 @@ import Footer from './Footer.vue'
 const route = useRoute()
 
 const layout = computed(() => {
-  return route.meta.layout as 'admin' | 'customer' || 'customer'
+  return route.meta.layout as 'admin' | 'customer' | 'blank' || 'customer'
 })
 </script>

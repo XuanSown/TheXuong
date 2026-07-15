@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 @RestController
 @RequestMapping("/api/v1/categories")
@@ -15,6 +16,17 @@ import java.util.List;
 public class CategoryRestController {
 
     private final ProductRepository productRepository;
+
+    // GET /api/v1/categories?all=true - List all categories
+    @GetMapping
+    public ResponseEntity<List<CategoryDto>> getAllCategories() {
+        List<String> categories = productRepository.findAllDistinctCategories();
+        AtomicLong counter = new AtomicLong(1);
+        List<CategoryDto> result = categories.stream()
+                .map(name -> new CategoryDto(counter.getAndIncrement(), name))
+                .toList();
+        return ResponseEntity.ok(result);
+    }
 
     // GET /api/v1/categories/sports - List all sports
     @GetMapping("/sports")
@@ -29,4 +41,6 @@ public class CategoryRestController {
         List<String> brands = productRepository.findAllDistinctBrands();
         return ResponseEntity.ok(brands.toArray(new String[0]));
     }
+
+    public record CategoryDto(Long id, String name) {}
 }

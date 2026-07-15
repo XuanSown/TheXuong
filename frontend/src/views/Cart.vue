@@ -25,6 +25,7 @@
                     :src="item.productImage"
                     :alt="item.productName"
                     class="w-full h-full object-cover"
+                    loading="lazy"
                   />
                   <div v-else class="w-full h-full bg-gray-200 flex items-center justify-center">
                     <span class="text-gray-400 text-sm">No image</span>
@@ -79,8 +80,8 @@
                   class="flex items-center gap-2 text-[#5E5F5C] hover:text-red-500 transition-colors"
                   :disabled="isUpdating"
                 >
-                  <svg class="w-[9.33px] h-[9.33px]" viewBox="0 0 9 9" fill="currentColor">
-                    <rect width="9" height="9" fill="currentColor"/>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                   </svg>
                   <span class="font-gelasio text-base">Xóa khỏi giỏ</span>
                 </button>
@@ -158,7 +159,7 @@
     </main>
 
     <!-- Footer -->
-    <Footer />
+    
   </div>
 </template>
 
@@ -167,7 +168,7 @@ import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.store'
 import { useCartStore } from '@/stores/cart.store'
-import Footer from '@/components/layout/Footer.vue'
+
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -179,7 +180,7 @@ const isUpdating = ref(false)
 const cartItems = computed(() => cartStore.displayItems)
 
 const formatPrice = (price: number): string => {
-  return new Intl.NumberFormat('vi-VN').format(price) + 'đ'
+  return new Intl.NumberFormat('vi-VN').format(price) + ' đ'
 }
 
 const increaseQuantity = async (item: any) => {
@@ -231,14 +232,14 @@ const handleCheckout = () => {
 @import url('https://fonts.googleapis.com/css2?family=Gelasio:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap') layer(fonts);
 
 .font-geist {
-  font-family: 'Inter', 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: 'Geist', sans-serif;
 }
 
 .font-gelasio {
-  font-family: 'Gelasio', serif;
+  font-family: 'Geist', sans-serif;
 }
 
 .font-inter {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Geist', sans-serif;
 }
 </style>

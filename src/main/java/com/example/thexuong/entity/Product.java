@@ -10,6 +10,7 @@ import lombok.Setter;
 import org.hibernate.annotations.SQLRestriction;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -21,7 +22,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 @Table(name = "Products")
-@SQLRestriction("active = 1")
+@SQLRestriction("active = 1") // Soft delete filter - only returns active products by default
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,13 +31,20 @@ public class Product {
     @Column(nullable = false, columnDefinition = "NVARCHAR(255)") // Tên sản phẩm
     private String name;
 
-    @Column(columnDefinition = "NVARCHAR(100)") // Danh mục
-    private String category;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private Category category;
+
     private BigDecimal price;
-    @Column(columnDefinition = "NVARCHAR(100)") // Môn thể thao
-    private String sport;
-    @Column(columnDefinition = "NVARCHAR(100)") // Thương hiệu
-    private String brand;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "sport_id")
+    private Sport sport;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "brand_id")
+    private Brand brand;
+
     @Column(name = "image_url")
     private String imageUrl;
 
@@ -49,13 +57,20 @@ public class Product {
 
     @Column(name = "active", nullable = false)
     @Builder.Default
-    private boolean active = true;
+    private boolean active = true; // Soft delete flag
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "product_id", insertable = false, updatable = false)
+    @Builder.Default
+    @JsonIgnore
+    private List<ProductImage> images = new ArrayList<>();
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore // Tránh lặp vô hạn khi convert sang JSON
     private List<ProductVariant> variants;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    @Builder.Default
     @JsonIgnore
     private Set<Review> reviews = new HashSet<>();
 }

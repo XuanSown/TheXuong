@@ -34,11 +34,11 @@ export default {
         }
       },
       fontFamily: {
-        // Figma design fonts
-        geist: ['Geist', 'Inter', 'system-ui', 'sans-serif'],
-        gelasio: ['Gelasio', 'Georgia', 'serif'],
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-        brand: ['Russo One', 'sans-serif']
+        geist: ['Geist', 'sans-serif'],
+        sans: ['Geist', 'sans-serif'],
+        mono: ['Geist Mono', 'JetBrains Mono', 'monospace'],
+        'geist-mono': ['Geist Mono', 'monospace'],
+        'jetbrains-mono': ['JetBrains Mono', 'monospace']
       },
       spacing: {
         '128': '32rem',

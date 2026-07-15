@@ -1,7 +1,9 @@
 package com.example.thexuong.repository;
 
 import com.example.thexuong.entity.Order;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -11,11 +13,14 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface OrderRepository extends JpaRepository<Order, Long> {
+public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecificationExecutor<Order> {
     List<Order> findByUserIdOrderByIdDesc(Long userId);
 
     @Query("SELECT o FROM Order o LEFT JOIN FETCH o.orderDetails WHERE o.id = :id")
     Optional<Order> findByIdWithDetails(@Param("id") Long id);
+
+    @Query("SELECT o FROM Order o LEFT JOIN FETCH o.orderDetails WHERE o.id = :id AND o.phoneNumber = :phoneNumber")
+    Optional<Order> findByIdAndPhoneNumberWithDetails(@Param("id") Long id, @Param("phoneNumber") String phoneNumber);
 
     // 3. Tổng doanh thu theo ngày (có thể lọc theo khoảng thời gian)
     // Trả về: [Ngày (yyyy-MM-dd), Tổng tiền]

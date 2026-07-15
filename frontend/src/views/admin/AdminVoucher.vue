@@ -391,19 +391,13 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { useToast } from 'vue-toastification'
 import voucherService from '@/services/voucherService'
-import type {
-  VoucherResponse,
-  VoucherFormData,
-  VoucherStatus,
-  Category,
-  Product
-} from '@/types/voucher'
+import type { VoucherResponse, Category, Product } from '@/types/voucher'
 
-const router = useRouter()
+const toast = useToast()
 
 // ============================================================
 // Constants
@@ -442,20 +436,20 @@ const total = ref(0)
 const currentPage = ref(1)
 const itemsPerPage = ref(5)
 const searchQuery = ref('')
-const statusFilter = ref<'all' | VoucherStatus>('all')
+const statusFilter = ref('all')
 const vipOnlyFilter = ref(false)
 const selectedIds = ref<number[]>([])
-const sortBy = ref<'code' | 'discountAmount' | 'requiredPoints' | 'status'>('code')
-const sortOrder = ref<'asc' | 'desc'>('asc')
+const sortBy = ref('code')
+const sortOrder = ref('asc')
 const isLoading = ref(false)
 
 // ============================================================
 // Modal State
 // ============================================================
 const showModal = ref(false)
-const modalMode = ref<'create' | 'edit'>('create')
+const modalMode = ref('create')
 const currentVoucherId = ref<number | null>(null)
-const formData = ref<VoucherFormData>({
+const formData = ref<any>({
   code: '',
   discountAmount: null,
   requiredPoints: null,
@@ -466,7 +460,7 @@ const formData = ref<VoucherFormData>({
   status: 'ACTIVE',
   expiresAt: null
 })
-const errors = ref<Record<string, string>>({})
+const errors = ref<any>({})
 const isSubmitting = ref(false)
 
 // Supporting data for selects
@@ -491,7 +485,7 @@ const allSelected = computed({
     return vouchers.value.length > 0 &&
       selectedIds.value.length === vouchers.value.length
   },
-  set: (value: boolean) => {
+  set: (value) => {
     selectedIds.value = value ? vouchers.value.map(v => v.id) : []
   }
 })
@@ -509,7 +503,7 @@ const endIndex = computed(() =>
 )
 
 const visiblePages = computed(() => {
-  const pages: number[] = []
+  const pages = []
   const maxVisible = 5
   let start = Math.max(1, currentPage.value - Math.floor(maxVisible / 2))
   let end = Math.min(totalPages.value, start + maxVisible - 1)
@@ -534,7 +528,7 @@ const today = computed(() => {
 const fetchVouchers = async () => {
   isLoading.value = true
   try {
-    const params: Record<string, unknown> = {
+    const params = {
       page: currentPage.value,
       size: itemsPerPage.value,
       search: searchQuery.value || undefined,
@@ -548,7 +542,7 @@ const fetchVouchers = async () => {
     selectedIds.value = [] // Reset selection on page change
   } catch (error) {
     console.error('Failed to fetch vouchers:', error)
-    // TODO: Show toast notification
+    toast.error('Tai danh sach voucher that bai')
   } finally {
     isLoading.value = false
   }
@@ -559,6 +553,7 @@ const fetchCategories = async () => {
     categories.value = await voucherService.getAllCategories()
   } catch (error) {
     console.error('Failed to fetch categories:', error)
+  toast.error('Tai danh sach danh muc that bai')
   }
 }
 
@@ -567,13 +562,14 @@ const fetchProducts = async () => {
     products.value = await voucherService.getAllProducts()
   } catch (error) {
     console.error('Failed to fetch products:', error)
+  toast.error('Tai danh sach san pham that bai')
   }
 }
 
 // ============================================================
 // Sorting & Filtering
 // ============================================================
-const handleSort = (column: string) => {
+const handleSort = (column: any) => {
   if (sortBy.value === column) {
     sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc'
   } else {
@@ -585,7 +581,7 @@ const handleSort = (column: string) => {
   fetchVouchers()
 }
 
-const changePage = (page: number) => {
+const changePage = (page: any) => {
   if (page < 1 || page > totalPages.value) return
   currentPage.value = page
   fetchVouchers()
@@ -661,7 +657,7 @@ const validateMinOrder = () => {
   return true
 }
 
-const validateForm = (): boolean => {
+const validateForm = () => {
   const validators = [
     validateCode,
     validatePoints,
@@ -670,22 +666,22 @@ const validateForm = (): boolean => {
   return validators.every(fn => fn())
 }
 
-const getCategoryName = (id: number): string => {
+const getCategoryName = (id: any) => {
   const cat = categories.value.find(c => c.id === id)
   return cat ? cat.name : String(id)
 }
 
-const getProductName = (id: number): string => {
+const getProductName = (id: any) => {
   const prod = products.value.find(p => p.id === id)
   return prod ? `${prod.name} (${prod.sku})` : String(id)
 }
 
-const removeCategory = (id: number) => {
-  formData.value.applicableCategoryIds = formData.value.applicableCategoryIds.filter(catId => catId !== id)
+const removeCategory = (id: any) => {
+  formData.value.applicableCategoryIds = formData.value.applicableCategoryIds.filter((catId: any) => catId !== id)
 }
 
-const removeProduct = (id: number) => {
-  formData.value.applicableProductIds = formData.value.applicableProductIds.filter(prodId => prodId !== id)
+const removeProduct = (id: any) => {
+  formData.value.applicableProductIds = formData.value.applicableProductIds.filter((prodId: any) => prodId !== id)
 }
 
 // ============================================================
@@ -767,7 +763,7 @@ const handleSubmit = async () => {
 
     closeModal()
     fetchVouchers()
-  } catch (error: any) {
+  } catch (error) {
     console.error('Failed to save voucher:', error)
   } finally {
     isSubmitting.value = false
@@ -777,13 +773,13 @@ const handleSubmit = async () => {
 // ============================================================
 // Delete & Bulk Actions
 // ============================================================
-const confirmAction = ref<(() => void) | null>(null)
+
 
 const showConfirmation = (
   title: string,
   message: string,
   action: () => void,
-  buttonText: string = 'XÁC NHẬN',
+  buttonText = 'XÁC NHẬN',
   type: 'danger' | 'warning' | 'primary' = 'primary'
 ) => {
   confirmTitle.value = title
@@ -911,12 +907,12 @@ const toggleSelectAll = () => {
 // ============================================================
 // Display Helpers
 // ============================================================
-const formatCurrency = (value: number): string => {
+const formatCurrency = (value: any) => {
   return new Intl.NumberFormat('vi-VN').format(value) + ' đ'
 }
 
-const getStatusLabel = (status: VoucherStatus): string => {
-  const labels: Record<VoucherStatus, string> = {
+const getStatusLabel = (status: 'ACTIVE' | 'LOCKED' | 'EXPIRED') => {
+  const labels = {
     ACTIVE: 'Hoạt động',
     LOCKED: 'Đã khóa',
     EXPIRED: 'Hết hạn'
@@ -924,8 +920,8 @@ const getStatusLabel = (status: VoucherStatus): string => {
   return labels[status]
 }
 
-const getStatusClass = (status: VoucherStatus): string => {
-  const classes: Record<VoucherStatus, string> = {
+const getStatusClass = (status: 'ACTIVE' | 'LOCKED' | 'EXPIRED') => {
+  const classes = {
     ACTIVE: 'status-active',
     LOCKED: 'status-locked',
     EXPIRED: 'status-expired'
@@ -1155,7 +1151,7 @@ onMounted(() => {
 }
 
 .col-code .mono {
-  font-family: 'Monaco', 'Menlo', monospace;
+  font-family: 'Geist', sans-serif;
   font-size: 13px;
 }
 
