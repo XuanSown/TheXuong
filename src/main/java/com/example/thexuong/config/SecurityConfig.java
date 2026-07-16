@@ -172,6 +172,8 @@ public class SecurityConfig {
                 .requestMatchers("/api/v1/auth/login", "/api/v1/auth/register", "/api/v1/auth/forgot-password", "/api/v1/auth/reset-password").permitAll()
                 // 2c. Public catalog REST API (khách xem sản phẩm, danh mục) — ponytail: từng thiếu, gây 401
                 .requestMatchers("/api/v1/products/**", "/api/v1/categories/**").permitAll()
+                // 2d. Chatbot REST API (n8n gọi server-to-server, không có session/JWT) — từng thiếu, gây 401 toàn bộ endpoint
+                .requestMatchers("/api/v1/chatbot/**").permitAll()
                 // 3. Các trang yêu cầu User (hoặc Admin) đăng nhập rồi mới được vào
                 .requestMatchers("/cart", "/cart/**", "/checkout", "/checkout/**", "/orders", "/orders/**", "/profile", "/profile/**", "/place-order", "/order/**").authenticated()
                 .requestMatchers("/api/v1/addresses", "/api/v1/addresses/**", "/api/v1/maps", "/api/v1/maps/**").authenticated()
