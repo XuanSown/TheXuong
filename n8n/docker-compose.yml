@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:2.19.4
+    container_name: n8n_chatbot
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_HOST=bot.xuansown.id.vn
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=https
+      - NODE_ENV=production
+      - WEBHOOK_URL=https://bot.xuansown.id.vn
+      - GENERIC_TIMEZONE=Asia/Ho_Chi_Minh
+    volumes:
+      - postgres_test_n8n_dev_data:/home/node/.n8n
+
+volumes:
+  postgres_test_n8n_dev_data:
+    external: true
