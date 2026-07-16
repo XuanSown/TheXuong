@@ -154,7 +154,6 @@ public class CheckoutRestController {
                 .email(user.getEmail())
                 .fullName(user.getFullName())
                 .phoneNumber(user.getPhoneNumber())
-                .address(user.getAddress())
                 .build());
         response.put("currentPoints", currentPoints);
         response.put("availableVouchers", checkoutVouchers);

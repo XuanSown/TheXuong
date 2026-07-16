@@ -150,6 +150,9 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                // ponytail: disable CSRF cho /api/** — SPA session-based + CORS strict + SameSite=Lax, risk thấp;
+                // token không expose qua header/meta cho Vue SPA nên POST login/register 403. Giữ CSRF cho non-API.
+                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"))
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint(authenticationEntryPoint())
                         .accessDeniedHandler((request, response, accessDeniedException) -> {
@@ -167,8 +170,11 @@ public class SecurityConfig {
                 .requestMatchers("/", "/index", "/login", "/register", "/products/**", "/product-detail/**", "/forgot-password", "/vnpay-return").permitAll()
                 // 2b. Auth REST API công khai (đăng nhập/đăng ký/quên & đặt lại mật khẩu)
                 .requestMatchers("/api/v1/auth/login", "/api/v1/auth/register", "/api/v1/auth/forgot-password", "/api/v1/auth/reset-password").permitAll()
+                // 2c. Public catalog REST API (khách xem sản phẩm, danh mục) — ponytail: từng thiếu, gây 401
+                .requestMatchers("/api/v1/products/**", "/api/v1/categories/**").permitAll()
                 // 3. Các trang yêu cầu User (hoặc Admin) đăng nhập rồi mới được vào
                 .requestMatchers("/cart", "/cart/**", "/checkout", "/checkout/**", "/orders", "/orders/**", "/profile", "/profile/**", "/place-order", "/order/**").authenticated()
+                .requestMatchers("/api/v1/addresses", "/api/v1/addresses/**", "/api/v1/maps", "/api/v1/maps/**").authenticated()
                 // 4. CHỈ ADMIN và BOTH mới vào được hệ thống quản trị (Thymeleaf + REST API)
                 .requestMatchers("/admin/**", "/api/v1/admin/**").hasAnyAuthority("ADMIN", "BOTH")
                 .anyRequest().authenticated()

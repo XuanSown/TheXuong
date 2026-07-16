@@ -2,6 +2,7 @@ package com.example.thexuong.repository;
 
 import com.example.thexuong.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -18,6 +19,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     // Tìm user bằng email (dùng cho login Google + trang profile).
     Optional<User> findByEmail(String email);
+
+    // Tìm user + addresses eager (dùng cho toUserResponse — open-in-view=false nên phải fetch join).
+    @EntityGraph(attributePaths = "addresses")
+    Optional<User> findWithAddressesByEmail(String email);
+
     boolean existsByEmail(String email);
 
     /**

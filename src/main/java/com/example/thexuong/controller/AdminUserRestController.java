@@ -151,7 +151,7 @@ UserStatusDto.from(updated)
  }
 
  if (fullName != null || phoneNumber != null || password != null) {
- userService.updateProfile(id, fullName, phoneNumber, null, password);
+  userService.updateProfile(id, fullName, phoneNumber, password);
  }
 
  if (active != null) {

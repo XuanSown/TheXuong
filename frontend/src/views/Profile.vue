@@ -76,15 +76,43 @@
                   class="w-[308px] h-[50px] bg-white border border-[#CFC4C5] rounded-lg px-4 font-gelasio text-[16px] text-[#1A1C1C] outline-none focus:border-black transition-colors" />
               </div>
 
-              <!-- Address Field -->
-              <div class="flex flex-col gap-2">
-                <label
-                  class="font-geist text-[12px] font-semibold leading-[12px] tracking-[1.2px] uppercase text-[#4C4546] opacity-80">
-                  ĐỊA CHỈ NHẬN HÀNG
-                </label>
-                <textarea v-model="profileForm.address" placeholder="Nhập địa chỉ nhận hàng" rows="3"
-                  class="w-full h-[98px] bg-white border border-[#CFC4C5] rounded-lg px-4 py-3 font-gelasio text-[16px] text-[#1A1C1C] outline-none focus:border-black transition-colors resize-none overflow-y-auto"></textarea>
+              <!-- Sổ địa chỉ -->
+              <div class="flex flex-col gap-3">
+                <div class="flex items-center justify-between">
+                  <label class="font-geist text-[12px] font-semibold leading-[12px] tracking-[1.2px] uppercase text-[#4C4546] opacity-80">
+                    SỔ ĐỊA CHỈ
+                  </label>
+                  <button type="button" @click="openCreateAddress" class="text-sm underline hover:text-black">+ Thêm địa chỉ</button>
+                </div>
+                <div v-if="addressStore.addresses.length === 0" class="text-sm text-gray-500 italic py-2">
+                  Chưa có địa chỉ nào. Bấm "Thêm địa chỉ" để tạo mới.
+                </div>
+                <div v-else class="flex flex-col gap-2">
+                  <div v-for="a in addressStore.addresses" :key="a.id"
+                    class="flex items-start justify-between p-3 border border-[#EEEEEE] rounded-lg">
+                    <div class="flex-1">
+                      <div class="font-medium text-[14px]">
+                        {{ a.recipientName }} · {{ a.recipientPhone }}
+                        <span v-if="a.isDefault" class="ml-2 text-[10px] bg-black text-white px-1 rounded">Mặc định</span>
+                        <span v-if="a.label" class="ml-2 text-[10px] text-gray-500">{{ a.label }}</span>
+                      </div>
+                      <div class="text-sm text-gray-600 mt-1">
+                        {{ formatAddress({ streetDetail: a.streetDetail, wardCode: a.wardCode, districtCode: a.districtCode, provinceCode: a.provinceCode }) }}
+                      </div>
+                    </div>
+                    <div class="flex gap-2 text-xs">
+                      <button v-if="!a.isDefault" type="button" @click="onSetDefault(a.id)" class="underline hover:text-black">Đặt mặc định</button>
+                      <button type="button" @click="openEditAddress(a)" class="underline hover:text-black">Sửa</button>
+                      <button type="button" @click="onDeleteAddress(a.id)" class="underline text-red-500 hover:text-red-700">Xóa</button>
+                    </div>
+                  </div>
+                </div>
               </div>
+
+              <!-- Address Modal -->
+              <BaseModal v-model="showAddressModal" :title="editingAddress ? 'Sửa địa chỉ' : 'Thêm địa chỉ'">
+                <AddressForm :model-value="editingAddress || undefined" @submit="onSubmitAddress" @cancel="showAddressModal = false" />
+              </BaseModal>
 
               <!-- Separator Line -->
               <div class="w-full h-px bg-[#E8E8E8]"></div>
@@ -181,6 +209,11 @@ import { ref, reactive, computed, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth.store'
 import { useToast } from 'vue-toastification'
 import api from '@/services/api'
+import { useAddressStore } from '@/stores/address.store'
+import AddressForm from '@/components/address/AddressForm.vue'
+import BaseModal from '@/components/ui/BaseModal.vue'
+import { formatAddress } from '@/utils/vn-regions'
+import type { Address } from '@/types'
 
 const authStore = useAuthStore()
 const toast = useToast()
@@ -189,8 +222,7 @@ const user = computed(() => authStore.user)
 
 const profileForm = reactive({
   fullName: '',
-  phoneNumber: '',
-  address: ''
+  phoneNumber: ''
 })
 
 const passwordForm = reactive({
@@ -201,12 +233,36 @@ const passwordForm = reactive({
 
 const isLoading = ref(false)
 
+const addressStore = useAddressStore()
+const showAddressModal = ref(false)
+const editingAddress = ref<Address | null>(null)
+
+const openCreateAddress = () => { editingAddress.value = null; showAddressModal.value = true }
+const openEditAddress = (a: Address) => { editingAddress.value = a; showAddressModal.value = true }
+const onSubmitAddress = async (data: any) => {
+  try {
+    if (editingAddress.value) await addressStore.update(editingAddress.value.id, data)
+    else await addressStore.create(data)
+    showAddressModal.value = false
+    toast.success('Lưu địa chỉ thành công')
+  } catch (e: any) { toast.error(e.response?.data?.message || 'Không thể lưu địa chỉ') }
+}
+const onDeleteAddress = async (id: number) => {
+  if (!confirm('Xóa địa chỉ này?')) return
+  try { await addressStore.remove(id); toast.success('Đã xóa') }
+  catch (e: any) { toast.error(e.response?.data?.message || 'Không thể xóa') }
+}
+const onSetDefault = async (id: number) => {
+  try { await addressStore.setDefault(id); toast.success('Đã đặt mặc định') }
+  catch (e: any) { toast.error(e.response?.data?.message || 'Không thể đặt mặc định') }
+}
+
 onMounted(() => {
   if (user.value) {
     profileForm.fullName = user.value.fullName || ''
     profileForm.phoneNumber = user.value.phoneNumber || ''
-    profileForm.address = user.value.address || ''
   }
+  addressStore.fetch()
 })
 
 const handleSave = async () => {
@@ -219,8 +275,7 @@ const handleSave = async () => {
   try {
     await authStore.updateProfile({
       fullName: profileForm.fullName,
-      phoneNumber: profileForm.phoneNumber,
-      address: profileForm.address
+      phoneNumber: profileForm.phoneNumber
     })
 
     if (passwordForm.newPassword) {
@@ -253,7 +308,6 @@ const handleCancel = () => {
   if (user.value) {
     profileForm.fullName = user.value.fullName || ''
     profileForm.phoneNumber = user.value.phoneNumber || ''
-    profileForm.address = user.value.address || ''
   }
   passwordForm.currentPassword = ''
   passwordForm.newPassword = ''

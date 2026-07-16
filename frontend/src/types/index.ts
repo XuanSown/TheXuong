@@ -1,4 +1,4 @@
-export type { User } from './auth.types'
+export type { User, Address } from './auth.types'
 export type { Cart, CartItem } from './cart.types'
 export type { Order, OrderItem } from './order.types'
 export { OrderStatus } from './order.types'

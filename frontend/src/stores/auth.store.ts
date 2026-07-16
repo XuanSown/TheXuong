@@ -77,17 +77,16 @@ export const useAuthStore = defineStore('auth', {
     async updateProfile(profileData: {
       fullName?: string
       phoneNumber?: string
-      address?: string
       password?: string
     }) {
       this.loading = true
       try {
         const response = await api.updateProfile(profileData)
         // Update local user data
-        if (response.data.user) {
-          this.setUser(response.data.user)
+        if (response.user) {
+          this.setUser(response.user)
         }
-        return response.data
+        return response
       } finally {
         this.loading = false
       }

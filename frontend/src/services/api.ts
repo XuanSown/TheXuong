@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosError } from 'axios'
-import type { User } from '@/types'
+import type { User, Address } from '@/types'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || '/api/v1'
 
@@ -165,9 +165,24 @@ class ApiService {
   async updateProfile(data: {
     fullName?: string
     phoneNumber?: string
-    address?: string
   }): Promise<any> {
     return (await this.client.put('/auth/profile', data)).data
+  }
+
+  // Address APIs
+  async getAddresses(): Promise<Address[]> { return (await this.client.get('/addresses')).data }
+  async createAddress(data: Omit<Address,'id'|'isDefault'> & { isDefault?: boolean }): Promise<Address> {
+    return (await this.client.post('/addresses', data)).data
+  }
+  async updateAddress(id: number, data: Omit<Address,'id'|'isDefault'> & { isDefault?: boolean }): Promise<Address> {
+    return (await this.client.put(`/addresses/${id}`, data)).data
+  }
+  async deleteAddress(id: number): Promise<void> { await this.client.delete(`/addresses/${id}`) }
+  async setDefaultAddress(id: number): Promise<void> { await this.client.patch(`/addresses/${id}/default`) }
+
+  // Maps proxy
+  async reverseGeocode(lat: number, lng: number): Promise<{ formattedAddress: string; addressComponents: any[] }> {
+    return (await this.client.get('/maps/reverse-geocode', { params: { lat, lng } })).data
   }
 
   // Admin APIs
