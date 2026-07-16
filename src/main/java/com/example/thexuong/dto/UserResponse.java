@@ -22,7 +22,7 @@ public class UserResponse {
     private String fullName;
     @JsonProperty("phone")
     private String phoneNumber;
-    private String address;
+    private java.util.List<com.example.thexuong.dto.address.AddressResponse> addresses;
     private String role;
     private String provider;
     private Boolean active;

@@ -14,6 +14,12 @@ app:
       bucket-name: the-xuong-media
       public-url: https://pub-3fbae0ca10794f42ad228e5d2cf7ce04.r2.dev # Đường dẫn subdomain public ảnh
 
+  google:
+    maps:
+      api-key: ${GOOGLE_MAPS_API_KEY:}
+      language: vi
+      region: vn
+
 spring:
   security:
     oauth2:

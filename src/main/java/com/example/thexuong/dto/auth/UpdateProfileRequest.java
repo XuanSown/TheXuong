@@ -22,8 +22,4 @@ public class UpdateProfileRequest {
     @Size(max = 20, message = "Số điện thoại tối đa 20 ký tự")
     @Pattern(regexp = "^0[0-9]{9,10}$", message = "Số điện thoại không hợp lệ (bắt đầu 0, 10-11 số)")
     private String phoneNumber;
-
-    @Size(max = 500, message = "Địa chỉ tối đa 500 ký tự")
-    @NotBlank(message = "Địa chỉ không được để trống")
-    private String address;
 }

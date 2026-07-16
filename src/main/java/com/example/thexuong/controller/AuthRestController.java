@@ -48,7 +48,7 @@ public class AuthRestController {
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        User user = userService.getUserByEmail(request.getEmail());
+        User user = userService.getUserByEmailWithAddresses(request.getEmail());
         UserResponse userResponse = toUserResponse(user);
 
         Map<String, Object> data = new HashMap<>();
@@ -81,7 +81,7 @@ public class AuthRestController {
         }
 
         String email = authentication.getName();
-        User user = userService.getUserByEmail(email);
+        User user = userService.getUserByEmailWithAddresses(email);
         if (user == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(Map.of("error", "Không tìm thấy người dùng"));
@@ -196,13 +196,12 @@ public class AuthRestController {
                 email,
                 request.getFullName(),
                 request.getPhoneNumber(),
-                request.getAddress(),
                 null // no password change in this endpoint
         );
 
         return ResponseEntity.ok(Map.of(
                 "message", "Cập nhật thông tin thành công",
-                "user", toUserResponse(userService.getUserByEmail(email))
+                "user", toUserResponse(userService.getUserByEmailWithAddresses(email))
         ));
     }
 
@@ -260,7 +259,15 @@ public class AuthRestController {
                 .username(user.getUsername())
                 .fullName(user.getFullName())
                 .phoneNumber(user.getPhoneNumber())
-                .address(user.getAddress())
+                .addresses(user.getAddresses() == null ? java.util.List.of() :
+                    user.getAddresses().stream().map(a -> com.example.thexuong.dto.address.AddressResponse.builder()
+                        .id(a.getId()).label(a.getLabel())
+                        .recipientName(a.getRecipientName()).recipientPhone(a.getRecipientPhone())
+                        .provinceCode(a.getProvinceCode()).districtCode(a.getDistrictCode()).wardCode(a.getWardCode())
+                        .streetDetail(a.getStreetDetail())
+                        .latitude(a.getLatitude()).longitude(a.getLongitude())
+                        .isDefault(a.getIsDefault())
+                        .build()).toList())
                 .role(user.getRole())
                 .provider(user.getProvider())
                 .active(user.getActive())

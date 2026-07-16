@@ -24,6 +24,10 @@ public User getUserByEmail(String email) {
 return userRepository.findByEmail(email).orElse(null);
 }
 
+public User getUserByEmailWithAddresses(String email) {
+return userRepository.findWithAddressesByEmail(email).orElse(null);
+}
+
 /**
 * Tim User theo ID — nem UserNotFoundException neu khong tim thay.
 */
@@ -36,13 +40,12 @@ return userRepository.findById(id)
 
 @Transactional
 public void updateProfile(String currentEmail, String fullName, String phoneNumber,
-String address, String newPassword) {
+String newPassword) {
 log.debug("Updating profile for user {}", currentEmail);
 User user = userRepository.findByEmail(currentEmail)
 .orElseThrow(() -> new UserNotFoundException(currentEmail));
 
 user.setFullName(fullName);
-user.setAddress(address);
 user.setPhoneNumber(phoneNumber);
 
 if (newPassword != null && !newPassword.isBlank()) {
@@ -55,14 +58,13 @@ log.info("Profile updated for user {}", currentEmail);
 
     /** Cap nhat thong tin user theo userId (dung cho admin). */
     @Transactional
-    public void updateProfile(Long userId, String fullName, String phoneNumber, String address, String newPassword) {
+    public void updateProfile(Long userId, String fullName, String phoneNumber, String newPassword) {
         log.debug("Admin updating profile for user {}", userId);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found: " + userId));
 
         if (fullName != null) user.setFullName(fullName);
         if (phoneNumber != null) user.setPhoneNumber(phoneNumber);
-        if (address != null) user.setAddress(address);
         
         if (newPassword != null && !newPassword.isBlank()) {
             user.setPassword(passwordEncoder.encode(newPassword));

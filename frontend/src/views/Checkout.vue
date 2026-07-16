@@ -54,17 +54,40 @@
                   class="!h-[50px]" />
               </div>
 
-              <!-- Address -->
+              <!-- Address Picker -->
               <div class="mb-6">
-                <label
-                  class="block font-geist text-[12px] font-semibold leading-[12px] tracking-[1.2px] uppercase text-[#4C4546] opacity-80 mb-2">
-                  ĐỊA CHỈ NHẬN HÀNG
+                <label class="block font-geist text-[12px] font-semibold leading-[12px] tracking-[1.2px] uppercase text-[#4C4546] opacity-80 mb-2">
+                  ĐỊA CHỈ GIAO HÀNG
                 </label>
+                <div v-if="addressStore.hasAddresses" class="flex flex-col gap-2 mb-3">
+                  <label v-for="a in addressStore.addresses" :key="a.id"
+                    class="flex gap-2 items-start p-3 border rounded-lg cursor-pointer"
+                    :class="selectedAddressId === a.id ? 'border-black bg-gray-50' : 'border-[#CFC4C5]'">
+                    <input type="radio" :value="a.id" v-model="selectedAddressId" @change="selectAddress(a)" />
+                    <div class="flex-1">
+                      <div class="font-medium text-[14px]">
+                        {{ a.recipientName }} · {{ a.recipientPhone }}
+                        <span v-if="a.isDefault" class="ml-2 text-[10px] bg-black text-white px-1 rounded">Mặc định</span>
+                        <span v-if="a.label" class="ml-2 text-[10px] text-gray-500">{{ a.label }}</span>
+                      </div>
+                      <div class="text-sm text-gray-600">
+                        {{ formatAddress({ streetDetail: a.streetDetail, wardCode: a.wardCode, districtCode: a.districtCode, provinceCode: a.provinceCode }) }}
+                      </div>
+                    </div>
+                    <button type="button" @click="editAtCheckout(a)" class="text-xs underline">Sửa</button>
+                  </label>
+                </div>
+                <button type="button" @click="openAddressModal" class="text-sm underline self-start mb-3">+ Thêm địa chỉ mới</button>
                 <textarea v-model="address" placeholder="Nhập địa chỉ chi tiết" rows="3"
                   class="w-full h-[98px] bg-white border border-[#CFC4C5] rounded-lg px-4 py-3 font-gelasio text-[16px] text-[#1A1C1C] outline-none focus:border-black transition-colors resize-none overflow-y-auto"
                   :class="{ 'border-red-500 focus:border-red-500': addressError }"></textarea>
                 <span v-if="addressError" class="text-red-500 text-sm mt-1">{{ addressError }}</span>
               </div>
+
+              <!-- Address Modal -->
+              <BaseModal v-model="showAddressModal" :title="editingAddress ? 'Sửa địa chỉ' : 'Thêm địa chỉ'">
+                <AddressForm :model-value="editingAddress || undefined" @submit="onSubmitAddressAtCheckout" @cancel="showAddressModal = false" />
+              </BaseModal>
 
               <!-- Payment Method -->
               <div class="flex flex-col gap-2 mb-6">
@@ -253,6 +276,12 @@ import { checkoutSchema } from '@/utils/validators'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import api from '@/services/api'
+import { useAddressStore } from '@/stores/address.store'
+import { formatAddress } from '@/utils/vn-regions'
+import AddressForm from '@/components/address/AddressForm.vue'
+import BaseModal from '@/components/ui/BaseModal.vue'
+import { useToast } from 'vue-toastification'
+import type { Address } from '@/types'
 
 const cartStore = useCartStore()
 const authStore = useAuthStore()
@@ -277,6 +306,12 @@ const tierDiscountAmount = ref(0)
 const currentPoints = ref(0)
 const pointsToUse = ref<number>(0)
 const pointsError = ref('')
+
+const addressStore = useAddressStore()
+const checkoutToast = useToast()
+const selectedAddressId = ref<number | null>(null)
+const showAddressModal = ref(false)
+const editingAddress = ref<Address | null>(null)
 
 const finalTotal = computed(() => {
   let amt = total.value
@@ -337,24 +372,51 @@ const loadCheckoutData = async () => {
   }
 }
 
-onMounted(() => {
-  // Auto-fill from user profile if logged in
+onMounted(async () => {
+  // Check if cart is empty
+  if (cartItems.value.length === 0) {
+    router.push('/cart')
+    return
+  }
+
+  // Auto-fill from user profile
   if (authStore.user) {
     setValues({
       fullName: authStore.user.fullName || '',
       phoneNumber: authStore.user.phone || '',
-      address: authStore.user.address || '',
+      address: '',
       paymentMethod: 'COD'
     })
   }
 
-  // Check if cart is empty
-  if (cartItems.value.length === 0) {
-    router.push('/cart')
-  } else {
-    loadCheckoutData()
-  }
+  // Load addresses and prefill default
+  await addressStore.fetch()
+  const def = addressStore.defaultAddress
+  if (def) selectAddress(def)
+
+  loadCheckoutData()
 })
+
+function selectAddress(a: Address) {
+  selectedAddressId.value = a.id
+  setValues({
+    fullName: a.recipientName,
+    phoneNumber: a.recipientPhone,
+    address: formatAddress({ streetDetail: a.streetDetail, wardCode: a.wardCode, districtCode: a.districtCode, provinceCode: a.provinceCode })
+  })
+}
+const openAddressModal = () => { editingAddress.value = null; showAddressModal.value = true }
+const editAtCheckout = (a: Address) => { editingAddress.value = a; showAddressModal.value = true }
+const onSubmitAddressAtCheckout = async (data: any) => {
+  try {
+    const saved: Address = editingAddress.value
+      ? await addressStore.update(editingAddress.value.id, data)
+      : await addressStore.create(data)
+    showAddressModal.value = false
+    selectAddress(saved)
+    checkoutToast.success('Đã lưu địa chỉ')
+  } catch (e: any) { checkoutToast.error(e.response?.data?.message || 'Không thể lưu địa chỉ') }
+}
 
 const formatPrice = (price: number) => {
   return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price)
@@ -442,7 +504,7 @@ const onSubmit = handleSubmit(async (values) => {
 
   } catch (error: any) {
     console.error('Failed to place order:', error)
-    // Global toast will handle the error message
+    checkoutToast.error('Đặt hàng thất bại. Vui lòng thử lại.')
   }
 })
 </script>

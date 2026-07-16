@@ -54,8 +54,9 @@ public class User {
     @Column(name = "phone_number")
     private String phoneNumber;
 
-    @Column(columnDefinition = "NVARCHAR(MAX)")
-    private String address;
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @Builder.Default
+    private java.util.List<UserAddress> addresses = new java.util.ArrayList<>();
 
     /**
      * Trạng thái hoạt động: true = Active, false = Bị khóa.
