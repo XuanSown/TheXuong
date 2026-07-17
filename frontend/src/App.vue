@@ -1,5 +1,7 @@
 <template>
   <div id="app">
+    <AppLoader v-if="!appReady" @exited="appReady = true" />
+
     <LayoutProvider>
       <router-view v-slot="{ Component }">
         <transition name="fade" mode="out-in">
@@ -15,30 +17,28 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, watch } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth.store'
 import { useCartStore } from '@/stores/cart.store'
 import LayoutProvider from '@/components/layout/LayoutProvider.vue'
 import BackToTop from '@/components/ui/BackToTop.vue'
 import TelegramChatButton from '@/components/ui/TelegramChatButton.vue'
+import AppLoader from '@/components/AppLoader.vue'
 
 const authStore = useAuthStore()
 const cartStore = useCartStore()
+const appReady = ref(false)
 
 onMounted(async () => {
-  // Router guard now handles auth initialization before mount.
-  // Fetch cart if user is authenticated
   if (authStore.isAuthenticated) {
     await cartStore.fetchCart().catch(console.error)
   }
 })
 
-// Watch for login to merge guest cart
 watch(
   () => authStore.isAuthenticated,
   async (newVal, oldVal) => {
     if (newVal && !oldVal) {
-      // User just logged in - merge guest cart
       await cartStore.mergeGuestCart()
     }
   }
