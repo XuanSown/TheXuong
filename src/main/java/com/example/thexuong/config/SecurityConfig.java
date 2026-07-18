@@ -164,21 +164,16 @@ public class SecurityConfig {
                         })
                 )
                 .authorizeHttpRequests(auth -> auth
-                // 1. Cho phép truy cập resources
-                .requestMatchers("/css/**", "/js/**", "/img/**", "/fonts/**", "/uploads/**").permitAll()
-                // 2. Các trang Public ai cũng xem được
-                .requestMatchers("/", "/index", "/login", "/register", "/products/**", "/product-detail/**", "/forgot-password", "/vnpay-return").permitAll()
-                // 2b. Auth REST API công khai (đăng nhập/đăng ký/quên & đặt lại mật khẩu)
+                // Auth REST API công khai (đăng nhập/đăng ký/quên & đặt lại mật khẩu)
                 .requestMatchers("/api/v1/auth/login", "/api/v1/auth/register", "/api/v1/auth/forgot-password", "/api/v1/auth/reset-password").permitAll()
-                // 2c. Public catalog REST API (khách xem sản phẩm, danh mục) — ponytail: từng thiếu, gây 401
+                // Public catalog REST API (khách xem sản phẩm, danh mục)
                 .requestMatchers("/api/v1/products/**", "/api/v1/categories/**").permitAll()
-                // 2d. Chatbot REST API (n8n gọi server-to-server, không có session/JWT) — từng thiếu, gây 401 toàn bộ endpoint
+                // Chatbot REST API (n8n gọi server-to-server)
                 .requestMatchers("/api/v1/chatbot/**").permitAll()
-                // 3. Các trang yêu cầu User (hoặc Admin) đăng nhập rồi mới được vào
-                .requestMatchers("/cart", "/cart/**", "/checkout", "/checkout/**", "/orders", "/orders/**", "/profile", "/profile/**", "/place-order", "/order/**").authenticated()
+                // User endpoints yêu cầu đăng nhập
                 .requestMatchers("/api/v1/addresses", "/api/v1/addresses/**", "/api/v1/maps", "/api/v1/maps/**").authenticated()
-                // 4. CHỈ ADMIN và BOTH mới vào được hệ thống quản trị (Thymeleaf + REST API)
-                .requestMatchers("/admin/**", "/api/v1/admin/**").hasAnyAuthority("ADMIN", "BOTH")
+                // Admin-only endpoints
+                .requestMatchers("/api/v1/admin/**").hasAnyAuthority("ADMIN", "BOTH")
                 .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider)
