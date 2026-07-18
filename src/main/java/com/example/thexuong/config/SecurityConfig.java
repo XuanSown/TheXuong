@@ -39,6 +39,7 @@ public class SecurityConfig {
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
     private final AuthenticationProvider authenticationProvider;
     private final UserRepository userRepository;
+    private final com.example.thexuong.security.JwtAuthenticationFilter jwtAuthenticationFilter;
 
     /**
      * Custom OAuth2UserService để đảm bảo principal.getName() trả về email
@@ -150,8 +151,6 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                // ponytail: disable CSRF cho /api/** — SPA session-based + CORS strict + SameSite=Lax, risk thấp;
-                // token không expose qua header/meta cho Vue SPA nên POST login/register 403. Giữ CSRF cho non-API.
                 .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"))
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint(authenticationEntryPoint())
@@ -164,41 +163,22 @@ public class SecurityConfig {
                         })
                 )
                 .authorizeHttpRequests(auth -> auth
-                // Auth REST API công khai (đăng nhập/đăng ký/quên & đặt lại mật khẩu)
-                .requestMatchers("/api/v1/auth/login", "/api/v1/auth/register", "/api/v1/auth/forgot-password", "/api/v1/auth/reset-password").permitAll()
-                // Public catalog REST API (khách xem sản phẩm, danh mục)
+                .requestMatchers("/api/v1/auth/login", "/api/v1/auth/register", "/api/v1/auth/forgot-password", "/api/v1/auth/reset-password", "/api/v1/auth/refresh").permitAll()
                 .requestMatchers("/api/v1/products/**", "/api/v1/categories/**").permitAll()
-                // Chatbot REST API (n8n gọi server-to-server)
                 .requestMatchers("/api/v1/chatbot/**").permitAll()
-                // User endpoints yêu cầu đăng nhập
                 .requestMatchers("/api/v1/addresses", "/api/v1/addresses/**", "/api/v1/maps", "/api/v1/maps/**").authenticated()
-                // Admin-only endpoints
                 .requestMatchers("/api/v1/admin/**").hasAnyAuthority("ADMIN", "BOTH")
                 .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider)
-                .formLogin(form -> form
-                .loginPage("/login")
-                .loginProcessingUrl("/perform_login")
-                .defaultSuccessUrl("/", true)
-                .failureUrl("/login?error=true")
-                .usernameParameter("email")
-                .passwordParameter("password")
-                .permitAll()
-                )
+                .addFilterBefore(jwtAuthenticationFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class)
+                .sessionManagement(session -> session.sessionCreationPolicy(org.springframework.security.config.http.SessionCreationPolicy.STATELESS))
                 .oauth2Login(oauth2 -> oauth2
                 .loginPage("/login")
                 .userInfoEndpoint(userInfo -> userInfo
                         .userService(oauth2UserService())
                 )
                 .successHandler(oAuth2SuccessHandler)
-                )
-                .logout(logout -> logout
-                .logoutUrl("/logout")
-                .logoutSuccessUrl("/login?logout=true")
-                .invalidateHttpSession(true)
-                .deleteCookies("JSESSIONID")
-                .permitAll()
                 );
 
         return http.build();
