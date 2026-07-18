@@ -7,7 +7,12 @@ import com.example.thexuong.dto.auth.RegisterRequest;
 import com.example.thexuong.dto.auth.UpdateProfileRequest;
 import com.example.thexuong.entity.User;
 import com.example.thexuong.service.PasswordResetService;
+import com.example.thexuong.filter.LoginRateLimitFilter;
 import com.example.thexuong.service.UserService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +40,7 @@ public class AuthRestController {
     private final AuthenticationManager authenticationManager;
     private final UserService userService;
     private final PasswordResetService passwordResetService;
+    private final LoginRateLimitFilter loginRateLimitFilter;
 
     /**
      * POST /api/auth/login
@@ -42,10 +48,19 @@ public class AuthRestController {
      * Returns: { user: UserResponse }
      */
     @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
-        );
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request,
+                                   HttpServletRequest httpRequest) {
+        String clientIp = loginRateLimitFilter.getClientIp(httpRequest);
+        Authentication authentication;
+        try {
+            authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+            );
+        } catch (org.springframework.security.core.AuthenticationException e) {
+            loginRateLimitFilter.recordFailedAttempt(clientIp);
+            throw e; // GlobalExceptionHandler returns 401
+        }
+        loginRateLimitFilter.resetAttempts(clientIp);
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         User user = userService.getUserByEmailWithAddresses(request.getEmail());
@@ -59,13 +74,21 @@ public class AuthRestController {
     }
 
     /**
-     * POST /api/auth/logout
-     * Requires session
+     * POST /api/v1/auth/logout
+     * Hủy session (JSESSIONID) + clear SecurityContext + xóa cookie.
+     * SPA gọi endpoint này (SecurityConfig's /logout chỉ fallback cho non-API).
      */
     @PostMapping("/logout")
-    public ResponseEntity<?> logout() {
-        // Spring Security handles session invalidation via /logout endpoint
-        // This is a placeholder for API consistency
+    public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
+        SecurityContextHolder.clearContext();
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
+        Cookie cookie = new Cookie("JSESSIONID", "");
+        cookie.setPath("/");
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
         return ResponseEntity.ok(Map.of("message", "Đăng xuất thành công"));
     }
 
