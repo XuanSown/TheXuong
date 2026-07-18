@@ -5,12 +5,29 @@
       <!-- Header Section -->
       <div class="header-section">
         <div class="header-left">
-          <h1 class="heading-1">DANH SÁCH SẢN PHẨM</h1>
-          <p class="subtitle">Quản lý và theo dõi các sản phẩm trên hệ thống THE XUONG Sport.</p>
+          <h1 class="heading-1">
+            DANH SÁCH SẢN PHẨM
+          </h1>
+          <p class="subtitle">
+            Quản lý và theo dõi các sản phẩm trên hệ thống THE XUONG Sport.
+          </p>
         </div>
-        <button class="btn-add" @click="goToCreate">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M8 3V13M3 8H13" stroke="white" stroke-width="2" stroke-linecap="round"/>
+        <button
+          class="btn-add"
+          @click="goToCreate"
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 16 16"
+            fill="none"
+          >
+            <path
+              d="M8 3V13M3 8H13"
+              stroke="white"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
           </svg>
           THÊM SẢN PHẨM MỚI
         </button>
@@ -19,28 +36,55 @@
       <!-- Filters Section -->
       <div class="filters-section">
         <div class="search-container">
-          <svg class="search-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
-            <circle cx="8.5" cy="8.5" r="6.5" stroke="#6B7280" stroke-width="1.66667"/>
-            <path d="M13.5 13.5L17.5 17.5" stroke="#6B7280" stroke-width="1.66667" stroke-linecap="round"/>
+          <svg
+            class="search-icon"
+            width="20"
+            height="20"
+            viewBox="0 0 20 20"
+            fill="none"
+          >
+            <circle
+              cx="8.5"
+              cy="8.5"
+              r="6.5"
+              stroke="#6B7280"
+              stroke-width="1.66667"
+            />
+            <path
+              d="M13.5 13.5L17.5 17.5"
+              stroke="#6B7280"
+              stroke-width="1.66667"
+              stroke-linecap="round"
+            />
           </svg>
           <input
-            type="text"
             v-model="searchQuery"
+            type="text"
             class="search-input"
             placeholder="Tìm kiếm sản phẩm..."
             @keyup.enter="onSearch"
-          />
+          >
         </div>
       </div>
 
       <!-- Table Info & Pagination Top -->
       <div class="table-info-top">
-        <span class="showing-text" v-if="!isLoading">
+        <span
+          v-if="!isLoading"
+          class="showing-text"
+        >
           Hiển thị {{ (currentPage - 1) * itemsPerPage + 1 }} - {{ Math.min(currentPage * itemsPerPage, totalProducts) }} của {{ totalProducts }} sản phẩm
         </span>
-        <span class="showing-text" v-else>Đang tải...</span>
+        <span
+          v-else
+          class="showing-text"
+        >Đang tải...</span>
         <div class="pagination">
-          <button class="btn-page" :disabled="currentPage === 1 || isLoading" @click="currentPage--">
+          <button
+            class="btn-page"
+            :disabled="currentPage === 1 || isLoading"
+            @click="currentPage--"
+          >
             ‹
           </button>
           <button
@@ -48,12 +92,16 @@
             :key="page"
             class="btn-page"
             :class="{ active: currentPage === page }"
-            @click="currentPage = Number(page)"
             :disabled="isLoading || page === '...'"
+            @click="currentPage = Number(page)"
           >
             {{ page }}
           </button>
-          <button class="btn-page" :disabled="currentPage === totalPages || isLoading" @click="currentPage++">
+          <button
+            class="btn-page"
+            :disabled="currentPage === totalPages || isLoading"
+            @click="currentPage++"
+          >
             ›
           </button>
         </div>
@@ -63,29 +111,59 @@
       <div class="product-table">
         <!-- Table Header -->
         <div class="table-header">
-          <div class="header-cell cell-product">SẢN PHẨM</div>
-          <div class="header-cell cell-category">DANH MỤC</div>
-          <div class="header-cell cell-price">GIÁ NIÊM YẾT</div>
-          <div class="header-cell cell-status">TRẠNG THÁI</div>
-          <div class="header-cell cell-actions">THAO TÁC</div>
+          <div class="header-cell cell-product">
+            SẢN PHẨM
+          </div>
+          <div class="header-cell cell-category">
+            DANH MỤC
+          </div>
+          <div class="header-cell cell-price">
+            GIÁ NIÊM YẾT
+          </div>
+          <div class="header-cell cell-status">
+            TRẠNG THÁI
+          </div>
+          <div class="header-cell cell-actions">
+            THAO TÁC
+          </div>
         </div>
 
         <!-- Table Body -->
         <div class="table-body">
-          <div v-if="isLoading" class="loading-cell">
+          <div
+            v-if="isLoading"
+            class="loading-cell"
+          >
             Đang tải dữ liệu...
           </div>
-          <div v-else-if="allProducts.length === 0" class="empty-cell">
+          <div
+            v-else-if="allProducts.length === 0"
+            class="empty-cell"
+          >
             Không tìm thấy sản phẩm nào
           </div>
-          <div v-for="product in allProducts" :key="product.id" class="table-row">
+          <div
+            v-for="product in allProducts"
+            :key="product.id"
+            class="table-row"
+          >
             <div class="cell cell-product">
               <div class="product-info">
                 <div class="product-image">
-                  <div v-if="product.image" class="image-content">
-                    <img :src="product.image" :alt="product.name" loading="lazy" />
+                  <div
+                    v-if="product.image"
+                    class="image-content"
+                  >
+                    <img
+                      :src="product.image"
+                      :alt="product.name"
+                      loading="lazy"
+                    >
                   </div>
-                  <div v-else class="image-placeholder"></div>
+                  <div
+                    v-else
+                    class="image-placeholder"
+                  />
                 </div>
                 <div class="product-details">
                   <span class="product-name">{{ product.name }}</span>
@@ -93,8 +171,12 @@
                 </div>
               </div>
             </div>
-            <div class="cell cell-category">{{ product.category || 'N/A' }}</div>
-            <div class="cell cell-price">{{ formatPrice(product.price) }}</div>
+            <div class="cell cell-category">
+              {{ product.category || 'N/A' }}
+            </div>
+            <div class="cell cell-price">
+              {{ formatPrice(product.price) }}
+            </div>
             <div class="cell cell-status">
               <span
                 class="status-badge"
@@ -104,11 +186,25 @@
               </span>
             </div>
             <div class="cell cell-actions">
-              <button class="btn-toggle-active" @click="toggleActive(product.id, product.active)" :class="product.active === false ? 'btn-show' : 'btn-hide'">
+              <button
+                class="btn-toggle-active"
+                :class="product.active === false ? 'btn-show' : 'btn-hide'"
+                @click="toggleActive(product.id, product.active)"
+              >
                 {{ product.active === false ? 'HIỆN' : 'ẨN' }}
               </button>
-              <button class="btn-edit" @click="editProduct(product.id)">SỬA</button>
-              <button class="btn-delete" @click="deleteProduct(product.id)">XÓA</button>
+              <button
+                class="btn-edit"
+                @click="editProduct(product.id)"
+              >
+                SỬA
+              </button>
+              <button
+                class="btn-delete"
+                @click="deleteProduct(product.id)"
+              >
+                XÓA
+              </button>
             </div>
           </div>
         </div>
@@ -126,12 +222,26 @@
         >
           <div class="glass-modal-container">
             <!-- Glass shimmer edge -->
-            <div class="glass-edge-glow"></div>
+            <div class="glass-edge-glow" />
 
             <!-- Close Button -->
-            <button class="glass-close-btn" @click="closeModal" aria-label="Đóng">
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                <path d="M5 5L15 15M15 5L5 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            <button
+              class="glass-close-btn"
+              aria-label="Đóng"
+              @click="closeModal"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 20 20"
+                fill="none"
+              >
+                <path
+                  d="M5 5L15 15M15 5L5 15"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                />
               </svg>
             </button>
 
@@ -154,7 +264,7 @@
 import { ref, computed, onMounted, watch, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
-import api from '@/services/api'
+import adminService from '@/services/admin.service'
 import AdminProductEdit from '@/views/admin/AdminProductEdit.vue'
 
 const router = useRouter()
@@ -180,8 +290,7 @@ const fetchProducts = async () => {
     if (searchQuery.value.trim()) {
       params.keyword = searchQuery.value.trim()
     }
-    const response = await api.get('/admin/products', { params })
-    const data = response.data
+    const data = await adminService.getProducts(params)
     const items = data.content || data || []
     allProducts.value = items.map((p: any) => ({
       id: p.id,
@@ -240,7 +349,7 @@ const editProduct = (id: any) => {
 const deleteProduct = async (id: any) => {
   if (!confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) return
   try {
-    await api.delete(`/admin/products/${id}`)
+    await adminService.deleteProduct(id)
     allProducts.value = allProducts.value.filter(p => p.id !== id)
     totalProducts.value--
     toast.success('Xóa sản phẩm thành công!')
@@ -251,8 +360,8 @@ const deleteProduct = async (id: any) => {
 
 const toggleActive = async (id: any, _currentStatus?: any) => {
   try {
-    const res = await api.patch(`/admin/products/${id}/toggle-active`)
-    toast.success(res.data.message || 'Cập nhật trạng thái thành công!')
+    const res = await adminService.toggleProductActive(id)
+    toast.success(res.message || 'Cập nhật trạng thái thành công!')
     
     // Update local state
     const product = allProducts.value.find(p => p.id === id)

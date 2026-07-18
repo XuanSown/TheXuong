@@ -3,7 +3,7 @@
  * Batch 2: Voucher Catalog CRUD + Bulk Operations
  */
 
-import api from './api'
+import http from './http'
 import type {
   VoucherResponse,
   VoucherListResponse,
@@ -33,7 +33,7 @@ export const voucherService = {
     minPoints?: number
     maxPoints?: number
   }): Promise<VoucherListResponse> {
-    const response = await api.get('/admin/loyalty/vouchers', { params })
+    const response = await http.get('/admin/loyalty/vouchers', { params })
     return response.data?.data || response.data
   },
 
@@ -41,7 +41,7 @@ export const voucherService = {
    * Get single voucher by ID
    */
   async getVoucher(id: number): Promise<VoucherResponse> {
-    const response = await api.get(`/admin/loyalty/vouchers/${id}`)
+    const response = await http.get(`/admin/loyalty/vouchers/${id}`)
     return response.data?.data || response.data
   },
 
@@ -50,7 +50,7 @@ export const voucherService = {
    * If code is empty/null, backend will auto-generate
    */
   async createVoucher(data: VoucherCreateRequest): Promise<VoucherResponse> {
-    const response = await api.post('/admin/loyalty/vouchers', data)
+    const response = await http.post('/admin/loyalty/vouchers', data)
     return response.data?.data || response.data
   },
 
@@ -61,7 +61,7 @@ export const voucherService = {
     id: number,
     data: VoucherUpdateRequest
   ): Promise<VoucherResponse> {
-    const response = await api.put(`/admin/loyalty/vouchers/${id}`, data)
+    const response = await http.put(`/admin/loyalty/vouchers/${id}`, data)
     return response.data?.data || response.data
   },
 
@@ -70,7 +70,7 @@ export const voucherService = {
    * Fails if voucher has claimed UserVouchers (business rule)
    */
   async deleteVoucher(id: number): Promise<void> {
-    await api.delete(`/admin/loyalty/vouchers/${id}`)
+    await http.delete(`/admin/loyalty/vouchers/${id}`)
   },
 
   // ============================================================
@@ -81,7 +81,7 @@ export const voucherService = {
    * Bulk lock/unlock/delete/set-vip multiple vouchers
    */
   async bulkAction(data: BulkVoucherRequest): Promise<BulkVoucherResponse> {
-    const response = await api.post('/admin/loyalty/vouchers/bulk', data)
+    const response = await http.post('/admin/loyalty/vouchers/bulk', data)
     return response.data?.data || response.data
   },
 
@@ -93,7 +93,7 @@ export const voucherService = {
    * Get voucher statistics (optional endpoint)
    */
   async getVoucherStats(): Promise<VoucherStats> {
-    const response = await api.get('/admin/loyalty/vouchers/stats')
+    const response = await http.get('/admin/loyalty/vouchers/stats')
     return response.data?.data || response.data
   },
 
@@ -101,7 +101,7 @@ export const voucherService = {
    * Get all categories for multi-select (load once on modal open)
    */
   async getAllCategories(): Promise<Category[]> {
-    const response = await api.get('/categories', { params: { all: true } })
+    const response = await http.get('/categories', { params: { all: true } })
     return response.data.content || response.data
   },
 
@@ -109,7 +109,7 @@ export const voucherService = {
    * Search products (for multi-select)
    */
   async searchProducts(query: string): Promise<Product[]> {
-    const response = await api.get('/products', { params: { keyword: query, size: 100 } })
+    const response = await http.get('/products', { params: { keyword: query, size: 100 } })
     return response.data.content || response.data
   },
 
@@ -117,7 +117,7 @@ export const voucherService = {
    * Get all products (if Option A: load all on modal open)
    */
   async getAllProducts(): Promise<Product[]> {
-    const response = await api.get('/products', { params: { size: 100 } })
+    const response = await http.get('/products', { params: { size: 100 } })
     return response.data.content || response.data
   },
 

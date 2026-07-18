@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen bg-[#F9F9F9] flex items-center justify-center py-12 px-4">
     <div class="w-full max-w-[480px]">
-      <!-- Forgot Password Card -->
+      <!-- Reset Password Card -->
       <div class="bg-white border border-[rgba(207,196,197,0.3)] rounded-xl shadow-[0px_25px_50px_-12px_rgba(0,0,0,0.25)] p-12">
         <div class="flex flex-col gap-8">
           <!-- Logo & Brand -->
@@ -9,15 +9,10 @@
             <div class="w-[82px] h-[75px] bg-[url('@/assets/logo.png')] bg-contain bg-no-repeat bg-center" />
             <div class="mt-1 flex flex-col items-center">
               <p class="font-geist text-base text-[#4C4546] leading-[26px]">
-                Quên mật khẩu
+                Đặt lại mật khẩu
               </p>
             </div>
           </div>
-
-          <!-- Info Text -->
-          <p class="font-gelasio text-sm text-[#7E7576] leading-relaxed text-center">
-            Nhập email đã đăng ký để nhận link đặt lại mật khẩu. Link có hiệu lực trong <strong class="text-black">2 giờ</strong>.
-          </p>
 
           <!-- Success Message -->
           <div
@@ -78,18 +73,17 @@
             </span>
           </div>
 
-          <!-- Forgot Password Form -->
+          <!-- Reset Password Form -->
           <form
             v-if="!successMsg"
             class="flex flex-col gap-5"
             @submit.prevent="onSubmit"
           >
-            <!-- Email Input -->
             <BaseInput
-              v-model="email"
-              type="email"
-              placeholder="Nhập email của bạn"
-              :error="emailError"
+              v-model="password"
+              type="password"
+              placeholder="Mật khẩu mới (ít nhất 8 ký tự)"
+              :error="passwordError"
               class="!h-[59.59px]"
             >
               <template #prefix>
@@ -103,13 +97,42 @@
                   stroke-linejoin="round"
                 >
                   <rect
-                    x="2"
-                    y="4"
-                    width="20"
-                    height="16"
+                    x="3"
+                    y="11"
+                    width="18"
+                    height="11"
                     rx="2"
                   />
-                  <path d="M22 4L12 13L2 4" />
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                </svg>
+              </template>
+            </BaseInput>
+
+            <BaseInput
+              v-model="confirmPassword"
+              type="password"
+              placeholder="Xác nhận mật khẩu mới"
+              :error="confirmPasswordError"
+              class="!h-[59.59px]"
+            >
+              <template #prefix>
+                <svg
+                  class="w-5 h-5 text-[#7E7576]"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <rect
+                    x="3"
+                    y="11"
+                    width="18"
+                    height="11"
+                    rx="2"
+                  />
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
                 </svg>
               </template>
             </BaseInput>
@@ -120,17 +143,17 @@
               :loading="isSubmitting"
               class="w-full !h-[56px]"
             >
-              Gửi link đặt lại mật khẩu
+              Đặt lại mật khẩu
             </BaseButton>
           </form>
 
-          <!-- Back to Login Link -->
+          <!-- Back to Forgot Password Link -->
           <div class="flex justify-center">
             <router-link
-              to="/login"
+              to="/forgot-password"
               class="font-gelasio text-base text-[#7E7576] hover:text-black transition-colors"
             >
-              ← Quay lại đăng nhập
+              ← Yêu cầu link mới
             </router-link>
           </div>
         </div>
@@ -140,29 +163,56 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import authService from '@/services/auth.service'
 import { useForm, useField } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
-import { forgotPasswordSchema } from '@/utils/validators'
+import { resetPasswordSchema } from '@/utils/validators'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 
+const route = useRoute()
+const router = useRouter()
+
+const token = ref('')
 const successMsg = ref('')
 const errorMsg = ref('')
 
 const { handleSubmit, isSubmitting } = useForm({
-  validationSchema: toTypedSchema(forgotPasswordSchema)
+  validationSchema: toTypedSchema(resetPasswordSchema)
 })
 
-const { value: email, errorMessage: emailError } = useField<string>('email')
+const { value: password, errorMessage: passwordError } = useField<string>('password')
+const { value: confirmPassword, errorMessage: confirmPasswordError } = useField<string>('confirmPassword')
+
+onMounted(() => {
+  if (route.query.token) {
+    token.value = route.query.token as string
+  } else {
+    errorMsg.value = 'Token không hợp lệ hoặc đã hết hạn.'
+  }
+})
 
 const onSubmit = handleSubmit(async (values) => {
+  if (!token.value) {
+    errorMsg.value = 'Không tìm thấy token đặt lại mật khẩu'
+    return
+  }
+
   successMsg.value = ''
   errorMsg.value = ''
+  
   try {
-    const res = await authService.forgotPassword(values.email)
-    successMsg.value = res.message || 'Đã gửi link đặt lại mật khẩu vào email của bạn!'
+    const res = await authService.resetPassword({
+      token: token.value,
+      password: values.password,
+      confirmPassword: values.confirmPassword
+    })
+    successMsg.value = res.message || 'Đặt lại mật khẩu thành công!'
+    setTimeout(() => {
+      router.push('/login')
+    }, 2000)
   } catch (error: any) {
     errorMsg.value = error.response?.data?.message || 'Có lỗi xảy ra, vui lòng thử lại'
   }

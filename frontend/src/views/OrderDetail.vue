@@ -6,9 +6,21 @@
         <header class="flex flex-col gap-[48px] mb-16">
           <!-- Breadcrumb -->
           <div class="flex items-center gap-3">
-            <router-link to="/orders" class="flex items-center gap-2 text-[#666666] hover:text-black transition-colors">
-              <svg class="w-[9.33px] h-[9.33px]" viewBox="0 0 13 13" fill="currentColor">
-                <path d="M6.5 1L1 6.5l5.5 5.5M1 6.5L6.5 12" stroke="currentColor" stroke-width="1.5" fill="none"/>
+            <router-link
+              to="/orders"
+              class="flex items-center gap-2 text-[#666666] hover:text-black transition-colors"
+            >
+              <svg
+                class="w-[9.33px] h-[9.33px]"
+                viewBox="0 0 13 13"
+                fill="currentColor"
+              >
+                <path
+                  d="M6.5 1L1 6.5l5.5 5.5M1 6.5L6.5 12"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  fill="none"
+                />
               </svg>
               <span class="font-gelasio text-[14px]">Quay lại lịch sử đơn hàng</span>
             </router-link>
@@ -24,20 +36,23 @@
                 Ngày đặt: {{ formatDate(order?.createdAt || '') }}
               </span>
             </div>
-            <div v-if="order" class="flex items-center gap-3">
+            <div
+              v-if="order"
+              class="flex items-center gap-3"
+            >
               <button
                 v-if="order.status === 'PENDING'"
-                @click="confirmCancelOrder"
                 class="px-4 py-1.5 border border-red-500 text-red-500 rounded font-geist text-[12px] font-medium hover:bg-red-50 transition-colors"
                 :disabled="isCancelling"
+                @click="confirmCancelOrder"
               >
                 {{ isCancelling ? 'Đang xử lý...' : 'Yêu cầu hủy đơn' }}
               </button>
               <button
                 v-if="order.status === 'DELIVERED'"
-                @click="confirmReceivedOrder"
                 class="px-4 py-1.5 bg-black text-white rounded font-geist text-[12px] font-medium hover:bg-gray-900 transition-colors"
                 :disabled="isConfirmingReceived"
+                @click="confirmReceivedOrder"
               >
                 {{ isConfirmingReceived ? 'Đang xử lý...' : 'Đã nhận được hàng' }}
               </button>
@@ -60,9 +75,18 @@
                 <h2 class="font-geist text-[14px] font-bold leading-[20px] tracking-[0.7px] uppercase text-[#111111]">
                   THÔNG TIN NGƯỜI NHẬN
                 </h2>
-                <button v-if="order?.status === 'PENDING' && !isEditing" @click="startEdit" class="text-blue-600 text-[14px] font-medium hover:underline">Sửa</button>
+                <button
+                  v-if="order?.status === 'PENDING' && !isEditing"
+                  class="text-blue-600 text-[14px] font-medium hover:underline"
+                  @click="startEdit"
+                >
+                  Sửa
+                </button>
               </div>
-              <div class="flex flex-col gap-4" v-if="order && !isEditing">
+              <div
+                v-if="order && !isEditing"
+                class="flex flex-col gap-4"
+              >
                 <div class="flex flex-col gap-1">
                   <span class="font-geist text-[14px] text-[#666666]">Họ và tên</span>
                   <span class="font-geist text-[14px] font-medium text-[#111111]">{{ order.fullName }}</span>
@@ -77,27 +101,55 @@
                     {{ order.address }}
                   </span>
                 </div>
-                <div v-if="order.note" class="flex flex-col gap-1 pt-2 border-t border-[#F0F0F0]">
+                <div
+                  v-if="order.note"
+                  class="flex flex-col gap-1 pt-2 border-t border-[#F0F0F0]"
+                >
                   <span class="font-geist text-[14px] text-[#666666]">Ghi chú</span>
                   <span class="font-geist text-[14px] font-medium text-[#111111]">{{ order.note }}</span>
                 </div>
               </div>
 
               <!-- Edit Mode -->
-              <div class="flex flex-col gap-4" v-if="order && isEditing">
+              <div
+                v-if="order && isEditing"
+                class="flex flex-col gap-4"
+              >
                 <div class="flex flex-col gap-1">
                   <label class="text-[12px] text-[#666666]">Số điện thoại</label>
-                  <input v-model="editForm.phoneNumber" class="border border-[#E0E0E0] px-3 py-2 rounded-md w-full text-[14px] font-medium text-[#111111] outline-none focus:border-black" placeholder="Nhập số điện thoại mới" />
+                  <input
+                    v-model="editForm.phoneNumber"
+                    class="border border-[#E0E0E0] px-3 py-2 rounded-md w-full text-[14px] font-medium text-[#111111] outline-none focus:border-black"
+                    placeholder="Nhập số điện thoại mới"
+                  >
                 </div>
                 <div class="flex flex-col gap-1">
                   <label class="text-[12px] text-[#666666]">Địa chỉ giao hàng</label>
-                  <textarea v-model="editForm.address" class="border border-[#E0E0E0] px-3 py-2 rounded-md w-full text-[14px] font-medium text-[#111111] outline-none focus:border-black resize-none" rows="3" placeholder="Nhập địa chỉ mới"></textarea>
+                  <textarea
+                    v-model="editForm.address"
+                    class="border border-[#E0E0E0] px-3 py-2 rounded-md w-full text-[14px] font-medium text-[#111111] outline-none focus:border-black resize-none"
+                    rows="3"
+                    placeholder="Nhập địa chỉ mới"
+                  />
                 </div>
                 <div class="flex gap-3 justify-end mt-2">
-                  <button @click="isEditing = false" class="px-4 py-2 border border-black text-black text-[14px] font-medium rounded-md hover:bg-black hover:text-white transition-colors" :disabled="isSaving">Hủy</button>
-                  <button @click="saveShippingInfo" class="px-4 py-2 bg-black text-white text-[14px] font-medium rounded-md hover:bg-gray-900 transition-colors flex items-center justify-center min-w-[80px]" :disabled="isSaving">
+                  <button
+                    class="px-4 py-2 border border-black text-black text-[14px] font-medium rounded-md hover:bg-black hover:text-white transition-colors"
+                    :disabled="isSaving"
+                    @click="isEditing = false"
+                  >
+                    Hủy
+                  </button>
+                  <button
+                    class="px-4 py-2 bg-black text-white text-[14px] font-medium rounded-md hover:bg-gray-900 transition-colors flex items-center justify-center min-w-[80px]"
+                    :disabled="isSaving"
+                    @click="saveShippingInfo"
+                  >
                     <span v-if="!isSaving">Lưu</span>
-                    <div v-else class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <div
+                      v-else
+                      class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"
+                    />
                   </button>
                 </div>
               </div>
@@ -127,15 +179,46 @@
 
             <!-- Items -->
             <div class="p-6">
-              <div v-if="order" class="flex flex-col gap-6">
-                <div v-for="(item, index) in order.items" :key="index" class="flex gap-6" :class="{ 'border-t border-[#F0F0F0] pt-6': index > 0 }">
+              <div
+                v-if="order"
+                class="flex flex-col gap-6"
+              >
+                <div
+                  v-for="(item, index) in order.items"
+                  :key="index"
+                  class="flex gap-6"
+                  :class="{ 'border-t border-[#F0F0F0] pt-6': index > 0 }"
+                >
                   <!-- Product Image -->
                   <div class="w-[96px] h-[96px] bg-[#F9F9F9] rounded flex-shrink-0 flex items-center justify-center overflow-hidden">
-                    <img v-if="item.imageUrl" :src="item.imageUrl" :alt="item.productName" class="w-full h-full object-cover" />
-                    <svg v-else class="w-10 h-10 text-[#CFC4C5]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                      <circle cx="8.5" cy="8.5" r="1.5"/>
-                      <polyline points="21 15 16 10 5 21"/>
+                    <img
+                      v-if="item.imageUrl"
+                      :src="item.imageUrl"
+                      :alt="item.productName"
+                      class="w-full h-full object-cover"
+                    >
+                    <svg
+                      v-else
+                      class="w-10 h-10 text-[#CFC4C5]"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <rect
+                        x="3"
+                        y="3"
+                        width="18"
+                        height="18"
+                        rx="2"
+                        ry="2"
+                      />
+                      <circle
+                        cx="8.5"
+                        cy="8.5"
+                        r="1.5"
+                      />
+                      <polyline points="21 15 16 10 5 21" />
                     </svg>
                   </div>
 
@@ -168,7 +251,10 @@
 
             <!-- Totals -->
             <div class="bg-[#F9F9F9] border-t border-[#F0F0F0] p-6">
-              <div v-if="order" class="flex flex-col gap-4">
+              <div
+                v-if="order"
+                class="flex flex-col gap-4"
+              >
                 <div class="flex justify-between items-center">
                   <span class="font-geist text-[14px] text-[#666666]">Tạm tính</span>
                   <span class="font-geist text-[14px] font-medium text-[#111111]">{{ formatPrice(order.subtotal) }}</span>
@@ -193,7 +279,6 @@
     </main>
 
     <!-- Footer -->
-    
   </div>
 </template>
 
@@ -201,7 +286,7 @@
 import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useOrderStore } from '@/stores/order.store'
-import api from '@/services/api'
+import orderService from '@/services/order.service'
 
 const route = useRoute()
 const orderStore = useOrderStore()
@@ -237,7 +322,7 @@ const saveShippingInfo = async () => {
   
   try {
     isSaving.value = true
-    await api.put(`/orders/${orderId.value}/update-info`, editForm.value)
+    await orderService.updateOrderInfo(orderId.value, editForm.value)
     // Refetch the order to get the updated info
     await orderStore.fetchOrderById(orderId.value)
     isEditing.value = false
@@ -257,7 +342,7 @@ const confirmCancelOrder = async () => {
 
   try {
     isCancelling.value = true
-    await api.post(`/orders/${orderId.value}/cancel`)
+    await orderService.cancelOrder(orderId.value)
     alert('Yêu cầu hủy đơn hàng đã được gửi thành công.')
     await orderStore.fetchOrderById(orderId.value)
   } catch (error: any) {
@@ -278,7 +363,7 @@ const confirmReceivedOrder = async () => {
 
   try {
     isConfirmingReceived.value = true
-    await api.post(`/orders/${orderId.value}/confirm-received`)
+    await orderService.confirmReceived(orderId.value)
     alert('Cảm ơn bạn đã xác nhận nhận hàng! Đơn hàng đã hoàn tất.')
     await orderStore.fetchOrderById(orderId.value)
   } catch (error: any) {

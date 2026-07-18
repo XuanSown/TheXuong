@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import type { User } from '@/types'
-import api from '@/services/api'
+import authService from '@/services/auth.service'
+import http from '@/services/http'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -32,7 +33,7 @@ export const useAuthStore = defineStore('auth', {
     async login(credentials: { email: string; password: string }) {
       this.loading = true
       try {
-        const user = await api.login({ email: credentials.email, password: credentials.password })
+        const user = await authService.login({ email: credentials.email, password: credentials.password })
         this.setUser(user)
         return user
       } finally {
@@ -46,12 +47,12 @@ export const useAuthStore = defineStore('auth', {
       password: string
       confirmPassword: string
     }) {
-      return await api.register(data)
+      return await authService.register(data)
     },
 
     async logout() {
       try {
-        await api.logout()
+        await authService.logout()
       } finally {
         this.clear()
         window.location.href = '/'
@@ -61,7 +62,7 @@ export const useAuthStore = defineStore('auth', {
     async fetchUser() {
       this.loading = true
       try {
-        const user = await api.getCurrentUser()
+        const user = await authService.getCurrentUser()
         this.setUser(user)
         this.isInitialized = true
         return user
@@ -81,7 +82,7 @@ export const useAuthStore = defineStore('auth', {
     }) {
       this.loading = true
       try {
-        const response = await api.updateProfile(profileData)
+        const response = await authService.updateProfile(profileData)
         // Update local user data
         if (response.user) {
           this.setUser(response.user)
@@ -97,7 +98,7 @@ export const useAuthStore = defineStore('auth', {
       this.isAuthenticated = false
       this.roles = []
       this.redirectTo = null
-      api.clearCsrfToken()
+      http.clearCsrfToken()
       // Clear guest cart on logout
       localStorage.removeItem('guest_cart_items')
     }

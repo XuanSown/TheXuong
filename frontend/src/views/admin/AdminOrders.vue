@@ -1,220 +1,443 @@
 <template>
   <div class="orders-manager">
-  <div class="main-container">
-    <!-- Toolbar & Filters Section -->
-    <div class="toolbar-section">
-    <div class="toolbar-content">
-      <!-- Search -->
-      <div class="search-container">
-      <svg class="search-icon" width="18" height="18" viewBox="0 0 18 18" fill="none">
-        <circle cx="8" cy="8" r="6" stroke="#5E5F5C" stroke-width="1.66667"/>
-        <path d="M12.5 12.5L16.5 16.5" stroke="#5E5F5C" stroke-width="1.66667" stroke-linecap="round"/>
-      </svg>
-      <input
-        type="text"
-        v-model="searchQuery"
-        class="search-input"
-        placeholder="Tìm mã đơn hoặc khách hàng..."
-        @input="onSearch"
-      />
+    <div class="main-container">
+      <!-- Toolbar & Filters Section -->
+      <div class="toolbar-section">
+        <div class="toolbar-content">
+          <!-- Search -->
+          <div class="search-container">
+            <svg
+              class="search-icon"
+              width="18"
+              height="18"
+              viewBox="0 0 18 18"
+              fill="none"
+            >
+              <circle
+                cx="8"
+                cy="8"
+                r="6"
+                stroke="#5E5F5C"
+                stroke-width="1.66667"
+              />
+              <path
+                d="M12.5 12.5L16.5 16.5"
+                stroke="#5E5F5C"
+                stroke-width="1.66667"
+                stroke-linecap="round"
+              />
+            </svg>
+            <input
+              v-model="searchQuery"
+              type="text"
+              class="search-input"
+              placeholder="Tìm mã đơn hoặc khách hàng..."
+              @input="onSearch"
+            >
+          </div>
+
+          <!-- Filter Buttons -->
+          <div class="filter-buttons">
+            <button
+              v-for="filter in filters"
+              :key="filter.value"
+              class="filter-btn"
+              :class="{ active: statusFilter === filter.value }"
+              @click="applyFilter(filter.value)"
+            >
+              {{ filter.label }}
+            </button>
+          </div>
+        </div>
       </div>
 
-      <!-- Filter Buttons -->
-      <div class="filter-buttons">
-      <button
-        v-for="filter in filters"
-        :key="filter.value"
-        class="filter-btn"
-        :class="{ active: statusFilter === filter.value }"
-        @click="applyFilter(filter.value)"
-      >
-        {{ filter.label }}
-      </button>
-      </div>
-    </div>
-    </div>
-
-    <!-- Order Table -->
-    <div class="order-table-container">
-    <div class="table-wrapper">
-      <!-- Table Header -->
-      <div class="table-header">
-      <div class="header-cell" style="width: 10%;">MÃ ĐƠN</div>
-      <div class="header-cell" style="width: 16%;">KHÁCH HÀNG</div>
-      <div class="header-cell" style="width: 12%;">SĐT</div>
-      <div class="header-cell" style="width: 15%;">NGÀY ĐẶT</div>
-      <div class="header-cell" style="width: 13%;">THANH TOÁN</div>
-      <div class="header-cell" style="width: 13%;">TỔNG TIỀN</div>
-      <div class="header-cell" style="width: 13%;">TRẠNG THÁI</div>
-      <div class="header-cell" style="width: 8%; justify-content: flex-end;">HÀNH ĐỘNG</div>
-      </div>
-
-      <!-- Table Body -->
-      <div class="table-body">
-      <div v-if="isLoading" class="loading-cell">
-        Đang tải...
-      </div>
-      <div v-else-if="orders.length === 0" class="empty-cell">
-        Không có đơn hàng nào
-      </div>
-        <div v-else>
-        <div v-for="order in paginatedOrders" :key="order.id" class="table-row">
-        <div class="cell" style="width: 10%;">
-        <span class="order-id">{{ order.id }}</span>
-        </div>
-        <div class="cell" style="width: 16%;">
-        <span class="customer-name">{{ order.customerName }}</span>
-        </div>
-        <div class="cell" style="width: 12%;">
-        <span class="phone-number">{{ order.phone }}</span>
-        </div>
-        <div class="cell" style="width: 15%;">
-        <span class="date">{{ order.date }}</span>
-        </div>
-        <div class="cell" style="width: 13%;">
-        <span class="payment-method">{{ order.paymentMethod }}</span>
-        </div>
-        <div class="cell" style="width: 13%;">
-        <span class="total-price">{{ formatPrice(order.total) }}</span>
-        </div>
-        <div class="cell" style="width: 13%;">
-        <span
-          class="status-badge"
-          :class="getStatusClass(order.status)"
-        >
-          {{ getStatusLabel(order.status) }}
-        </span>
-        </div>
-        <div class="cell" style="width: 8%; justify-content: flex-end;">
-        <div class="action-buttons">
-          <button class="action-btn view-btn" title="Xem chi tiết" @click="viewOrderDetails(order.id)">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-            <circle cx="12" cy="12" r="3"></circle>
-          </svg>
-          </button>
-          <button class="action-btn edit-btn" title="Chỉnh sửa trạng thái" @click="editOrderStatus(order)">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-          </svg>
-          </button>
-        </div>
-        </div>
-      </div>
-      </div>
-      </div> <!-- table-body -->
-    </div> <!-- table-wrapper -->
- <!-- Pagination -->
-    <div class="pagination-section">
-    <div class="pagination-info">
-        Hiển thị {{ pageNumber === 0 ? 1 : pageNumber * size + 1 }} - {{ Math.min((pageNumber + 1) * size, totalElements) }} của {{ totalElements }} kết quả
-    </div>
-    <div class="pagination-controls">
-      <button
-      class="page-btn prev-btn"
-      :disabled="currentPage === 1"
-        @click="changePage(pageNumber + 1)"
-      >
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-        <path d="M12.5 5L7.5 10L12.5 15" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-      </button>
-
-      <button
-      v-for="page in visiblePages"
-      :key="page"
-      class="page-btn page-number"
-      :class="{ active: currentPage === page }"
-        @click="changePage(Number(page))"
-      >
-      {{ page === '...' ? '...' : page }}
-      </button>
-
-      <button
-      class="page-btn next-btn"
-      :disabled="currentPage === totalPages"
-        @click="changePage(pageNumber + 2)"
-      >
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-        <path d="M7.5 5L12.5 10L7.5 15" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-      </button>
-    </div>
-    </div>
-    </div> <!-- order-table-container -->
-
-    <!-- View Details Modal -->
-    <div v-if="showViewModal" class="modal-overlay" @click.self="showViewModal = false">
-      <div class="confirm-dialog view-dialog">
-        <div class="confirm-header">
-          <h3>Chi tiết đơn hàng #{{ viewingOrder?.id }}</h3>
-        </div>
-        <div class="confirm-body" style="max-height: 400px; overflow-y: auto;">
-          <div v-if="viewingOrder" class="order-details-content">
-            <p><strong>Khách hàng:</strong> {{ viewingOrder.fullName }}</p>
-            <p><strong>SĐT:</strong> {{ viewingOrder.phoneNumber }}</p>
-            <p><strong>Địa chỉ:</strong> {{ viewingOrder.address }}</p>
-            <p><strong>Ngày đặt:</strong> {{ new Date(viewingOrder.createdAt).toLocaleString('vi-VN') }}</p>
-            <p style="margin-bottom: 16px;"><strong>Tổng thanh toán:</strong> <span style="color: #d32f2f; font-weight: bold;">{{ formatPrice(viewingOrder.totalMoney) }}</span></p>
-            
-            <h4 style="font-weight: 700; text-transform: uppercase; margin-bottom: 8px;">Sản phẩm:</h4>
-            <div class="items-list" style="display: flex; flex-direction: column; gap: 10px;">
-              <div v-for="item in viewingOrder.items" :key="item.id" style="display: flex; gap: 16px; border-bottom: 1px solid #eee; padding-bottom: 8px; align-items: center;">
-                <img :src="item.imageUrl" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;" v-if="item.imageUrl" />
-                <div style="flex: 1;">
-                  <p style="font-weight: 600; margin: 0;">{{ item.productName }}</p>
-                  <p style="font-size: 13px; color: #666; margin: 4px 0 0;">Size: {{ item.size }} | SL: {{ item.quantity }}</p>
-                </div>
-                <div style="font-weight: 600;">{{ formatPrice(item.totalPrice) }}</div>
-              </div>
+      <!-- Order Table -->
+      <div class="order-table-container">
+        <div class="table-wrapper">
+          <!-- Table Header -->
+          <div class="table-header">
+            <div
+              class="header-cell"
+              style="width: 10%;"
+            >
+              MÃ ĐƠN
+            </div>
+            <div
+              class="header-cell"
+              style="width: 16%;"
+            >
+              KHÁCH HÀNG
+            </div>
+            <div
+              class="header-cell"
+              style="width: 12%;"
+            >
+              SĐT
+            </div>
+            <div
+              class="header-cell"
+              style="width: 15%;"
+            >
+              NGÀY ĐẶT
+            </div>
+            <div
+              class="header-cell"
+              style="width: 13%;"
+            >
+              THANH TOÁN
+            </div>
+            <div
+              class="header-cell"
+              style="width: 13%;"
+            >
+              TỔNG TIỀN
+            </div>
+            <div
+              class="header-cell"
+              style="width: 13%;"
+            >
+              TRẠNG THÁI
+            </div>
+            <div
+              class="header-cell"
+              style="width: 8%; justify-content: flex-end;"
+            >
+              HÀNH ĐỘNG
             </div>
           </div>
-          <div v-else style="text-align: center; padding: 20px;">Đang tải...</div>
-        </div>
-        <div class="confirm-actions" style="margin-top: 16px;">
-          <button @click="showViewModal = false" class="btn-secondary">ĐÓNG</button>
-        </div>
-      </div>
-    </div>
 
-    <!-- Status Edit Modal -->
-    <div v-if="showStatusModal" class="modal-overlay" @click.self="cancelStatusChange">
-    <div class="confirm-dialog">
-      <div class="confirm-header">
-      <span class="confirm-icon">&#9998;</span>
-      <h3>Chỉnh sửa trạng thái đơn hàng</h3>
+          <!-- Table Body -->
+          <div class="table-body">
+            <div
+              v-if="isLoading"
+              class="loading-cell"
+            >
+              Đang tải...
+            </div>
+            <div
+              v-else-if="orders.length === 0"
+              class="empty-cell"
+            >
+              Không có đơn hàng nào
+            </div>
+            <div v-else>
+              <div
+                v-for="order in paginatedOrders"
+                :key="order.id"
+                class="table-row"
+              >
+                <div
+                  class="cell"
+                  style="width: 10%;"
+                >
+                  <span class="order-id">{{ order.id }}</span>
+                </div>
+                <div
+                  class="cell"
+                  style="width: 16%;"
+                >
+                  <span class="customer-name">{{ order.customerName }}</span>
+                </div>
+                <div
+                  class="cell"
+                  style="width: 12%;"
+                >
+                  <span class="phone-number">{{ order.phone }}</span>
+                </div>
+                <div
+                  class="cell"
+                  style="width: 15%;"
+                >
+                  <span class="date">{{ order.date }}</span>
+                </div>
+                <div
+                  class="cell"
+                  style="width: 13%;"
+                >
+                  <span class="payment-method">{{ order.paymentMethod }}</span>
+                </div>
+                <div
+                  class="cell"
+                  style="width: 13%;"
+                >
+                  <span class="total-price">{{ formatPrice(order.total) }}</span>
+                </div>
+                <div
+                  class="cell"
+                  style="width: 13%;"
+                >
+                  <span
+                    class="status-badge"
+                    :class="getStatusClass(order.status)"
+                  >
+                    {{ getStatusLabel(order.status) }}
+                  </span>
+                </div>
+                <div
+                  class="cell"
+                  style="width: 8%; justify-content: flex-end;"
+                >
+                  <div class="action-buttons">
+                    <button
+                      class="action-btn view-btn"
+                      title="Xem chi tiết"
+                      @click="viewOrderDetails(order.id)"
+                    >
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="#9CA3AF"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                        <circle
+                          cx="12"
+                          cy="12"
+                          r="3"
+                        />
+                      </svg>
+                    </button>
+                    <button
+                      class="action-btn edit-btn"
+                      title="Chỉnh sửa trạng thái"
+                      @click="editOrderStatus(order)"
+                    >
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="#9CA3AF"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div> <!-- table-body -->
+        </div> <!-- table-wrapper -->
+        <!-- Pagination -->
+        <div class="pagination-section">
+          <div class="pagination-info">
+            Hiển thị {{ pageNumber === 0 ? 1 : pageNumber * size + 1 }} - {{ Math.min((pageNumber + 1) * size, totalElements) }} của {{ totalElements }} kết quả
+          </div>
+          <div class="pagination-controls">
+            <button
+              class="page-btn prev-btn"
+              :disabled="currentPage === 1"
+              @click="changePage(pageNumber + 1)"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 20 20"
+                fill="none"
+              >
+                <path
+                  d="M12.5 5L7.5 10L12.5 15"
+                  stroke="currentColor"
+                  stroke-width="1.66667"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </button>
+
+            <button
+              v-for="page in visiblePages"
+              :key="page"
+              class="page-btn page-number"
+              :class="{ active: currentPage === page }"
+              @click="changePage(Number(page))"
+            >
+              {{ page === '...' ? '...' : page }}
+            </button>
+
+            <button
+              class="page-btn next-btn"
+              :disabled="currentPage === totalPages"
+              @click="changePage(pageNumber + 2)"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 20 20"
+                fill="none"
+              >
+                <path
+                  d="M7.5 5L12.5 10L7.5 15"
+                  stroke="currentColor"
+                  stroke-width="1.66667"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div> <!-- order-table-container -->
+
+      <!-- View Details Modal -->
+      <div
+        v-if="showViewModal"
+        class="modal-overlay"
+        @click.self="showViewModal = false"
+      >
+        <div class="confirm-dialog view-dialog">
+          <div class="confirm-header">
+            <h3>Chi tiết đơn hàng #{{ viewingOrder?.id }}</h3>
+          </div>
+          <div
+            class="confirm-body"
+            style="max-height: 400px; overflow-y: auto;"
+          >
+            <div
+              v-if="viewingOrder"
+              class="order-details-content"
+            >
+              <p><strong>Khách hàng:</strong> {{ viewingOrder.fullName }}</p>
+              <p><strong>SĐT:</strong> {{ viewingOrder.phoneNumber }}</p>
+              <p><strong>Địa chỉ:</strong> {{ viewingOrder.address }}</p>
+              <p><strong>Ngày đặt:</strong> {{ new Date(viewingOrder.createdAt).toLocaleString('vi-VN') }}</p>
+              <p style="margin-bottom: 16px;">
+                <strong>Tổng thanh toán:</strong> <span style="color: #d32f2f; font-weight: bold;">{{ formatPrice(viewingOrder.totalMoney) }}</span>
+              </p>
+            
+              <h4 style="font-weight: 700; text-transform: uppercase; margin-bottom: 8px;">
+                Sản phẩm:
+              </h4>
+              <div
+                class="items-list"
+                style="display: flex; flex-direction: column; gap: 10px;"
+              >
+                <div
+                  v-for="item in viewingOrder.items"
+                  :key="item.id"
+                  style="display: flex; gap: 16px; border-bottom: 1px solid #eee; padding-bottom: 8px; align-items: center;"
+                >
+                  <img
+                    v-if="item.imageUrl"
+                    :src="item.imageUrl"
+                    style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;"
+                  >
+                  <div style="flex: 1;">
+                    <p style="font-weight: 600; margin: 0;">
+                      {{ item.productName }}
+                    </p>
+                    <p style="font-size: 13px; color: #666; margin: 4px 0 0;">
+                      Size: {{ item.size }} | SL: {{ item.quantity }}
+                    </p>
+                  </div>
+                  <div style="font-weight: 600;">
+                    {{ formatPrice(item.totalPrice) }}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              v-else
+              style="text-align: center; padding: 20px;"
+            >
+              Đang tải...
+            </div>
+          </div>
+          <div
+            class="confirm-actions"
+            style="margin-top: 16px;"
+          >
+            <button
+              class="btn-secondary"
+              @click="showViewModal = false"
+            >
+              ĐÓNG
+            </button>
+          </div>
+        </div>
       </div>
-      <div class="confirm-body">
-      <p class="mb-4">Đơn #{{ editingOrder?.id }} — {{ editingOrder?.customerName }}</p>
-      <div class="form-group">
-        <label>Trạng thái mới</label>
-        <select v-model="newStatus" class="form-input">
-        <option value="PENDING">Đã đặt (PENDING)</option>
-        <option value="CONFIRMED">Đã xác nhận (CONFIRMED)</option>
-        <option value="SHIPPING">Đang giao (SHIPPING)</option>
-        <option value="DELIVERED">Đã giao (DELIVERED)</option>
-        <option value="COMPLETED">Hoàn thành (COMPLETED)</option>
-        <option value="CANCEL_REQUESTED">Yêu cầu hủy (CANCEL_REQUESTED)</option>
-        <option value="CANCELLED">Đã hủy (CANCELLED)</option>
-        <option value="REFUNDED">Hoàn tiền (REFUNDED)</option>
-        </select>
-      </div>
-      </div>
-      <div class="confirm-actions">
-      <button @click="cancelStatusChange" class="btn-secondary">HỦY</button>
-      <button @click="submitStatusChange" class="btn-confirm primary">CẬP NHẬT</button>
+
+      <!-- Status Edit Modal -->
+      <div
+        v-if="showStatusModal"
+        class="modal-overlay"
+        @click.self="cancelStatusChange"
+      >
+        <div class="confirm-dialog">
+          <div class="confirm-header">
+            <span class="confirm-icon">&#9998;</span>
+            <h3>Chỉnh sửa trạng thái đơn hàng</h3>
+          </div>
+          <div class="confirm-body">
+            <p class="mb-4">
+              Đơn #{{ editingOrder?.id }} — {{ editingOrder?.customerName }}
+            </p>
+            <div class="form-group">
+              <label>Trạng thái mới</label>
+              <select
+                v-model="newStatus"
+                class="form-input"
+              >
+                <option value="PENDING">
+                  Đã đặt (PENDING)
+                </option>
+                <option value="CONFIRMED">
+                  Đã xác nhận (CONFIRMED)
+                </option>
+                <option value="SHIPPING">
+                  Đang giao (SHIPPING)
+                </option>
+                <option value="DELIVERED">
+                  Đã giao (DELIVERED)
+                </option>
+                <option value="COMPLETED">
+                  Hoàn thành (COMPLETED)
+                </option>
+                <option value="CANCEL_REQUESTED">
+                  Yêu cầu hủy (CANCEL_REQUESTED)
+                </option>
+                <option value="CANCELLED">
+                  Đã hủy (CANCELLED)
+                </option>
+                <option value="REFUNDED">
+                  Hoàn tiền (REFUNDED)
+                </option>
+              </select>
+            </div>
+          </div>
+          <div class="confirm-actions">
+            <button
+              class="btn-secondary"
+              @click="cancelStatusChange"
+            >
+              HỦY
+            </button>
+            <button
+              class="btn-confirm primary"
+              @click="submitStatusChange"
+            >
+              CẬP NHẬT
+            </button>
+          </div>
+        </div>
       </div>
     </div>
-    </div>
-  </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useToast } from 'vue-toastification'
-import api from '@/services/api'
+import adminService from '@/services/admin.service'
+import orderService from '@/services/order.service'
 
 const searchQuery = ref('')
 const statusFilter = ref('all')
@@ -254,8 +477,8 @@ const viewOrderDetails = async (orderId: number) => {
   showViewModal.value = true
   viewingOrder.value = null
   try {
-    const res = await api.get(`/orders/${orderId}`)
-    viewingOrder.value = res.data
+    const res = await orderService.getOrder(orderId)
+    viewingOrder.value = res
   } catch (err) {
     toast.error('Không thể lấy chi tiết đơn hàng')
     showViewModal.value = false
@@ -300,8 +523,8 @@ const fetchOrders = async () => {
     if (searchQuery.value.trim()) {
       params.keyword = searchQuery.value.trim()
     }
-    const response = await api.get('/admin/orders', { params })
-    const data = response.data
+    const response = await adminService.getOrders(params)
+    const data = response
     const items = data.content || data || []
     orders.value = items.map((o: any) => ({
       id: o.id || 0,
@@ -397,7 +620,7 @@ const submitStatusChange = async () => {
   editingOrder.value.status = newStatus.value
   showStatusModal.value = false
   try {
-    await api.patch(`/admin/orders/${editingOrder.value.id}/status`, { status: newStatus.value })
+    await adminService.updateOrderStatus(editingOrder.value.id, newStatus.value)
     toast.success('Cập nhật trạng thái thành công')
     fetchOrders()
   } catch (err: any) {

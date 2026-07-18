@@ -3,7 +3,9 @@
     <div class="form-container">
       <!-- Form Header -->
       <div class="form-header">
-        <h1 class="form-title">{{ isEditMode ? 'SỬA SẢN PHẨM' : 'THÊM SẢN PHẨM MỚI' }}</h1>
+        <h1 class="form-title">
+          {{ isEditMode ? 'SỬA SẢN PHẨM' : 'THÊM SẢN PHẨM MỚI' }}
+        </h1>
       </div>
 
       <!-- Form Content -->
@@ -14,11 +16,11 @@
           <div class="field-group">
             <label class="field-label">TÊN SẢN PHẨM</label>
             <input
-              type="text"
               v-model="productForm.name"
+              type="text"
               class="field-input"
               placeholder="Nhập tên sản phẩm thể thao..."
-            />
+            >
           </div>
 
           <!-- Price and Image Upload (2 columns) -->
@@ -26,11 +28,11 @@
             <div class="field-group half">
               <label class="field-label">GIÁ (VNĐ)</label>
               <input
-                type="text"
                 v-model="productForm.price"
+                type="text"
                 class="field-input"
                 placeholder="500.000"
-              />
+              >
             </div>
             <div class="field-group half">
               <label class="field-label">HÌNH ẢNH SẢN PHẨM</label>
@@ -42,11 +44,29 @@
                 @drop.prevent="handleDrop"
               >
                 <Transition name="fade">
-                  <div v-if="isDragging" class="drop-overlay">
-                    <svg class="drop-icon" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                      <polyline points="17 8 12 3 7 8"/>
-                      <line x1="12" y1="3" x2="12" y2="15"/>
+                  <div
+                    v-if="isDragging"
+                    class="drop-overlay"
+                  >
+                    <svg
+                      class="drop-icon"
+                      width="40"
+                      height="40"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                      <polyline points="17 8 12 3 7 8" />
+                      <line
+                        x1="12"
+                        y1="3"
+                        x2="12"
+                        y2="15"
+                      />
                     </svg>
                     <span class="drop-text">Thả ảnh vào đây</span>
                   </div>
@@ -59,16 +79,32 @@
                   class="image-gallery-item"
                   :class="{ 'is-primary': idx === 0 }"
                 >
-                  <img :src="preview" class="gallery-image" />
-                  <span v-if="idx === 0" class="primary-badge">CHÍNH</span>
+                  <img
+                    :src="preview"
+                    class="gallery-image"
+                  >
+                  <span
+                    v-if="idx === 0"
+                    class="primary-badge"
+                  >CHÍNH</span>
                   <button
                     type="button"
-                    @click="removeImage(idx)"
                     class="gallery-remove-btn"
                     title="Xóa ảnh"
+                    @click="removeImage(idx)"
                   >
-                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                      <path d="M2.5 2.5L9.5 9.5M9.5 2.5L2.5 9.5" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+                    <svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 12 12"
+                      fill="none"
+                    >
+                      <path
+                        d="M2.5 2.5L9.5 9.5M9.5 2.5L2.5 9.5"
+                        stroke="white"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                      />
                     </svg>
                   </button>
                 </div>
@@ -77,17 +113,38 @@
                 <button
                   v-if="imageFiles.length < 5"
                   type="button"
-                  @click="triggerFileInput"
                   class="image-add-btn"
+                  @click="triggerFileInput"
                 >
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="12" y1="5" x2="12" y2="19"/>
-                    <line x1="5" y1="12" x2="19" y2="12"/>
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#94A3B8"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <line
+                      x1="12"
+                      y1="5"
+                      x2="12"
+                      y2="19"
+                    />
+                    <line
+                      x1="5"
+                      y1="12"
+                      x2="19"
+                      y2="12"
+                    />
                   </svg>
                   <span class="add-btn-text">Thêm ảnh</span>
                 </button>
               </div>
-              <p class="image-hint">Kéo thả ảnh hoặc click để chọn từ máy (tối đa 5 ảnh)</p>
+              <p class="image-hint">
+                Kéo thả ảnh hoặc click để chọn từ máy (tối đa 5 ảnh)
+              </p>
               <input
                 ref="fileInputRef"
                 type="file"
@@ -95,7 +152,7 @@
                 multiple
                 class="hidden-file-input"
                 @change="handleFileSelect"
-              />
+              >
             </div>
           </div>
 
@@ -104,38 +161,110 @@
             <div class="field-group half">
               <label class="field-label">DANH MỤC</label>
               <div class="select-wrapper">
-                <select v-model="productForm.category" class="field-select">
-                  <option value="" disabled>Chọn danh mục</option>
-                  <option value="Áo">Áo</option>
-                  <option value="Quần">Quần</option>
-                  <option value="Giày">Giày</option>
-                  <option value="Phụ kiện">Phụ kiện</option>
-                  <option value="Balo">Balo</option>
-                  <option value="Khác">Khác</option>
+                <select
+                  v-model="productForm.category"
+                  class="field-select"
+                >
+                  <option
+                    value=""
+                    disabled
+                  >
+                    Chọn danh mục
+                  </option>
+                  <option value="Áo">
+                    Áo
+                  </option>
+                  <option value="Quần">
+                    Quần
+                  </option>
+                  <option value="Giày">
+                    Giày
+                  </option>
+                  <option value="Phụ kiện">
+                    Phụ kiện
+                  </option>
+                  <option value="Balo">
+                    Balo
+                  </option>
+                  <option value="Khác">
+                    Khác
+                  </option>
                 </select>
-                <svg class="select-arrow" width="21" height="21" viewBox="0 0 21 21" fill="none">
-                  <path d="M6.5 8.25L10.5 12.25L14.5 8.25" stroke="#6B7280" stroke-width="1.575" stroke-linecap="round" stroke-linejoin="round"/>
+                <svg
+                  class="select-arrow"
+                  width="21"
+                  height="21"
+                  viewBox="0 0 21 21"
+                  fill="none"
+                >
+                  <path
+                    d="M6.5 8.25L10.5 12.25L14.5 8.25"
+                    stroke="#6B7280"
+                    stroke-width="1.575"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
                 </svg>
               </div>
             </div>
             <div class="field-group half">
               <label class="field-label">THƯƠNG HIỆU</label>
               <div class="select-wrapper">
-                <select v-model="productForm.brand" class="field-select">
-                  <option value="" disabled>Chọn thương hiệu</option>
-                  <option value="Nike">Nike</option>
-                  <option value="Adidas">Adidas</option>
-                  <option value="Puma">Puma</option>
-                  <option value="Li-Ning">Li-Ning</option>
-                  <option value="ASICS">ASICS</option>
-                  <option value="Fila">Fila</option>
-                  <option value="Decathlon">Decathlon</option>
-                  <option value="Mizuno">Mizuno</option>
-                  <option value="Yonex">Yonex</option>
-                  <option value="Khác">Khác</option>
+                <select
+                  v-model="productForm.brand"
+                  class="field-select"
+                >
+                  <option
+                    value=""
+                    disabled
+                  >
+                    Chọn thương hiệu
+                  </option>
+                  <option value="Nike">
+                    Nike
+                  </option>
+                  <option value="Adidas">
+                    Adidas
+                  </option>
+                  <option value="Puma">
+                    Puma
+                  </option>
+                  <option value="Li-Ning">
+                    Li-Ning
+                  </option>
+                  <option value="ASICS">
+                    ASICS
+                  </option>
+                  <option value="Fila">
+                    Fila
+                  </option>
+                  <option value="Decathlon">
+                    Decathlon
+                  </option>
+                  <option value="Mizuno">
+                    Mizuno
+                  </option>
+                  <option value="Yonex">
+                    Yonex
+                  </option>
+                  <option value="Khác">
+                    Khác
+                  </option>
                 </select>
-                <svg class="select-arrow" width="21" height="21" viewBox="0 0 21 21" fill="none">
-                  <path d="M6.5 8.25L10.5 12.25L14.5 8.25" stroke="#6B7280" stroke-width="1.575" stroke-linecap="round" stroke-linejoin="round"/>
+                <svg
+                  class="select-arrow"
+                  width="21"
+                  height="21"
+                  viewBox="0 0 21 21"
+                  fill="none"
+                >
+                  <path
+                    d="M6.5 8.25L10.5 12.25L14.5 8.25"
+                    stroke="#6B7280"
+                    stroke-width="1.575"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
                 </svg>
               </div>
             </div>
@@ -145,68 +274,130 @@
           <div class="field-group">
             <label class="field-label">BỘ MÔN THỂ THAO</label>
             <div class="select-wrapper">
-              <select v-model="productForm.sport" class="field-select">
-                <option value="" disabled>Chọn bộ môn</option>
-                <option value="Bóng đá">Bóng đá</option>
-                <option value="Chạy bộ">Chạy bộ</option>
-                <option value="Cầu lông & Pickleball">Cầu lông & Pickleball</option>
-                <option value="Cầu lông">Cầu lông</option>
-                <option value="Đua xe">Đua xe</option>
-                <option value="Bóng rổ">Bóng rổ</option>
-                <option value="Khác">Khác</option>
+              <select
+                v-model="productForm.sport"
+                class="field-select"
+              >
+                <option
+                  value=""
+                  disabled
+                >
+                  Chọn bộ môn
+                </option>
+                <option value="Bóng đá">
+                  Bóng đá
+                </option>
+                <option value="Chạy bộ">
+                  Chạy bộ
+                </option>
+                <option value="Cầu lông & Pickleball">
+                  Cầu lông & Pickleball
+                </option>
+                <option value="Cầu lông">
+                  Cầu lông
+                </option>
+                <option value="Đua xe">
+                  Đua xe
+                </option>
+                <option value="Bóng rổ">
+                  Bóng rổ
+                </option>
+                <option value="Khác">
+                  Khác
+                </option>
               </select>
-              <svg class="select-arrow" width="21" height="21" viewBox="0 0 21 21" fill="none">
-                <path d="M6.5 8.25L10.5 12.25L14.5 8.25" stroke="#6B7280" stroke-width="1.575" stroke-linecap="round" stroke-linejoin="round"/>
+              <svg
+                class="select-arrow"
+                width="21"
+                height="21"
+                viewBox="0 0 21 21"
+                fill="none"
+              >
+                <path
+                  d="M6.5 8.25L10.5 12.25L14.5 8.25"
+                  stroke="#6B7280"
+                  stroke-width="1.575"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
               </svg>
             </div>
           </div>
         </div>
 
         <!-- Separator -->
-        <div class="separator"></div>
+        <div class="separator" />
 
         <!-- Size Management Section -->
         <div class="size-management-section">
           <div class="section-header">
             <span class="section-icon">📦</span>
-            <h2 class="section-title">Cập nhật Số lượng theo Size</h2>
+            <h2 class="section-title">
+              Cập nhật Số lượng theo Size
+            </h2>
           </div>
-          <p class="section-description">Chỉ cần điền số lượng cho những size mà bạn muốn bán. Để trống nếu size đó không kinh doanh.</p>
+          <p class="section-description">
+            Chỉ cần điền số lượng cho những size mà bạn muốn bán. Để trống nếu size đó không kinh doanh.
+          </p>
 
           <!-- Loading state -->
-          <div v-if="isLoadingSizes" class="size-loading">
-            <div class="size-spinner"></div>
+          <div
+            v-if="isLoadingSizes"
+            class="size-loading"
+          >
+            <div class="size-spinner" />
             <span>Đang tải danh sách size...</span>
           </div>
 
           <!-- Size error state -->
-          <div v-else-if="sizeLoadError" class="size-error">
+          <div
+            v-else-if="sizeLoadError"
+            class="size-error"
+          >
             <span>{{ sizeLoadError }}</span>
-            <button type="button" class="size-retry-btn" @click="fetchSizes">Thử lại</button>
+            <button
+              type="button"
+              class="size-retry-btn"
+              @click="fetchSizes"
+            >
+              Thử lại
+            </button>
           </div>
 
           <!-- Size cards -->
-          <div v-else-if="availableSizes.length > 0" class="size-grid">
-            <div v-for="size in availableSizes" :key="size" class="size-card">
-              <div class="size-header">{{ size }}</div>
+          <div
+            v-else-if="availableSizes.length > 0"
+            class="size-grid"
+          >
+            <div
+              v-for="size in availableSizes"
+              :key="size"
+              class="size-card"
+            >
+              <div class="size-header">
+                {{ size }}
+              </div>
               <input
-                type="number"
                 v-model.number="productForm.sizes[size]"
+                type="number"
                 class="size-input"
                 placeholder="Số lượng"
                 min="0"
-              />
+              >
             </div>
           </div>
 
           <!-- No category selected -->
-          <div v-else class="size-empty">
+          <div
+            v-else
+            class="size-empty"
+          >
             <span>Vui lòng chọn danh mục sản phẩm để hiển thị các size phù hợp.</span>
           </div>
         </div>
 
         <!-- Separator -->
-        <div class="separator"></div>
+        <div class="separator" />
 
         <!-- Description Section -->
         <div class="description-section">
@@ -215,15 +406,36 @@
             v-model="productForm.description"
             class="description-textarea"
             placeholder="Mô tả chi tiết về chất liệu, tính năng, và thông số kỹ thuật..."
-          ></textarea>
+          />
         </div>
 
         <!-- Action Buttons -->
         <div class="action-buttons">
-          <button class="btn-cancel" @click="handleCancel">HỦY</button>
-          <button class="btn-save" @click="handleSave" :disabled="isSubmitting">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" v-if="!isSubmitting">
-              <path d="M13.5 4.5L6 12L2.5 8.5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <button
+            class="btn-cancel"
+            @click="handleCancel"
+          >
+            HỦY
+          </button>
+          <button
+            class="btn-save"
+            :disabled="isSubmitting"
+            @click="handleSave"
+          >
+            <svg
+              v-if="!isSubmitting"
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+            >
+              <path
+                d="M13.5 4.5L6 12L2.5 8.5"
+                stroke="white"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
             </svg>
             {{ isSubmitting ? 'ĐANG LƯU...' : 'LƯU SẢN PHẨM' }}
           </button>
@@ -236,7 +448,8 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import api from '@/services/api'
+import adminService from '@/services/admin.service'
+import http from '@/services/http'
 
 const props = defineProps({
   isModal: {
@@ -295,7 +508,7 @@ async function fetchSizes() {
   sizeLoadError.value = ''
 
   try {
-    const response: any = await api.getSizeCatalog(sizeType)
+    const response: any = await adminService.getSizeCatalog(sizeType)
     // Expect response shape: { data: [{ sizeName: 'S', sizeType: 'CLOTHING', ... }, ...] }
     // or a plain array. Handle both.
     const items: any[] = Array.isArray(response) ? response : (response?.data ?? response?.content ?? [])
@@ -330,7 +543,7 @@ const fileInputRef = ref<HTMLInputElement | null>(null)
 
 const loadProductData = async (productId: number) => {
   try {
-    const existingProduct = await api.getAdminProduct(productId)
+    const existingProduct = await adminService.getProduct(productId)
     if (existingProduct) {
       productForm.value = { 
         ...existingProduct,
@@ -474,11 +687,11 @@ const handleSave = async () => {
     }
 
     if (isEditMode.value && route.params.id) {
-      await api.put(`/admin/products/${route.params.id}`, formData, {
+      await http.put(`/admin/products/${route.params.id}`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       })
     } else {
-      await api.post('/admin/products', formData, {
+      await http.post('/admin/products', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       })
     }

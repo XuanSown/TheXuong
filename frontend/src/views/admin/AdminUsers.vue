@@ -8,16 +8,38 @@
         <div class="list-header">
           <div class="header-info">
             <h2>Danh sách người dùng</h2>
-            <p class="user-count">Tổng cộng {{ totalUsers }} thành viên</p>
+            <p class="user-count">
+              Tổng cộng {{ totalUsers }} thành viên
+            </p>
           </div>
           <div class="search-container">
-            <input v-model="searchQuery" type="text" placeholder="Tìm theo email hoặc tên..." class="search-input"
-              @input="onSearch" />
+            <input
+              v-model="searchQuery"
+              type="text"
+              placeholder="Tìm theo email hoặc tên..."
+              class="search-input"
+              @input="onSearch"
+            >
             <div class="search-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                stroke-linejoin="round">
-                <circle cx="11" cy="11" r="8" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle
+                  cx="11"
+                  cy="11"
+                  r="8"
+                />
+                <line
+                  x1="21"
+                  y1="21"
+                  x2="16.65"
+                  y2="16.65"
+                />
               </svg>
             </div>
           </div>
@@ -28,24 +50,53 @@
           <table class="users-table">
             <thead>
               <tr>
-                <th class="col-id">ID</th>
-                <th class="col-email">EMAIL / HO TEN</th>
-                <th class="col-role">QUYEN</th>
-                <th class="col-tier">HANG</th>
-                <th class="col-status">TRANG THAI</th>
-                <th class="col-provider">PROVIDER</th>
-                <th class="col-actions">THAO TAC</th>
+                <th class="col-id">
+                  ID
+                </th>
+                <th class="col-email">
+                  EMAIL / HO TEN
+                </th>
+                <th class="col-role">
+                  QUYEN
+                </th>
+                <th class="col-tier">
+                  HANG
+                </th>
+                <th class="col-status">
+                  TRANG THAI
+                </th>
+                <th class="col-provider">
+                  PROVIDER
+                </th>
+                <th class="col-actions">
+                  THAO TAC
+                </th>
               </tr>
             </thead>
             <tbody>
               <tr v-if="isLoading">
-                <td colspan="6" class="loading-cell">Đang tải dữ liệu...</td>
+                <td
+                  colspan="6"
+                  class="loading-cell"
+                >
+                  Đang tải dữ liệu...
+                </td>
               </tr>
               <tr v-else-if="paginatedUsers.length === 0">
-                <td colspan="6" class="empty-cell">Không tìm thấy người dùng nào</td>
+                <td
+                  colspan="6"
+                  class="empty-cell"
+                >
+                  Không tìm thấy người dùng nào
+                </td>
               </tr>
-              <tr v-for="user in paginatedUsers" :key="user.id">
-                <td class="col-id">{{ user.idDisplay }}</td>
+              <tr
+                v-for="user in paginatedUsers"
+                :key="user.id"
+              >
+                <td class="col-id">
+                  {{ user.idDisplay }}
+                </td>
                 <td class="col-email">
                   <div class="user-info">
                     <div class="user-details">
@@ -55,40 +106,75 @@
                   </div>
                 </td>
                 <td class="col-role">
-                  <span class="role-badge" :class="user.roleClass" @click="cycleRole(user)">
+                  <span
+                    class="role-badge"
+                    :class="user.roleClass"
+                    @click="cycleRole(user)"
+                  >
                     {{ user.role }}
                   </span>
                 </td>
                 <td class="col-tier">
                   <div class="tier-info">
                     <span class="badge">{{ user.tierCode || 'THUONG' }}</span>
-                    <button class="action-btn loyalty-btn" @click="openLoyaltyModal(user)" title="Chi tiet hang">
+                    <button
+                      class="action-btn loyalty-btn"
+                      title="Chi tiet hang"
+                      @click="openLoyaltyModal(user)"
+                    >
                       ⭐
                     </button>
                   </div>
                 </td>
                 <td class="col-status">
-                  <span class="status-toggle" :class="{ active: user.isActive }" @click="toggleUserActive(user)">
+                  <span
+                    class="status-toggle"
+                    :class="{ active: user.isActive }"
+                    @click="toggleUserActive(user)"
+                  >
                     <div class="toggle-track">
-                      <div class="toggle-thumb"></div>
+                      <div class="toggle-thumb" />
                     </div>
                   </span>
                 </td>
                 <td class="col-provider">
-                  <span class="provider-badge" :class="user.providerClass">
+                  <span
+                    class="provider-badge"
+                    :class="user.providerClass"
+                  >
                     {{ user.provider }}
                   </span>
                 </td>
                 <td class="col-actions">
                   <div class="action-buttons">
-                    <button class="action-btn edit-btn" @click="editUser(user)" title="Sua">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <button
+                      class="action-btn edit-btn"
+                      title="Sua"
+                      @click="editUser(user)"
+                    >
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                      >
                         <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
                         <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                       </svg>
                     </button>
-                    <button class="action-btn delete-btn" @click="deleteUser(user)" title="Xoa">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <button
+                      class="action-btn delete-btn"
+                      title="Xoa"
+                      @click="deleteUser(user)"
+                    >
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                      >
                         <polyline points="3 6 5 6 21 6" />
                         <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
                       </svg>
@@ -102,19 +188,36 @@
 
         <!-- Pagination -->
         <div class="pagination">
-          <span class="showing-text" v-if="!isLoading">
+          <span
+            v-if="!isLoading"
+            class="showing-text"
+          >
             Hiển thị {{ startIndex + 1 }} đến {{ Math.min(endIndex, filteredUsers.length) }} của {{ totalUsers }} người
             dùng
           </span>
           <div class="pagination-controls">
-            <button class="page-btn" :disabled="currentPage === 1 || isLoading" @click="currentPage--">
+            <button
+              class="page-btn"
+              :disabled="currentPage === 1 || isLoading"
+              @click="currentPage--"
+            >
               Trước
             </button>
-            <button v-for="page in visiblePages" :key="page" class="page-btn" :class="{ active: currentPage === page }"
-              @click="currentPage = page" :disabled="isLoading">
+            <button
+              v-for="page in visiblePages"
+              :key="page"
+              class="page-btn"
+              :class="{ active: currentPage === page }"
+              :disabled="isLoading"
+              @click="currentPage = page"
+            >
               {{ page }}
             </button>
-            <button class="page-btn" :disabled="currentPage === totalPages || isLoading" @click="currentPage++">
+            <button
+              class="page-btn"
+              :disabled="currentPage === totalPages || isLoading"
+              @click="currentPage++"
+            >
               Sau
             </button>
           </div>
@@ -125,34 +228,59 @@
       <section class="add-user-form">
         <div class="form-header">
           <h2>Thêm người dùng mới</h2>
-          <p class="form-subtitle">Điền thông tin để đăng ký tài khoản mới</p>
+          <p class="form-subtitle">
+            Điền thông tin để đăng ký tài khoản mới
+          </p>
         </div>
         <form @submit.prevent="handleSubmit">
           <div class="form-grid">
             <!-- Email -->
             <div class="form-group">
               <label>EMAIL</label>
-              <input v-model="formData.email" type="email" placeholder="example@thexuong.com" class="form-input"
-                required />
+              <input
+                v-model="formData.email"
+                type="email"
+                placeholder="example@thexuong.com"
+                class="form-input"
+                required
+              >
             </div>
 
             <!-- Username -->
             <div class="form-group">
               <label>USERNAME</label>
-              <input v-model="formData.username" type="text" placeholder="username123" class="form-input" required />
+              <input
+                v-model="formData.username"
+                type="text"
+                placeholder="username123"
+                class="form-input"
+                required
+              >
             </div>
 
             <!-- Full Name -->
             <div class="form-group">
               <label>FULL NAME</label>
-              <input v-model="formData.fullName" type="text" placeholder="Ho va ten" class="form-input" required />
+              <input
+                v-model="formData.fullName"
+                type="text"
+                placeholder="Ho va ten"
+                class="form-input"
+                required
+              >
             </div>
 
             <!-- Password -->
             <div class="form-group">
               <label>PASSWORD</label>
-              <input v-model="formData.password" type="password" placeholder="........" class="form-input" required
-                minlength="8" />
+              <input
+                v-model="formData.password"
+                type="password"
+                placeholder="........"
+                class="form-input"
+                required
+                minlength="8"
+              >
             </div>
           </div>
 
@@ -160,16 +288,28 @@
           <div class="form-group role-group">
             <label>QUYỀN NGƯỜI DÙNG</label>
             <div class="role-options">
-              <button type="button" class="role-btn" :class="{ active: formData.role === 'CUSTOMER' }"
-                @click="formData.role = 'CUSTOMER'">
+              <button
+                type="button"
+                class="role-btn"
+                :class="{ active: formData.role === 'CUSTOMER' }"
+                @click="formData.role = 'CUSTOMER'"
+              >
                 CUSTOMER
               </button>
-              <button type="button" class="role-btn" :class="{ active: formData.role === 'ADMIN' }"
-                @click="formData.role = 'ADMIN'">
+              <button
+                type="button"
+                class="role-btn"
+                :class="{ active: formData.role === 'ADMIN' }"
+                @click="formData.role = 'ADMIN'"
+              >
                 ADMIN
               </button>
-              <button type="button" class="role-btn" :class="{ active: formData.role === 'BOTH' }"
-                @click="formData.role = 'BOTH'">
+              <button
+                type="button"
+                class="role-btn"
+                :class="{ active: formData.role === 'BOTH' }"
+                @click="formData.role = 'BOTH'"
+              >
                 BOTH
               </button>
             </div>
@@ -177,10 +317,18 @@
 
           <!-- Form Actions -->
           <div class="form-actions">
-            <button type="submit" class="submit-btn" :disabled="isSubmitting">
+            <button
+              type="submit"
+              class="submit-btn"
+              :disabled="isSubmitting"
+            >
               {{ isSubmitting ? 'ĐANG LƯU...' : 'LƯU' }}
             </button>
-            <button type="button" class="reset-btn" @click="resetForm">
+            <button
+              type="button"
+              class="reset-btn"
+              @click="resetForm"
+            >
               LÀM MỚI
             </button>
           </div>
@@ -189,50 +337,111 @@
     </main>
 
     <!-- Edit User Modal -->
-    <div v-if="showEditModal" class="modal-overlay" @click.self="closeEditModal">
+    <div
+      v-if="showEditModal"
+      class="modal-overlay"
+      @click.self="closeEditModal"
+    >
       <div class="modal-content">
         <div class="modal-header">
           <h2>Sửa người dùng</h2>
-          <button @click="closeEditModal" class="btn-close">&times;</button>
+          <button
+            class="btn-close"
+            @click="closeEditModal"
+          >
+            &times;
+          </button>
         </div>
         <div class="modal-body">
           <form @submit.prevent="submitEdit">
             <div class="form-group">
               <label>EMAIL</label>
-              <input v-model="editForm.email" type="email" class="form-input" disabled />
+              <input
+                v-model="editForm.email"
+                type="email"
+                class="form-input"
+                disabled
+              >
             </div>
             <div class="form-group">
               <label>HO VA TEN</label>
-              <input v-model="editForm.fullName" type="text" class="form-input" required />
+              <input
+                v-model="editForm.fullName"
+                type="text"
+                class="form-input"
+                required
+              >
             </div>
             <div class="form-group">
               <label>QUYEN</label>
-              <select v-model="editForm.role" class="form-input">
-                <option value="CUSTOMER">CUSTOMER</option>
-                <option value="ADMIN">ADMIN</option>
-                <option value="BOTH">BOTH</option>
+              <select
+                v-model="editForm.role"
+                class="form-input"
+              >
+                <option value="CUSTOMER">
+                  CUSTOMER
+                </option>
+                <option value="ADMIN">
+                  ADMIN
+                </option>
+                <option value="BOTH">
+                  BOTH
+                </option>
               </select>
             </div>
             <div class="form-group">
               <label>TRẠNG THÁI</label>
-              <select v-model="editForm.active" class="form-input">
-                <option value="true">Hoạt động</option>
-                <option value="false">Khóa</option>
+              <select
+                v-model="editForm.active"
+                class="form-input"
+              >
+                <option value="true">
+                  Hoạt động
+                </option>
+                <option value="false">
+                  Khóa
+                </option>
               </select>
             </div>
-            <div class="form-group" v-if="editingUser?.provider === 'LOCAL'">
+            <div
+              v-if="editingUser?.provider === 'LOCAL'"
+              class="form-group"
+            >
               <label>MẬT KHẨU MỚI (Để trống nếu không đổi)</label>
-              <input v-model="editForm.password" type="password" class="form-input" placeholder="Nhập mật khẩu mới..."
-                minlength="8" />
+              <input
+                v-model="editForm.password"
+                type="password"
+                class="form-input"
+                placeholder="Nhập mật khẩu mới..."
+                minlength="8"
+              >
             </div>
-            <div class="form-group" v-if="editingUser?.provider === 'LOCAL' && editForm.password">
+            <div
+              v-if="editingUser?.provider === 'LOCAL' && editForm.password"
+              class="form-group"
+            >
               <label>XÁC NHẬN MẬT KHẨU</label>
-              <input v-model="editForm.confirmPassword" type="password" class="form-input"
-                placeholder="Nhập lại mật khẩu mới..." minlength="8" />
+              <input
+                v-model="editForm.confirmPassword"
+                type="password"
+                class="form-input"
+                placeholder="Nhập lại mật khẩu mới..."
+                minlength="8"
+              >
             </div>
             <div class="form-actions">
-              <button type="button" @click="closeEditModal" class="btn-secondary">HUY</button>
-              <button type="submit" :disabled="isEditSubmitting" class="btn-primary">
+              <button
+                type="button"
+                class="btn-secondary"
+                @click="closeEditModal"
+              >
+                HUY
+              </button>
+              <button
+                type="submit"
+                :disabled="isEditSubmitting"
+                class="btn-primary"
+              >
                 {{ isEditSubmitting ? 'ĐANG LƯU...' : 'LƯU' }}
               </button>
             </div>
@@ -242,13 +451,25 @@
     </div>
 
     <!-- Loyalty Progress & Adjustment Modal -->
-    <div v-if="showLoyaltyModal" class="modal-overlay" @click.self="closeLoyaltyModal">
+    <div
+      v-if="showLoyaltyModal"
+      class="modal-overlay"
+      @click.self="closeLoyaltyModal"
+    >
       <div class="modal-content loyalty-modal">
         <div class="modal-header">
           <h2>Chi Tiết Khách Hàng Thân Thiết</h2>
-          <button @click="closeLoyaltyModal" class="btn-close">&times;</button>
+          <button
+            class="btn-close"
+            @click="closeLoyaltyModal"
+          >
+            &times;
+          </button>
         </div>
-        <div class="modal-body" v-if="loyaltyData">
+        <div
+          v-if="loyaltyData"
+          class="modal-body"
+        >
           <div class="loyalty-stats">
             <div class="stat-card">
               <span class="stat-label">Hạng hiện tại</span>
@@ -260,68 +481,152 @@
             </div>
           </div>
           
-          <div class="progress-section" v-if="loyaltyData.nextTierCode">
+          <div
+            v-if="loyaltyData.nextTierCode"
+            class="progress-section"
+          >
             <h3>Tiến trình lên hạng: {{ loyaltyData.nextTierName }}</h3>
-            <p>Cần thêm: 
+            <p>
+              Cần thêm: 
               <strong>{{ formatCurrency(loyaltyData.spentRemainingToNextTier) }}</strong> chi tiêu
               hoặc <strong>{{ loyaltyData.pointsRemainingToNextTier }}</strong> điểm
             </p>
           </div>
-          <div class="progress-section" v-else>
+          <div
+            v-else
+            class="progress-section"
+          >
             <h3>Khách hàng đã đạt hạng cao nhất!</h3>
           </div>
 
-          <hr class="divider"/>
+          <hr class="divider">
 
           <div class="adjust-points-section">
-            <h3 style="margin-bottom: 16px;">Cộng/Trừ Điểm Thủ Công</h3>
-            <form @submit.prevent="submitAdjustPoints" style="padding: 0;">
-              <div class="form-row loyalty-form-row" style="display: flex; gap: 16px; align-items: flex-start; margin-bottom: 16px;">
-                <div class="form-group" style="flex: 1;">
+            <h3 style="margin-bottom: 16px;">
+              Cộng/Trừ Điểm Thủ Công
+            </h3>
+            <form
+              style="padding: 0;"
+              @submit.prevent="submitAdjustPoints"
+            >
+              <div
+                class="form-row loyalty-form-row"
+                style="display: flex; gap: 16px; align-items: flex-start; margin-bottom: 16px;"
+              >
+                <div
+                  class="form-group"
+                  style="flex: 1;"
+                >
                   <label>Số điểm (nhập số âm để trừ)</label>
-                  <input v-model.number="adjustForm.points" type="number" required class="form-input" />
+                  <input
+                    v-model.number="adjustForm.points"
+                    type="number"
+                    required
+                    class="form-input"
+                  >
                 </div>
-                <div class="form-group" style="flex: 2;">
+                <div
+                  class="form-group"
+                  style="flex: 2;"
+                >
                   <label>Lý do (bắt buộc)</label>
-                  <input v-model="adjustForm.note" type="text" required placeholder="VD: Đền bù đơn hàng..." class="form-input" />
+                  <input
+                    v-model="adjustForm.note"
+                    type="text"
+                    required
+                    placeholder="VD: Đền bù đơn hàng..."
+                    class="form-input"
+                  >
                 </div>
               </div>
-              <div class="form-actions" style="margin-top: 16px;">
-                <button type="submit" class="btn-primary" :disabled="isAdjusting" style="width: 100%;">
+              <div
+                class="form-actions"
+                style="margin-top: 16px;"
+              >
+                <button
+                  type="submit"
+                  class="btn-primary"
+                  :disabled="isAdjusting"
+                  style="width: 100%;"
+                >
                   {{ isAdjusting ? 'Đang xử lý...' : 'Thực Hiện' }}
                 </button>
               </div>
             </form>
           </div>
 
-          <hr class="divider"/>
+          <hr class="divider">
 
           <div class="adjust-tier-section">
-            <h3 style="margin-bottom: 16px;">Điều Chỉnh Hạng Thủ Công</h3>
-            <form @submit.prevent="submitUpdateTier" style="padding: 0;">
-              <div class="form-row loyalty-form-row" style="display: flex; gap: 16px; align-items: flex-start; margin-bottom: 16px;">
-                <div class="form-group" style="flex: 1;">
+            <h3 style="margin-bottom: 16px;">
+              Điều Chỉnh Hạng Thủ Công
+            </h3>
+            <form
+              style="padding: 0;"
+              @submit.prevent="submitUpdateTier"
+            >
+              <div
+                class="form-row loyalty-form-row"
+                style="display: flex; gap: 16px; align-items: flex-start; margin-bottom: 16px;"
+              >
+                <div
+                  class="form-group"
+                  style="flex: 1;"
+                >
                   <label>Hạng Mới</label>
-                  <select v-model="tierForm.newTierCode" required class="form-input">
-                    <option value="" disabled>-- Chọn Hạng --</option>
-                    <option value="THUONG">Khách hàng thường (THUONG)</option>
-                    <option value="VIP">Khách hàng VIP (VIP)</option>
+                  <select
+                    v-model="tierForm.newTierCode"
+                    required
+                    class="form-input"
+                  >
+                    <option
+                      value=""
+                      disabled
+                    >
+                      -- Chọn Hạng --
+                    </option>
+                    <option value="THUONG">
+                      Khách hàng thường (THUONG)
+                    </option>
+                    <option value="VIP">
+                      Khách hàng VIP (VIP)
+                    </option>
                   </select>
                 </div>
-                <div class="form-group" style="flex: 2;">
+                <div
+                  class="form-group"
+                  style="flex: 2;"
+                >
                   <label>Lý do (bắt buộc)</label>
-                  <input v-model="tierForm.note" type="text" required placeholder="VD: Đặc cách thăng hạng..." class="form-input" />
+                  <input
+                    v-model="tierForm.note"
+                    type="text"
+                    required
+                    placeholder="VD: Đặc cách thăng hạng..."
+                    class="form-input"
+                  >
                 </div>
               </div>
-              <div class="form-actions" style="margin-top: 16px;">
-                <button type="submit" class="btn-primary" :disabled="isUpdatingTier" style="width: 100%; background: #333;">
+              <div
+                class="form-actions"
+                style="margin-top: 16px;"
+              >
+                <button
+                  type="submit"
+                  class="btn-primary"
+                  :disabled="isUpdatingTier"
+                  style="width: 100%; background: #333;"
+                >
                   {{ isUpdatingTier ? 'Đang xử lý...' : 'Cập Nhật Hạng' }}
                 </button>
               </div>
             </form>
           </div>
         </div>
-        <div class="modal-body" v-else>
+        <div
+          v-else
+          class="modal-body"
+        >
           <p>Đang tải dữ liệu...</p>
         </div>
       </div>
@@ -332,7 +637,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useToast } from 'vue-toastification'
-import api from '@/services/api'
+import adminService from '@/services/admin.service'
 import { loyaltyAdminService, type UserLoyaltyProgress } from '@/services/loyaltyAdminService'
 
 const toast = useToast()
@@ -383,9 +688,7 @@ const formatCurrency = (val: number | undefined) => {
 const fetchUsers = async () => {
   isLoading.value = true
   try {
-    const response = await api.get('/admin/users')
-    const data = response.data
-    const items = data.data || data
+    const items = await adminService.getUsers()
     if (Array.isArray(items)) {
       allUsers.value = items.map((u: any) => ({
         id: u.id,
@@ -424,7 +727,7 @@ const cycleRole = async (user: any) => {
   const nextRole = roles[(currentIdx + 1) % roles.length]
 
   try {
-    await api.patch(`/admin/users/${user.id}`, { role: nextRole })
+    await adminService.updateUser(user.id, { role: nextRole })
     user.role = nextRole
     user.roleClass = getRoleClass(nextRole)
     toast.success('Doi quyen thanh cong')
@@ -435,7 +738,7 @@ const cycleRole = async (user: any) => {
 
 const toggleUserActive = async (user: any) => {
   try {
-    await api.patch(`/admin/users/${user.id}/toggle-active`)
+    await adminService.toggleUserActive(user.id)
     user.isActive = !user.isActive
     toast.success('Cap nhat trang thai thanh cong')
   } catch (error: any) {
@@ -478,7 +781,7 @@ const submitEdit = async () => {
     if (editForm.value.password) {
       payload.password = editForm.value.password
     }
-    await api.patch(`/admin/users/${editingUser.value.id}`, payload)
+    await adminService.updateUser(editingUser.value.id, payload)
     // Update local data
     editingUser.value.fullName = editForm.value.fullName
     editingUser.value.role = editForm.value.role
@@ -500,7 +803,7 @@ const deleteUser = async (user: any) => {
   }
   if (!confirm(`Ban co chac muon xoa ${user.email}? Hanh dong nay khong the hoan tac.`)) return
   try {
-    await api.delete(`/admin/users/${user.id}`)
+    await adminService.deleteUser(user.id)
     toast.success('Xoa nguoi dung thanh cong')
     // Remove from local list
     const idx = allUsers.value.findIndex(u => u.id === user.id)
@@ -513,7 +816,7 @@ const deleteUser = async (user: any) => {
 const handleSubmit = async () => {
   isSubmitting.value = true
   try {
-    await api.post('/admin/users', {
+    await adminService.createUser({
       email: formData.value.email,
       username: formData.value.username,
       fullName: formData.value.fullName,
@@ -623,7 +926,7 @@ onMounted(() => {
     try {
       const auth = JSON.parse(stored)
       currentUserId.value = auth.user?.id || null
-    } catch { }
+    } catch { /* ignore invalid JSON */ }
   }
 })
 
