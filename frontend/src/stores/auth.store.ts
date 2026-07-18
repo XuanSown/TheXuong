@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia'
 import type { User } from '@/types'
 import authService from '@/services/auth.service'
-import http from '@/services/http'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -98,7 +97,6 @@ export const useAuthStore = defineStore('auth', {
       this.isAuthenticated = false
       this.roles = []
       this.redirectTo = null
-      http.clearCsrfToken()
       // Clear guest cart on logout
       localStorage.removeItem('guest_cart_items')
     }

@@ -8,15 +8,6 @@ const client: AxiosInstance = axios.create({
   withCredentials: true
 })
 
-client.interceptors.request.use((config) => {
-  if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(config.method?.toUpperCase() || '')) {
-    const meta = document.querySelector('meta[name="_csrf"]')
-    const token = meta?.getAttribute('content') || localStorage.getItem('csrf_token')
-    if (token) config.headers['X-CSRF-TOKEN'] = token
-  }
-  return config
-})
-
 client.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -35,9 +26,7 @@ const http = {
   post: (url: string, data?: any, config?: any) => client.post(url, data, config),
   put: (url: string, data?: any, config?: any) => client.put(url, data, config),
   patch: (url: string, data?: any, config?: any) => client.patch(url, data, config),
-  delete: (url: string, config?: any) => client.delete(url, config),
-  setCsrfToken: (token: string) => localStorage.setItem('csrf_token', token),
-  clearCsrfToken: () => localStorage.removeItem('csrf_token')
+  delete: (url: string, config?: any) => client.delete(url, config)
 }
 
 export default http
