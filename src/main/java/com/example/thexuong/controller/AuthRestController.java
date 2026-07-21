@@ -7,7 +7,6 @@ import com.example.thexuong.dto.auth.RegisterRequest;
 import com.example.thexuong.dto.auth.UpdateProfileRequest;
 import com.example.thexuong.entity.User;
 import com.example.thexuong.service.PasswordResetService;
-import com.example.thexuong.filter.LoginRateLimitFilter;
 import com.example.thexuong.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -39,7 +38,6 @@ public class AuthRestController {
     private final AuthenticationManager authenticationManager;
     private final UserService userService;
     private final PasswordResetService passwordResetService;
-    private final LoginRateLimitFilter loginRateLimitFilter;
     private final com.example.thexuong.security.JwtService jwtService;
     private final com.example.thexuong.security.JwtCookieService jwtCookieService;
     private final com.example.thexuong.security.TokenBlacklist tokenBlacklist;
@@ -54,17 +52,14 @@ public class AuthRestController {
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request,
                                    HttpServletRequest httpRequest,
                                    HttpServletResponse httpResponse) {
-        String clientIp = loginRateLimitFilter.getClientIp(httpRequest);
         Authentication authentication;
         try {
             authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
             );
         } catch (org.springframework.security.core.AuthenticationException e) {
-            loginRateLimitFilter.recordFailedAttempt(clientIp);
             throw e; // GlobalExceptionHandler returns 401
         }
-        loginRateLimitFilter.resetAttempts(clientIp);
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
