@@ -13,7 +13,6 @@ public enum RateLimitPlan {
     USER_REVIEW(10, Duration.ofMinutes(1)),
     USER_COMMENT(10, Duration.ofMinutes(1)),
     USER_PROFILE(5, Duration.ofMinutes(1)),
-    PUBLIC_SEARCH(30, Duration.ofMinutes(1)),
     PUBLIC_PRODUCT(60, Duration.ofMinutes(1)),
     GLOBAL(300, Duration.ofMinutes(1));
 

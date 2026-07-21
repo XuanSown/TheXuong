@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.ConsumptionProbe;
+import java.io.IOException;
 
 @Component
 public class RateLimitInterceptor implements HandlerInterceptor {
@@ -36,7 +37,7 @@ public class RateLimitInterceptor implements HandlerInterceptor {
         String key = determineKey(clientIp, plan);
 
         // 1. Check Specific Limit (if not global fallback)
-        // ponytail: double-count với global là circuit breaker có chủ ý, không phải bug
+        // ponytail: double-count có chủ ý — global là per-IP cap (không phải app-wide circuit breaker), tránh 1 IP choke app
         if (plan != RateLimitPlan.GLOBAL) {
             Bucket specificBucket = rateLimitService.resolveBucket(key, plan);
             ConsumptionProbe specificProbe = specificBucket.tryConsumeAndReturnRemaining(1);
@@ -58,7 +59,7 @@ public class RateLimitInterceptor implements HandlerInterceptor {
         return true;
     }
 
-    private void reject429(HttpServletResponse response) throws Exception {
+    private void reject429(HttpServletResponse response) throws IOException {
         // ponytail: tên khác với HttpServletResponse.sendError để tránh nhầm
         response.setStatus(429);
         response.setContentType("application/json;charset=UTF-8");
@@ -70,13 +71,12 @@ public class RateLimitInterceptor implements HandlerInterceptor {
         if (uri.startsWith("/api/v1/auth/register")) return RateLimitPlan.AUTH_REGISTER;
         if (uri.startsWith("/api/v1/auth/forgot-password")) return RateLimitPlan.AUTH_FORGOT_PASSWORD;
         if (uri.startsWith("/api/v1/auth/reset-password")) return RateLimitPlan.AUTH_RESET_PASSWORD;
-        if (uri.startsWith("/api/v1/auth/refresh-token")) return RateLimitPlan.AUTH_REFRESH_TOKEN;
+        if (uri.startsWith("/api/v1/auth/refresh")) return RateLimitPlan.AUTH_REFRESH_TOKEN;
         if (uri.startsWith("/api/v1/orders")) return RateLimitPlan.USER_ORDER;
         if (uri.startsWith("/api/v1/payments")) return RateLimitPlan.USER_PAYMENT;
         if (uri.startsWith("/api/v1/reviews")) return RateLimitPlan.USER_REVIEW;
         if (uri.startsWith("/api/v1/comments")) return RateLimitPlan.USER_COMMENT;
-        if (uri.startsWith("/api/v1/users/me")) return RateLimitPlan.USER_PROFILE;
-        if (uri.startsWith("/api/v1/products/search")) return RateLimitPlan.PUBLIC_SEARCH;
+        if (uri.startsWith("/api/v1/auth/profile")) return RateLimitPlan.USER_PROFILE;
         if (uri.startsWith("/api/v1/products")) return RateLimitPlan.PUBLIC_PRODUCT;
         return RateLimitPlan.GLOBAL;
     }
