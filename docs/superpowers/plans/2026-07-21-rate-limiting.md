@@ -103,7 +103,6 @@ public enum RateLimitPlan {
     USER_REVIEW(10, Duration.ofMinutes(1)),
     USER_COMMENT(10, Duration.ofMinutes(1)),
     USER_PROFILE(5, Duration.ofMinutes(1)),
-    PUBLIC_SEARCH(30, Duration.ofMinutes(1)),
     PUBLIC_PRODUCT(60, Duration.ofMinutes(1)),
     GLOBAL(300, Duration.ofMinutes(1));
 
@@ -358,7 +357,6 @@ public class RateLimitInterceptor implements HandlerInterceptor {
         if (uri.startsWith("/api/v1/reviews")) return RateLimitPlan.USER_REVIEW;
         if (uri.startsWith("/api/v1/comments")) return RateLimitPlan.USER_COMMENT;
         if (uri.startsWith("/api/v1/users/me")) return RateLimitPlan.USER_PROFILE;
-        if (uri.startsWith("/api/v1/products/search")) return RateLimitPlan.PUBLIC_SEARCH;
         if (uri.startsWith("/api/v1/products")) return RateLimitPlan.PUBLIC_PRODUCT;
         return RateLimitPlan.GLOBAL;
     }

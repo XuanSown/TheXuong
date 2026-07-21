@@ -96,24 +96,41 @@ public class RateLimitInterceptorTest {
         RateLimitService service = new RateLimitService();
         RateLimitInterceptor interceptor = new RateLimitInterceptor(service);
         try {
-            Authentication anon = mock(Authentication.class);
-            when(anon.getName()).thenReturn("anonymousUser");
-            when(anon.getPrincipal()).thenReturn("anonymousUser");
-            when(anon.isAuthenticated()).thenReturn(true);
-            SecurityContextHolder.getContext().setAuthentication(anon);
+            // First anonymous user from IP 127.0.0.1
+            Authentication anon1 = mock(Authentication.class);
+            when(anon1.getName()).thenReturn("anonymousUser");
+            when(anon1.getPrincipal()).thenReturn("anonymousUser");
+            when(anon1.isAuthenticated()).thenReturn(true);
+            SecurityContextHolder.getContext().setAuthentication(anon1);
 
             MockHttpServletRequest req = new MockHttpServletRequest();
             req.setRequestURI("/api/v1/orders");
             req.setRemoteAddr("127.0.0.1");
             MockHttpServletResponse res = new MockHttpServletResponse();
 
-            // 5 requests allowed (IP fallback bucket)
+            // 5 requests allowed (IP fallback bucket for 127.0.0.1)
             for (int i = 0; i < 5; i++) {
                 assertTrue(interceptor.preHandle(req, res, null));
             }
             // 6th request should fail
             assertFalse(interceptor.preHandle(req, res, null));
             assertEquals(429, res.getStatus());
+
+            // Second anonymous user from a DIFFERENT IP gets its own bucket.
+            // If keying wrongly used auth.getName() for anonymous, this 2nd
+            // user would share the 1st user's exhausted bucket and fail immediately.
+            SecurityContextHolder.clearContext();
+            Authentication anon2 = mock(Authentication.class);
+            when(anon2.getName()).thenReturn("anonymousUser");
+            when(anon2.getPrincipal()).thenReturn("anonymousUser");
+            when(anon2.isAuthenticated()).thenReturn(true);
+            SecurityContextHolder.getContext().setAuthentication(anon2);
+
+            req.setRemoteAddr("192.168.1.1");
+            MockHttpServletResponse res2 = new MockHttpServletResponse();
+            for (int i = 0; i < 5; i++) {
+                assertTrue(interceptor.preHandle(req, res2, null));
+            }
         } finally {
             SecurityContextHolder.clearContext();
         }
