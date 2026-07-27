@@ -18,12 +18,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 	// SELECT * FROM product ORDER BY id DESC LIMIT 4
 	List<Product> findTop4ByOrderByIdDesc();
 
-	Page<Product> findByNameContaining(String keyword, Pageable pageable);
-
-	Page<Product> findBySport_Name(String sport, Pageable pageable);
-
-	Page<Product> findByBrand_Name(String brand, Pageable pageable);
-
 	@Query("SELECT DISTINCT p FROM Product p LEFT JOIN FETCH p.variants v LEFT JOIN FETCH v.size LEFT JOIN FETCH p.reviews WHERE p.id = :id")
 	Optional<Product> findByIdWithVariants(@Param("id") Long id);
 
@@ -68,11 +62,9 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 	@Query("SELECT DISTINCT p.category.name FROM Product p WHERE p.category IS NOT NULL ORDER BY p.category.name")
 	List<String> findAllDistinctCategories();
 
-	// Find top products by ID desc for new arrivals (with JOIN FETCH to avoid LazyInitializationException)
-	@Query("SELECT DISTINCT p FROM Product p LEFT JOIN FETCH p.variants v LEFT JOIN FETCH v.size WHERE p.active = true ORDER BY p.id DESC")
-	List<Product> findAllWithVariantsByOrderByIdDesc(Pageable pageable);
-
-	// Find top products by ID desc for new arrivals
+	// Find top products by ID desc for new arrivals.
+	// ponytail: Khong JOIN FETCH collection vo Pageable -> Hibernate warning HHH90003004 + RAM OOM.
+	// N+1 variants da giai quyen o Controller qua productVariantRepository.findByProductId().
 	List<Product> findAllByOrderByIdDesc(Pageable pageable);
 
 	// Bộ lọc song song: keyword + sport + brand. Sort inject qua Pageable.
