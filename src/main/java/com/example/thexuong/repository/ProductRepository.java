@@ -75,6 +75,21 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 	// Find top products by ID desc for new arrivals
 	List<Product> findAllByOrderByIdDesc(Pageable pageable);
 
+	// Bộ lọc song song: keyword + sport + brand. Sort inject qua Pageable.
+	// ponytail: null-binding thay vì Optional, tránh bùng nổ method derived.
+	@Query("""
+		SELECT p FROM Product p
+		WHERE (:keyword IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%')))
+		  AND (:sport IS NULL OR p.sport.name = :sport)
+		  AND (:brand IS NULL OR p.brand.name = :brand)
+	""")
+	Page<Product> findByFilters(
+		@Param("keyword") String keyword,
+		@Param("sport") String sport,
+		@Param("brand") String brand,
+		Pageable pageable
+	);
+
 	// ========== ADMIN: Soft Delete / Product Management ==========
 	/**
 	 * Admin: Lấy tất cả sản phẩm kể cả inactive (đã vô hiệu hóa). Bỏ qua
