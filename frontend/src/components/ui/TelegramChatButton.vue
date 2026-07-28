@@ -1,6 +1,6 @@
 <template>
   <a
-    href="#"
+    href="https://t.me/thexuongsport_n8nchatbot"
     target="_blank"
     rel="noopener"
     aria-label="Chat on Telegram"
@@ -13,5 +13,4 @@
 </template>
 
 <script setup lang="ts">
-// ponytail: replace with real t.me handle
 </script>
