@@ -4,19 +4,18 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Getter @Setter
-@NoArgsConstructor @AllArgsConstructor
+@NoArgsConstructor
 @Builder
 @Entity
+@IdClass(ProductImageId.class)
 @Table(name = "ProductImages")
 public class ProductImage {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
     @Column(name = "product_id", nullable = false)
     private Long productId;
 
+    @Id
     @Column(name = "sort_order", nullable = false)
     @Builder.Default
     private int sortOrder = 0;

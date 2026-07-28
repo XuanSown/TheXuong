@@ -44,16 +44,6 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Gelasio:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
-
-.font-geist {
-  font-family: 'Inter', 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-}
-
-.font-gelasio {
-  font-family: 'Gelasio', serif;
-}
-
 @keyframes spin {
   to { transform: rotate(360deg); }
 }

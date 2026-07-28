@@ -33,12 +33,6 @@ const brands = ['NIKE', 'ADIDAS', 'PUMA', 'LI-NING', 'NEW BALANCE', 'ASICS']
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&display=swap') layer(fonts);
-
-.font-geist {
-  font-family: 'Geist', sans-serif;
-}
-
 @keyframes marquee {
   0% { transform: translateX(0); }
   100% { transform: translateX(-100%); }

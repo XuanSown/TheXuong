@@ -751,7 +751,7 @@ const handleCancel = () => {
   width: 848px;
   height: 28px;
   margin: 0;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Geist', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-weight: 600;
   font-size: 18px;
   line-height: 28px;
@@ -802,7 +802,7 @@ const handleCancel = () => {
   align-items: center;
   width: 100%;
   height: 18px;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Geist', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-weight: 600;
   font-size: 12px;
   line-height: 18px;
@@ -820,7 +820,7 @@ const handleCancel = () => {
   background: #F8FAFC;
   border: 1px solid #E2E8F0;
   border-radius: 4px;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Geist', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: 14px;
   color: #475569;
   box-sizing: border-box;
@@ -850,7 +850,7 @@ const handleCancel = () => {
   background: #F8FAFC;
   border: 1px solid #E2E8F0;
   border-radius: 4px;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Geist', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: 14px;
   color: #475569;
   appearance: none;
@@ -911,7 +911,7 @@ const handleCancel = () => {
   width: 832px;
   height: 16px;
   margin: 0;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Geist', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-style: italic;
   font-weight: 400;
   font-size: 12px;
@@ -926,7 +926,7 @@ const handleCancel = () => {
   gap: 12px;
   width: 832px;
   padding: 24px 0;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Geist', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: 13px;
   color: #64748B;
 }
@@ -950,7 +950,7 @@ const handleCancel = () => {
   gap: 12px;
   width: 832px;
   padding: 16px 0;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Geist', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: 13px;
   color: #EF4444;
 }
@@ -961,7 +961,7 @@ const handleCancel = () => {
   color: #FFF;
   border: none;
   border-radius: 4px;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Geist', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: 12px;
   cursor: pointer;
 }
@@ -975,7 +975,7 @@ const handleCancel = () => {
   align-items: center;
   width: 832px;
   padding: 24px 0;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Geist', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: 13px;
   font-style: italic;
   color: #94A3B8;
@@ -1012,7 +1012,7 @@ const handleCancel = () => {
   height: 38px;
   background: #F8FAFC;
   border-bottom: 1px solid #E2E8F0;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Geist', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-weight: 700;
   font-size: 14px;
   line-height: 21px;
@@ -1028,7 +1028,7 @@ const handleCancel = () => {
   padding: 4px 0 5px;
   border: none;
   background: transparent;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Geist', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: 12px;
   color: #94A3B8;
   box-sizing: border-box;
@@ -1067,7 +1067,7 @@ const handleCancel = () => {
   background: #F8FAFC;
   border: 1px solid #E2E8F0;
   border-radius: 4px;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Geist', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: 14px;
   color: #475569;
   resize: vertical;

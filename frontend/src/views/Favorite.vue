@@ -198,16 +198,6 @@ const addToCart = (product: Product) => {
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Gelasio:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap') layer(fonts);
-
-.font-geist {
-font-family: 'Geist', sans-serif;
-}
-
-.font-gelasio {
-font-family: 'Geist', sans-serif;
-}
-
 .line-clamp-2 {
 display: -webkit-box;
 -webkit-line-clamp: 2;

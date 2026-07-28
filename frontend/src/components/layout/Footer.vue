@@ -67,7 +67,7 @@
                 </svg>
                 <span
                   class="text-[#9CA3AF] text-sm leading-[20px]"
-                  style="font-family: 'Nimbus Sans', sans-serif;"
+                  style="font-family: 'Geist', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;"
                 >
                   thexuong.sport@gmail.com
                 </span>
@@ -331,9 +331,4 @@
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Gelasio:wght@400;500&family=Inter:wght@400;500;600&display=swap');
-
-.font-geist {
-  font-family: 'Geist', sans-serif;
-}
 </style>

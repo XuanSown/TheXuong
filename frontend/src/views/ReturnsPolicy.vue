@@ -378,16 +378,6 @@ const refundTimeline = [
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&display=swap') layer(fonts);
-
-.font-geist {
-  font-family: 'Geist', sans-serif;
-}
-
-.font-jetbrains {
-  font-family: 'JetBrains Mono', monospace;
-}
-
 /* ---- Liquid glass ---- */
 .liquid-glass {
   -webkit-backdrop-filter: blur(18px) saturate(160%);

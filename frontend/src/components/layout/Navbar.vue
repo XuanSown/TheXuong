@@ -231,9 +231,4 @@ watch(isAuthenticated, (newVal, oldVal) => {
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap') layer(fonts);
-
-.font-geist {
-  font-family: 'Geist', sans-serif;
-}
 </style>

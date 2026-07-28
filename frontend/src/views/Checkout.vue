@@ -695,16 +695,6 @@ const onSubmit = handleSubmit(async (values) => {
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Gelasio:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap') layer(fonts);
-
-.font-geist {
-  font-family: 'Geist', sans-serif;
-}
-
-.font-gelasio {
-  font-family: 'Geist', sans-serif;
-}
-
 .font-inter {
   font-family: 'Geist', sans-serif;
 }
