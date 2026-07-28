@@ -2,8 +2,13 @@
   <div class="admin-voucher-page">
     <!-- Header Section -->
     <div class="header-section">
-      <h1 class="page-title">QUẢN LÝ VOUCHER</h1>
-      <button @click="openCreateModal" class="btn-add">
+      <h1 class="page-title">
+        QUẢN LÝ VOUCHER
+      </h1>
+      <button
+        class="btn-add"
+        @click="openCreateModal"
+      >
         THÊM VOUCHER MỚI
       </button>
     </div>
@@ -16,7 +21,7 @@
           type="text"
           placeholder="Tìm theo mã voucher (TX-XXXXXX)..."
           class="search-input"
-        />
+        >
       </div>
 
       <div class="filter-buttons">
@@ -35,28 +40,43 @@
           <input
             v-model="vipOnlyFilter"
             type="checkbox"
-          />
+          >
           Chỉ VIP
         </label>
       </div>
     </div>
 
     <!-- Bulk Actions Bar (hiển thị khi có selection) -->
-    <div v-if="selectedIds.length > 0" class="bulk-actions-bar">
+    <div
+      v-if="selectedIds.length > 0"
+      class="bulk-actions-bar"
+    >
       <span class="selection-info">
         Đã chọn {{ selectedIds.length }} voucher
       </span>
       <div class="bulk-buttons">
-        <button @click="handleBulkLock" class="btn-bulk btn-lock">
+        <button
+          class="btn-bulk btn-lock"
+          @click="handleBulkLock"
+        >
           LOCK 🔒
         </button>
-        <button @click="handleBulkUnlock" class="btn-bulk btn-unlock">
+        <button
+          class="btn-bulk btn-unlock"
+          @click="handleBulkUnlock"
+        >
           UNLOCK 🔓
         </button>
-        <button @click="handleBulkDelete" class="btn-bulk btn-delete">
+        <button
+          class="btn-bulk btn-delete"
+          @click="handleBulkDelete"
+        >
           DELETE 🗑️
         </button>
-        <button @click="handleBulkSetVip" class="btn-bulk btn-vip">
+        <button
+          class="btn-bulk btn-vip"
+          @click="handleBulkSetVip"
+        >
           SET VIP ⭐
         </button>
       </div>
@@ -71,9 +91,9 @@
               <input
                 v-model="allSelected"
                 type="checkbox"
-                @change="toggleSelectAll"
                 :disabled="vouchers.length === 0"
-              />
+                @change="toggleSelectAll"
+              >
             </th>
             <th
               v-for="col in columns"
@@ -82,7 +102,10 @@
               @click="col.sortable !== false ? handleSort(col.key) : null"
             >
               {{ col.label }}
-              <span v-if="sortBy === col.key" class="sort-icon">
+              <span
+                v-if="sortBy === col.key"
+                class="sort-icon"
+              >
                 {{ sortOrder === 'asc' ? '▲' : '▼' }}
               </span>
             </th>
@@ -91,27 +114,43 @@
         </thead>
         <tbody>
           <tr v-if="isLoading">
-            <td :colspan="columns.length + 2" class="loading-cell">
+            <td
+              :colspan="columns.length + 2"
+              class="loading-cell"
+            >
               Đang tải...
             </td>
           </tr>
           <tr v-else-if="vouchers.length === 0">
-            <td :colspan="columns.length + 2" class="empty-cell">
+            <td
+              :colspan="columns.length + 2"
+              class="empty-cell"
+            >
               <div class="empty-state">
-                <div class="empty-icon">📦</div>
-                <div class="empty-text">Chưa có voucher nào</div>
-                <div class="empty-hint">Nhấn "THÊM VOUCHER MỚI" để tạo</div>
+                <div class="empty-icon">
+                  📦
+                </div>
+                <div class="empty-text">
+                  Chưa có voucher nào
+                </div>
+                <div class="empty-hint">
+                  Nhấn "THÊM VOUCHER MỚI" để tạo
+                </div>
               </div>
             </td>
           </tr>
-          <tr v-else v-for="voucher in vouchers" :key="voucher.id">
+          <tr
+            v-for="voucher in vouchers"
+            v-else
+            :key="voucher.id"
+          >
             <td class="col-checkbox">
               <input
                 v-model="selectedIds"
                 :value="voucher.id"
                 type="checkbox"
                 :disabled="voucher.status === 'EXPIRED'"
-              />
+              >
             </td>
             <td class="col-code">
               <span class="mono">{{ voucher.code }}</span>
@@ -126,8 +165,14 @@
               {{ formatCurrency(voucher.minOrderAmount) }}
             </td>
             <td class="col-vip">
-              <span v-if="voucher.vipOnly" class="badge vip-badge">VIP</span>
-              <span v-else class="badge normal-badge">Không</span>
+              <span
+                v-if="voucher.vipOnly"
+                class="badge vip-badge"
+              >VIP</span>
+              <span
+                v-else
+                class="badge normal-badge"
+              >Không</span>
             </td>
             <td class="col-status">
               <span :class="['status-badge', getStatusClass(voucher.status)]">
@@ -135,10 +180,16 @@
               </span>
             </td>
             <td class="col-actions">
-              <button @click="openEditModal(voucher)" class="btn-action btn-edit">
+              <button
+                class="btn-action btn-edit"
+                @click="openEditModal(voucher)"
+              >
                 SỬA
               </button>
-              <button @click="handleDelete(voucher)" class="btn-action btn-delete">
+              <button
+                class="btn-action btn-delete"
+                @click="handleDelete(voucher)"
+              >
                 XÓA
               </button>
             </td>
@@ -148,30 +199,33 @@
     </div>
 
     <!-- Pagination -->
-    <div v-if="total > 0" class="pagination">
+    <div
+      v-if="total > 0"
+      class="pagination"
+    >
       <span class="page-info">
         Hiển thị {{ startIndex }}-{{ endIndex }} của {{ total }} kết quả
       </span>
       <div class="page-buttons">
         <button
-          @click="changePage(currentPage - 1)"
           :disabled="currentPage === 1"
           class="btn-page"
+          @click="changePage(currentPage - 1)"
         >
           &lt;
         </button>
         <button
           v-for="page in visiblePages"
           :key="page"
-          @click="changePage(page)"
           :class="['btn-page', { active: currentPage === page }]"
+          @click="changePage(page)"
         >
           {{ page }}
         </button>
         <button
-          @click="changePage(currentPage + 1)"
           :disabled="currentPage === totalPages"
           class="btn-page"
+          @click="changePage(currentPage + 1)"
         >
           &gt;
         </button>
@@ -179,11 +233,20 @@
     </div>
 
     <!-- Voucher Modal (Create/Edit) -->
-    <div v-if="showModal" class="modal-overlay" @click.self="closeModal">
+    <div
+      v-if="showModal"
+      class="modal-overlay"
+      @click.self="closeModal"
+    >
       <div class="modal-content">
         <div class="modal-header">
           <h2>{{ modalMode === 'create' ? 'THÊM VOUCHER MỚI' : 'CHỈNH SỬA VOUCHER' }}</h2>
-          <button @click="closeModal" class="btn-close">&times;</button>
+          <button
+            class="btn-close"
+            @click="closeModal"
+          >
+            &times;
+          </button>
         </div>
 
         <div class="modal-body">
@@ -198,18 +261,25 @@
                   placeholder="TX-XXXXXX"
                   :class="{ error: errors.code }"
                   @blur="validateCode"
-                />
+                >
                 <button
                   type="button"
-                  @click="generateCode"
                   class="btn-generate"
                   title="Tự động tạo mã"
+                  @click="generateCode"
                 >
                   🎲
                 </button>
               </div>
-              <div v-if="errors.code" class="error-message">{{ errors.code }}</div>
-              <div class="form-hint">Format: TX-XXXXXX (chữ hoa, không O/I/L)</div>
+              <div
+                v-if="errors.code"
+                class="error-message"
+              >
+                {{ errors.code }}
+              </div>
+              <div class="form-hint">
+                Format: TX-XXXXXX (chữ hoa, không O/I/L)
+              </div>
             </div>
 
             <!-- Discount Amount & Required Points -->
@@ -221,7 +291,12 @@
                   :class="{ error: errors.discountAmount }"
                   @change="onDiscountChange"
                 >
-                  <option :value="null" disabled>Chọn mệnh giá</option>
+                  <option
+                    :value="null"
+                    disabled
+                  >
+                    Chọn mệnh giá
+                  </option>
                   <option
                     v-for="(label, idx) in discountLabels"
                     :key="discountAmounts[idx]"
@@ -230,7 +305,12 @@
                     {{ label }}
                   </option>
                 </select>
-                <div v-if="errors.discountAmount" class="error-message">{{ errors.discountAmount }}</div>
+                <div
+                  v-if="errors.discountAmount"
+                  class="error-message"
+                >
+                  {{ errors.discountAmount }}
+                </div>
               </div>
 
               <div class="form-group">
@@ -242,9 +322,16 @@
                   max="50"
                   :class="{ error: errors.requiredPoints }"
                   @blur="validatePoints"
-                />
-                <div v-if="errors.requiredPoints" class="error-message">{{ errors.requiredPoints }}</div>
-                <div class="form-hint">Tự động: {{ formData.discountAmount ? Math.floor(formData.discountAmount / 10000) : 0 }} điểm</div>
+                >
+                <div
+                  v-if="errors.requiredPoints"
+                  class="error-message"
+                >
+                  {{ errors.requiredPoints }}
+                </div>
+                <div class="form-hint">
+                  Tự động: {{ formData.discountAmount ? Math.floor(formData.discountAmount / 10000) : 0 }} điểm
+                </div>
               </div>
             </div>
 
@@ -257,15 +344,25 @@
                 min="0"
                 :class="{ error: errors.minOrderAmount }"
                 @blur="validateMinOrder"
-              />
-              <div v-if="errors.minOrderAmount" class="error-message">{{ errors.minOrderAmount }}</div>
-              <div class="form-hint">Điều kiện đơn tối thiểu để áp dụng voucher</div>
+              >
+              <div
+                v-if="errors.minOrderAmount"
+                class="error-message"
+              >
+                {{ errors.minOrderAmount }}
+              </div>
+              <div class="form-hint">
+                Điều kiện đơn tối thiểu để áp dụng voucher
+              </div>
             </div>
 
             <!-- VIP Only Toggle -->
             <div class="form-group checkbox-group">
               <label>
-                <input v-model="formData.vipOnly" type="checkbox" />
+                <input
+                  v-model="formData.vipOnly"
+                  type="checkbox"
+                >
                 Chỉ dành cho VIP
               </label>
             </div>
@@ -273,12 +370,26 @@
             <!-- Status Select -->
             <div class="form-group">
               <label>Trạng thái <span class="required">*</span></label>
-              <select v-model="formData.status" :class="{ error: errors.status }">
-                <option value="ACTIVE">ACTIVE</option>
-                <option value="LOCKED">LOCKED</option>
-                <option value="EXPIRED">EXPIRED</option>
+              <select
+                v-model="formData.status"
+                :class="{ error: errors.status }"
+              >
+                <option value="ACTIVE">
+                  ACTIVE
+                </option>
+                <option value="LOCKED">
+                  LOCKED
+                </option>
+                <option value="EXPIRED">
+                  EXPIRED
+                </option>
               </select>
-              <div v-if="errors.status" class="error-message">{{ errors.status }}</div>
+              <div
+                v-if="errors.status"
+                class="error-message"
+              >
+                {{ errors.status }}
+              </div>
             </div>
 
             <!-- Expires At Date Picker -->
@@ -288,8 +399,10 @@
                 v-model="formData.expiresAt"
                 type="date"
                 :min="today"
-              />
-              <div class="form-hint">Để trống nếu vĩnh viễn</div>
+              >
+              <div class="form-hint">
+                Để trống nếu vĩnh viễn
+              </div>
             </div>
 
             <!-- Applicable Categories (Multi-select) -->
@@ -297,8 +410,8 @@
               <label>Danh mục áp dụng</label>
               <div class="multi-select-container">
                 <select
-                  multiple
                   v-model="formData.applicableCategoryIds"
+                  multiple
                   class="multi-select"
                   size="5"
                 >
@@ -310,18 +423,27 @@
                     {{ cat.name }}
                   </option>
                 </select>
-                <div class="selected-chips" v-if="formData.applicableCategoryIds.length > 0">
+                <div
+                  v-if="formData.applicableCategoryIds.length > 0"
+                  class="selected-chips"
+                >
                   <span
                     v-for="catId in formData.applicableCategoryIds"
                     :key="catId"
                     class="chip"
                   >
                     {{ getCategoryName(catId) }}
-                    <button type="button" @click="removeCategory(catId)" class="chip-remove">&times;</button>
+                    <button
+                      type="button"
+                      class="chip-remove"
+                      @click="removeCategory(catId)"
+                    >&times;</button>
                   </span>
                 </div>
               </div>
-              <div class="form-hint">Giữ Ctrl/Cmd để chọn nhiều. Để trống = áp dụng tất cả</div>
+              <div class="form-hint">
+                Giữ Ctrl/Cmd để chọn nhiều. Để trống = áp dụng tất cả
+              </div>
             </div>
 
             <!-- Applicable Products (Multi-select) -->
@@ -329,8 +451,8 @@
               <label>Sản phẩm áp dụng</label>
               <div class="multi-select-container">
                 <select
-                  multiple
                   v-model="formData.applicableProductIds"
+                  multiple
                   class="multi-select"
                   size="5"
                 >
@@ -342,26 +464,43 @@
                     {{ prod.name }} ({{ prod.sku }})
                   </option>
                 </select>
-                <div class="selected-chips" v-if="formData.applicableProductIds.length > 0">
+                <div
+                  v-if="formData.applicableProductIds.length > 0"
+                  class="selected-chips"
+                >
                   <span
                     v-for="prodId in formData.applicableProductIds"
                     :key="prodId"
                     class="chip"
                   >
                     {{ getProductName(prodId) }}
-                    <button type="button" @click="removeProduct(prodId)" class="chip-remove">&times;</button>
+                    <button
+                      type="button"
+                      class="chip-remove"
+                      @click="removeProduct(prodId)"
+                    >&times;</button>
                   </span>
                 </div>
               </div>
-              <div class="form-hint">Để trống = áp dụng tất cả sản phẩm</div>
+              <div class="form-hint">
+                Để trống = áp dụng tất cả sản phẩm
+              </div>
             </div>
 
             <!-- Form Actions -->
             <div class="form-actions">
-              <button type="button" @click="closeModal" class="btn-secondary">
+              <button
+                type="button"
+                class="btn-secondary"
+                @click="closeModal"
+              >
                 HỦY
               </button>
-              <button type="submit" :disabled="isSubmitting" class="btn-primary">
+              <button
+                type="submit"
+                :disabled="isSubmitting"
+                class="btn-primary"
+              >
                 {{ isSubmitting ? 'ĐANG LƯU...' : 'LƯU' }}
               </button>
             </div>
@@ -371,7 +510,11 @@
     </div>
 
     <!-- Confirmation Dialog -->
-    <div v-if="showConfirm" class="modal-overlay" @click.self="cancelConfirm">
+    <div
+      v-if="showConfirm"
+      class="modal-overlay"
+      @click.self="cancelConfirm"
+    >
       <div class="confirm-dialog">
         <div class="confirm-header">
           <span class="confirm-icon">⚠️</span>
@@ -381,8 +524,17 @@
           {{ confirmMessage }}
         </div>
         <div class="confirm-actions">
-          <button @click="cancelConfirm" class="btn-secondary">HỦY</button>
-          <button @click="confirmAction" class="btn-confirm" :class="confirmType">
+          <button
+            class="btn-secondary"
+            @click="cancelConfirm"
+          >
+            HỦY
+          </button>
+          <button
+            class="btn-confirm"
+            :class="confirmType"
+            @click="confirmAction"
+          >
             {{ confirmButtonText }}
           </button>
         </div>

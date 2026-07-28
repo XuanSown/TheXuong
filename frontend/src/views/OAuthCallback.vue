@@ -1,9 +1,13 @@
 <template>
   <div class="min-h-screen bg-[#F9F9F9] flex items-center justify-center">
     <div class="text-center">
-      <div class="w-16 h-16 border-4 border-black border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
-      <h1 class="font-geist text-2xl text-black mb-2">ĐANG HOÀN TẤT ĐĂNG NHẬP</h1>
-      <p class="font-gelasio text-[#5E5F5C]">Vui lòng chờ một chút...</p>
+      <div class="w-16 h-16 border-4 border-black border-t-transparent rounded-full animate-spin mx-auto mb-6" />
+      <h1 class="font-geist text-2xl text-black mb-2">
+        ĐANG HOÀN TẤT ĐĂNG NHẬP
+      </h1>
+      <p class="font-gelasio text-[#5E5F5C]">
+        Vui lòng chờ một chút...
+      </p>
     </div>
   </div>
 </template>
