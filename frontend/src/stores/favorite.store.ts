@@ -31,7 +31,7 @@ export const useFavoriteStore = defineStore('favorite', {
         if (wasPresent) {
           await favoriteService.removeFavorite(product.id)
         } else {
-          await favoriteService.addFavorite(product.id)
+          await favoriteService.addFavorite(product)
         }
       } catch (e: any) {
         if (wasPresent) {
