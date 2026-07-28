@@ -12,6 +12,8 @@ public class JwtCookieService {
     private final String domain;
     private final boolean secure;
     private final String sameSite;
+    @Value("${app.security.jwt.access-ttl-seconds:900}") private long accessTtlSeconds;
+    @Value("${app.security.jwt.refresh-ttl-seconds:604800}") private long refreshTtlSeconds;
 
     public JwtCookieService(@Value("${app.security.jwt.cookie-domain:}") String domain,
                             @Value("${app.security.jwt.cookie-secure:true}") boolean secure,
@@ -22,8 +24,8 @@ public class JwtCookieService {
     }
 
     public void setAuthCookies(HttpServletResponse res, String accessToken, String refreshToken) {
-        res.addHeader("Set-Cookie", buildCookie("access_token", accessToken, 900));
-        res.addHeader("Set-Cookie", buildCookie("refresh_token", refreshToken, 604800));
+        res.addHeader("Set-Cookie", buildCookie("access_token", accessToken, accessTtlSeconds));
+        res.addHeader("Set-Cookie", buildCookie("refresh_token", refreshToken, refreshTtlSeconds));
     }
 
     public void clearAuthCookies(HttpServletResponse res) {

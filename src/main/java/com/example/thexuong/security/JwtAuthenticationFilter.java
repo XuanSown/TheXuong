@@ -25,6 +25,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final JwtCookieService cookieService;
     private final UserDetailsService userDetailsService;
+    private final TokenBlacklist tokenBlacklist;
 
     private static final List<String> SKIP_PREFIXES = List.of(
             "/api/v1/auth/login",
@@ -39,7 +40,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
-        return SKIP_PREFIXES.stream().anyMatch(path::startsWith);
+        return SKIP_PREFIXES.stream().anyMatch(p -> path.equals(p) || path.startsWith(p + "/"));
     }
 
     @Override
@@ -66,6 +67,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     String newAccess = jwtService.generateAccessToken(user);
                     String newRefresh = jwtService.generateRefreshToken(user);
                     cookieService.setAuthCookies(response, newAccess, newRefresh);
+                    // ponytail: blacklist old refresh jti so it can't be reused
+                    String oldJti = jwtService.extractClaims(refreshToken).getId();
+                    java.time.Instant oldExp = jwtService.extractClaims(refreshToken).getExpiration().toInstant();
+                    tokenBlacklist.blacklist(oldJti, oldExp);
                     setAuthentication(newAccess, request);
                     log.debug("[JWT] Auto-refreshed access token for user {}", username);
                 } catch (Exception e) {
