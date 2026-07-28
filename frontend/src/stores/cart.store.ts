@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import type { Cart, CartItem } from '@/types'
-import api from '@/services/api'
+import cartService from '@/services/cart.service'
 
 const GUEST_CART_KEY = 'guest_cart_items'
 
@@ -87,7 +87,7 @@ export const useCartStore = defineStore('cart', {
     async fetchCart() {
       this.loading = true
       try {
-        const cart = await api.getCart()
+        const cart = await cartService.getCart()
         this.cart = cart
         // Clear guest cart after successful server fetch
         localStorage.removeItem(GUEST_CART_KEY)
@@ -101,7 +101,7 @@ export const useCartStore = defineStore('cart', {
       // If explicitly authenticated or cart exists (server cart loaded), use API
       if (isAuthenticated || this.cart !== null) {
         try {
-          const cart = await api.addCartItem({ variantId, quantity })
+          const cart = await cartService.addCartItem({ variantId, quantity })
           this.cart = cart
         } catch (error) {
           // If API fails (e.g., token expired), fallback to guest cart
@@ -118,7 +118,7 @@ export const useCartStore = defineStore('cart', {
     async updateItem(itemId: number, quantity: number) {
       if (this.cart) {
         // Authenticated
-        const cart = await api.updateCartItem(itemId, quantity)
+        const cart = await cartService.updateCartItem(itemId, quantity)
         this.cart = cart
       } else {
         // Guest: update localStorage
@@ -130,7 +130,7 @@ export const useCartStore = defineStore('cart', {
     async removeItem(itemId: number) {
       if (this.cart) {
         // Authenticated
-        await api.removeCartItem(itemId)
+        await cartService.removeCartItem(itemId)
         await this.fetchCart()
       } else {
         // Guest: remove from localStorage
@@ -158,7 +158,7 @@ export const useCartStore = defineStore('cart', {
         // Add each guest item to server cart
         for (const guestItem of guestItems) {
           try {
-            await api.addCartItem({
+            await cartService.addCartItem({
               variantId: guestItem.variantId,
               quantity: guestItem.quantity
             })
@@ -179,7 +179,7 @@ export const useCartStore = defineStore('cart', {
     // Guest cart localStorage operations
     addToGuestCart(variantId: number, quantity: number, productInfo?: Partial<GuestCartItem>) {
       const guestItemsStr = localStorage.getItem(GUEST_CART_KEY)
-      let guestItems: GuestCartItem[] = guestItemsStr ? JSON.parse(guestItemsStr) : []
+      const guestItems: GuestCartItem[] = guestItemsStr ? JSON.parse(guestItemsStr) : []
 
       // Check if variant already exists
       const existingIndex = guestItems.findIndex(item => item.variantId === variantId)

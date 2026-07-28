@@ -8,11 +8,14 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -20,6 +23,8 @@ import java.io.IOException;
 public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final UserRepository userRepository;
+    private final JwtService jwtService;
+    private final JwtCookieService jwtCookieService;
 
     @Value("${app.frontend.url:http://localhost:5173}")
     private String frontendUrl;
@@ -34,7 +39,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         // 2. Đồng bộ User vào Database (nếu chưa có thì tạo mới)
         //    Role mặc định = "USER" (không có bảng Role/RoleGroup nữa).
-        userRepository.findByEmail(email).orElseGet(() -> {
+        User user = userRepository.findByEmail(email).orElseGet(() -> {
             User newUser = User.builder()
                     .email(email)
                     .username(email)    // Dùng email làm username
@@ -48,7 +53,19 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             return userRepository.save(newUser);
         });
 
-        // 3. Redirect to frontend OAuth callback page to complete the flow
+        // 3. Build UserDetails từ User entity và issue JWT vào httpOnly cookie
+        String role = (user.getRole() == null || user.getRole().isBlank()) ? "CUSTOMER" : user.getRole();
+        UserDetails userDetails = org.springframework.security.core.userdetails.User.withUsername(email)
+                .password("")
+                .disabled(!Boolean.TRUE.equals(user.getActive()))
+                .authorities(List.of(new SimpleGrantedAuthority(role)))
+                .build();
+
+        String accessToken = jwtService.generateAccessToken(userDetails);
+        String refreshToken = jwtService.generateRefreshToken(userDetails);
+        jwtCookieService.setAuthCookies(response, accessToken, refreshToken);
+
+        // 4. Redirect to frontend OAuth callback page to complete the flow
         String redirectUrl = frontendUrl + "/oauth/callback";
         getRedirectStrategy().sendRedirect(request, response, redirectUrl);
     }

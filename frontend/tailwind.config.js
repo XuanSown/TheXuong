@@ -38,7 +38,8 @@ export default {
         sans: ['Geist', 'sans-serif'],
         mono: ['Geist Mono', 'JetBrains Mono', 'monospace'],
         'geist-mono': ['Geist Mono', 'monospace'],
-        'jetbrains-mono': ['JetBrains Mono', 'monospace']
+        'jetbrains-mono': ['JetBrains Mono', 'monospace'],
+        'dancing-script': ['Dancing Script', 'cursive'],
       },
       spacing: {
         '128': '32rem',

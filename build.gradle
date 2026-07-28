@@ -86,6 +86,8 @@ dependencies {
 
   testImplementation 'org.springframework.boot:spring-boot-starter-test'
   testImplementation 'org.springframework.security:spring-security-test'
+  // H2 for @DataJpaTest in-memory DB (test only)
+  testRuntimeOnly 'com.h2database:h2'
   testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
   // JWT Library
@@ -96,6 +98,7 @@ dependencies {
   // Cloudflare R2 (S3-compatible)
   implementation 'software.amazon.awssdk:s3:2.29.51'
   implementation 'software.amazon.awssdk:apache-client:2.29.51'
+  implementation 'com.bucket4j:bucket4j-core:8.10.0'
 }
 
 tasks.named('test') {

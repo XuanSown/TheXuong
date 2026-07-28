@@ -8,6 +8,8 @@ import com.example.thexuong.dto.auth.UpdateProfileRequest;
 import com.example.thexuong.entity.User;
 import com.example.thexuong.service.PasswordResetService;
 import com.example.thexuong.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +19,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -35,6 +38,10 @@ public class AuthRestController {
     private final AuthenticationManager authenticationManager;
     private final UserService userService;
     private final PasswordResetService passwordResetService;
+    private final com.example.thexuong.security.JwtService jwtService;
+    private final com.example.thexuong.security.JwtCookieService jwtCookieService;
+    private final com.example.thexuong.security.TokenBlacklist tokenBlacklist;
+    private final org.springframework.security.core.userdetails.UserDetailsService userDetailsService;
 
     /**
      * POST /api/auth/login
@@ -42,11 +49,23 @@ public class AuthRestController {
      * Returns: { user: UserResponse }
      */
     @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
-        );
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request,
+                                   HttpServletRequest httpRequest,
+                                   HttpServletResponse httpResponse) {
+        Authentication authentication;
+        try {
+            authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+            );
+        } catch (org.springframework.security.core.AuthenticationException e) {
+            throw e; // GlobalExceptionHandler returns 401
+        }
         SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        String accessToken = jwtService.generateAccessToken(userDetails);
+        String refreshToken = jwtService.generateRefreshToken(userDetails);
+        jwtCookieService.setAuthCookies(httpResponse, accessToken, refreshToken);
 
         User user = userService.getUserByEmailWithAddresses(request.getEmail());
         UserResponse userResponse = toUserResponse(user);
@@ -59,14 +78,51 @@ public class AuthRestController {
     }
 
     /**
-     * POST /api/auth/logout
-     * Requires session
+     * POST /api/v1/auth/logout
+     * Hủy session (JSESSIONID) + clear SecurityContext + xóa cookie.
+     * SPA gọi endpoint này (SecurityConfig's /logout chỉ fallback cho non-API).
      */
     @PostMapping("/logout")
-    public ResponseEntity<?> logout() {
-        // Spring Security handles session invalidation via /logout endpoint
-        // This is a placeholder for API consistency
+    public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
+        String accessToken = jwtCookieService.readCookie(request, "access_token");
+        if (accessToken != null) {
+            try {
+                var claims = jwtService.extractClaims(accessToken);
+                tokenBlacklist.blacklist(claims.getId(), claims.getExpiration().toInstant());
+            } catch (Exception ignored) {}
+        }
+        String refreshToken = jwtCookieService.readCookie(request, "refresh_token");
+        if (refreshToken != null) {
+            try {
+                var claims = jwtService.extractClaims(refreshToken);
+                tokenBlacklist.blacklist(claims.getId(), claims.getExpiration().toInstant());
+            } catch (Exception ignored) {}
+        }
+        SecurityContextHolder.clearContext();
+        jwtCookieService.clearAuthCookies(response);
         return ResponseEntity.ok(Map.of("message", "Đăng xuất thành công"));
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refresh(HttpServletRequest request, HttpServletResponse response) {
+        String refreshToken = jwtCookieService.readCookie(request, "refresh_token");
+        if (refreshToken == null || !jwtService.isValid(refreshToken) || !jwtService.isRefreshToken(refreshToken)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "Refresh token không hợp lệ"));
+        }
+        String email = jwtService.extractUsername(refreshToken);
+        try {
+            UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+            String newAccess = jwtService.generateAccessToken(userDetails);
+            String newRefresh = jwtService.generateRefreshToken(userDetails);
+            jwtCookieService.setAuthCookies(response, newAccess, newRefresh);
+
+            User user = userService.getUserByEmailWithAddresses(email);
+            return ResponseEntity.ok(Map.of("user", toUserResponse(user)));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "Không thể refresh token"));
+        }
     }
 
     /**

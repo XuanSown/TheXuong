@@ -20,10 +20,21 @@
           </p>
 
           <!-- Success Message -->
-          <div v-if="successMsg" class="bg-[#E2F0E7] border border-[#C3E6CB] rounded-lg p-4 flex items-center gap-3">
-            <svg class="w-5 h-5 text-[#2D5A3F] flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-              <polyline points="22 4 12 14.01 9 11.01"/>
+          <div
+            v-if="successMsg"
+            class="bg-[#E2F0E7] border border-[#C3E6CB] rounded-lg p-4 flex items-center gap-3"
+          >
+            <svg
+              class="w-5 h-5 text-[#2D5A3F] flex-shrink-0"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+              <polyline points="22 4 12 14.01 9 11.01" />
             </svg>
             <span class="font-gelasio text-sm font-semibold text-[#2D5A3F]">
               {{ successMsg }}
@@ -31,11 +42,36 @@
           </div>
 
           <!-- Error Message -->
-          <div v-if="errorMsg" class="bg-[#FDE8E8] border border-[#F5C6CB] rounded-lg p-4 flex items-center gap-3">
-            <svg class="w-5 h-5 text-[#721C24] flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"/>
-              <line x1="15" y1="9" x2="9" y2="15"/>
-              <line x1="9" y1="9" x2="15" y2="15"/>
+          <div
+            v-if="errorMsg"
+            class="bg-[#FDE8E8] border border-[#F5C6CB] rounded-lg p-4 flex items-center gap-3"
+          >
+            <svg
+              class="w-5 h-5 text-[#721C24] flex-shrink-0"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle
+                cx="12"
+                cy="12"
+                r="10"
+              />
+              <line
+                x1="15"
+                y1="9"
+                x2="9"
+                y2="15"
+              />
+              <line
+                x1="9"
+                y1="9"
+                x2="15"
+                y2="15"
+              />
             </svg>
             <span class="font-gelasio text-sm font-semibold text-[#721C24]">
               {{ errorMsg }}
@@ -43,7 +79,11 @@
           </div>
 
           <!-- Forgot Password Form -->
-          <form v-if="!successMsg" @submit.prevent="onSubmit" class="flex flex-col gap-5">
+          <form
+            v-if="!successMsg"
+            class="flex flex-col gap-5"
+            @submit.prevent="onSubmit"
+          >
             <!-- Email Input -->
             <BaseInput
               v-model="email"
@@ -53,9 +93,23 @@
               class="!h-[59.59px]"
             >
               <template #prefix>
-                <svg class="w-5 h-5 text-[#7E7576]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="2" y="4" width="20" height="16" rx="2"/>
-                  <path d="M22 4L12 13L2 4"/>
+                <svg
+                  class="w-5 h-5 text-[#7E7576]"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <rect
+                    x="2"
+                    y="4"
+                    width="20"
+                    height="16"
+                    rx="2"
+                  />
+                  <path d="M22 4L12 13L2 4" />
                 </svg>
               </template>
             </BaseInput>
@@ -72,7 +126,10 @@
 
           <!-- Back to Login Link -->
           <div class="flex justify-center">
-            <router-link to="/login" class="font-gelasio text-base text-[#7E7576] hover:text-black transition-colors">
+            <router-link
+              to="/login"
+              class="font-gelasio text-base text-[#7E7576] hover:text-black transition-colors"
+            >
               ← Quay lại đăng nhập
             </router-link>
           </div>
@@ -84,7 +141,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { api } from '@/services/api'
+import authService from '@/services/auth.service'
 import { useForm, useField } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import { forgotPasswordSchema } from '@/utils/validators'
@@ -104,7 +161,7 @@ const onSubmit = handleSubmit(async (values) => {
   successMsg.value = ''
   errorMsg.value = ''
   try {
-    const res = await api.forgotPassword(values.email)
+    const res = await authService.forgotPassword(values.email)
     successMsg.value = res.message || 'Đã gửi link đặt lại mật khẩu vào email của bạn!'
   } catch (error: any) {
     errorMsg.value = error.response?.data?.message || 'Có lỗi xảy ra, vui lòng thử lại'

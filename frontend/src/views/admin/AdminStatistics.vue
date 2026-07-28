@@ -6,13 +6,18 @@
       <div class="metric-card">
         <div class="metric-header">
           <span class="metric-label">DOANH THU</span>
-          <button class="filter-btn" @click="refreshData">
+          <button
+            class="filter-btn"
+            @click="refreshData"
+          >
             <span>LÀM MỚI</span>
           </button>
         </div>
         <div class="metric-value">
           <h2>{{ formatPrice(stats.totalRevenue) }}</h2>
-          <p class="metric-period">THEO KHOẢNG THỜI GIAN ĐÃ CHỌN</p>
+          <p class="metric-period">
+            THEO KHOẢNG THỜI GIAN ĐÃ CHỌN
+          </p>
         </div>
       </div>
 
@@ -23,7 +28,9 @@
         </div>
         <div class="metric-value">
           <h2>{{ stats.totalOrders }}</h2>
-          <p class="metric-period">TỔNG SỐ ĐƠN HÀNG</p>
+          <p class="metric-period">
+            TỔNG SỐ ĐƠN HÀNG
+          </p>
         </div>
       </div>
 
@@ -34,7 +41,9 @@
         </div>
         <div class="metric-value">
           <h2>{{ stats.totalUsers }}</h2>
-          <p class="metric-period">ĐÃ ĐĂNG KÝ</p>
+          <p class="metric-period">
+            ĐÃ ĐĂNG KÝ
+          </p>
         </div>
         <div class="metric-sub">
           <span>{{ stats.usersWithOrders }} có đơn hàng</span>
@@ -49,7 +58,9 @@
         </div>
         <div class="metric-value">
           <h2>{{ stats.totalProducts }}</h2>
-          <p class="metric-period">TRONG KHO</p>
+          <p class="metric-period">
+            TRONG KHO
+          </p>
         </div>
       </div>
     </section>
@@ -60,9 +71,22 @@
         <h3>Doanh thu theo ngày</h3>
       </div>
       <div class="chart-container">
-        <div v-if="isLoading" class="chart-placeholder">Đang tải...</div>
-        <div v-else-if="stats.revenueByDay.length === 0" class="chart-placeholder">Chưa có dữ liệu</div>
-        <table v-else class="revenue-table">
+        <div
+          v-if="isLoading"
+          class="chart-placeholder"
+        >
+          Đang tải...
+        </div>
+        <div
+          v-else-if="stats.revenueByDay.length === 0"
+          class="chart-placeholder"
+        >
+          Chưa có dữ liệu
+        </div>
+        <table
+          v-else
+          class="revenue-table"
+        >
           <thead>
             <tr>
               <th>Ngày</th>
@@ -70,7 +94,10 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="row in stats.revenueByDay" :key="row[0]">
+            <tr
+              v-for="row in stats.revenueByDay"
+              :key="row[0]"
+            >
               <td>{{ row[0] }}</td>
               <td>{{ formatPrice(row[1]) }}</td>
             </tr>
@@ -86,35 +113,74 @@
         <div class="section-header">
           <h3>Top sản phẩm bán chạy</h3>
         </div>
-        <div v-if="isLoading" class="loading-text">Đang tải...</div>
-        <div v-else class="products-list">
-          <div v-for="product in stats.topSelling" :key="product[0]" class="product-item">
+        <div
+          v-if="isLoading"
+          class="loading-text"
+        >
+          Đang tải...
+        </div>
+        <div
+          v-else
+          class="products-list"
+        >
+          <div
+            v-for="product in stats.topSelling"
+            :key="product[0]"
+            class="product-item"
+          >
             <div class="product-info">
               <h4>{{ product[0] }}</h4>
-              <p class="product-category">Đã bán: {{ product[1] }} sản phẩm</p>
+              <p class="product-category">
+                Đã bán: {{ product[1] }} sản phẩm
+              </p>
             </div>
             <div class="product-sales">
               <span class="sales-count">{{ formatPrice(product[2]) }}</span>
               <span class="sales-label">DOANH THU</span>
             </div>
           </div>
-          <div v-if="stats.topSelling.length === 0" class="empty-text">Chưa có dữ liệu</div>
+          <div
+            v-if="stats.topSelling.length === 0"
+            class="empty-text"
+          >
+            Chưa có dữ liệu
+          </div>
         </div>
       </div>
 
       <!-- Order Status Distribution -->
       <div class="order-status">
         <h3>Đơn hàng theo trạng thái</h3>
-        <div v-if="isLoading" class="loading-text">Đang tải...</div>
-        <div v-else class="status-list">
-          <div v-for="item in stats.orderStatusStats" :key="item[0]" class="status-item">
-            <div class="status-color" :class="getStatusColor(item[0])"></div>
+        <div
+          v-if="isLoading"
+          class="loading-text"
+        >
+          Đang tải...
+        </div>
+        <div
+          v-else
+          class="status-list"
+        >
+          <div
+            v-for="item in stats.orderStatusStats"
+            :key="item[0]"
+            class="status-item"
+          >
+            <div
+              class="status-color"
+              :class="getStatusColor(item[0])"
+            />
             <div class="status-info">
               <span class="status-label">{{ getStatusLabel(item[0]) }}</span>
               <span class="status-count">{{ item[1] }} đơn</span>
             </div>
           </div>
-          <div v-if="stats.orderStatusStats.length === 0" class="empty-text">Chưa có dữ liệu</div>
+          <div
+            v-if="stats.orderStatusStats.length === 0"
+            class="empty-text"
+          >
+            Chưa có dữ liệu
+          </div>
         </div>
       </div>
     </section>
@@ -124,8 +190,16 @@
       <!-- Low Stock Inventory -->
       <div class="low-stock">
         <h3>Tồn kho thấp</h3>
-        <div v-if="isLoading" class="loading-text">Đang tải...</div>
-        <div v-else class="table-container">
+        <div
+          v-if="isLoading"
+          class="loading-text"
+        >
+          Đang tải...
+        </div>
+        <div
+          v-else
+          class="table-container"
+        >
           <table class="inventory-table">
             <thead>
               <tr>
@@ -135,7 +209,10 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="item in stats.lowStock" :key="item[0]">
+              <tr
+                v-for="item in stats.lowStock"
+                :key="item[0]"
+              >
                 <td>{{ item[0] }}</td>
                 <td>{{ item[1] }}</td>
                 <td>
@@ -145,7 +222,12 @@
                 </td>
               </tr>
               <tr v-if="stats.lowStock.length === 0">
-                <td colspan="3" class="empty-text">Không có sản phẩm tồn kho thấp</td>
+                <td
+                  colspan="3"
+                  class="empty-text"
+                >
+                  Không có sản phẩm tồn kho thấp
+                </td>
               </tr>
             </tbody>
           </table>
@@ -155,15 +237,34 @@
       <!-- Top Viewed Products -->
       <div class="top-customers">
         <h3>Top sản phẩm xem nhiều</h3>
-        <div v-if="isLoading" class="loading-text">Đang tải...</div>
-        <div v-else class="customers-list">
-          <div v-for="product in stats.topViewed" :key="product[0]" class="customer-item">
+        <div
+          v-if="isLoading"
+          class="loading-text"
+        >
+          Đang tải...
+        </div>
+        <div
+          v-else
+          class="customers-list"
+        >
+          <div
+            v-for="product in stats.topViewed"
+            :key="product[0]"
+            class="customer-item"
+          >
             <div class="customer-info">
               <h4>{{ product[0] }}</h4>
-              <p class="customer-orders">{{ product[1] }} lượt xem</p>
+              <p class="customer-orders">
+                {{ product[1] }} lượt xem
+              </p>
             </div>
           </div>
-          <div v-if="stats.topViewed.length === 0" class="empty-text">Chưa có dữ liệu</div>
+          <div
+            v-if="stats.topViewed.length === 0"
+            class="empty-text"
+          >
+            Chưa có dữ liệu
+          </div>
         </div>
       </div>
     </section>
@@ -172,7 +273,7 @@
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
-import api from '@/services/api'
+import adminService from '@/services/admin.service'
 
 const isLoading = ref(false)
 
@@ -195,8 +296,7 @@ const stats = reactive({
 const fetchStatistics = async () => {
   isLoading.value = true
   try {
-    const response = await api.get('/admin/statistics')
-    const data = response.data
+    const data = await adminService.getStatistics()
 
     stats.totalRevenue = data.revenueByDay?.reduce((sum, row) => sum + (Number(row[1]) || 0), 0) || 0
     stats.totalOrders = data.orderStatusStats?.reduce((sum, row) => sum + (Number(row[1]) || 0), 0) || 0
