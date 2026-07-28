@@ -1,5 +1,6 @@
 export interface CartItem {
   id: number | string
+  variantId: number
   productId: number
   productName: string
   productImage: string
