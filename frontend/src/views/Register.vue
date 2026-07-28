@@ -6,11 +6,16 @@
           <div class="flex flex-col items-center gap-0">
             <div class="w-[82px] h-[75px] bg-[url('@/assets/logo.png')] bg-contain bg-no-repeat bg-center" />
             <div class="mt-1 flex flex-col items-center">
-              <p class="font-geist text-base text-[#4C4546] leading-[26px]">Tạo tài khoản thành viên mới</p>
+              <p class="font-geist text-base text-[#4C4546] leading-[26px]">
+                Tạo tài khoản thành viên mới
+              </p>
             </div>
           </div>
 
-          <form @submit.prevent="onSubmit" class="flex flex-col gap-6">
+          <form
+            class="flex flex-col gap-6"
+            @submit.prevent="onSubmit"
+          >
             <BaseInput
               v-model="fullName"
               type="text"
@@ -18,9 +23,21 @@
               :error="fullNameError"
             >
               <template #prefix>
-                <svg class="w-5 h-5 text-[#7E7576]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg
+                  class="w-5 h-5 text-[#7E7576]"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                  <circle cx="12" cy="7" r="4" />
+                  <circle
+                    cx="12"
+                    cy="7"
+                    r="4"
+                  />
                 </svg>
               </template>
             </BaseInput>
@@ -32,8 +49,22 @@
               :error="emailError"
             >
               <template #prefix>
-                <svg class="w-5 h-5 text-[#7E7576]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 4L12 13L2 4"/>
+                <svg
+                  class="w-5 h-5 text-[#7E7576]"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <rect
+                    x="2"
+                    y="4"
+                    width="20"
+                    height="16"
+                    rx="2"
+                  /><path d="M22 4L12 13L2 4" />
                 </svg>
               </template>
             </BaseInput>
@@ -45,8 +76,22 @@
               :error="passwordError"
             >
               <template #prefix>
-                <svg class="w-5 h-5 text-[#7E7576]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                <svg
+                  class="w-5 h-5 text-[#7E7576]"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <rect
+                    x="3"
+                    y="11"
+                    width="18"
+                    height="11"
+                    rx="2"
+                  /><path d="M7 11V7a5 5 0 0 1 10 0v4" />
                 </svg>
               </template>
             </BaseInput>
@@ -58,8 +103,22 @@
               :error="confirmPasswordError"
             >
               <template #prefix>
-                <svg class="w-5 h-5 text-[#7E7576]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                <svg
+                  class="w-5 h-5 text-[#7E7576]"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <rect
+                    x="3"
+                    y="11"
+                    width="18"
+                    height="11"
+                    rx="2"
+                  /><path d="M7 11V7a5 5 0 0 1 10 0v4" />
                 </svg>
               </template>
             </BaseInput>
@@ -75,7 +134,12 @@
 
           <div class="flex justify-center items-center gap-2">
             <span class="font-gelasio text-base text-[#4C4546]">Đã có tài khoản?</span>
-            <router-link to="/login" class="font-gelasio text-base font-bold text-black hover:underline">Đăng nhập ngay</router-link>
+            <router-link
+              to="/login"
+              class="font-gelasio text-base font-bold text-black hover:underline"
+            >
+              Đăng nhập ngay
+            </router-link>
           </div>
         </div>
       </div>
@@ -122,7 +186,4 @@ const onSubmit = handleSubmit(async (values) => {
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Gelasio:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap') layer(fonts);
-.font-geist { font-family: 'Geist', sans-serif; }
-.font-gelasio { font-family: 'Geist', sans-serif; }
 </style>

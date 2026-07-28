@@ -1,0 +1,2100 @@
+[
+  {
+    "id": "TC001",
+    "title": "Place an order from checkout with a voucher applied",
+    "description": "An authenticated customer can complete checkout, apply a voucher, and initiate order placement successfully.",
+    "category": "Shopping Cart",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /checkout"
+      },
+      {
+        "type": "action",
+        "description": "Fill in valid shipping information"
+      },
+      {
+        "type": "action",
+        "description": "Apply a voucher"
+      },
+      {
+        "type": "action",
+        "description": "Place the order"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the order submission confirmation is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the VNPay redirect flow is initiated"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC002",
+    "title": "Log in with email and password",
+    "description": "A guest can sign in with valid credentials and access the authenticated account area.",
+    "category": "User Login",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the authenticated account area is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC003",
+    "title": "View product details and add an item to the cart",
+    "description": "A shopper can choose an available size on the product detail page and add the item to the cart with confirmation feedback.",
+    "category": "Product Detail View",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /product-detail/1"
+      },
+      {
+        "type": "action",
+        "description": "Select an available size variant"
+      },
+      {
+        "type": "action",
+        "description": "Add the item to the cart"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a confirmation message is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the item was added to the cart"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC004",
+    "title": "Complete checkout with shipping and voucher",
+    "description": "An authenticated customer can enter shipping details, apply a voucher, place the order, and reach the VNPay payment flow.",
+    "category": "Checkout and Payment",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /checkout"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the shipping full name field with a valid name"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the shipping phone number field with a valid phone number"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the shipping address field with a valid address"
+      },
+      {
+        "type": "action",
+        "description": "Enter a voucher code and apply it"
+      },
+      {
+        "type": "action",
+        "description": "Place the order"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the VNPay payment flow is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the order placement succeeded"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC005",
+    "title": "Create a new admin product",
+    "description": "An admin can create a product by filling the form, saving it, and seeing the new product in the product list.",
+    "category": "Admin Product Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /admin/products"
+      },
+      {
+        "type": "action",
+        "description": "Open the create product flow"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the product name field with a unique product name"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the product description field with a valid description"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the price field with a valid price"
+      },
+      {
+        "type": "action",
+        "description": "Select valid sport, brand, and category values"
+      },
+      {
+        "type": "action",
+        "description": "Configure size quantities for the product variants"
+      },
+      {
+        "type": "action",
+        "description": "Save the product"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a success confirmation is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the new product appears in the product list"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC006",
+    "title": "Review cart contents and update quantity",
+    "description": "A shopper can inspect cart items and increase or decrease a quantity with the cart total updating afterward.",
+    "category": "Shopping Cart",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /cart"
+      },
+      {
+        "type": "action",
+        "description": "Increase the quantity of an item"
+      },
+      {
+        "type": "action",
+        "description": "Decrease the quantity of an item"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify cart items are displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the cart total is updated"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC007",
+    "title": "Open a product from the catalog",
+    "description": "A shopper can open a product card from the listing and reach the product detail page.",
+    "category": "Product Browsing and Search",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /products"
+      },
+      {
+        "type": "action",
+        "description": "Click a product card"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the product detail page is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify product information is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC008",
+    "title": "Proceed from cart to checkout after login",
+    "description": "A guest shopper can move from the cart into the authenticated checkout flow after signing in.",
+    "category": "Shopping Cart",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /cart"
+      },
+      {
+        "type": "action",
+        "description": "Click the proceed to checkout control"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the checkout page is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify shipping and payment fields are available"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC009",
+    "title": "Complete checkout without a voucher",
+    "description": "An authenticated customer can place an order after entering shipping details even when no voucher is applied.",
+    "category": "Checkout and Payment",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /checkout"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the shipping full name field with a valid name"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the shipping phone number field with a valid phone number"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the shipping address field with a valid address"
+      },
+      {
+        "type": "action",
+        "description": "Place the order"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the VNPay payment flow is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the order placement succeeded"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC010",
+    "title": "Remove an item from the cart",
+    "description": "A shopper can remove a cart item and see it disappear from the cart list.",
+    "category": "Shopping Cart",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /cart"
+      },
+      {
+        "type": "action",
+        "description": "Remove an item from the cart"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the item is removed from the cart"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the cart list is updated"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC011",
+    "title": "Update an admin order status",
+    "description": "An admin can select a new status for an order and see the order status change in the list.",
+    "category": "Admin Order Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /admin/orders"
+      },
+      {
+        "type": "action",
+        "description": "Select an order in the list"
+      },
+      {
+        "type": "action",
+        "description": "Choose a new order status"
+      },
+      {
+        "type": "action",
+        "description": "Update the order status"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a success confirmation is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the order status changes in the list"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC012",
+    "title": "Access admin product management",
+    "description": "An admin user can sign in and open the admin product management page successfully.",
+    "category": "Admin Product Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /admin/products"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the admin product list is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify admin product management controls are available"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC013",
+    "title": "Edit an existing admin product",
+    "description": "An admin can open an existing product, update its details, save the changes, and see the updated product in the list.",
+    "category": "Admin Product Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /admin/products"
+      },
+      {
+        "type": "action",
+        "description": "Open an existing product for editing"
+      },
+      {
+        "type": "action",
+        "description": "Update the product name field with a unique updated name"
+      },
+      {
+        "type": "action",
+        "description": "Update the product description field with a valid description"
+      },
+      {
+        "type": "action",
+        "description": "Save the product"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a success confirmation is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the updated product appears in the product list"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC014",
+    "title": "Cancel a pending order",
+    "description": "An authenticated customer can cancel a pending order and see its status update on the order detail page.",
+    "category": "Order History and Cancellation",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /orders"
+      },
+      {
+        "type": "action",
+        "description": "Open a pending order from the list"
+      },
+      {
+        "type": "action",
+        "description": "Cancel the order"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the order status is updated"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the canceled order state is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC015",
+    "title": "Browse and refine the product catalog",
+    "description": "A shopper can search, filter, and sort products and see the product grid update accordingly.",
+    "category": "Product Browsing and Search",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /products"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the search field with a product keyword"
+      },
+      {
+        "type": "action",
+        "description": "Select a sport filter"
+      },
+      {
+        "type": "action",
+        "description": "Select a brand filter"
+      },
+      {
+        "type": "action",
+        "description": "Select a sort option"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the product grid is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify updated search results are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC016",
+    "title": "Admin can view the user list",
+    "description": "An admin can open the user management page and see the full list of users available for management.",
+    "category": "Admin User Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /admin/users"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the user list is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC017",
+    "title": "Redeem a voucher from rewards",
+    "description": "A signed-in customer can redeem points for a voucher from the catalog and see the voucher added to their owned vouchers.",
+    "category": "Loyalty Rewards and Voucher Redemption",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /my-rewards"
+      },
+      {
+        "type": "action",
+        "description": "Redeem an available voucher from the catalog"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a success confirmation is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the redeemed voucher appears in the owned vouchers list"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC018",
+    "title": "Manage admin orders",
+    "description": "An admin user can open the order management page, change an order status, and see the updated status in the list.",
+    "category": "Admin Order Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /admin/orders"
+      },
+      {
+        "type": "action",
+        "description": "Update an order status"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the updated order status is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the admin order list is updated"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC019",
+    "title": "Update profile information",
+    "description": "An authenticated customer can edit personal details in their profile and see the updated information afterwards.",
+    "category": "User Profile Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open the profile page"
+      },
+      {
+        "type": "action",
+        "description": "Edit the full name field"
+      },
+      {
+        "type": "action",
+        "description": "Edit the phone number field"
+      },
+      {
+        "type": "action",
+        "description": "Edit the address field"
+      },
+      {
+        "type": "action",
+        "description": "Save the profile changes"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the updated profile information is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC020",
+    "title": "View order history and open an order detail",
+    "description": "An authenticated customer can review past orders and open a specific order to inspect its details.",
+    "category": "Order History and Cancellation",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /orders"
+      },
+      {
+        "type": "action",
+        "description": "Open an order from the list"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the order history list is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the order detail page is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC021",
+    "title": "Admin can toggle a user's active status",
+    "description": "An admin can disable or enable a user account from the user list and see the account status update in the UI.",
+    "category": "Admin User Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /admin/users"
+      },
+      {
+        "type": "action",
+        "description": "Toggle a user's active status"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the user's account status is updated"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC022",
+    "title": "View order history",
+    "description": "An authenticated customer can open their order history and see previously placed orders listed.",
+    "category": "Order History and Detail",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open the order history page"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify past orders are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC023",
+    "title": "Search for products in admin list",
+    "description": "An admin can open the product management page and search for a product in the list.",
+    "category": "Admin Product Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /admin/products"
+      },
+      {
+        "type": "action",
+        "description": "Search for an existing product"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the product list updates to show matching products"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC024",
+    "title": "Admin can update a user's role",
+    "description": "An admin can change a user's role and see the updated role reflected in the user list.",
+    "category": "Admin User Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /admin/users"
+      },
+      {
+        "type": "action",
+        "description": "Select a different role for a user"
+      },
+      {
+        "type": "action",
+        "description": "Save the role change"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the user's role is updated"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC025",
+    "title": "Filter admin orders by status",
+    "description": "An admin can filter the order list by status and see the displayed orders update accordingly.",
+    "category": "Admin Order Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /admin/orders"
+      },
+      {
+        "type": "action",
+        "description": "Select an order status filter"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the order list updates to match the selected status"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC026",
+    "title": "Adjust a customer's points balance",
+    "description": "An admin can add points to a customer account with a note and see the updated balance afterward.",
+    "category": "Admin Tier Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in {{LOGIN_USER}} into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Fill in {{LOGIN_PASSWORD}} into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /admin/loyalty/tiers"
+      },
+      {
+        "type": "action",
+        "description": "Open a user point adjustment flow"
+      },
+      {
+        "type": "action",
+        "description": "Add points to the customer's account"
+      },
+      {
+        "type": "action",
+        "description": "Fill in a note explaining the adjustment"
+      },
+      {
+        "type": "action",
+        "description": "Save the adjustment"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the customer's updated points balance is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the loyalty progress view remains available"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC027",
+    "title": "Update an existing admin product",
+    "description": "An admin user can edit an existing product and see the updated product details afterward.",
+    "category": "Admin Product Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /admin/products"
+      },
+      {
+        "type": "action",
+        "description": "Open a product for editing"
+      },
+      {
+        "type": "action",
+        "description": "Update the product with valid values"
+      },
+      {
+        "type": "action",
+        "description": "Save the product changes"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the updated product information is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a success confirmation is visible"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC028",
+    "title": "Change password from profile",
+    "description": "An authenticated customer can change their password from the profile page and see completion feedback.",
+    "category": "User Profile Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open the profile page"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the current password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the new password field with a valid new password"
+      },
+      {
+        "type": "action",
+        "description": "Save the password change"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a password change confirmation is visible"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC029",
+    "title": "Save a product to favorites",
+    "description": "An authenticated customer can toggle a product into favorites and see it saved there.",
+    "category": "Product Detail View",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /product-detail/1"
+      },
+      {
+        "type": "action",
+        "description": "Toggle the favorite state"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the product is saved to favorites"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the favorite state is active"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC030",
+    "title": "Admin can create a new user account",
+    "description": "An admin can open the create-user flow, submit a valid user form, and see the new account in the user list.",
+    "category": "Admin User Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /admin/users"
+      },
+      {
+        "type": "action",
+        "description": "Open the create user flow"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the user form with valid details"
+      },
+      {
+        "type": "action",
+        "description": "Create the account"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the new user appears in the list"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC031",
+    "title": "Delete an admin product",
+    "description": "An admin can remove a product from the management list and see it no longer displayed.",
+    "category": "Admin Product Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /admin/products"
+      },
+      {
+        "type": "action",
+        "description": "Delete a product from the list"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a success confirmation is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the deleted product is no longer displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC032",
+    "title": "Update a customer's loyalty tier",
+    "description": "An admin can assign a new loyalty tier to a customer and see the tier change reflected in the user record.",
+    "category": "Admin Tier Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in {{LOGIN_USER}} into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Fill in {{LOGIN_PASSWORD}} into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /admin/loyalty/tiers"
+      },
+      {
+        "type": "action",
+        "description": "Open a user tier update flow"
+      },
+      {
+        "type": "action",
+        "description": "Choose a new tier for the customer"
+      },
+      {
+        "type": "action",
+        "description": "Fill in a reason for the tier update"
+      },
+      {
+        "type": "action",
+        "description": "Save the update"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the customer's tier change is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the user's loyalty record remains visible"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC033",
+    "title": "Check loyalty points and redeem a voucher",
+    "description": "An authenticated customer can view loyalty points history and redeem points for an owned voucher.",
+    "category": "Loyalty Points and Rewards",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /my-rewards"
+      },
+      {
+        "type": "action",
+        "description": "Redeem points for a voucher"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the points history is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the redeemed voucher appears in the rewards area"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC034",
+    "title": "Open an order from history",
+    "description": "An authenticated customer can open an order from the history list and view its details.",
+    "category": "Order History and Detail",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open the order history page"
+      },
+      {
+        "type": "action",
+        "description": "Open an order from the list"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify order details are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC035",
+    "title": "Search admin orders by keyword",
+    "description": "An admin can search for orders by keyword and see matching orders in the management list.",
+    "category": "Admin Order Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /admin/orders"
+      },
+      {
+        "type": "action",
+        "description": "Search for an order keyword"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the order list updates to show matching orders"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC036",
+    "title": "Manage admin users",
+    "description": "An admin user can change a user's active state or role from the user management page.",
+    "category": "Admin User Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /admin/users"
+      },
+      {
+        "type": "action",
+        "description": "Update a user's active state or role"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the updated user state is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the user management list reflects the change"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC037",
+    "title": "Deactivate and reactivate an admin product",
+    "description": "An admin can toggle a product's active state and see the status update in the product list.",
+    "category": "Admin Product Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /admin/products"
+      },
+      {
+        "type": "action",
+        "description": "Toggle a product's active state"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the product status changes in the list"
+      },
+      {
+        "type": "action",
+        "description": "Toggle the same product's active state again"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the product status changes back in the list"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC038",
+    "title": "Admin can create a voucher",
+    "description": "An admin can create a voucher with valid values and see it appear in the voucher table.",
+    "category": "Admin Voucher Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /admin/loyalty/vouchers"
+      },
+      {
+        "type": "action",
+        "description": "Open the create voucher flow"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the voucher form with valid details"
+      },
+      {
+        "type": "action",
+        "description": "Save the voucher"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the new voucher appears in the list"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC039",
+    "title": "Create a new loyalty tier",
+    "description": "An admin can create a loyalty tier and see it appear in the tier list afterward.",
+    "category": "Admin Tier Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in {{LOGIN_USER}} into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Fill in {{LOGIN_PASSWORD}} into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /admin/loyalty/tiers"
+      },
+      {
+        "type": "action",
+        "description": "Create a new tier"
+      },
+      {
+        "type": "action",
+        "description": "Fill in a unique tier code into the tier code field"
+      },
+      {
+        "type": "action",
+        "description": "Fill in a tier name into the tier name field"
+      },
+      {
+        "type": "action",
+        "description": "Fill in a valid minimum spend into the minimum spend field"
+      },
+      {
+        "type": "action",
+        "description": "Fill in a valid minimum points value into the minimum points field"
+      },
+      {
+        "type": "action",
+        "description": "Save the tier"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the new tier appears in the list"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the tier configuration list remains available"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC040",
+    "title": "Admin can update an existing voucher",
+    "description": "An admin can edit an existing voucher and see the updated details reflected in the voucher list.",
+    "category": "Admin Voucher Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /admin/loyalty/vouchers"
+      },
+      {
+        "type": "action",
+        "description": "Open an existing voucher for editing"
+      },
+      {
+        "type": "action",
+        "description": "Update the voucher details"
+      },
+      {
+        "type": "action",
+        "description": "Save the changes"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the updated voucher is shown in the list"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC041",
+    "title": "Change password successfully",
+    "description": "An authenticated customer can change their password and receive a success confirmation.",
+    "category": "Profile and Password Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /profile"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password change fields with valid values"
+      },
+      {
+        "type": "action",
+        "description": "Save the password change"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a password change success confirmation is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the password change form is cleared or reset"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC042",
+    "title": "View profile information",
+    "description": "An authenticated customer can open their profile and see their current personal information.",
+    "category": "User Profile Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open the profile page"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the current profile information is displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC043",
+    "title": "View loyalty dashboard and rewards details",
+    "description": "A signed-in customer can open the rewards page and see their points balance, transaction history, owned vouchers, and voucher catalog.",
+    "category": "Loyalty Rewards and Voucher Redemption",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /my-rewards"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the points balance is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify points history, owned vouchers, and the voucher catalog are displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC044",
+    "title": "Admin can search vouchers and filter the catalog",
+    "description": "An admin can narrow the voucher list by code, status, VIP-only flag, and discount range and see the list update accordingly.",
+    "category": "Admin Voucher Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /admin/loyalty/vouchers"
+      },
+      {
+        "type": "action",
+        "description": "Search for a voucher by code"
+      },
+      {
+        "type": "action",
+        "description": "Filter vouchers by status"
+      },
+      {
+        "type": "action",
+        "description": "Filter vouchers by VIP-only flag"
+      },
+      {
+        "type": "action",
+        "description": "Filter vouchers by discount range"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the voucher list is filtered"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC045",
+    "title": "Edit an existing loyalty tier",
+    "description": "An admin can update a loyalty tier and see the revised details in the list afterward.",
+    "category": "Admin Tier Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in {{LOGIN_USER}} into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Fill in {{LOGIN_PASSWORD}} into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /admin/loyalty/tiers"
+      },
+      {
+        "type": "action",
+        "description": "Open a tier for editing"
+      },
+      {
+        "type": "action",
+        "description": "Update the tier name"
+      },
+      {
+        "type": "action",
+        "description": "Update the minimum points value"
+      },
+      {
+        "type": "action",
+        "description": "Save the changes"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the updated tier appears in the list"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the revised tier thresholds are visible"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC046",
+    "title": "Manage admin vouchers",
+    "description": "An admin user can view voucher management controls and create or update vouchers from the voucher page.",
+    "category": "Admin Voucher Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /admin/loyalty/vouchers"
+      },
+      {
+        "type": "action",
+        "description": "Create or update a voucher with valid values"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the voucher appears in the voucher list"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a success confirmation is visible"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC047",
+    "title": "Create a new customer account",
+    "description": "A guest can register a new account with valid personal details and is sent to login afterward.",
+    "category": "User Registration",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /register"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the full name field with a valid name"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with a new email address"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with a valid password"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the confirm password field with the same valid password"
+      },
+      {
+        "type": "action",
+        "description": "Submit the registration form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the login page is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify registration completed successfully"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC048",
+    "title": "View the loyalty tier list",
+    "description": "An admin can open the loyalty tiers page and see the existing tier configuration list with thresholds and benefits.",
+    "category": "Admin Tier Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in {{LOGIN_USER}} into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Fill in {{LOGIN_PASSWORD}} into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /admin/loyalty/tiers"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the tier list is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify tier thresholds and benefits are visible"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC049",
+    "title": "Admin can apply a bulk voucher action",
+    "description": "An admin can select multiple vouchers, apply a bulk action, and see the selected vouchers update together.",
+    "category": "Admin Voucher Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /admin/loyalty/vouchers"
+      },
+      {
+        "type": "action",
+        "description": "Select multiple vouchers"
+      },
+      {
+        "type": "action",
+        "description": "Apply a bulk voucher action"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the selected vouchers are updated"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC050",
+    "title": "Complete a password reset",
+    "description": "A guest can set a new password with a valid reset token and see that the reset is completed successfully.",
+    "category": "Forgot and Reset Password",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /reset-password"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the new password field with a valid password"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the confirm password field with the same valid password"
+      },
+      {
+        "type": "action",
+        "description": "Submit the reset form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a completion confirmation is visible"
+      }
+    ],
+    "priority": "Medium"
+  }
+]

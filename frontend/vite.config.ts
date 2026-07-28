@@ -28,7 +28,8 @@ export default defineConfig({
         secure: false,
         configure: (proxy, _options) => {
           proxy.on('proxyReq', (proxyReq, req, _res) => {
-            proxyReq.setHeader('X-Forwarded-Proto', 'https')
+            const isLocal = req.headers.host && (req.headers.host.includes('localhost') || req.headers.host.includes('127.0.0.1'))
+            proxyReq.setHeader('X-Forwarded-Proto', isLocal ? 'http' : 'https')
             proxyReq.setHeader('X-Forwarded-Host', req.headers.host || 'thexuong.xuansown.id.vn')
           })
         }
@@ -39,7 +40,8 @@ export default defineConfig({
         secure: false,
         configure: (proxy, _options) => {
           proxy.on('proxyReq', (proxyReq, req, _res) => {
-            proxyReq.setHeader('X-Forwarded-Proto', 'https')
+            const isLocal = req.headers.host && (req.headers.host.includes('localhost') || req.headers.host.includes('127.0.0.1'))
+            proxyReq.setHeader('X-Forwarded-Proto', isLocal ? 'http' : 'https')
             proxyReq.setHeader('X-Forwarded-Host', req.headers.host || 'thexuong.xuansown.id.vn')
           })
         }
@@ -50,7 +52,8 @@ export default defineConfig({
         secure: false,
         configure: (proxy, _options) => {
           proxy.on('proxyReq', (proxyReq, req, _res) => {
-            proxyReq.setHeader('X-Forwarded-Proto', 'https')
+            const isLocal = req.headers.host && (req.headers.host.includes('localhost') || req.headers.host.includes('127.0.0.1'))
+            proxyReq.setHeader('X-Forwarded-Proto', isLocal ? 'http' : 'https')
             proxyReq.setHeader('X-Forwarded-Host', req.headers.host || 'thexuong.xuansown.id.vn')
           })
         }

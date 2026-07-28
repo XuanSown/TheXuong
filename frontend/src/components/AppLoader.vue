@@ -11,9 +11,17 @@
     </div>
 
     <div class="app-loader__stage">
-      <img :src="logoUrl" alt="" class="app-loader__logo" />
-      <h1 class="app-loader__title">The Xưởng</h1>
-      <p class="app-loader__subtitle">Sport</p>
+      <img
+        :src="logoUrl"
+        alt=""
+        class="app-loader__logo"
+      >
+      <h1 class="app-loader__title">
+        The Xưởng
+      </h1>
+      <p class="app-loader__subtitle">
+        Sport
+      </p>
       <div class="app-loader__shimmer">
         <div />
       </div>

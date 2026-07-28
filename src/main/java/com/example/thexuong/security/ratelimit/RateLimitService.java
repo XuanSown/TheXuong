@@ -1,8 +1,6 @@
 package com.example.thexuong.security.ratelimit;
 
-import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
-import io.github.bucket4j.Refill;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -17,8 +15,10 @@ public class RateLimitService {
     }
 
     private Bucket createNewBucket(RateLimitPlan plan) {
-        Refill refill = Refill.intervally(plan.getLimit(), plan.getDuration());
-        Bandwidth limit = Bandwidth.classic(plan.getLimit(), refill);
-        return Bucket.builder().addLimit(limit).build();
+        return Bucket.builder()
+                .addLimit(limit -> limit
+                        .capacity(plan.getLimit())
+                        .refillIntervally(plan.getLimit(), plan.getDuration()))
+                .build();
     }
 }

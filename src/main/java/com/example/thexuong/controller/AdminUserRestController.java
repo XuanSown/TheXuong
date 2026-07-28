@@ -20,7 +20,6 @@ import java.util.stream.Collectors;
 
 /**
  * REST Controller quản lý người dùng.
- * Chạy SONG SONG với UserManagementController (Thymeleaf) — không thay thế.
  * Prefix: /api/admin/users
  */
 @Slf4j

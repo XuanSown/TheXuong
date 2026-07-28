@@ -34,12 +34,16 @@ export default {
         }
       },
       fontFamily: {
-        geist: ['Geist', 'sans-serif'],
-        sans: ['Geist', 'sans-serif'],
-        mono: ['Geist Mono', 'JetBrains Mono', 'monospace'],
-        'geist-mono': ['Geist Mono', 'monospace'],
-        'jetbrains-mono': ['JetBrains Mono', 'monospace'],
+        sans: ['Geist', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
+        geist: ['Geist', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
+        mono: ['Geist Mono', 'JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
+        'geist-mono': ['Geist Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
+        'jetbrains-mono': ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
+        jetbrains: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
         'dancing-script': ['Dancing Script', 'cursive'],
+        dancing: ['Dancing Script', 'cursive'],
+        lobster: ['Lobster', 'cursive'],
+        gelasio: ['Gelasio', 'Georgia', 'serif'],
       },
       spacing: {
         '128': '32rem',
