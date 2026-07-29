@@ -1,32 +1,3 @@
-<<<<<<< HEAD
-export const OrderStatus = {
-  PENDING: 'PENDING', CONFIRMED: 'CONFIRMED', CANCEL_REQUESTED: 'CANCEL_REQUESTED',
-  SHIPPING: 'SHIPPING', DELIVERED: 'DELIVERED', COMPLETED: 'COMPLETED',
-  CANCELLED: 'CANCELLED', REFUNDED: 'REFUNDED'
-} as const
-export type OrderStatus = typeof OrderStatus[keyof typeof OrderStatus]
-export interface OrderItem {
-  imageUrl?: string
-  productName: string
-  size: string
-  quantity: number
-  price: number
-}
-export interface Order {
-  id: number
-  createdAt: string
-  fullName: string
-  phoneNumber: string
-  address: string
-  totalMoney: number
-  total?: number
-  status: OrderStatus
-  note?: string
-  paymentMethod: string
-  subtotal: number
-  items: OrderItem[]
-}
-=======
 export interface Order {
   id: number
   orderNumber: string
@@ -71,4 +42,3 @@ export enum OrderStatus {
   CANCELLED = 'CANCELLED',
   REFUNDED = 'REFUNDED'
 }
->>>>>>> fb265d4 (restore: code lost to ponytail full (2026-07-27) from stash@{0})

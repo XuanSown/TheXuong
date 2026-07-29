@@ -1,18 +1,4 @@
 <template>
-<<<<<<< HEAD
-  <div :class="['animate-pulse rounded bg-gray-200', sizeMap[type ?? 'text']]" />
-</template>
-
-<script setup lang="ts">
-defineProps<{ type?: 'image' | 'text' | 'title' }>()
-
-const sizeMap: Record<'image' | 'text' | 'title', string> = {
-  image: 'aspect-square w-full',
-  text: 'h-3 w-full',
-  title: 'h-5 w-full'
-}
-</script>
-=======
   <div :class="['skeleton', typeClass, animationClass]" />
 </template>
 
@@ -49,4 +35,3 @@ const animationClass = computed(() => {
 <style scoped>
 /* Wave animation could be added here if needed, sticking to Tailwind's default pulse for simplicity */
 </style>
->>>>>>> fb265d4 (restore: code lost to ponytail full (2026-07-27) from stash@{0})

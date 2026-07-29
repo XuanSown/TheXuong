@@ -1,5 +1,5 @@
 {
-  "name": "Telegram Chatbot - Chat Bot TheXuong",
+  "name": "Telegram Chatbot - Chat Bot TheXuong Final",
   "nodes": [
     {
       "parameters": {
@@ -21,13 +21,13 @@
           "timeout": 60000
         }
       },
-      "id": "703b213f-d93f-4f10-a1dd-5dcec692129b",
+      "id": "a512e3ac-030f-4277-9514-00cca8e2765f",
       "name": "Ollama AI (qwen2.5:3b)",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        9760,
-        10176
+        2224,
+        1088
       ],
       "onError": "continueErrorOutput"
     },
@@ -50,10 +50,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        8640,
-        9984
+        656,
+        992
       ],
-      "id": "26d2d6b3-2e1b-4259-8746-bb187f0253fc",
+      "id": "42c45197-6834-4bfd-9317-085806e550cf",
       "name": "Lấy Dữ Liệu Sản Phẩm",
       "onError": "continueErrorOutput"
     },
@@ -64,13 +64,13 @@
         ],
         "additionalFields": {}
       },
-      "id": "5e8f56e2-24b9-4547-bf19-34509dbe6cb0",
+      "id": "dd400d94-959f-43f8-a6b5-f7bedb2adcee",
       "name": "Telegram Trigger",
       "type": "n8n-nodes-base.telegramTrigger",
       "typeVersion": 1.1,
       "position": [
-        8192,
-        10272
+        208,
+        1184
       ],
       "webhookId": "telegram-sport-bot",
       "credentials": {
@@ -104,13 +104,13 @@
         },
         "options": {}
       },
-      "id": "63a75a78-0867-4c34-a570-5b93d8c82b6c",
+      "id": "577c09f9-f4b2-4bd3-a656-719bb8c9d11c",
       "name": "Kiểm Tra Loại Message",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
       "position": [
-        8416,
-        10272
+        432,
+        1184
       ]
     },
     {
@@ -121,13 +121,13 @@
           "parse_mode": "HTML"
         }
       },
-      "id": "c7e6c726-9f62-44fc-81bc-c79ed4bda4d4",
+      "id": "0379637a-4da8-4a84-a0c4-855d775007cd",
       "name": "Trả Lời Non-Text",
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        8640,
-        10368
+        656,
+        1376
       ],
       "webhookId": "93bc5ae6-11ca-4221-86cb-f11c713647e5",
       "credentials": {
@@ -138,17 +138,14 @@
       }
     },
     {
-      "parameters": {
-        "mode": "append",
-        "options": {}
-      },
-      "id": "e4e738ec-6eb9-448b-90a1-88face0ca3d8",
+      "parameters": {},
+      "id": "3251a7fd-2d0b-493d-90bd-d68d73996ce0",
       "name": "Gộp Dữ Liệu",
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3,
       "position": [
-        8864,
-        10176
+        880,
+        1088
       ]
     },
     {
@@ -170,10 +167,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        9312,
-        10176
+        1776,
+        1088
       ],
-      "id": "216f44b4-081b-4b9d-bb08-19b57f23a3e8",
+      "id": "8fc02b83-fd3f-416b-86d2-2a9ccbe56f96",
       "name": "Load Memory",
       "alwaysOutputData": true,
       "onError": "continueErrorOutput"
@@ -182,52 +179,52 @@
       "parameters": {
         "jsCode": "\nconst telegramData = $('Kiểm Tra Loại Message').item.json;\nconst userMessage = (telegramData.message.text || '').trim();\nconst chatId = telegramData.message.chat.id;\nconst userName = telegramData.message.from.first_name || 'Bạn';\n\nconst allItems = $input.all();\nconst products = [];\nconst faqs = [];\n\nfor (const item of allItems) {\n const resp = item.json;\n const dataArr = resp.data || resp;\n const rows = Array.isArray(dataArr) ? dataArr : [dataArr];\n\n for (const row of rows) {\n   if (row.id && row.name && row.price !== undefined) {\n     products.push({\n       id: String(row.id || ''),\n       name: (row.name || '').toLowerCase(),\n       name_orig: row.name || '',\n       brand: (row.brand || '').toLowerCase(),\n       brand_orig: row.brand || '',\n       sport: row.sport || '',\n       category: row.category || '',\n       price: Number(row.price || 0),\n       description: row.description || '',\n       stock: row.stockStatus || 'Không rõ',\n     });\n   }\n   if (row.topic && row.answer) {\n     faqs.push({\n       topic: row.topic || '',\n       keywords: (row.questionKeywords || '').toLowerCase(),\n       answer: row.answer || '',\n     });\n   }\n }\n}\n\nconst msg = userMessage.toLowerCase();\nconst INTENT_MAP = [\n ['exchange', ['đổi hàng', 'trả hàng', 'hoàn tiền', 'đổi size', 'đổi trả', 'đổi', 'trả', 'hoàn']],\n ['shipping', ['phí ship', 'giao hàng', 'vận chuyển', 'thời gian giao', 'ship', 'bao lâu']],\n ['payment', ['thanh toán', 'trả tiền', 'cod', 'chuyển khoản', 'momo', 'zalopay', 'zalo', 'thẻ']],\n ['warranty', ['bảo hành', 'hàng lỗi', 'lỗi hàng', 'bảo hành mấy tháng']],\n ['stock', ['còn hàng', 'còn không', 'hết hàng', 'có hàng', 'tồn kho', 'còn size', 'hết size']],\n ['compare', ['so sánh', 'khác nhau', 'tốt hơn', 'nên chọn', 'hay là']],\n ['describe', ['mô tả', 'giới thiệu', 'thông tin', 'chi tiết', 'công nghệ', 'chất liệu', 'tính năng']],\n ['brand', ['hãng nào', 'thương hiệu', 'của ai', 'sản xuất', 'nhà sản xuất']],\n ['size', ['bảng size', 'size áo', 'size giày', 'cỡ áo', 'cỡ giày', 'số giày', 'form', 'chọn size']],\n ['price', ['giá bao nhiêu', 'bao nhiêu tiền', 'giá', 'bao nhiêu', 'tiền']],\n ['order_tracking', ['tra cứu', 'đơn hàng', 'kiểm tra đơn', 'xem đơn', 'tình trạng đơn', 'mã đơn', 'đơn của tôi', 'đơn của mình']],\n];\n\nlet intent = 'general';\nfor (const [key, kws] of INTENT_MAP) {\n if (kws.some(k => msg.includes(k))) { intent = key; break; }\n}\n\nconst POLICY_INTENTS = ['exchange','size','shipping','payment','warranty'];\nconst isPolicy = POLICY_INTENTS.includes(intent);\n\nconst STOP = new Set(['của','và','có','không','cho','bao','nhiêu','giá','còn','thì','sao','muốn','mua','cái','chiếc','đôi','như','nào','rồi','này','đó','là','gì','với','anh','chị','em','shop','ạ','nhé']);\nconst tokens = msg.replace(/[?,!.]/g,' ').split(/\\s+/).filter(t => t.length > 1 && !STOP.has(t));\n\nfunction scoreProduct(p) {\n let score = 0;\n for (const tok of tokens) {\n   if (p.name.includes(tok)) score += 10;\n   if (p.brand.includes(tok)) score += 8;\n   if (p.category.toLowerCase().includes(tok)) score += 5;\n   if (p.sport.toLowerCase().includes(tok)) score += 4;\n   if (p.description.toLowerCase().includes(tok)) score += 1;\n }\n return score;\n}\n\nfunction scoreFaq(f) {\n let score = 0;\n for (const tok of tokens) {\n   if (f.keywords.includes(tok)) score += 10;\n   if (f.topic.toLowerCase().includes(tok)) score += 5;\n   if (f.answer.toLowerCase().includes(tok)) score += 1;\n }\n return score;\n}\n\nlet filteredProducts = products.map(p => ({ ...p, score: scoreProduct(p) })).filter(p => p.score > 0).sort((a, b) => b.score - a.score);\nlet filteredFaqs = faqs.map(f => ({ ...f, score: scoreFaq(f) })).filter(f => f.score > 0).sort((a, b) => b.score - a.score);\n\nlet maxProducts = (intent === 'compare') ? 4 : 3;\n\nif (filteredProducts.length === 0 && tokens.length === 0 && intent === 'general') {\n    filteredProducts = products.slice(0, 3);\n} else {\n    filteredProducts = filteredProducts.slice(0, maxProducts);\n}\n\nif (filteredFaqs.length === 0 && isPolicy) {\n    let fallbackFaqs = faqs.filter(f => f.topic.toLowerCase().includes(intent));\n    if(fallbackFaqs.length > 0) filteredFaqs = fallbackFaqs.slice(0, 3);\n    else filteredFaqs = faqs.slice(0, 3);\n} else {\n    filteredFaqs = filteredFaqs.slice(0, 3);\n}\n\nfunction sanitize(str) {\n return String(str).replace(/[\\r\\n\\t]/g, ' ').replace(/[\\x00-\\x1F\\x7F]/g, ' ').trim();\n}\n\nlet productContext = '';\nfor (const p of filteredProducts) {\n productContext += `- [${p.id}] ${p.name_orig} | Hãng: ${p.brand_orig} | Giá: ${p.price.toLocaleString('vi-VN')} VNĐ | Tình trạng: ${p.stock}\\n`;\n}\n\nlet faqContext = '';\nfor (const f of filteredFaqs) {\n faqContext += `- [${f.topic}] ${f.answer}\\n`;\n}\n\n// ==== EXTRACT ORDER INFO ====\nlet msgForId = userMessage;\nlet orderPhone = null;\nlet orderId = null;\n\n// Tìm và chuẩn hóa phone (cho phép có dấu cách/chấm/gạch nối)\nconst phoneRegex = /(03|05|07|08|09)[\\s\\.-]?\\d{3}[\\s\\.-]?\\d{3,4}/;\nconst pMatch = userMessage.match(phoneRegex);\nif (pMatch) {\n    // Xóa số điện thoại ra khỏi câu để khi tìm ID không bị nhầm\n    msgForId = userMessage.replace(pMatch[0], '');\n    orderPhone = pMatch[0].replace(/[\\s\\.-]/g, '');\n}\n\nconst idMatch = msgForId.match(/\\d+/g);\nif (idMatch) {\n    orderId = idMatch[0]; // Lấy số đầu tiên còn lại làm ID đơn hàng\n}\n\nreturn [{\n json: {\n   chatId,\n   userName: sanitize(userName),\n   userMessage: sanitize(userMessage),\n   intent,\n   isPolicy,\n   productContext: sanitize(productContext) || 'Không tìm thấy sản phẩm phù hợp',\n   faqContext: sanitize(faqContext) || 'Không có FAQ phù hợp',\n   orderPhone,\n   orderId,\n   needOrderFetch: !!(orderPhone && orderId && intent === 'order_tracking'),\n   timestamp: new Date().toISOString(),\n }\n}];\n"
       },
-      "id": "933ceb6f-7d9b-44fe-8c97-fd7091031f02",
+      "id": "6bbbf9e7-a115-4312-8c21-6c090cd3a15b",
       "name": "Smart Filter + Intent",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        9088,
-        10176
+        1104,
+        1088
       ]
     },
     {
       "parameters": {
         "jsCode": "\nconst ctx = $('Smart Filter + Intent').item.json;\nlet orderDataStr = '';\n\nif (ctx.needOrderFetch) {\n  try {\n    const orderResp = $('Lấy Dữ Liệu Đơn Hàng').item.json;\n    if (orderResp.success && orderResp.data) {\n      const d = orderResp.data;\n      orderDataStr = `Trạng thái: ${d.status} | Tổng tiền: ${d.totalMoney.toLocaleString('vi-VN')} VNĐ | Thanh toán: ${d.paymentMethod} | SP: ${d.items.join(', ')}`;\n    } else {\n      orderDataStr = orderResp.message || 'Không tìm thấy đơn hàng với thông tin đã cung cấp.';\n    }\n  } catch(e) {\n    orderDataStr = 'Lỗi hệ thống khi tra cứu đơn hàng.';\n  }\n}\n\n// Đọc memory\nlet conversationHistory = [];\ntry {\n const memItems = $('Load Memory').all();\n if (memItems.length > 0 && memItems[0].json.history_json) {\n  conversationHistory = JSON.parse(memItems[0].json.history_json);\n }\n} catch(e) {\n conversationHistory = [];\n}\nconversationHistory = conversationHistory.slice(-5);\n\nlet historyStr = '';\nif (conversationHistory.length > 0) {\n historyStr = '[LỊCH SỬ HỘI THOẠI GẦN ĐÂY]\\n';\n for (const turn of conversationHistory) {\n  historyStr += `Khách: ${turn.user}\\nTư vấn viên: ${turn.bot}\\n`;\n }\n historyStr += '\\n';\n}\n\nlet dataBlock = '';\nlet hasProduct = ctx.productContext !== 'Không tìm thấy sản phẩm phù hợp';\nlet hasFaq = ctx.faqContext !== 'Không có FAQ phù hợp';\n\nif (hasProduct) dataBlock += `[SẢN PHẨM]\\n${ctx.productContext}\\n`;\nif (hasFaq) dataBlock += `[CHÍNH SÁCH]\\n${ctx.faqContext}\\n`;\nif (orderDataStr) dataBlock += `[THÔNG TIN ĐƠN HÀNG TRA CỨU ĐƯỢC]\\n${orderDataStr}\\n`;\n\nconst intentGuide = {\n stock: 'Thông báo tình trạng tồn kho từ [SẢN PHẨM].',\n price: 'Nêu giá sản phẩm từ [SẢN PHẨM].',\n describe: 'Mô tả sản phẩm từ [SẢN PHẨM].',\n brand: 'Xác nhận thương hiệu từ [SẢN PHẨM].',\n exchange: 'Trả lời dựa nội dung [CHÍNH SÁCH] mục đổi trả.',\n size: 'Trả lời dựa nội dung [CHÍNH SÁCH] mục size.',\n shipping: 'Trả lời dựa nội dung [CHÍNH SÁCH] mục vận chuyển.',\n payment: 'Trả lời dựa nội dung [CHÍNH SÁCH] mục thanh toán.',\n warranty: 'Trả lời dựa nội dung [CHÍNH SÁCH] mục bảo hành.',\n compare: 'So sánh các sản phẩm trong [SẢN PHẨM].',\n order_tracking: orderDataStr ? 'Thông báo tình trạng đơn hàng trong [THÔNG TIN ĐƠN HÀNG TRA CỨU ĐƯỢC] cho khách.' : 'Yêu cầu khách hàng cung cấp ĐẦY ĐỦ số điện thoại VÀ mã đơn hàng để tra cứu (nếu khách chưa cung cấp đủ).',\n general: 'Trò chuyện lịch sự. Hỏi khách đang quan tâm môn thể thao nào.',\n};\nconst guide = intentGuide[ctx.intent] || intentGuide.general;\n\nlet rule2 = '';\nlet rule3 = '';\n\nif (['stock', 'price', 'describe', 'brand', 'compare'].includes(ctx.intent)) {\n  rule2 = '2. NẾU KHÁCH HỎI VỀ MỘT SẢN PHẨM NHƯNG [SẢN PHẨM] TRỐNG → Tuyệt đối không đoán thông tin, MÀ PHẢI TRẢ LỜI: \"Xin lỗi bạn, hiện tại mình chưa có thông tin về sản phẩm này...\"\\n';\n}\n\nif (['exchange', 'size', 'shipping', 'payment', 'warranty'].includes(ctx.intent)) {\n  rule3 = '3. NẾU KHÁCH HỎI CHÍNH SÁCH NHƯNG [CHÍNH SÁCH] TRỐNG → \"Bạn vui lòng liên hệ hotline nhé!\"\\n';\n}\n\nif (ctx.intent === 'general') {\n  rule2 = '2. NẾU KHÁCH HỎI VỀ SẢN PHẨM NHƯNG KHÔNG RÕ RÀNG → Trả lời lịch sự và xin thêm thông tin.\\n';\n}\n\nconst prompt =\n`Bạn là AI tư vấn viên của TheXuong Sport Store. Tên bạn là TheXuong AI.\n\n===LUẬT TUYỆT ĐỐI (CẤM VI PHẠM)===\n0. CHỈ ĐƯỢC PHÉP TRẢ LỜI BẰNG TIẾNG VIỆT (VIETNAMESE). TUYỆT ĐỐI KHÔNG SỬ DỤNG TIẾNG TRUNG QUỐC (CHINESE), KHÔNG DÙNG CÁC TỪ NHƯ 吗, 呢, 吧...\n1. KHÔNG TỰ BỊA ĐẶT THÔNG TIN. Chỉ dùng dữ liệu bên dưới.\n${rule2}${rule3}4. Dùng ngôn từ tự nhiên, súc tích (dưới 80 từ). Dùng emoji lịch sự.\n5. Hướng dẫn riêng cho câu này: ${guide}\n\n===DỮ LIỆU ĐƯỢC CẤP===\n${dataBlock || '(Trống)'}\n=======================\n\n${historyStr}Khách (${ctx.userName}): ${ctx.userMessage}\nTư vấn viên:`;\n\nreturn [{\n json: {\n chatId: ctx.chatId,\n userName: ctx.userName,\n userMessage: ctx.userMessage,\n intent: ctx.intent,\n timestamp: ctx.timestamp,\n requestBody: {\n model: \"qwen2.5:3b\",\n prompt: prompt,\n stream: false,\n    think: false,\n options: {\n temperature: 0.1,\n top_p: 0.85,\n num_predict: 600,\n repeat_penalty: 1.2,\n }\n },\n }\n}];\n"
       },
-      "id": "d7ae71bd-1e0d-41aa-a409-d9ca13073bc1",
+      "id": "22991e0a-2118-42cc-8b5a-66502ce5e9df",
       "name": "Build Prompt",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        9536,
-        10176
+        2000,
+        1088
       ]
     },
     {
       "parameters": {
         "jsCode": "const ollamaResp = ($json.response || '').trim();\nconst buildCtx = $('Build Prompt').item.json;\n\nconst botReply = ollamaResp ||\n  'Xin lỗi, hệ thống đang bận. Vui lòng thử lại sau! 🙏';\n\nconst history = buildCtx.conversationHistory || [];\nhistory.push({ user: buildCtx.userMessage, bot: ollamaResp });\nconst updatedHistory = history.slice(-5);\n\nreturn [{\n  json: {\n    chatId: buildCtx.chatId,\n    userName: buildCtx.userName,\n    userMessage: buildCtx.userMessage,\n    intent: buildCtx.intent,\n    botReply: botReply,\n    botReplyRaw: ollamaResp,\n    updatedHistory: updatedHistory,\n    timestamp: buildCtx.timestamp,\n  }\n}];"
       },
-      "id": "c82fa52c-0e1b-400a-a793-eb664367ceb5",
+      "id": "598f9577-b080-4a39-9fba-cc652643c0ba",
       "name": "Xử Lý Phản Hồi AI",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        9984,
-        10176
+        2448,
+        1088
       ]
     },
     {
       "parameters": {
         "jsCode": "\nconst d = $json;\nconst historyJson = JSON.stringify(d.updatedHistory);\nconst now = new Date().toISOString();\n\nreturn [{\n json: {\n chatId: d.chatId,\n userName: d.userName,\n userMessage: d.userMessage,\n intent: d.intent,\n botReply: d.botReplyRaw,\n timestamp: d.timestamp,\n historyJson: historyJson,\n updatedAt: now,\n payloadSave: { chatId: String(d.chatId), historyJson: historyJson },\n payloadLog: { chatId: String(d.chatId), userName: d.userName, intent: d.intent, userMessage: d.userMessage, botReply: d.botReplyRaw }\n }\n}];\n"
       },
-      "id": "c46c8c1a-d689-4fff-b8e5-02a80ffd13b8",
+      "id": "6f5bf43a-d417-4871-b978-ccb57fdc1398",
       "name": "Chuẩn Bị Save Memory",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        10208,
-        9984
+        2672,
+        992
       ]
     },
     {
@@ -238,13 +235,13 @@
           "appendAttribution": false
         }
       },
-      "id": "d93e0b74-8fb6-44bb-b65c-c302ae321992",
+      "id": "768ada0c-6820-4344-a526-b0b559ee402d",
       "name": "Gửi Phản Hồi Telegram",
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        10208,
-        10176
+        2672,
+        1184
       ],
       "webhookId": "e685a7e8-0ab7-4e79-8e2f-5201e8587b50",
       "credentials": {
@@ -277,10 +274,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        10432,
-        9984
+        2896,
+        896
       ],
-      "id": "eb11c987-0fcb-4d17-a0f2-dac6d00d6dd7",
+      "id": "2a7c30fe-2d79-4620-b3ef-30acf1f2d932",
       "name": "Save Memory",
       "onError": "continueErrorOutput"
     },
@@ -307,10 +304,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        10208,
-        10368
+        2896,
+        1088
       ],
-      "id": "107cee05-9cdc-48d8-82b5-e5d6f729e63a",
+      "id": "0d8730a7-3c1b-482e-8e86-c3b92ee71f55",
       "name": "Logging",
       "onError": "continueErrorOutput"
     },
@@ -333,10 +330,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        8640,
-        10176
+        656,
+        1184
       ],
-      "id": "b8845bd6-2613-4feb-8333-95029dbd32c8",
+      "id": "0b38ae94-67ed-41c6-8df3-e2d0d1271044",
       "name": "Lấy Dữ Liệu FAQ",
       "onError": "continueErrorOutput"
     },
@@ -351,13 +348,13 @@
           ]
         }
       },
-      "id": "node-if-order",
+      "id": "bfbfb730-3cdf-4ba6-8279-681da7e8ffd6",
       "name": "Kiểm Tra Tra Cứu",
       "type": "n8n-nodes-base.if",
       "typeVersion": 1,
       "position": [
-        9250,
-        10176
+        1328,
+        1088
       ]
     },
     {
@@ -374,13 +371,13 @@
         },
         "options": {}
       },
-      "id": "node-http-order",
+      "id": "a280b23e-9f71-47da-b236-be048bfab841",
       "name": "Lấy Dữ Liệu Đơn Hàng",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        9380,
-        10050
+        1552,
+        1024
       ],
       "onError": "continueErrorOutput"
     }
@@ -560,17 +557,16 @@
       ]
     }
   },
-  "active": false,
+  "active": true,
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "b434d1bb-d297-44af-bc24-6184cb5ebada",
+  "versionId": "b15fb932-2bf4-4a96-8440-d15606847e69",
   "meta": {
-    "templateCredsSetupCompleted": true,
     "instanceId": "4b1d3183ed1cb372c21586a67151e76db4c967b85cb979a1ab24e76cbec31270"
   },
-  "id": "LdiOcPqakBdbALfx",
+  "id": "KbmHmB3bRNR9PMkf",
   "tags": [
     {
       "updatedAt": "2026-06-07T13:43:17.696Z",

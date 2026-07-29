@@ -95,6 +95,9 @@ dependencies {
   runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
   runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
+  // .env file support (auto-loads .env into Spring Environment)
+  implementation 'me.paulschwarz:springboot3-dotenv:5.1.0'
+
   // Cloudflare R2 (S3-compatible)
   implementation 'software.amazon.awssdk:s3:2.29.51'
   implementation 'software.amazon.awssdk:apache-client:2.29.51'

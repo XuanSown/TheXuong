@@ -1,55 +1,27 @@
 import { defineStore } from 'pinia'
-<<<<<<< HEAD
-import type { Order } from '@/types'
-import orderService from '@/services/order.service'
-=======
 import { type Order, OrderStatus } from '@/types'
 import { orderService } from '@/services/order.service'
->>>>>>> fb265d4 (restore: code lost to ponytail full (2026-07-27) from stash@{0})
 
 export const useOrderStore = defineStore('order', {
   state: () => ({
     orders: [] as Order[],
     currentOrder: null as Order | null,
     loading: false,
-<<<<<<< HEAD
-    error: null as string | null
-  }),
-  actions: {
-    async fetchOrders(): Promise<void> {
-=======
     error: null as string | null,
   }),
   actions: {
     async fetchOrders() {
->>>>>>> fb265d4 (restore: code lost to ponytail full (2026-07-27) from stash@{0})
       this.loading = true
       this.error = null
       try {
         this.orders = await orderService.getOrders()
       } catch (e: any) {
-<<<<<<< HEAD
-        this.error = e?.message || 'Không tải được đơn hàng'
-=======
         this.error = e?.response?.data?.message || 'Không thể tải danh sách đơn hàng'
         this.orders = []
->>>>>>> fb265d4 (restore: code lost to ponytail full (2026-07-27) from stash@{0})
       } finally {
         this.loading = false
       }
     },
-<<<<<<< HEAD
-    async fetchOrderById(id: number | string): Promise<void> {
-      this.loading = true
-      try {
-        this.currentOrder = await orderService.getOrder(id)
-      } finally {
-        this.loading = false
-      }
-    }
-  }
-})
-=======
     async fetchOrderById(id: string) {
       this.loading = true
       this.error = null
@@ -86,4 +58,3 @@ export const useOrderStore = defineStore('order', {
     },
   },
 })
->>>>>>> fb265d4 (restore: code lost to ponytail full (2026-07-27) from stash@{0})
