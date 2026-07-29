@@ -86,12 +86,17 @@ dependencies {
 
   testImplementation 'org.springframework.boot:spring-boot-starter-test'
   testImplementation 'org.springframework.security:spring-security-test'
+  // H2 for @DataJpaTest in-memory DB (test only)
+  testRuntimeOnly 'com.h2database:h2'
   testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
   // JWT Library
   implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
   runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
   runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
+  // .env file support (auto-loads .env into Spring Environment)
+  implementation 'me.paulschwarz:springboot3-dotenv:5.1.0'
 
   // Cloudflare R2 (S3-compatible)
   implementation 'software.amazon.awssdk:s3:2.29.51'

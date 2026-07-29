@@ -1,0 +1,17 @@
+{
+  "status": "commited",
+  "type": "frontend",
+  "scope": "codebase",
+  "localEndpoint": "https://thexuong.xuansown.id.vn",
+  "executionArgs": {
+    "projectName": "TheXuong",
+    "projectPath": "D:\\FPT Polytechnic\\JAVA\\JAVA5\\TheXuong\\frontend",
+    "testIds": [],
+    "additionalInstruction": "Login credentials for authenticated tests: email = testboth@thexuong.com, password = admin123. This user has role BOTH (CUSTOMER + ADMIN) so it can access both customer and admin flows. Replace {{LOGIN_USER}} with testboth@thexuong.com and {{LOGIN_PASSWORD}} with admin123 in all login steps.",
+    "serverMode": "development",
+    "envs": {
+      "API_KEY": "sk-user-rgN5AnW2F5ES-9UtVhsSX8xDQc65EHyOeOxpyvEnVmNJSMkw8ictje2AgUKf-oQfdbMJjKjvm3N-1Li5ENzLVCztalUgSSw4OIxj_T-1IB0AXvgjuHPZ7EXPkpLCoxSM8aQ"
+    }
+  },
+  "serverPort": 62354
+}

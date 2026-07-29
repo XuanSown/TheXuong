@@ -63,15 +63,11 @@ public class ProductRestController {
 		Pageable pageable = PageRequest.of(page, size, sorting);
 		Page<Product> productsPage;
 
-		if (keyword != null && !keyword.isEmpty()) {
-			productsPage = productRepository.findByNameContaining(keyword, pageable);
-		} else if (sport != null && !sport.isEmpty()) {
-			productsPage = productRepository.findBySport_Name(sport, pageable);
-		} else if (brand != null && !brand.isEmpty()) {
-			productsPage = productRepository.findByBrand_Name(brand, pageable);
-		} else {
-			productsPage = productRepository.findAll(pageable);
-		}
+		// Chuẩn hóa empty -> null vì ":param IS NULL" chỉ khớp Java null, không khớp "".
+		String kw = (keyword != null && !keyword.isEmpty()) ? keyword : null;
+		String sp = (sport    != null && !sport.isEmpty())    ? sport    : null;
+		String br = (brand    != null && !brand.isEmpty())    ? brand    : null;
+		productsPage = productRepository.findByFilters(kw, sp, br, pageable);
 
 		// Convert to DTOs
 		List<ProductDto> productDtos = productsPage.getContent().stream()
@@ -144,7 +140,7 @@ public class ProductRestController {
 	@GetMapping("/new")
 	public ResponseEntity<?> getNewProducts(@RequestParam(defaultValue = "8") @Min(1) @Max(50) Integer limit) {
 		Pageable pageable = PageRequest.of(0, limit);
-		List<Product> newProducts = productRepository.findAllWithVariantsByOrderByIdDesc(pageable);
+		List<Product> newProducts = productRepository.findAllByOrderByIdDesc(pageable);
 		List<ProductDto> productDtos = newProducts.stream()
 				.map(this::toProductDto)
 				.collect(Collectors.toList());

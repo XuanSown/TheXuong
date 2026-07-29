@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -12,9 +13,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 /**
  * Bắt tất cả exception từ @RestController và trả về ApiResponse JSON chuẩn.
  * Không cần try-catch trong từng Controller nữa.
- *
- * LƯU Ý: Chỉ áp dụng cho REST Controllers (@RestController).
- * Thymeleaf Controllers (@Controller) vẫn xử lý exception riêng qua RedirectAttributes.
  */
 @RestControllerAdvice(basePackages = {"com.example.thexuong.controller.api", "com.example.thexuong.controller"})
 @Slf4j
@@ -105,6 +103,18 @@ public class GlobalExceptionHandler {
     return ResponseEntity
       .status(HttpStatus.FORBIDDEN)
       .body(ApiResponse.error("Bạn không có quyền thực hiện thao tác này."));
+  }
+
+  /**
+   * 401 — Xác thực thất bại (sai email/mật khẩu). Bắt cho controller gọi
+   * authenticationManager.authenticate() thủ công (VD: AuthRestController.login)
+   * thay vì đi qua Spring Security filter chain — tránh rơi vào catch-all 500.
+   */
+  @ExceptionHandler(AuthenticationException.class)
+  public ResponseEntity<ApiResponse<Void>> handleAuthenticationException(AuthenticationException ex) {
+    return ResponseEntity
+      .status(HttpStatus.UNAUTHORIZED)
+      .body(ApiResponse.error("Email hoặc mật khẩu không đúng"));
   }
 
   /**

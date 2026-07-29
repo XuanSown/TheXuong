@@ -1,19 +1,31 @@
 <template>
   <div class="min-h-screen flex">
     <!-- Blank Layout: no Navbar, no Footer (for login/register) -->
-    <div v-if="layout === 'blank'" class="w-full">
+    <div
+      v-if="layout === 'blank'"
+      class="w-full"
+    >
       <slot />
     </div>
 
     <!-- Admin Layout: Sidebar only (no Navbar/Footer) -->
-    <div v-else-if="layout === 'admin'" class="w-full flex">
+    <div
+      v-else-if="layout === 'admin'"
+      class="w-full flex"
+    >
       <slot />
     </div>
 
     <!-- Customer Layout: Navbar + Main + Footer -->
-    <div v-else class="flex flex-col w-full">
+    <div
+      v-else
+      class="flex flex-col w-full"
+    >
       <Navbar />
-      <main class="flex-1 pt-[120px]">
+      <main
+        class="flex-1"
+        :class="{ 'pt-[120px]': !isNoPadding }"
+      >
         <slot />
       </main>
       <Footer />
@@ -31,5 +43,9 @@ const route = useRoute()
 
 const layout = computed(() => {
   return route.meta.layout as 'admin' | 'customer' | 'blank' || 'customer'
+})
+
+const isNoPadding = computed(() => {
+  return route.name === 'about'
 })
 </script>

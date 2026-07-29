@@ -19,8 +19,6 @@ import java.util.UUID;
 @Slf4j
 public class JwtService {
 
-    private static final String DEV_SECRET = "dev-only-secret-key-change-in-prod-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
-
     private final SecretKey signingKey;
     private final long accessTtlSeconds;
     private final long refreshTtlSeconds;
@@ -30,9 +28,9 @@ public class JwtService {
                       @Value("${app.security.jwt.access-ttl-seconds:900}") long accessTtlSeconds,
                       @Value("${app.security.jwt.refresh-ttl-seconds:604800}") long refreshTtlSeconds,
                       TokenBlacklist blacklist) {
-        if (secret == null || secret.length() < 32) {
-            log.warn("[JWT] Secret too short or null — using insecure dev key. Set JWT_SECRET env var in production!");
-            secret = DEV_SECRET;
+        // ponytail: no dev fallback — fail fast on misconfigured secret
+        if (secret == null || secret.getBytes(StandardCharsets.UTF_8).length < 32) {
+            throw new IllegalStateException("JWT secret missing or too short — set app.security.jwt.secret (>=32 bytes)");
         }
         this.signingKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
         this.accessTtlSeconds = accessTtlSeconds;
