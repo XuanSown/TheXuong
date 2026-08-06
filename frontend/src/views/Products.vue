@@ -23,7 +23,7 @@
               <ul class="flex flex-col gap-3">
                 <li>
                   <router-link
-                    to="/products"
+                    :to="getFilterUrl('sport', null)"
                     :class="['text-sm', activeSport === '' ? 'text-black font-semibold' : 'text-[#5E5F5C] hover:text-black']"
                   >
                     Tất cả
@@ -31,7 +31,7 @@
                 </li>
                 <li>
                   <router-link
-                    to="/products?sport=football"
+                    :to="getFilterUrl('sport', 'football')"
                     :class="['text-sm', activeSport === 'football' ? 'text-black font-semibold' : 'text-[#5E5F5C] hover:text-black']"
                   >
                     Bóng đá
@@ -39,7 +39,7 @@
                 </li>
                 <li>
                   <router-link
-                    to="/products?sport=badminton"
+                    :to="getFilterUrl('sport', 'badminton')"
                     :class="['text-sm', activeSport === 'badminton' ? 'text-black font-semibold' : 'text-[#5E5F5C] hover:text-black']"
                   >
                     Cầu lông
@@ -47,7 +47,7 @@
                 </li>
                 <li>
                   <router-link
-                    to="/products?sport=running"
+                    :to="getFilterUrl('sport', 'running')"
                     :class="['text-sm', activeSport === 'running' ? 'text-black font-semibold' : 'text-[#5E5F5C] hover:text-black']"
                   >
                     Chạy bộ
@@ -55,7 +55,7 @@
                 </li>
                 <li>
                   <router-link
-                    to="/products?sport=other"
+                    :to="getFilterUrl('sport', 'other')"
                     :class="['text-sm', activeSport === 'other' ? 'text-black font-semibold' : 'text-[#5E5F5C] hover:text-black']"
                   >
                     Khác
@@ -75,7 +75,7 @@
               <ul class="flex flex-col gap-3">
                 <li>
                   <router-link
-                    to="/products"
+                    :to="getFilterUrl('brand', null)"
                     :class="['text-sm', activeBrand === '' ? 'text-black font-semibold' : 'text-[#5E5F5C] hover:text-black']"
                   >
                     Tất cả
@@ -83,7 +83,7 @@
                 </li>
                 <li>
                   <router-link
-                    to="/products?brand=nike"
+                    :to="getFilterUrl('brand', 'nike')"
                     :class="['text-sm', activeBrand === 'nike' ? 'text-black font-semibold' : 'text-[#5E5F5C] hover:text-black']"
                   >
                     Nike
@@ -91,7 +91,7 @@
                 </li>
                 <li>
                   <router-link
-                    to="/products?brand=adidas"
+                    :to="getFilterUrl('brand', 'adidas')"
                     :class="['text-sm', activeBrand === 'adidas' ? 'text-black font-semibold' : 'text-[#5E5F5C] hover:text-black']"
                   >
                     Adidas
@@ -99,7 +99,7 @@
                 </li>
                 <li>
                   <router-link
-                    to="/products?brand=lining"
+                    :to="getFilterUrl('brand', 'lining')"
                     :class="['text-sm', activeBrand === 'lining' ? 'text-black font-semibold' : 'text-[#5E5F5C] hover:text-black']"
                   >
                     Li-Ning
@@ -107,7 +107,7 @@
                 </li>
                 <li>
                   <router-link
-                    to="/products?brand=puma"
+                    :to="getFilterUrl('brand', 'puma')"
                     :class="['text-sm', activeBrand === 'puma' ? 'text-black font-semibold' : 'text-[#5E5F5C] hover:text-black']"
                   >
                     Puma
@@ -115,13 +115,126 @@
                 </li>
                 <li>
                   <router-link
-                    to="/products?brand=other"
+                    :to="getFilterUrl('brand', 'other')"
                     :class="['text-sm', activeBrand === 'other' ? 'text-black font-semibold' : 'text-[#5E5F5C] hover:text-black']"
                   >
                     Khác
                   </router-link>
                 </li>
               </ul>
+            </div>
+
+            <!-- Price Filter Section -->
+            <div class="mb-6 mt-6">
+              <h3 class="font-geist text-sm font-semibold uppercase tracking-[1.2px] text-[#1A1C1C] mb-4">
+                Mức giá
+              </h3>
+              <ul class="flex flex-col gap-3">
+                <li>
+                  <router-link
+                    :to="getFilterUrl('price', null)"
+                    :class="['text-sm', !activeMinPrice && !activeMaxPrice ? 'text-black font-semibold' : 'text-[#5E5F5C] hover:text-black']"
+                  >
+                    Tất cả
+                  </router-link>
+                </li>
+                <li>
+                  <router-link
+                    :to="getFilterUrl('price', '<1m')"
+                    :class="['text-sm', !activeMinPrice && activeMaxPrice === '1000000' ? 'text-black font-semibold' : 'text-[#5E5F5C] hover:text-black']"
+                  >
+                    Dưới 1.000.000₫
+                  </router-link>
+                </li>
+                <li>
+                  <router-link
+                    :to="getFilterUrl('price', '1m-2m')"
+                    :class="['text-sm', activeMinPrice === '1000000' && activeMaxPrice === '2000000' ? 'text-black font-semibold' : 'text-[#5E5F5C] hover:text-black']"
+                  >
+                    1.000.000₫ - 2.000.000₫
+                  </router-link>
+                </li>
+                <li>
+                  <router-link
+                    :to="getFilterUrl('price', '2m-5m')"
+                    :class="['text-sm', activeMinPrice === '2000000' && activeMaxPrice === '5000000' ? 'text-black font-semibold' : 'text-[#5E5F5C] hover:text-black']"
+                  >
+                    2.000.000₫ - 5.000.000₫
+                  </router-link>
+                </li>
+                <li>
+                  <router-link
+                    :to="getFilterUrl('price', '>5m')"
+                    :class="['text-sm', activeMinPrice === '5000000' && !activeMaxPrice ? 'text-black font-semibold' : 'text-[#5E5F5C] hover:text-black']"
+                  >
+                    Trên 5.000.000₫
+                  </router-link>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Divider -->
+            <div class="border-t border-[rgba(207,196,197,0.3)] mb-6" />
+
+            <!-- Size Filter Section -->
+            <div>
+              <h3 class="font-geist text-sm font-semibold uppercase tracking-[1.2px] text-[#1A1C1C] mb-4">
+                Kích cỡ
+              </h3>
+
+              <!-- Shoes -->
+              <div class="mb-4">
+                <span class="text-xs text-[#5E5F5C] uppercase font-semibold mb-2 block">Giày dép</span>
+                <div class="grid grid-cols-3 gap-2">
+                  <router-link
+                    v-for="size in ['36', '37', '38', '39', '40', '41', '42', '43', '44', '45']"
+                    :key="size"
+                    :to="getFilterUrl('shoeSize', size)"
+                    :class="[
+                      'h-10 border rounded flex items-center justify-center text-sm transition-colors',
+                      activeShoeSize === size ? 'border-black bg-black text-white font-semibold' : 'border-[#CFC4C6] text-[#1A1C1C] hover:border-black'
+                    ]"
+                  >
+                    {{ size }}
+                  </router-link>
+                </div>
+              </div>
+
+              <!-- Clothing -->
+              <div class="mb-4">
+                <span class="text-xs text-[#5E5F5C] uppercase font-semibold mb-2 block">Quần áo</span>
+                <div class="grid grid-cols-3 gap-2">
+                  <router-link
+                    v-for="size in ['S', 'M', 'L', 'XL', 'XXL', 'XXXL']"
+                    :key="size"
+                    :to="getFilterUrl('shoeSize', size)"
+                    :class="[
+                      'h-10 border rounded flex items-center justify-center text-sm transition-colors',
+                      activeShoeSize === size ? 'border-black bg-black text-white font-semibold' : 'border-[#CFC4C6] text-[#1A1C1C] hover:border-black'
+                    ]"
+                  >
+                    {{ size }}
+                  </router-link>
+                </div>
+              </div>
+
+              <!-- Accessories -->
+              <div>
+                <span class="text-xs text-[#5E5F5C] uppercase font-semibold mb-2 block">Phụ kiện</span>
+                <div class="grid grid-cols-3 gap-2">
+                  <router-link
+                    v-for="size in ['FreeSize']"
+                    :key="size"
+                    :to="getFilterUrl('shoeSize', size)"
+                    :class="[
+                      'h-10 border rounded flex items-center justify-center text-sm transition-colors col-span-3',
+                      activeShoeSize === size ? 'border-black bg-black text-white font-semibold' : 'border-[#CFC4C6] text-[#1A1C1C] hover:border-black'
+                    ]"
+                  >
+                    {{ size }}
+                  </router-link>
+                </div>
+              </div>
             </div>
           </div>
         </aside>
@@ -130,10 +243,22 @@
         <section class="flex-1">
           <!-- Active Filters Display -->
           <div
-            v-if="activeSport || activeBrand"
+            v-if="activeSport || activeBrand || activeKeyword || activeMinPrice || activeMaxPrice || activeShoeSize"
             class="mb-6 flex items-center gap-2"
           >
             <span class="text-sm text-[#5E5F5C]">Đang lọc:</span>
+            <div
+              v-if="activeKeyword"
+              class="flex items-center gap-2"
+            >
+              <span class="px-3 py-1 bg-[#E5E7EB] text-sm text-[#1A1C1C] rounded flex items-center">
+                Từ khóa: "{{ activeKeyword }}"
+                <button
+                  class="ml-2 hover:text-red-500"
+                  @click="clearKeyword"
+                >&times;</button>
+              </span>
+            </div>
             <div
               v-if="activeSport"
               class="flex items-center gap-2"
@@ -158,8 +283,33 @@
                 >&times;</button>
               </span>
             </div>
+            <div
+              v-if="activePriceLabel"
+              class="flex items-center gap-2"
+            >
+              <span class="px-3 py-1 bg-[#E5E7EB] text-sm text-[#1A1C1C] rounded flex items-center">
+                Giá: {{ activePriceLabel }}
+                <button
+                  class="ml-2 hover:text-red-500"
+                  @click="clearPrice"
+                >&times;</button>
+              </span>
+            </div>
+            <div
+              v-if="activeShoeSize"
+              class="flex items-center gap-2"
+            >
+              <span class="px-3 py-1 bg-[#E5E7EB] text-sm text-[#1A1C1C] rounded flex items-center">
+                Size: {{ activeShoeSize }}
+                <button
+                  class="ml-2 hover:text-red-500"
+                  @click="clearShoeSize"
+                >&times;</button>
+              </span>
+            </div>
+
             <button
-              v-if="activeSport || activeBrand"
+              v-if="activeSport || activeBrand || activeKeyword || activeMinPrice || activeMaxPrice || activeShoeSize"
               class="text-sm text-[#5E5F5C] hover:text-black underline"
               @click="clearAllFilters"
             >
@@ -277,8 +427,62 @@ const currentPage = ref(0)
 const totalPages = ref(1)
 
 // Active filters from query params
-const activeSport = computed(() => (route.query.sport as string) || '')
-const activeBrand = computed(() => (route.query.brand as string) || '')
+const activeSport = computed(() => {
+  const sport = route.query.sport as string
+  return (!sport || sport.toLowerCase() === 'all') ? '' : sport
+})
+const activeBrand = computed(() => {
+  const brand = route.query.brand as string
+  return (!brand || brand.toLowerCase() === 'all') ? '' : brand
+})
+const activeKeyword = computed(() => (route.query.keyword as string) || '')
+const activeMinPrice = computed(() => route.query.minPrice as string || '')
+const activeMaxPrice = computed(() => route.query.maxPrice as string || '')
+const activeShoeSize = computed(() => route.query.shoeSize as string || '')
+
+const getPriceLabel = (min: string, max: string) => {
+  if (!min && max === '1000000') return 'Dưới 1.000.000₫'
+  if (min === '1000000' && max === '2000000') return '1.000.000₫ - 2.000.000₫'
+  if (min === '2000000' && max === '5000000') return '2.000.000₫ - 5.000.000₫'
+  if (min === '5000000' && !max) return 'Trên 5.000.000₫'
+  return ''
+}
+const activePriceLabel = computed(() => getPriceLabel(activeMinPrice.value, activeMaxPrice.value))
+
+const getFilterUrl = (key: string, value: string | null) => {
+  const query = { ...route.query }
+  
+  // Toggle logic for standard keys (sport, brand, shoeSize)
+  if (key !== 'price' && value !== null && query[key] === value) {
+    value = null
+  }
+
+  if (value === null) {
+    delete query[key]
+  } else {
+    query[key] = value
+  }
+
+  if (key === 'price') {
+    const isCurrentPrice = 
+      (value === '<1m' && !query.minPrice && query.maxPrice === '1000000') ||
+      (value === '1m-2m' && query.minPrice === '1000000' && query.maxPrice === '2000000') ||
+      (value === '2m-5m' && query.minPrice === '2000000' && query.maxPrice === '5000000') ||
+      (value === '>5m' && query.minPrice === '5000000' && !query.maxPrice)
+
+    delete query.minPrice
+    delete query.maxPrice
+    delete query.price
+
+    if (!isCurrentPrice && value !== null) {
+      if (value === '<1m') { query.maxPrice = '1000000' }
+      if (value === '1m-2m') { query.minPrice = '1000000'; query.maxPrice = '2000000' }
+      if (value === '2m-5m') { query.minPrice = '2000000'; query.maxPrice = '5000000' }
+      if (value === '>5m') { query.minPrice = '5000000' }
+    }
+  }
+  return { path: '/products', query }
+}
 
 // ponytail: single source of truth - 1 map cho cả API (title case) và UI label (uppercase).
 const SPORT_NAME: Record<string, string> = {
@@ -312,7 +516,11 @@ const fetchProducts = async () => {
       page: currentPage.value,
       size: 9,
       sport: getApiSportName(activeSport.value),
-      brand: getApiBrandName(activeBrand.value)
+      brand: getApiBrandName(activeBrand.value),
+      keyword: activeKeyword.value || undefined,
+      minPrice: activeMinPrice.value ? Number(activeMinPrice.value) : undefined,
+      maxPrice: activeMaxPrice.value ? Number(activeMaxPrice.value) : undefined,
+      shoeSize: activeShoeSize.value || undefined
     })
     products.value = response.content || []
     totalPages.value = response.totalPages || 1
@@ -325,7 +533,7 @@ const fetchProducts = async () => {
 
 // Watchers
 watch(
-  () => [route.query.sport, route.query.brand],
+  () => [route.query.sport, route.query.brand, route.query.keyword, route.query.minPrice, route.query.maxPrice, route.query.shoeSize],
   () => {
     currentPage.value = 0
     fetchProducts()
@@ -350,12 +558,31 @@ const clearSport = () => {
 }
 
 const clearBrand = () => {
-  router.push({ path: '/products', query: { ...route.query, brand: undefined } })
+  const query = { ...route.query }
+  delete query.brand
+  router.push({ query })
+}
+
+const clearKeyword = () => {
+  const query = { ...route.query }
+  delete query.keyword
+  router.push({ query })
 }
 
 const clearAllFilters = () => {
   router.push('/products')
 }
+const clearPrice = () => {
+    const query = { ...route.query }
+    delete query.minPrice
+    delete query.maxPrice
+    router.push({ path: '/products', query })
+  }
+  const clearShoeSize = () => {
+    const query = { ...route.query }
+    delete query.shoeSize
+    router.push({ path: '/products', query })
+  }
 </script>
 
 <style scoped>

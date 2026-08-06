@@ -1,0 +1,37 @@
+﻿TC ID,Testcase title,Expected result,Actual result,Status (Passed/Failed),Run type (Manual / Automatic),Tested by,Date started,Pre-conditions,Test step details,Test data,Note
+TC_VOUCHER_01,Tạo mã Unique thành công ngay lần đầu,Trả về mã TX-XXXXXX (9 ký tự),Sinh mã thành công không trùng,Passed,Automatic,Antigravity Bot,2026-07-30,DB chưa có mã này,"1. Mock DB rỗng
+2. Sinh mã và kiểm tra form TX-",DB Rỗng,
+TC_VOUCHER_02,Tạo mã Unique thất bại 10 lần,Ném Exception,Ném Exception,Passed,Automatic,Antigravity Bot,2026-07-30,DB trả về trùng mã liên tục,"1. Mock DB luôn tìm thấy mã
+2. Chạy hàm generate",DB Trùng,
+TC_VOUCHER_03,Đổi voucher - Catalog không tồn tại,Ném VoucherInvalidException,Ném Exception,Passed,Automatic,Antigravity Bot,2026-07-30,Catalog ID sai,1. Mock tìm catalog trả rỗng,id=1,
+TC_VOUCHER_04,Đổi voucher - Catalog bị khóa (LOCKED),Ném VoucherInvalidException,Ném Exception,Passed,Automatic,Antigravity Bot,2026-07-30,Catalog status = LOCKED,1. Set status LOCKED,id=1,
+TC_VOUCHER_05,Đổi voucher - User không đủ hạng VIP,Ném VoucherInvalidException,Ném Exception,Passed,Automatic,Antigravity Bot,2026-07-30,"vipOnly=true, User role=CUSTOMER",1. Mock vipOnly và user role,"id=1, role=CUSTOMER",
+TC_VOUCHER_06,Đổi voucher - User không đủ điểm,Ném PointBalanceException,Ném Exception,Passed,Automatic,Antigravity Bot,2026-07-30,currentPoints < required,"1. Mock current = 100, required = 500",points=100,
+TC_VOUCHER_07,Đổi voucher - Truyền điểm âm (Hack),Ném IllegalArgumentException,Ném Exception,Passed,Automatic,Antigravity Bot,2026-07-30,requiredPoints < 0,1. Mock required = -10,points=-10,
+TC_VOUCHER_08,Đổi voucher - Thành công,"Trừ điểm, sinh UserVoucher UNUSED",Hoạt động hoàn hảo,Passed,Automatic,Antigravity Bot,2026-07-30,"Đủ điểm, catalog hợp lệ",1. Kiểm tra transaction và save UserVoucher,points=1000,
+TC_VOUCHER_09,Tặng voucher trực tiếp (issueVoucher),Sinh UserVoucher không trừ điểm,Tạo mã thành công,Passed,Automatic,Antigravity Bot,2026-07-30,Catalog hợp lệ,"1. Gọi issueVoucherToUser
+2. Verify không gọi trừ điểm",id=1,
+TC_VOUCHER_10,Validate mã - Mã không tồn tại,Ném VoucherInvalidException,Ném Exception,Passed,Automatic,Antigravity Bot,2026-07-30,Mã UserVoucher sai,1. Mock tìm mã trả rỗng,code=TX-NULL,
+TC_VOUCHER_11,Validate mã - Sai chủ sở hữu (Access Denied),Ném VoucherInvalidException,Ném Exception,Passed,Automatic,Antigravity Bot,2026-07-30,User ID khác với chủ voucher,"1. Truyền userId=99, voucher của user 10",userId=99,
+TC_VOUCHER_12,Validate mã - Mã đã sử dụng (USED),Ném VoucherInvalidException,Ném Exception,Passed,Automatic,Antigravity Bot,2026-07-30,Status = USED,1. Set status USED,code=TX-ABCDEF,
+TC_VOUCHER_13,Validate mã - Hết hạn (EXPIRED status/time),Ném VoucherInvalidException,Ném Exception,Passed,Automatic,Antigravity Bot,2026-07-30,expiresAt < now,1. Set expiresAt ở quá khứ,code=TX-ABCDEF,
+TC_VOUCHER_14,Validate mã - Đơn hàng chưa đạt tối thiểu,Ném VoucherInvalidException,Ném Exception,Passed,Automatic,Antigravity Bot,2026-07-30,orderAmount < minOrderAmount,"1. Đơn 200k, min 300k",amount=200000,
+TC_VOUCHER_15,Validate mã - Hợp lệ 100%,Trả về số tiền giảm (discountAmount),Trả về đúng số tiền (100k),Passed,Automatic,Antigravity Bot,2026-07-30,Mọi điều kiện pass,1. Gọi validateAndGetDiscount,amount=500000,
+TC_VOUCHER_16,Đánh dấu đã dùng (markAsUsed) - Mã rỗng,"Bỏ qua, không gọi DB",Return sớm,Passed,Automatic,Antigravity Bot,2026-07-30,code=null,1. Gọi markAsUsed(null),code=null,
+TC_VOUCHER_17,Đánh dấu đã dùng - Mã không phải UNUSED,Ném VoucherInvalidException,Ném Exception,Passed,Automatic,Antigravity Bot,2026-07-30,Status = EXPIRED,"1. Set status EXPIRED
+2. Gọi markAsUsed",code=TX-ABCDEF,
+TC_VOUCHER_18,Đánh dấu đã dùng - Thành công,"Update thành USED, gán orderId",Update trạng thái hoàn hảo,Passed,Automatic,Antigravity Bot,2026-07-30,Status = UNUSED,1. Verify save USED,orderId=999,
+TC_VOUCHER_19,Phục hồi mã (restoreVoucher),"Chuyển USED -> UNUSED, xóa orderId",Phục hồi thành công,Passed,Automatic,Antigravity Bot,2026-07-30,Voucher bị hủy đơn,"1. Set status USED
+2. Gọi restore",code=TX-ABCDEF,
+TC_VOUCHER_20,Cron job hết hạn (expireOldVouchers),Update List thành EXPIRED,Update hàng loạt thành công,Passed,Automatic,Antigravity Bot,2026-07-30,Có mã quá hạn,"1. Mock trả về 1 mã
+2. Verify save EXPIRED",date=now,
+TC_VOUCHER_21,Admin Create Voucher - Mã đã tồn tại,Ném RuntimeException,Ném Exception,Passed,Automatic,Antigravity Bot,2026-07-30,Admin tự điền code trùng,1. Mock exists=true,code=EXISTING,
+TC_VOUCHER_22,Admin Create Voucher - Mã sinh tự động,"Sinh dạng TX-CAT-xxxx, lưu DB",Sinh và lưu thành công,Passed,Automatic,Antigravity Bot,2026-07-30,code = null,"1. Verify code tự tạo
+2. Lưu DB",code=null,
+TC_VOUCHER_23,Admin Update Voucher - Cập nhật toàn bộ,Lưu DB với các field mới,"Cập nhật trường discount, status thành công",Passed,Automatic,Antigravity Bot,2026-07-30,Dữ liệu mới hợp lệ,"1. Thay đổi discount, status",discount=99000,
+TC_VOUCHER_24,Admin Delete Voucher - Đã có user đổi,Soft Delete (chuyển sang EXPIRED),Soft Delete thành công,Passed,Automatic,Antigravity Bot,2026-07-30,claimedCount > 0,"1. Mock count = 5
+2. Verify update EXPIRED",id=1,
+TC_VOUCHER_25,Admin Delete Voucher - Chưa có ai đổi,Hard Delete (Xóa khỏi DB),Xóa triệt để,Passed,Automatic,Antigravity Bot,2026-07-30,claimedCount = 0,"1. Mock count = 0
+2. Verify gọi delete()",id=1,
+TC_VOUCHER_26,Admin Bulk Action - Xử lý hàng loạt,"Vượt qua lỗi lẻ, áp dụng cho phần còn lại","LOCK 1 bản ghi thành công, skip 1 bản ghi lỗi",Passed,Automatic,Antigravity Bot,2026-07-30,"Gửi list ID [tồn tại, không tồn tại]","1. Mock id 1 có, id 2 không
+2. Kết quả success=1, fail=1","ids=[1,2]",

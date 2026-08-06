@@ -1,0 +1,5 @@
+﻿TC ID,Testcase title,Expected result,Actual result,Status (Passed/Failed),Run type (Manual / Automatic),Tested by,Date started,Pre-conditions,Test step details,Test data,Note
+TC_EVENT_01,Ghi log sự kiện đầy đủ thông tin,Lưu OrderEvent đầy đủ các trường,"Lưu thành công, đúng dữ liệu",Passed,Automatic,Antigravity Bot,2026-07-30,Hệ thống gọi ghi log,"1. Gọi recordTransition với full params
+2. Verify save Event","orderId=1, actor=ADMIN",
+TC_EVENT_02,Ghi log sự kiện khuyết thiếu thông tin (Null),"Lưu OrderEvent bỏ qua các trường null, không crash","Lưu thành công, không bị lỗi NullPointer",Passed,Automatic,Antigravity Bot,2026-07-30,Hệ thống gọi ghi log tự động (VD hệ thống chuyển status),"1. Gọi recordTransition truyền null vài params
+2. Verify save","actorId=null, note=null",

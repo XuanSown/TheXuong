@@ -98,6 +98,10 @@ dependencies {
   // .env file support (auto-loads .env into Spring Environment)
   implementation 'me.paulschwarz:springboot3-dotenv:5.1.0'
 
+  // Testcontainers (MSSQL)
+  testImplementation 'org.testcontainers:junit-jupiter:1.19.7'
+  testImplementation 'org.testcontainers:mssqlserver:1.19.7'
+
   // Cloudflare R2 (S3-compatible)
   implementation 'software.amazon.awssdk:s3:2.29.51'
   implementation 'software.amazon.awssdk:apache-client:2.29.51'

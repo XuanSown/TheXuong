@@ -1,0 +1,14 @@
+﻿TC ID,Testcase title,Expected result,Actual result,Status (Passed/Failed),Run type (Manual / Automatic),Tested by,Date started,Pre-conditions,Test step details,Test data,Note
+TC_MAPS_01,Reverse Geocode - ApiKey null,Throw IllegalStateException,Ném Exception,Passed,Automatic,Antigravity Bot,2026-07-30,apiKey = null,"1. Cài đặt apiKey = null bằng ReflectionTestUtils.
+2. Gọi reverseGeocode(10, 10).
+3. Bắt lỗi và xác minh ném IllegalStateException.","lat=10, lng=10",
+TC_MAPS_02,Reverse Geocode - ApiKey rỗng,Throw IllegalStateException,Ném Exception,Passed,Automatic,Antigravity Bot,2026-07-30,"apiKey = ""   ""","1. Cài đặt apiKey là chuỗi rỗng bằng Reflection.
+2. Gọi reverseGeocode.
+3. Bắt lỗi và xác minh ném IllegalStateException.","lat=10, lng=10",
+TC_MAPS_03,Reverse Geocode - Kết quả rỗng,Trả về Map với address rỗng,Trả về Map rỗng chuẩn xác,Passed,Automatic,Antigravity Bot,2026-07-30,Google Maps API trả mảng results rỗng,"1. Mock RestClient.builder() và chuỗi filter query.
+2. Mock Response body trả về một danh sách ""results"" rỗng.
+3. Gọi reverseGeocode.
+4. Xác minh formattedAddress = rỗng và addressComponents là mảng trống.","lat=10, lng=10",
+TC_MAPS_04,Reverse Geocode - Gọi API thành công,Trích xuất địa chỉ formatted_address và components đầu tiên,"Trích xuất đúng ""123 Test St""",Passed,Automatic,Antigravity Bot,2026-07-30,Mock RestClient trả dữ liệu chuẩn,"1. Mock RestClient trả dữ liệu JSON hợp lệ có phần tử bestMatch.
+2. Gọi reverseGeocode.
+3. Xác minh kết quả trích xuất đúng 123 Test St.","lat=10, lng=10",

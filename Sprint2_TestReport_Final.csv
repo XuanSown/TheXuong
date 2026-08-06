@@ -1,0 +1,139 @@
+﻿TC ID,Testcase title,Expected result,Actual result,Status (Passed/Failed),Run type (Manual / Automatic),Tested by,Date started,Pre-conditions,Test step details,Test data,Note
+TC_ORDER_01,Đặt hàng nhưng giỏ hàng trống,"Báo lỗi ""Giỏ hàng trống""","Ném ra Exception ""Giỏ hàng trống""",Passed,Automatic,Antigravity Bot,7/30/2026,Giỏ hàng của user rỗng,"1. Khởi tạo mockCart rỗng
+2. Mock cartService trả về mockCart
+3. Gọi orderService.placeOrder()
+4. Kiểm tra văng Exception","username=""testuser""",
+TC_ORDER_02,Đặt hàng bình thường,Tạo Order thành công,"Tạo Order thành công, gọi deductStock, gọi clearCart",Passed,Automatic,Antigravity Bot,7/30/2026,"Giỏ hàng có SP, kho đủ hàng","1. Mock cartService trả về Cart có hàng
+2. Mock orderRepository.save() trả về Order có ID=1
+3. Gọi orderService.placeOrder()
+4. Verify orderDetailRepository.save() được gọi
+5. Verify inventoryService.deductStock() được gọi
+6. Verify cartService.clearCart() được gọi","address=""Addr""",
+TC_ORDER_03,Đặt hàng có dùng Voucher,Giảm trừ đúng số tiền Voucher,"Giảm giá 50k, tổng tiền 150k",Passed,Automatic,Antigravity Bot,7/30/2026,"Giỏ hàng 200k, Voucher giảm 50k","1. Mock userRepository trả về User
+2. Mock voucherService.validateAndGetDiscount trả về 50.000
+3. Gọi orderService.placeOrder() với mã Voucher
+4. Kiểm tra assert discountAmount = 50.000","voucherCode=""VOUCHER50""",
+TC_ORDER_04,Đặt hàng có dùng Điểm thưởng (Đủ điểm),"Trừ đúng số điểm, tính lại giá","Giảm giá 50k, tổng tiền 150k",Passed,Automatic,Antigravity Bot,7/30/2026,"Giỏ hàng 200k, Điểm dùng 50000","1. Mock userRepository trả về User
+2. Mock pointService.getCurrentPoints trả về 100.000
+3. Gọi orderService.placeOrder() với 50.000 điểm
+4. Verify pointService.spendPoints() được gọi
+5. Kiểm tra assert discountAmount = 50.000",pointsToUse=50000,
+TC_ORDER_05,Đặt hàng dùng Điểm thưởng (Không đủ điểm),"Báo lỗi ""không đủ X điểm""","Ném ra Exception ""không đủ điểm""",Passed,Automatic,Antigravity Bot,7/30/2026,Điểm hiện tại < Điểm yêu cầu,"1. Mock userRepository trả về User
+2. Mock pointService.getCurrentPoints trả về 10.000
+3. Gọi orderService.placeOrder() với 50.000 điểm
+4. Kiểm tra văng Exception",pointsToUse=50000,
+TC_ORDER_06,Đặt hàng được giảm giá tự động theo Hạng VIP,Được giảm % hóa đơn,"Giảm 10% (20k), tổng tiền 180k",Passed,Automatic,Antigravity Bot,7/30/2026,User hạng VIP,"1. Mock userRepository trả về User có hạng VIP
+2. Mock pointTierRepository trả về Tier VIP (-10%)
+3. Gọi orderService.placeOrder()
+4. Kiểm tra assert discountAmount = 20.000","tierCode=""VIP""",
+TC_ORDER_07,Lấy đơn hàng đúng chủ sở hữu,Trả về thông tin Order,Trả về Order ID=1,Passed,Automatic,Antigravity Bot,7/30/2026,Order thuộc về user,"1. Mock orderRepository.findByIdWithDetails trả về Order ID=1 của User ID=1
+2. Gọi orderService.getOrderByIdAndUser()
+3. Kiểm tra assertNotNull result","orderId=1, userId=1",
+TC_ORDER_08,Lấy đơn hàng sai chủ sở hữu,"Báo lỗi ""Không có quyền truy cập""","Ném ra Exception ""quyền truy cập""",Passed,Automatic,Antigravity Bot,7/30/2026,Order không thuộc user query,"1. Mock orderRepository trả về Order của User ID=1
+2. Gọi orderService.getOrderByIdAndUser() với User ID=2
+3. Kiểm tra văng Exception","orderId=1, userId=2",
+TC_ORDER_09,Lấy đơn hàng mã không tồn tại,"Báo lỗi ""không tồn tại""","Ném ra Exception ""không tồn tại""",Passed,Automatic,Antigravity Bot,7/30/2026,orderId sai,"1. Mock orderRepository trả về Optional.empty()
+2. Gọi orderService.getOrderByIdAndUser()
+3. Kiểm tra văng Exception",orderId=99,
+TC_ORDER_10,Cập nhật thông tin nhận hàng (đơn PENDING),"Thông tin Address, Phone cập nhật",Thông tin lưu thành công,Passed,Automatic,Antigravity Bot,7/30/2026,Đơn hàng PENDING,"1. Mock Order trạng thái PENDING
+2. Gọi orderService.updateOrderInfo()
+3. Verify orderRepository.save() được gọi
+4. Kiểm tra thông tin đã thay đổi","phone=""098"", addr=""New Addr""",
+TC_ORDER_11,Sửa đơn hàng khi trạng thái không cho phép,"Báo lỗi ""không thể thay đổi thông tin""",Ném ra Exception,Passed,Automatic,Antigravity Bot,7/30/2026,Đơn hàng CONFIRMED,"1. Mock Order trạng thái CONFIRMED
+2. Gọi orderService.updateOrderInfo()
+3. Kiểm tra văng Exception",orderId=1,
+TC_ORDER_12,Hủy đơn hàng (đơn PENDING),Trạng thái chuyển sang CANCEL_REQUESTED,Trạng thái lưu thành CANCEL_REQUESTED,Passed,Automatic,Antigravity Bot,7/30/2026,Đơn hàng PENDING,"1. Mock Order trạng thái PENDING
+2. Gọi orderService.cancelOrder()
+3. Verify orderRepository.save() được gọi
+4. Kiểm tra status = CANCEL_REQUESTED",orderId=1,
+TC_ORDER_13,Hủy đơn hàng trạng thái sai (SHIPPING),"Báo lỗi ""không thể yêu cầu hủy""",Ném ra Exception,Passed,Automatic,Antigravity Bot,7/30/2026,Đơn hàng SHIPPING,"1. Mock Order trạng thái SHIPPING
+2. Gọi orderService.cancelOrder()
+3. Kiểm tra văng Exception",orderId=1,
+TC_ORDER_14,Xác nhận nhận hàng (đơn DELIVERED),Trạng thái chuyển sang COMPLETED,"Trạng thái lưu thành COMPLETED, gọi earnPoints",Passed,Automatic,Antigravity Bot,7/30/2026,Đơn hàng DELIVERED,"1. Mock Order trạng thái DELIVERED
+2. Gọi orderService.confirmReceived()
+3. Verify pointService.earnPoints() được gọi
+4. Kiểm tra status = COMPLETED",orderId=1,
+TC_ORDER_15,Xác nhận nhận hàng (sai trạng thái PENDING),"Báo lỗi ""Không thể xác nhận nhận hàng""",Ném ra Exception,Passed,Automatic,Antigravity Bot,7/30/2026,Đơn hàng PENDING,"1. Mock Order trạng thái PENDING
+2. Gọi orderService.confirmReceived()
+3. Kiểm tra văng IllegalOrderTransitionException",orderId=1,
+TC_ORDER_16,Xác nhận nhận hàng nhưng lỗi cộng điểm,"Catch được lỗi, đơn vẫn COMPLETED","Catch lỗi, đơn vẫn COMPLETED",Passed,Automatic,Antigravity Bot,7/30/2026,Mock pointService ném Exception,"1. Mock Order trạng thái DELIVERED
+2. Mock pointService.earnPoints() ném RuntimeException
+3. Gọi orderService.confirmReceived()
+4. Kiểm tra order vẫn chuyển sang COMPLETED",orderId=1,
+TC_ORDER_17,Admin Hoàn tiền (đơn DELIVERED),Trạng thái chuyển sang REFUNDED,Trạng thái lưu thành REFUNDED,Passed,Automatic,Antigravity Bot,7/30/2026,Đơn hàng DELIVERED,"1. Mock Order trạng thái DELIVERED
+2. Gọi orderService.refundOrder()
+3. Verify orderRepository.save() được gọi
+4. Kiểm tra status = REFUNDED",orderId=1,
+TC_ORDER_18,Hoàn tiền cho đơn hàng không tồn tại,"Báo lỗi ""Order not found""",Ném ra Exception,Passed,Automatic,Antigravity Bot,7/30/2026,orderId sai,"1. Mock orderRepository trả về Optional.empty()
+2. Gọi orderService.refundOrder()
+3. Kiểm tra văng Exception",orderId=99,
+TC_ORDER_19,Hoàn tiền khi trạng thái không cho phép,"Báo lỗi ""Không thể hoàn tiền""",Ném ra Exception,Passed,Automatic,Antigravity Bot,7/30/2026,Đơn hàng PENDING,"1. Mock Order trạng thái PENDING
+2. Gọi orderService.refundOrder()
+3. Kiểm tra văng IllegalOrderTransitionException",orderId=1,
+TC_ORDER_20,Admin chuyển trạng thái PENDING -> CONFIRMED,Trạng thái chuyển sang CONFIRMED,Trạng thái lưu thành CONFIRMED,Passed,Automatic,Antigravity Bot,7/30/2026,Admin updateStatus hợp lệ,"1. Mock Order trạng thái PENDING
+2. Gọi orderService.adminUpdateStatus()
+3. Verify orderRepository.save() được gọi
+4. Kiểm tra status = CONFIRMED",status=CONFIRMED,
+TC_ORDER_21,Admin chuyển trạng thái PENDING -> DELIVERED (Sai logic),"Báo lỗi ""Transition không hợp lệ""",Ném ra Exception,Passed,Automatic,Antigravity Bot,7/30/2026,Transition nhảy cóc,"1. Mock Order trạng thái PENDING
+2. Gọi orderService.adminUpdateStatus() sang DELIVERED
+3. Kiểm tra văng IllegalOrderTransitionException",status=DELIVERED,
+TC_EVENT_01,Ghi log sự kiện đầy đủ thông tin,Lưu OrderEvent đầy đủ các trường,"Lưu thành công, đúng dữ liệu",Passed,Automatic,Antigravity Bot,2026-07-30,Hệ thống gọi ghi log,"1. Gọi recordTransition với full params
+2. Verify save Event","orderId=1, actor=ADMIN",
+TC_EVENT_02,Ghi log sự kiện khuyết thiếu thông tin (Null),"Lưu OrderEvent bỏ qua các trường null, không crash","Lưu thành công, không bị lỗi NullPointer",Passed,Automatic,Antigravity Bot,2026-07-30,Hệ thống gọi ghi log tự động (VD hệ thống chuyển status),"1. Gọi recordTransition truyền null vài params
+2. Verify save","actorId=null, note=null",
+TC_ADDRESS_01,Xem danh sách địa chỉ với User không tồn tại,Ném Exception EntityNotFoundException,Ném Exception chuẩn xác,Passed,Automatic,Antigravity Bot,2026-07-30,User email sai,"1. Mock userRepository.findByEmail trả rỗng
+2. Gọi listByUser",email=wrong,
+TC_ADDRESS_02,Xem danh sách địa chỉ thành công,Trả về list AddressResponse đã map đúng,Trả về list hợp lệ,Passed,Automatic,Antigravity Bot,2026-07-30,"User hợp lệ, có 1 địa chỉ","1. Mock trả về 1 UserAddress
+2. Verify kết quả map dto",email=test@gmail.com,
+TC_ADDRESS_03,Tạo địa chỉ bình thường (không phải default),"Lưu DB, isDefault = false","Lưu thành công, không xóa default của địa chỉ khác",Passed,Automatic,Antigravity Bot,2026-07-30,"Req isDefault=false, count > 1","1. Mock countByUserId = 2
+2. Verify gọi save 1 lần",isDefault=false,
+TC_ADDRESS_04,Tạo địa chỉ đầu tiên (auto default),isDefault tự chuyển thành true,Auto set isDefault = true và save thêm 1 lần,Passed,Automatic,Antigravity Bot,2026-07-30,"Req isDefault=false, count = 1","1. Mock countByUserId = 1
+2. Verify gọi save 2 lần (1 lần tạo, 1 lần update default)",isDefault=false,
+TC_ADDRESS_05,Tạo địa chỉ set Default chủ động,"Xóa isDefault của địa chỉ cũ, set cho địa chỉ mới",Cập nhật lại toàn bộ DB đúng logic,Passed,Automatic,Antigravity Bot,2026-07-30,"Req isDefault=true, có địa chỉ default cũ","1. Mock findBy... trả về address default cũ
+2. Verify address cũ bị set false",isDefault=true,
+TC_ADDRESS_06,Cập nhật địa chỉ không tồn tại,Ném EntityNotFoundException,Ném Exception,Passed,Automatic,Antigravity Bot,2026-07-30,ID địa chỉ sai,1. Mock findById rỗng,id=999,
+TC_ADDRESS_07,Cập nhật địa chỉ của người khác (Access Denied),Ném AccessDeniedException,Ném Exception,Passed,Automatic,Antigravity Bot,2026-07-30,Email request khác email chủ địa chỉ,"1. Mock findById ra address của ""other@gmail.com""",email=test@gmail.com,
+TC_ADDRESS_08,Cập nhật thông tin bình thường,Lưu DB với thông tin mới,Cập nhật thành công,Passed,Automatic,Antigravity Bot,2026-07-30,Thông tin hợp lệ,"1. Update name, phone
+2. Verify trả về đúng DTO",name=Jane Doe,
+TC_ADDRESS_09,Cập nhật địa chỉ cũ thành Default mới,"Xóa default của địa chỉ đang nắm giữ, chuyển sang địa chỉ này",Logic clearOtherDefaults chạy đúng,Passed,Automatic,Antigravity Bot,2026-07-30,req.isDefault = true,1. Verify address cũ bị update false,isDefault=true,
+TC_ADDRESS_10,Xóa địa chỉ bình thường,Chỉ xóa khỏi DB,Xóa thành công,Passed,Automatic,Antigravity Bot,2026-07-30,Địa chỉ bị xóa không phải default,1. Verify gọi delete() 1 lần,id=100,
+TC_ADDRESS_11,Xóa địa chỉ default (không còn địa chỉ nào khác),"Xóa thành công, không lỗi","Chỉ xóa, không auto gán default khác",Passed,Automatic,Antigravity Bot,2026-07-30,"wasDefault = true, rest.isEmpty",1. Mock list còn lại rỗng,id=100,
+TC_ADDRESS_12,Xóa địa chỉ default (còn địa chỉ phụ),Tự động lấy địa chỉ phụ đầu tiên làm default mới,Gán default tự động thành công,Passed,Automatic,Antigravity Bot,2026-07-30,"wasDefault = true, có address khác",1. Verify address khác được update isDefault=true,id=100,
+TC_ADDRESS_13,Set default trực tiếp (API riêng),"Xóa default cũ, cập nhật default mới",Logic phân bổ lại default chạy tốt,Passed,Automatic,Antigravity Bot,2026-07-30,id hợp lệ,"1. Gọi setDefault
+2. Verify clearOtherDefaults",id=100,
+TC_VOUCHER_01,Tạo mã Unique thành công ngay lần đầu,Trả về mã TX-XXXXXX (9 ký tự),Sinh mã thành công không trùng,Passed,Automatic,Antigravity Bot,2026-07-30,DB chưa có mã này,"1. Mock DB rỗng
+2. Sinh mã và kiểm tra form TX-",DB Rỗng,
+TC_VOUCHER_02,Tạo mã Unique thất bại 10 lần,Ném Exception,Ném Exception,Passed,Automatic,Antigravity Bot,2026-07-30,DB trả về trùng mã liên tục,"1. Mock DB luôn tìm thấy mã
+2. Chạy hàm generate",DB Trùng,
+TC_VOUCHER_03,Đổi voucher - Catalog không tồn tại,Ném VoucherInvalidException,Ném Exception,Passed,Automatic,Antigravity Bot,2026-07-30,Catalog ID sai,1. Mock tìm catalog trả rỗng,id=1,
+TC_VOUCHER_04,Đổi voucher - Catalog bị khóa (LOCKED),Ném VoucherInvalidException,Ném Exception,Passed,Automatic,Antigravity Bot,2026-07-30,Catalog status = LOCKED,1. Set status LOCKED,id=1,
+TC_VOUCHER_05,Đổi voucher - User không đủ hạng VIP,Ném VoucherInvalidException,Ném Exception,Passed,Automatic,Antigravity Bot,2026-07-30,"vipOnly=true, User role=CUSTOMER",1. Mock vipOnly và user role,"id=1, role=CUSTOMER",
+TC_VOUCHER_06,Đổi voucher - User không đủ điểm,Ném PointBalanceException,Ném Exception,Passed,Automatic,Antigravity Bot,2026-07-30,currentPoints < required,"1. Mock current = 100, required = 500",points=100,
+TC_VOUCHER_07,Đổi voucher - Truyền điểm âm (Hack),Ném IllegalArgumentException,Ném Exception,Passed,Automatic,Antigravity Bot,2026-07-30,requiredPoints < 0,1. Mock required = -10,points=-10,
+TC_VOUCHER_08,Đổi voucher - Thành công,"Trừ điểm, sinh UserVoucher UNUSED",Hoạt động hoàn hảo,Passed,Automatic,Antigravity Bot,2026-07-30,"Đủ điểm, catalog hợp lệ",1. Kiểm tra transaction và save UserVoucher,points=1000,
+TC_VOUCHER_09,Tặng voucher trực tiếp (issueVoucher),Sinh UserVoucher không trừ điểm,Tạo mã thành công,Passed,Automatic,Antigravity Bot,2026-07-30,Catalog hợp lệ,"1. Gọi issueVoucherToUser
+2. Verify không gọi trừ điểm",id=1,
+TC_VOUCHER_10,Validate mã - Mã không tồn tại,Ném VoucherInvalidException,Ném Exception,Passed,Automatic,Antigravity Bot,2026-07-30,Mã UserVoucher sai,1. Mock tìm mã trả rỗng,code=TX-NULL,
+TC_VOUCHER_11,Validate mã - Sai chủ sở hữu (Access Denied),Ném VoucherInvalidException,Ném Exception,Passed,Automatic,Antigravity Bot,2026-07-30,User ID khác với chủ voucher,"1. Truyền userId=99, voucher của user 10",userId=99,
+TC_VOUCHER_12,Validate mã - Mã đã sử dụng (USED),Ném VoucherInvalidException,Ném Exception,Passed,Automatic,Antigravity Bot,2026-07-30,Status = USED,1. Set status USED,code=TX-ABCDEF,
+TC_VOUCHER_13,Validate mã - Hết hạn (EXPIRED status/time),Ném VoucherInvalidException,Ném Exception,Passed,Automatic,Antigravity Bot,2026-07-30,expiresAt < now,1. Set expiresAt ở quá khứ,code=TX-ABCDEF,
+TC_VOUCHER_14,Validate mã - Đơn hàng chưa đạt tối thiểu,Ném VoucherInvalidException,Ném Exception,Passed,Automatic,Antigravity Bot,2026-07-30,orderAmount < minOrderAmount,"1. Đơn 200k, min 300k",amount=200000,
+TC_VOUCHER_15,Validate mã - Hợp lệ 100%,Trả về số tiền giảm (discountAmount),Trả về đúng số tiền (100k),Passed,Automatic,Antigravity Bot,2026-07-30,Mọi điều kiện pass,1. Gọi validateAndGetDiscount,amount=500000,
+TC_VOUCHER_16,Đánh dấu đã dùng (markAsUsed) - Mã rỗng,"Bỏ qua, không gọi DB",Return sớm,Passed,Automatic,Antigravity Bot,2026-07-30,code=null,1. Gọi markAsUsed(null),code=null,
+TC_VOUCHER_17,Đánh dấu đã dùng - Mã không phải UNUSED,Ném VoucherInvalidException,Ném Exception,Passed,Automatic,Antigravity Bot,2026-07-30,Status = EXPIRED,"1. Set status EXPIRED
+2. Gọi markAsUsed",code=TX-ABCDEF,
+TC_VOUCHER_18,Đánh dấu đã dùng - Thành công,"Update thành USED, gán orderId",Update trạng thái hoàn hảo,Passed,Automatic,Antigravity Bot,2026-07-30,Status = UNUSED,1. Verify save USED,orderId=999,
+TC_VOUCHER_19,Phục hồi mã (restoreVoucher),"Chuyển USED -> UNUSED, xóa orderId",Phục hồi thành công,Passed,Automatic,Antigravity Bot,2026-07-30,Voucher bị hủy đơn,"1. Set status USED
+2. Gọi restore",code=TX-ABCDEF,
+TC_VOUCHER_20,Cron job hết hạn (expireOldVouchers),Update List thành EXPIRED,Update hàng loạt thành công,Passed,Automatic,Antigravity Bot,2026-07-30,Có mã quá hạn,"1. Mock trả về 1 mã
+2. Verify save EXPIRED",date=now,
+TC_VOUCHER_21,Admin Create Voucher - Mã đã tồn tại,Ném RuntimeException,Ném Exception,Passed,Automatic,Antigravity Bot,2026-07-30,Admin tự điền code trùng,1. Mock exists=true,code=EXISTING,
+TC_VOUCHER_22,Admin Create Voucher - Mã sinh tự động,"Sinh dạng TX-CAT-xxxx, lưu DB",Sinh và lưu thành công,Passed,Automatic,Antigravity Bot,2026-07-30,code = null,"1. Verify code tự tạo
+2. Lưu DB",code=null,
+TC_VOUCHER_23,Admin Update Voucher - Cập nhật toàn bộ,Lưu DB với các field mới,"Cập nhật trường discount, status thành công",Passed,Automatic,Antigravity Bot,2026-07-30,Dữ liệu mới hợp lệ,"1. Thay đổi discount, status",discount=99000,
+TC_VOUCHER_24,Admin Delete Voucher - Đã có user đổi,Soft Delete (chuyển sang EXPIRED),Soft Delete thành công,Passed,Automatic,Antigravity Bot,2026-07-30,claimedCount > 0,"1. Mock count = 5
+2. Verify update EXPIRED",id=1,
+TC_VOUCHER_25,Admin Delete Voucher - Chưa có ai đổi,Hard Delete (Xóa khỏi DB),Xóa triệt để,Passed,Automatic,Antigravity Bot,2026-07-30,claimedCount = 0,"1. Mock count = 0
+2. Verify gọi delete()",id=1,
+TC_VOUCHER_26,Admin Bulk Action - Xử lý hàng loạt,"Vượt qua lỗi lẻ, áp dụng cho phần còn lại","LOCK 1 bản ghi thành công, skip 1 bản ghi lỗi",Passed,Automatic,Antigravity Bot,2026-07-30,"Gửi list ID [tồn tại, không tồn tại]","1. Mock id 1 có, id 2 không
+2. Kết quả success=1, fail=1","ids=[1,2]",

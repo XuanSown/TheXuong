@@ -1,0 +1,9 @@
+﻿TC ID,Testcase title,Expected result,Actual result,Status (Passed/Failed),Run type (Manual / Automatic),Tested by,Date started,Pre-conditions,Test step details,Test data,Note
+TC_VNP_01,Create Order - Đầu vào hợp lệ,Trả về URL VNPAY chứa đầy đủ tham số và checksum,URL chính xác 100%,Passed,Automatic,Antigravity Bot,2026-07-30,"Thông tin order hợp lệ, mock Hash và IP","1. Cấu hình mock cho VNPayConfig (TmnCode, HashKey, ReturnUrl).
+2. Mock static method sinh số random và IP.
+3. Gọi createOrder().
+4. Xác minh URL trả về chứa đầy đủ query params vnp_Amount, vnp_TxnRef, vnp_SecureHash chuẩn xác.",total=10000,
+TC_VNP_02,Create Order - orderInfo rỗng,URL VNPAY không chứa tham số vnp_OrderInfo,Bỏ qua tham số rỗng,Passed,Automatic,Antigravity Bot,2026-07-30,"orderInfo = """"","1. Cấu hình mock cho VNPayConfig.
+2. Truyền orderInfo rỗng.
+3. Gọi createOrder().
+4. Xác minh URL không chứa vnp_OrderInfo nhưng checksum SecureHash vẫn tính đúng.","orderInfo=""""",

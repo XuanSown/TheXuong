@@ -3,7 +3,9 @@ import type { ProductListResponse, Product } from '@/types'
 
 export const productService = {
   async getProducts(params: {
-    page?: number; size?: number; keyword?: string; sport?: string; brand?: string; sort?: 'newest' | 'price_asc' | 'price_desc'
+    page?: number; size?: number; keyword?: string; sport?: string; brand?: string; 
+    minPrice?: number; maxPrice?: number; shoeSize?: string;
+    sort?: 'newest' | 'price_asc' | 'price_desc'
   } = {}): Promise<ProductListResponse> {
     return (await http.get('/products', { params })).data
   },

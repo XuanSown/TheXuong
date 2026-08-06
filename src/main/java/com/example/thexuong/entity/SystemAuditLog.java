@@ -10,7 +10,7 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 /**
- * Audit log cho mọi thay đổi Voucher catalog.
+ * Audit log đa năng cho toàn bộ hệ thống.
  */
 @Getter
 @Setter
@@ -18,20 +18,23 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "VoucherAuditLog")
-public class VoucherAuditLog {
+@Table(name = "SystemAuditLog")
+public class SystemAuditLog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "voucher_id", nullable = false)
-    private Long voucherId;
-
     @Column(name = "admin_id", nullable = false, length = 100)
     private String adminId;
 
+    @Column(nullable = false, length = 50)
+    private String module;
+
     @Column(nullable = false, length = 20)
     private String action;
+
+    @Column(name = "target_id", nullable = false, length = 100)
+    private String targetId;
 
     @Column(name = "old_values", columnDefinition = "NVARCHAR(MAX)")
     private String oldValues;

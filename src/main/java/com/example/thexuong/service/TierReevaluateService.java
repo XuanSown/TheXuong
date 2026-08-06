@@ -40,8 +40,9 @@ public class TierReevaluateService {
         User user = userRepository.findById(userId).orElse(null);
         if (user == null) return false;
 
-        String oldTier = user.getTierCode() != null ? user.getTierCode() : "THUONG";
-        if (!"VIP".equals(oldTier)) return false;  // chỉ check user VIP
+        String baseTier = pointTierService.getBaseTierCode();
+        String oldTier = user.getTierCode() != null ? user.getTierCode() : baseTier;
+        if (baseTier.equals(oldTier)) return false;  // chỉ check user không ở hạng thấp nhất
 
         // Cửa sổ 365 ngày
         LocalDateTime windowStart = LocalDateTime.now().minusDays(365);
@@ -53,17 +54,12 @@ public class TierReevaluateService {
                 userId, com.example.thexuong.entity.PointTransaction.Type.EARN, windowStart);
         Integer totalPointsEarned = totalPointsEarnedLong != null ? totalPointsEarnedLong.intValue() : 0;
 
-        String newTier;
+        String newTier = pointTierService.getTierForUser(userId);
         String reason;
-        if (totalSpent != null && totalSpent.compareTo(new BigDecimal("5000000")) >= 0) {
-            newTier = "VIP";
-            reason = "Giữ VIP - chi tiêu " + totalSpent + "đ trong 365 ngày";
-        } else if (totalPointsEarned != null && totalPointsEarned >= 50) {
-            newTier = "VIP";
-            reason = "Giữ VIP - " + totalPointsEarned + " điểm earn trong 365 ngày";
+        if (newTier.equals(oldTier)) {
+            reason = "Giữ " + oldTier + " - đủ điều kiện duy trì trong 365 ngày";
         } else {
-            newTier = "THUONG";
-            reason = "Hạ THUONG - chỉ chi " + totalSpent + "đ, " + totalPointsEarned + " điểm trong 365 ngày";
+            reason = "Giáng xuống " + newTier + " - không đạt đủ chi tiêu/điểm trong 365 ngày";
         }
 
         // Ghi log
@@ -86,8 +82,8 @@ public class TierReevaluateService {
             user.setTierPromotedAt(LocalDateTime.now());
             userRepository.save(user);
 
-            // Gửi email nếu vừa bị hạ
-            if ("THUONG".equals(newTier) && "VIP".equals(oldTier)) {
+            // Gửi email nếu bị hạ hạng
+            if (baseTier.equals(newTier) && !baseTier.equals(oldTier)) {
                 try {
                     emailService.sendVipDowngraded(user.getEmail(), user.getFullName(), reason);
                 } catch (Exception e) {
@@ -100,14 +96,15 @@ public class TierReevaluateService {
     }
 
     /**
-     * Cron entry point: re-evaluate tất cả user VIP có tier_promoted_at <= (now - 365 ngày).
+     * Cron entry point: re-evaluate tất cả user không ở hạng thấp nhất có tier_promoted_at <= (now - 365 ngày).
      */
     @Transactional
     public int reevaluateAllActiveVip() {
         LocalDateTime threshold = LocalDateTime.now().minusDays(365);
-        List<User> vipUsers = userRepository.findByTierCodeAndTierPromotedAtBefore("VIP", threshold);
+        String baseTier = pointTierService.getBaseTierCode();
+        List<User> premiumUsers = userRepository.findByTierCodeNotAndTierPromotedAtBefore(baseTier, threshold);
         int changed = 0;
-        for (User user : vipUsers) {
+        for (User user : premiumUsers) {
             if (reevaluateUser(user.getId())) {
                 changed++;
             }

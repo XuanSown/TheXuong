@@ -1,0 +1,49 @@
+﻿TC ID,Testcase title,Expected result,Actual result,Status (Passed/Failed),Run type (Manual / Automatic),Tested by,Date started,Pre-conditions,Test step details,Test data,Note
+TC_CB_01,getAllProducts - Không có variant,StockStatus = Không rõ,"Trả về ""Không rõ""",Passed,Automatic,Antigravity Bot,2026-07-30,List variant rỗng,"1. Mock ProductRepository trả về 1 Product.
+2. Mock ProductVariantRepo trả về list rỗng.
+3. Gọi getAllProductsForChatbot.
+4. Xác minh phần tử đầu tiên có stockStatus=""Không rõ"".",,
+TC_CB_02,getAllProducts - Tổng tồn kho = 0,StockStatus = Hết hàng,"Trả về ""Hết hàng""",Passed,Automatic,Antigravity Bot,2026-07-30,Tổng quantity = 0,"1. Mock ProductVariantRepo trả về 2 variant có quantity=0.
+2. Gọi getAllProductsForChatbot.
+3. Xác minh stockStatus=""Hết hàng"".",qty=0,
+TC_CB_03,getAllProducts - Tổng tồn kho <= 5,StockStatus = Sắp hết,"Trả về ""Sắp hết""",Passed,Automatic,Antigravity Bot,2026-07-30,Tổng quantity = 5,"1. Mock Product có sẵn list variant (qty=3 và qty=2).
+2. Gọi getAllProductsForChatbot.
+3. Xác minh stockStatus=""Sắp hết"" và repo variant không bị gọi thừa.",qty=5,
+TC_CB_04,getAllProducts - Tổng tồn kho > 5,"StockStatus = Còn hàng, Map đủ trường","Trả về ""Còn hàng"", đủ DTO",Passed,Automatic,Antigravity Bot,2026-07-30,"Tổng quantity = 6, đủ info","1. Mock Product có Category, Sport, Brand, Price.
+2. Gọi getAllProductsForChatbot.
+3. Xác minh stockStatus=""Còn hàng"" và các trường Category, Sport, Brand, Price map đúng.",qty=6,
+TC_CB_05,getAllProducts - Các trường Null,Map sang null an toàn,Map thành công không crash,Passed,Automatic,Antigravity Bot,2026-07-30,"Product thiếu Category, Brand...","1. Mock Product có null field.
+2. Gọi getAllProducts.
+3. Xác minh DTO trả ra null an toàn thay vì crash.",null fields,
+TC_CB_06,getAllFaqsForChatbot - Map thành công,Trả về List ChatbotFaqDto,Trả về List DTO đúng,Passed,Automatic,Antigravity Bot,2026-07-30,Có 1 FAQ,"1. Mock FaqRepository trả về 1 Faq.
+2. Gọi getAllFaqsForChatbot.
+3. Xác minh DTO trả về chứa topic, keywords, answer chính xác.",,
+TC_CB_07,getAllFaqsForChatbot - List rỗng,Trả về empty list,Trả về [],Passed,Automatic,Antigravity Bot,2026-07-30,Không có FAQ,"1. Mock trả về empty list.
+2. Gọi hàm.
+3. Xác minh kết quả rỗng.",,
+TC_CB_08,getChatMemory - Không tìm thấy,"Trả về chuỗi ""[]""","Trả về ""[]""",Passed,Automatic,Antigravity Bot,2026-07-30,ID không có trong DB,"1. Mock findById trả Optional.empty.
+2. Gọi getChatMemory.
+3. Xác minh chuỗi trả về là ""[]"".",chatId,
+TC_CB_09,getChatMemory - Tìm thấy,Trả về chuỗi JSON,Trả về JSON đúng,Passed,Automatic,Antigravity Bot,2026-07-30,ID có trong DB,"1. Mock findById trả ChatMemory chứa historyJson.
+2. Gọi getChatMemory.
+3. Xác minh chuỗi JSON được trả ra đúng.",chatId,
+TC_CB_10,saveChatMemory - Tạo mới,Lưu bản ghi mới,Lưu thành công,Passed,Automatic,Antigravity Bot,2026-07-30,ID không tồn tại,"1. Mock findById trả rỗng.
+2. Gọi saveChatMemory.
+3. Bắt ArgumentCaptor lúc gọi save.
+4. Xác minh chatId và json được build đúng cho bản ghi mới.",chatId,
+TC_CB_11,saveChatMemory - Cập nhật,Update bản ghi cũ,Cập nhật thành công,Passed,Automatic,Antigravity Bot,2026-07-30,ID đã tồn tại,"1. Mock findById trả ChatMemory cũ.
+2. Gọi saveChatMemory.
+3. Xác minh object cũ được set lại HistoryJson và save.",chatId,
+TC_CB_12,trackOrder - Không tìm thấy,Trả về null,Trả về null,Passed,Automatic,Antigravity Bot,2026-07-30,Sai ID hoặc Phone,"1. Mock findByIdAndPhoneNumber trả rỗng.
+2. Gọi trackOrder.
+3. Xác minh kết quả null.","id,phone",
+TC_CB_13,trackOrder - Tìm thấy,Trả về ChatbotOrderDto,"Trả về đúng DTO, gộp item",Passed,Automatic,Antigravity Bot,2026-07-30,Order có 1 detail,"1. Mock Order có list OrderDetail.
+2. Gọi trackOrder.
+3. Xác minh DTO map đúng Status, TotalMoney, PaymentMethod.
+4. Xác minh list items được gộp thành chuỗi kiểu ""2x Giay Test (Size 42)"".",orderId,
+TC_CB_14,trackOrder - Null Status,Trả về UNKNOWN status,Trả về UNKNOWN,Passed,Automatic,Antigravity Bot,2026-07-30,"Order null status, rỗng detail","1. Mock Order null status.
+2. Gọi trackOrder.
+3. Xác minh status=""UNKNOWN"" và list rỗng.",null status,
+TC_CB_15,logInteraction - Lưu ChatLog,Gọi repository save,Save thành công,Passed,Automatic,Antigravity Bot,2026-07-30,Request có dữ liệu,"1. Truyền ChatLogRequest.
+2. Gọi logInteraction.
+3. Xác minh ChatLog được khởi tạo và lưu với đúng intent, reply.",request,

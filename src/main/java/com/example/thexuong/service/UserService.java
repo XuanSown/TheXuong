@@ -4,6 +4,7 @@ import com.example.thexuong.entity.User;
 import com.example.thexuong.exception.SelfDeactivationException;
 import com.example.thexuong.exception.UserNotFoundException;
 import com.example.thexuong.repository.UserRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,6 +18,31 @@ public class UserService {
 
 private final UserRepository userRepository;
 private final PasswordEncoder passwordEncoder;
+private final AuditLogService auditLogService;
+private final ObjectMapper objectMapper;
+
+private String toJson(Object obj) {
+    if (obj == null) return null;
+    if (obj instanceof User) {
+        User u = (User) obj;
+        java.util.Map<String, Object> map = new java.util.LinkedHashMap<>();
+        map.put("id", u.getId());
+        map.put("email", u.getEmail());
+        map.put("fullName", u.getFullName());
+        map.put("phone", u.getPhoneNumber());
+        map.put("provider", u.getProvider());
+        map.put("role", u.getRole());
+        map.put("tierCode", u.getTierCode());
+        map.put("active", u.getActive());
+        obj = map;
+    }
+    try {
+        return objectMapper.writeValueAsString(obj);
+    } catch (Exception e) {
+        log.error("Loi parse JSON audit log", e);
+        return null;
+    }
+}
 
 // ==================== QUERY ====================
 
@@ -63,6 +89,8 @@ log.info("Profile updated for user {}", currentEmail);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found: " + userId));
 
+        String oldState = toJson(user);
+
         if (fullName != null) user.setFullName(fullName);
         if (phoneNumber != null) user.setPhoneNumber(phoneNumber);
         
@@ -70,7 +98,17 @@ log.info("Profile updated for user {}", currentEmail);
             user.setPassword(passwordEncoder.encode(newPassword));
         }
 
-        userRepository.save(user);
+        User saved = userRepository.save(user);
+
+        auditLogService.logAction(
+                "USER",
+                "UPDATE",
+                String.valueOf(saved.getId()),
+                oldState,
+                toJson(saved),
+                "Admin updated profile for user: " + saved.getEmail()
+        );
+
         log.info("Admin updated profile for user {}", userId);
     }
 
@@ -134,9 +172,21 @@ throw new SelfDeactivationException();
 }
 
 User target = getUserById(targetUserId);
+String oldState = toJson(target);
+
 // Dao trang thai: true → false va nguoc lai
 target.setActive(!Boolean.TRUE.equals(target.getActive()));
-userRepository.save(target);
+User saved = userRepository.save(target);
+
+auditLogService.logAction(
+        "USER",
+        "TOGGLE_ACTIVE",
+        String.valueOf(saved.getId()),
+        oldState,
+        toJson(saved),
+        "Toggled active status to: " + saved.getActive()
+);
+
 log.info("User {} active status toggled to {}", targetUserId, target.getActive());
 }
 
@@ -150,8 +200,19 @@ log.info("User {} active status toggled to {}", targetUserId, target.getActive()
 public void setRole(Long userId, String role) {
 if (role == null || role.isBlank()) return;
 User user = getUserById(userId);
+String oldState = toJson(user);
+
 user.setRole(role.toUpperCase());
-userRepository.save(user);
+User saved = userRepository.save(user);
+
+auditLogService.logAction(
+        "USER",
+        "CHANGE_ROLE",
+        String.valueOf(saved.getId()),
+        oldState,
+        toJson(saved),
+        "Changed role to: " + saved.getRole()
+);
 }
 
 // ==================== DELETE ====================
@@ -159,7 +220,18 @@ userRepository.save(user);
 @Transactional
 public void deleteUser(Long userId) {
 log.info("Deleting user {}", userId);
+User u = getUserById(userId);
 userRepository.deleteById(userId);
+
+auditLogService.logAction(
+        "USER",
+        "DELETE",
+        String.valueOf(userId),
+        toJson(u),
+        null,
+        "Deleted user: " + u.getEmail()
+);
+
 log.debug("User {} deleted successfully", userId);
 }
 
@@ -177,7 +249,7 @@ log.debug("User {} deleted successfully", userId);
 */
 @Transactional
 public User createUser(String email, String username, String fullName,
-String rawPassword, String provider, String role) {
+String rawPassword, String provider, String role, String phone) {
 String finalRole = (role == null || role.isBlank()) ? "CUSTOMER" : role.toUpperCase();
 if ("USER".equals(finalRole)) finalRole = "CUSTOMER";
 log.debug("Creating user: email={}, username={}, role={}, provider={}", email, username, finalRole, provider);
@@ -186,8 +258,10 @@ User.UserBuilder builder = User.builder()
 .email(email)
 .username(username != null && !username.isBlank() ? username : email)
 .fullName(fullName)
+.phoneNumber(phone)
 .provider(provider != null ? provider : "LOCAL")
 .role(finalRole)
+.tierCode("THUONG")
 .active(true);
 
 // Ma hoa password neu la LOCAL, Google user khong can
@@ -198,6 +272,16 @@ builder.password("");
 }
 
 User saved = userRepository.save(builder.build());
+
+auditLogService.logAction(
+        "USER",
+        "CREATE",
+        String.valueOf(saved.getId()),
+        null,
+        toJson(saved),
+        "Created user: " + saved.getEmail()
+);
+
 log.info("User created: id={}, email={}", saved.getId(), email);
 return saved;
 }

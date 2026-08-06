@@ -32,9 +32,13 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.example.thexuong.service.AuditLogService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 @RestController
 @RequestMapping("/api/v1/admin/products")
 @Slf4j
+@lombok.RequiredArgsConstructor
 public class AdminProductRestController {
 
 	private static final int MAX_IMAGES = 5;
@@ -50,28 +54,17 @@ public class AdminProductRestController {
 	private final SportRepository sportRepository;
 	private final BrandRepository brandRepository;
 	private final CategoryRepository categoryRepository;
+	private final AuditLogService auditLogService;
+	private final ObjectMapper objectMapper;
 
-	public AdminProductRestController(
-			ProductRepository productRepository,
-			ProductVariantRepository productVariantRepository,
-			ProductImageRepository productImageRepository,
-			CloudflareR2Service r2Service,
-			SizeService sizeService,
-			SizeTypeRepository sizeTypeRepository,
-			SizeCatalogRepository sizeCatalogRepository,
-			SportRepository sportRepository,
-			BrandRepository brandRepository,
-			CategoryRepository categoryRepository) {
-		this.productRepository = productRepository;
-		this.productVariantRepository = productVariantRepository;
-		this.productImageRepository = productImageRepository;
-		this.r2Service = r2Service;
-		this.sizeService = sizeService;
-		this.sizeTypeRepository = sizeTypeRepository;
-		this.sizeCatalogRepository = sizeCatalogRepository;
-		this.sportRepository = sportRepository;
-		this.brandRepository = brandRepository;
-		this.categoryRepository = categoryRepository;
+	private String toJson(Object obj) {
+		if (obj == null) return null;
+		try {
+			return objectMapper.writeValueAsString(obj);
+		} catch (Exception e) {
+			log.error("Loi parse JSON audit log", e);
+			return null;
+		}
 	}
 
 	// ── List ────────────────────────────────────────────────
@@ -213,6 +206,15 @@ public class AdminProductRestController {
 				savedProduct.setVariants(variants);
 			}
 
+			auditLogService.logAction(
+					"PRODUCT",
+					"CREATE",
+					String.valueOf(savedProduct.getId()),
+					null,
+					toJson(toAdminProductDto(savedProduct)),
+					"Admin created product: " + savedProduct.getName()
+			);
+
 			return ResponseEntity.status(HttpStatus.CREATED)
 					.body(Map.of("message", "Tạo sản phẩm thành công", "product", toAdminProductDto(savedProduct)));
 		} catch (Exception e) {
@@ -240,7 +242,17 @@ public class AdminProductRestController {
 
 		try {
 			Product product = productRepository.findByIdIncludingInactive(id)
-					.orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm: " + id));
+					.orElseThrow(() -> new RuntimeException("Khong tim thay san pham: " + id));
+
+			AdminProductDto oldStateDto = toAdminProductDto(product);
+			List<ProductVariant> oldVariants = productVariantRepository.findByProductId(id);
+			Map<String, Integer> oldSizeQuantities = new LinkedHashMap<>();
+			for (ProductVariant v : oldVariants) {
+				if (v.getSize() != null) {
+					oldSizeQuantities.put(v.getSize().getName(), v.getQuantity());
+				}
+			}
+			oldStateDto.setSizeQuantities(oldSizeQuantities);
 
 			// Validate required fields
 			if (!StringUtils.hasText(name)) {
@@ -308,9 +320,28 @@ public class AdminProductRestController {
 			}
 
 			if (sizeQuantities != null && !sizeQuantities.isEmpty()) {
-				// updateVariants đã xóa hết variants cũ và tạo mới trong 1 lần gọi
+				// updateVariants da xoa het variants cu va tao moi trong 1 lan goi
 				sizeService.updateVariants(id, sizeQuantities);
 			}
+
+			AdminProductDto newStateDto = toAdminProductDto(savedProduct);
+			List<ProductVariant> newVariants = productVariantRepository.findByProductId(id);
+			Map<String, Integer> newSizeQuantities = new LinkedHashMap<>();
+			for (ProductVariant v : newVariants) {
+				if (v.getSize() != null) {
+					newSizeQuantities.put(v.getSize().getName(), v.getQuantity());
+				}
+			}
+			newStateDto.setSizeQuantities(newSizeQuantities);
+
+			auditLogService.logAction(
+					"PRODUCT",
+					"UPDATE",
+					String.valueOf(savedProduct.getId()),
+					toJson(oldStateDto),
+					toJson(newStateDto),
+					"Admin updated product: " + savedProduct.getName()
+			);
 
 			return ResponseEntity.ok(Map.of("message", "Cập nhật sản phẩm thành công", "product", toAdminProductDto(savedProduct)));
 		} catch (Exception e) {
@@ -333,9 +364,28 @@ public class AdminProductRestController {
 			for (ProductImage img : images) {
 				r2Service.deleteFile(img.getImageUrl());
 			}
+			AdminProductDto oldStateDto = toAdminProductDto(product);
+			List<ProductVariant> oldVariants = productVariantRepository.findByProductId(id);
+			Map<String, Integer> oldSizeQuantities = new LinkedHashMap<>();
+			for (ProductVariant v : oldVariants) {
+				if (v.getSize() != null) {
+					oldSizeQuantities.put(v.getSize().getName(), v.getQuantity());
+				}
+			}
+			oldStateDto.setSizeQuantities(oldSizeQuantities);
+
 			productImageRepository.deleteByProductId(id);
 			productVariantRepository.deleteByProductId(id);
 			productRepository.delete(product);
+
+			auditLogService.logAction(
+					"PRODUCT",
+					"DELETE",
+					String.valueOf(product.getId()),
+					toJson(oldStateDto),
+					null,
+					"Admin deleted product: " + product.getName()
+			);
 
 			return ResponseEntity.ok(Map.of("message", "Xóa sản phẩm thành công"));
 		} catch (Exception e) {
@@ -353,8 +403,32 @@ public class AdminProductRestController {
 		try {
 			Product product = productRepository.findByIdIncludingInactive(id)
 					.orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm: " + id));
+			
+			AdminProductDto oldStateDto = toAdminProductDto(product);
+			List<ProductVariant> oldVariants = productVariantRepository.findByProductId(id);
+			Map<String, Integer> oldSizeQuantities = new LinkedHashMap<>();
+			for (ProductVariant v : oldVariants) {
+				if (v.getSize() != null) {
+					oldSizeQuantities.put(v.getSize().getName(), v.getQuantity());
+				}
+			}
+			oldStateDto.setSizeQuantities(oldSizeQuantities);
+
 			product.setActive(!product.isActive());
 			productRepository.save(product);
+
+			AdminProductDto newStateDto = toAdminProductDto(product);
+			newStateDto.setSizeQuantities(oldSizeQuantities);
+
+			auditLogService.logAction(
+					"PRODUCT",
+					"TOGGLE_ACTIVE",
+					String.valueOf(product.getId()),
+					toJson(oldStateDto),
+					toJson(newStateDto),
+					"Admin toggled product active status to: " + product.isActive()
+			);
+
 			return ResponseEntity.ok(Map.of("message", "Đã " + (product.isActive() ? "hiện" : "ẩn") + " sản phẩm thành công"));
 		} catch (Exception e) {
 			log.error("Toggle product active failed", e);

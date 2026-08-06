@@ -47,4 +47,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * Dùng cho TierReevaluateService.reevaluateAllActiveVip().
      */
     List<User> findByTierCodeAndTierPromotedAtBefore(String tierCode, LocalDateTime before);
+    List<User> findByTierCodeNotAndTierPromotedAtBefore(String tierCode, LocalDateTime before);
 }

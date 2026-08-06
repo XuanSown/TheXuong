@@ -25,13 +25,15 @@ public class TierWarningJob {
     private final TierEvaluationLogRepository tierEvaluationLogRepository;
     private final UserRepository userRepository;
     private final EmailService emailService;
+    private final com.example.thexuong.service.PointTierService pointTierService;
 
     @Scheduled(cron = "0 0 9 * * *", zone = "Asia/Ho_Chi_Minh")
     public void warnVipNearReevaluation() {
         try {
-            // Tìm log gần nhất có newTierCode=VIP và evaluatedAt <= now - 335 ngày
+            // Tìm log gần nhất có newTierCode khác BaseTier và evaluatedAt <= now - 335 ngày
             LocalDateTime threshold = LocalDateTime.now().minusDays(335);
-            List<TierEvaluationLog> evaluationLogs = tierEvaluationLogRepository.findUsersNearReevaluation(threshold);
+            String baseTier = pointTierService.getBaseTierCode();
+            List<TierEvaluationLog> evaluationLogs = tierEvaluationLogRepository.findUsersNearReevaluation(threshold, baseTier);
             int warned = 0;
             for (TierEvaluationLog evaluationLog : evaluationLogs) {
                 Long userId = evaluationLog.getUserId();

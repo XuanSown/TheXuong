@@ -1,0 +1,87 @@
+﻿TC ID,Testcase title,Expected result,Actual result,Status (Passed/Failed),Run type (Manual / Automatic),Tested by,Date started,Pre-conditions,Test step details,Test data,Note
+TC_USER_01,Lấy user qua email (Tồn tại),Trả về đúng user,Trả về user test@gmail.com,Passed,Automatic,Antigravity Bot,7/30/2026,DB có user,"1. Mock userRepository.findByEmail trả về User
+2. Gọi userService.getUserByEmail
+3. Verify kết quả not null",email=test@gmail.com,
+TC_USER_02,Lấy user qua email (Không tồn tại),Trả về null,Trả về null,Passed,Automatic,Antigravity Bot,7/30/2026,DB không có user,"1. Mock userRepository.findByEmail trả về Optional.empty()
+2. Gọi userService.getUserByEmail
+3. Verify kết quả null",email=notfound,
+TC_USER_03,Lấy user qua email kèm địa chỉ (Tồn tại),Trả về đúng user,Trả về user,Passed,Automatic,Antigravity Bot,7/30/2026,DB có user,"1. Mock userRepository.findWithAddressesByEmail trả về User
+2. Gọi userService.getUserByEmailWithAddresses
+3. Verify kết quả not null",email=test@gmail.com,
+TC_USER_04,Lấy user qua email kèm địa chỉ (Không tồn tại),Trả về null,Trả về null,Passed,Automatic,Antigravity Bot,7/30/2026,DB không có user,"1. Mock userRepository.findWithAddressesByEmail trả về rỗng
+2. Gọi hàm
+3. Verify kết quả null",email=notfound,
+TC_USER_05,Lấy user qua ID (Tồn tại),Trả về đúng user,Trả về user ID=1,Passed,Automatic,Antigravity Bot,7/30/2026,DB có user,"1. Mock userRepository.findById trả về User
+2. Gọi userService.getUserById
+3. Verify kết quả not null",id=1,
+TC_USER_06,Lấy user qua ID (Không tồn tại),Ném Exception,Ném UserNotFoundException,Passed,Automatic,Antigravity Bot,7/30/2026,DB không có user,"1. Mock userRepository.findById trả về rỗng
+2. Gọi getUserById
+3. Assert throws UserNotFoundException",id=99,
+TC_USER_07,Update Profile bằng Email (Không đổi pass),"Lưu tên, sđt mới",Lưu thành công,Passed,Automatic,Antigravity Bot,7/30/2026,User tồn tại,"1. Mock userRepository.findByEmail
+2. Gọi updateProfile(email...)
+3. Verify không gọi passwordEncoder
+4. Verify save()","email, name, phone",
+TC_USER_08,Update Profile bằng Email (Có đổi pass),"Lưu tên, sđt, pass mới mã hóa",Lưu thành công,Passed,Automatic,Antigravity Bot,7/30/2026,User tồn tại,"1. Mock userRepository.findByEmail
+2. Mock passwordEncoder
+3. Gọi updateProfile
+4. Verify gọi passwordEncoder, verify save()","email, name, pass",
+TC_USER_09,Update Profile bằng Email (Sai email),Ném Exception,Ném UserNotFoundException,Passed,Automatic,Antigravity Bot,7/30/2026,Email sai,"1. Mock userRepository.findByEmail rỗng
+2. Gọi updateProfile
+3. Assert throws UserNotFoundException",email=notfound,
+TC_USER_10,Update Profile Admin bằng ID (Không đổi pass),"Lưu tên, sđt mới",Lưu thành công,Passed,Automatic,Antigravity Bot,7/30/2026,User tồn tại,"1. Mock userRepository.findById
+2. Gọi updateProfile(id...)
+3. Verify không gọi passwordEncoder
+4. Verify save()",id=1,
+TC_USER_11,Update Profile Admin bằng ID (Có đổi pass),Lưu pass mới mã hóa,Lưu thành công,Passed,Automatic,Antigravity Bot,7/30/2026,User tồn tại,"1. Mock userRepository.findById
+2. Mock passwordEncoder
+3. Gọi updateProfile
+4. Verify save()","id=1, pass",
+TC_USER_12,Update Profile Admin bằng ID (Sai ID),Ném Exception,Ném UserNotFoundException,Passed,Automatic,Antigravity Bot,7/30/2026,ID sai,"1. Mock userRepository.findById rỗng
+2. Gọi updateProfile
+3. Assert throws",id=99,
+TC_USER_13,Đổi mật khẩu thành công,Lưu pass mới,Lưu thành công,Passed,Automatic,Antigravity Bot,7/30/2026,Pass cũ đúng,"1. Mock findByEmail
+2. Mock passwordEncoder.matches = true
+3. Mock passwordEncoder.encode
+4. Gọi changePassword, verify save","old, new",
+TC_USER_14,Đổi mật khẩu user không tồn tại,Ném Exception,Ném UserNotFoundException,Passed,Automatic,Antigravity Bot,7/30/2026,Email sai,"1. Mock findByEmail rỗng
+2. Gọi changePassword
+3. Assert throws",email,
+TC_USER_15,Đổi mật khẩu tài khoản OAuth (Google),Ném Exception,Ném IllegalArgumentException,Passed,Automatic,Antigravity Bot,7/30/2026,User Google,"1. Mock User provider=GOOGLE
+2. Gọi changePassword
+3. Assert throws",email,
+TC_USER_16,Đổi mật khẩu tài khoản không có mật khẩu,Ném Exception,Ném IllegalArgumentException,Passed,Automatic,Antigravity Bot,7/30/2026,User password=null,"1. Mock User password=null
+2. Gọi changePassword
+3. Assert throws",email,
+TC_USER_17,Đổi mật khẩu sai pass cũ,Ném Exception,Ném IllegalArgumentException,Passed,Automatic,Antigravity Bot,7/30/2026,Pass cũ sai,"1. Mock passwordEncoder.matches = false
+2. Gọi changePassword
+3. Assert throws",old,
+TC_USER_18,Đổi mật khẩu pass mới < 8 ký tự,Ném Exception,Ném IllegalArgumentException,Passed,Automatic,Antigravity Bot,7/30/2026,Pass mới < 8,"1. Gọi changePassword với pass=""short""
+2. Assert throws","new=""short""",
+TC_USER_19,Toggle Active (Đang bật -> Tắt),Trạng thái chuyển false,Trạng thái chuyển false,Passed,Automatic,Antigravity Bot,7/30/2026,User Active=true,"1. Mock User active=true
+2. Gọi toggleActive
+3. Verify save(active=false)",id=1,
+TC_USER_20,Toggle Active (Đang tắt -> Bật),Trạng thái chuyển true,Trạng thái chuyển true,Passed,Automatic,Antigravity Bot,7/30/2026,User Active=false,"1. Mock User active=false
+2. Gọi toggleActive
+3. Verify save(active=true)",id=1,
+TC_USER_21,Toggle Active tự tắt chính mình,Ném Exception,Ném SelfDeactivationException,Passed,Automatic,Antigravity Bot,7/30/2026,Target ID == Current ID,"1. Gọi toggleActive(1, 1)
+2. Assert throws","id=1, curr=1",
+TC_USER_22,Toggle Active User không tồn tại,Ném Exception,Ném UserNotFoundException,Passed,Automatic,Antigravity Bot,7/30/2026,Target ID sai,"1. Mock findById rỗng
+2. Gọi toggleActive
+3. Assert throws",id=99,
+TC_USER_23,Set Role hợp lệ,Role mới UpperCase,Role lưu thành ADMIN,Passed,Automatic,Antigravity Bot,7/30/2026,"Role=""admin""","1. Mock User
+2. Gọi setRole(1, ""admin"")
+3. Verify role=""ADMIN"", verify save","role=""admin""",
+TC_USER_24,Set Role null/blank,Không làm gì cả,Không lưu,Passed,Automatic,Antigravity Bot,7/30/2026,"Role=""""","1. Gọi setRole
+2. Verify không gọi findById hay save","role=""""",
+TC_USER_25,Set Role User không tồn tại,Ném Exception,Ném UserNotFoundException,Passed,Automatic,Antigravity Bot,7/30/2026,User sai,"1. Mock findById rỗng
+2. Gọi setRole
+3. Assert throws",id=99,
+TC_USER_26,Xóa User thành công,Gọi deleteById,Gọi deleteById,Passed,Automatic,Antigravity Bot,7/30/2026,User tồn tại,"1. Gọi deleteUser
+2. Verify deleteById",id=1,
+TC_USER_27,Admin tạo User Local,"Mã hóa pass, active","Tạo User thành công, mã hóa mật khẩu",Passed,Automatic,Antigravity Bot,7/30/2026,Provider LOCAL,"1. Mock passwordEncoder
+2. Gọi createUser
+3. Verify save() với pass mã hóa","email, pass, LOCAL",
+TC_USER_28,Admin tạo User Google,Không mã hóa pass,"Tạo User pass=""""",Passed,Automatic,Antigravity Bot,7/30/2026,Provider GOOGLE,"1. Gọi createUser provider GOOGLE
+2. Verify không gọi passwordEncoder, save() pass=""""","email, GOOGLE",
+TC_USER_29,Admin tạo User truyền Role USER,Tự động convert về CUSTOMER,Role = CUSTOMER,Passed,Automatic,Antigravity Bot,7/30/2026,Role USER,"1. Gọi createUser role USER
+2. Verify save() với role CUSTOMER",role=USER,

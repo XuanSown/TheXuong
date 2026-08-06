@@ -396,7 +396,7 @@ const onSetDefault = async (id: number) => {
 onMounted(() => {
   if (user.value) {
     profileForm.fullName = user.value.fullName || ''
-    profileForm.phoneNumber = user.value.phoneNumber || ''
+    profileForm.phoneNumber = user.value.phone || user.value.phoneNumber || ''
   }
   addressStore.fetch()
 })
@@ -443,7 +443,7 @@ const handleCancel = () => {
   // Reset form to original values
   if (user.value) {
     profileForm.fullName = user.value.fullName || ''
-    profileForm.phoneNumber = user.value.phoneNumber || ''
+    profileForm.phoneNumber = user.value.phone || user.value.phoneNumber || ''
   }
   passwordForm.currentPassword = ''
   passwordForm.newPassword = ''

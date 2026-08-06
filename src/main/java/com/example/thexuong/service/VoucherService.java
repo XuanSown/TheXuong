@@ -23,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -57,6 +58,35 @@ public class VoucherService {
     private final UserRepository userRepository;
     private final UserPointsRepository userPointsRepository;
     private final PointTransactionRepository pointTransactionRepository;
+    private final com.example.thexuong.repository.PointTierRepository pointTierRepository;
+    private final AuditLogService auditLogService;
+    private final ObjectMapper objectMapper;
+
+    private String toJson(Object obj) {
+        if (obj == null) return null;
+        try {
+            if (obj instanceof Voucher) {
+                Voucher v = (Voucher) obj;
+                java.util.Map<String, Object> map = new java.util.LinkedHashMap<>();
+                map.put("id", v.getId());
+                map.put("code", v.getCode());
+                map.put("discountAmount", v.getDiscountAmount());
+                map.put("requiredPoints", v.getRequiredPoints());
+                map.put("minOrderAmount", v.getMinOrderAmount());
+                map.put("applicableCategoryIds", v.getApplicableCategoryIds());
+                map.put("applicableProductIds", v.getApplicableProductIds());
+                map.put("vipOnly", v.getVipOnly());
+                map.put("status", v.getStatus());
+                map.put("createdAt", v.getCreatedAt() != null ? v.getCreatedAt().toString() : "");
+                map.put("updatedAt", v.getUpdatedAt() != null ? v.getUpdatedAt().toString() : "");
+                return objectMapper.writeValueAsString(map);
+            }
+            return objectMapper.writeValueAsString(obj);
+        } catch (Exception e) {
+            log.error("Loi parse JSON audit log", e);
+            return null;
+        }
+    }
 
     // ============================================================
     // Task 2.8: Generate unique code TX-XXXXXX
@@ -108,12 +138,16 @@ public class VoucherService {
             throw new VoucherInvalidException("Voucher này hiện không khả dụng.");
         }
 
-        // Check VIP-only (dựa trên role string của user)
+        // Check VIP-only (chỉ dành cho khách hàng không ở hạng mặc định)
         if (Boolean.TRUE.equals(catalog.getVipOnly())) {
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> new VoucherInvalidException("User không tồn tại."));
-            // User giờ có String role (CUSTOMER/ADMIN/BOTH), không còn Set<Role>.
-            boolean isVip = "VIP".equals(user.getRole()) || "BOTH".equals(user.getRole());
+            
+            String baseTier = pointTierRepository.findAllByOrderByMinTotalSpentAsc()
+                    .stream().findFirst().map(com.example.thexuong.entity.PointTier::getCode).orElse("THUONG");
+            
+            String currentTier = user.getTierCode() != null ? user.getTierCode() : baseTier;
+            boolean isVip = !currentTier.equals(baseTier);
             if (!isVip) {
                 throw new VoucherInvalidException("Voucher này chỉ dành cho khách hàng VIP.");
             }
@@ -400,6 +434,16 @@ public class VoucherService {
                 .build();
 
         voucher = voucherRepository.save(voucher);
+        
+        auditLogService.logAction(
+                "VOUCHER",
+                "CREATE",
+                String.valueOf(voucher.getId()),
+                null,
+                toJson(voucher),
+                "Created voucher: " + voucher.getCode()
+        );
+
         return VoucherResponse.from(voucher, 0);
     }
 
@@ -410,6 +454,21 @@ public class VoucherService {
     public VoucherResponse updateVoucher(Long id, VoucherUpdateRequest request, String adminUsername) {
         Voucher voucher = voucherRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Voucher không tồn tại: " + id));
+
+        // Copy old state
+        Voucher oldState = Voucher.builder()
+            .id(voucher.getId())
+            .code(voucher.getCode())
+            .discountAmount(voucher.getDiscountAmount())
+            .requiredPoints(voucher.getRequiredPoints())
+            .minOrderAmount(voucher.getMinOrderAmount())
+            .applicableCategoryIds(voucher.getApplicableCategoryIds())
+            .applicableProductIds(voucher.getApplicableProductIds())
+            .vipOnly(voucher.getVipOnly())
+            .status(voucher.getStatus())
+            .createdAt(voucher.getCreatedAt())
+            .updatedAt(voucher.getUpdatedAt())
+            .build();
 
         // Update fields if not null
         if (request.getDiscountAmount() != null) {
@@ -440,6 +499,15 @@ public class VoucherService {
         voucher.setUpdatedAt(LocalDateTime.now());
         voucher = voucherRepository.save(voucher);
 
+        auditLogService.logAction(
+                "VOUCHER",
+                "UPDATE",
+                String.valueOf(voucher.getId()),
+                toJson(oldState),
+                toJson(voucher),
+                "Updated voucher: " + voucher.getCode()
+        );
+
         int claimed = (int) userVoucherRepository.countByVoucherId(voucher.getId());
         return VoucherResponse.from(voucher, claimed);
     }
@@ -462,6 +530,15 @@ public class VoucherService {
             // Hard delete
             voucherRepository.delete(v);
         }
+
+        auditLogService.logAction(
+                "VOUCHER",
+                "DELETE",
+                String.valueOf(v.getId()),
+                toJson(v),
+                null,
+                "Deleted voucher: " + v.getCode() + (claimedCount > 0 ? " (Soft delete)" : " (Hard delete)")
+        );
     }
 
     /**

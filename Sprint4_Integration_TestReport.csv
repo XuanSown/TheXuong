@@ -1,0 +1,19 @@
+﻿TC ID,Testcase title,Expected result,Actual result,Status (Passed/Failed),Run type,Tested by,Date started,Module/Class,Test step details,Test data,Note
+TC_IT_LOYALTY_01,Đổi voucher bằng điểm,"Trừ điểm user, thêm vào UserVoucher","Status 200, Point trừ 10, MyVoucher + 1",Passed,Automatic (Integration),Antigravity Bot,2026-07-31,LoyaltyApiController,"1. Tạo User có 100 điểm
+2. POST /api/v1/loyalty/redeem
+3. Assert số dư điểm = 90",voucherId,
+TC_IT_LOYALTY_02,Xem kho voucher của tôi,Trả về ds voucher đã đổi,"Status 200, list size = 1",Passed,Automatic (Integration),Antigravity Bot,2026-07-31,LoyaltyApiController,"1. API Đổi 1 voucher trước
+2. GET /api/v1/loyalty/my-vouchers
+3. Kiểm tra list trả về có voucher đó",,
+TC_IT_ADMIN_STAT_01,Xem thống kê Dashboard (Quyền ADMIN),Trả về cục data thống kê đầy đủ,"Status 200, đủ 8 field",Passed,Automatic (Integration),Antigravity Bot,2026-07-31,AdminStatisticsRestController,"1. Setup Orders & Users DB
+2. GET /api/v1/admin/statistics
+3. Verify số liệu JSON",,
+TC_IT_ADMIN_STAT_02,Xem thống kê Dashboard (Quyền USER),Bị từ chối (403 Forbidden),Status 403,Passed,Automatic (Integration),Antigravity Bot,2026-07-31,AdminStatisticsRestController,"1. Mock login quyền USER
+2. GET /api/v1/admin/statistics
+3. Assert chặn 403 Forbidden",,
+TC_IT_CHATBOT_01,Gửi tin nhắn cho AI Chatbot,AI phản hồi nội dung,"Status 200, Trả về text reply",Passed,Automatic (Integration),Antigravity Bot,2026-07-31,ChatbotController,"1. Mock ChatService mockResponse
+2. POST /api/v1/chatbot/ask
+3. Kiểm tra JSON chứa câu trả lời","message=""Giày nào rẻ nhất?""",
+TC_IT_ADMIN_BRAND_01,Thêm Brand mới,Brand lưu DB,Status 201,Passed,Automatic (Integration),Antigravity Bot,2026-07-31,AdminBrandRestController,"1. Set Admin Authority
+2. POST /api/v1/admin/brands
+3. Verify repository đã lưu",name,

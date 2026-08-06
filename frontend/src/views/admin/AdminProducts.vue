@@ -199,12 +199,6 @@
               >
                 SỬA
               </button>
-              <button
-                class="btn-delete"
-                @click="deleteProduct(product.id)"
-              >
-                XÓA
-              </button>
             </div>
           </div>
         </div>

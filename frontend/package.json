@@ -25,6 +25,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@playwright/test": "^1.62.1",
     "@testing-library/vue": "^8.1.0",
     "@types/google.maps": "^3.65.2",
     "@types/node": "^20.0.0",

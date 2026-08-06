@@ -1,0 +1,21 @@
+﻿TC ID,Testcase title,Expected result,Actual result,Status (Passed/Failed),Run type (Manual / Automatic),Tested by,Date started,Pre-conditions,Test step details,Test data,Note
+TC_ADDRESS_01,Xem danh sách địa chỉ với User không tồn tại,Ném Exception EntityNotFoundException,Ném Exception chuẩn xác,Passed,Automatic,Antigravity Bot,2026-07-30,User email sai,"1. Mock userRepository.findByEmail trả rỗng
+2. Gọi listByUser",email=wrong,
+TC_ADDRESS_02,Xem danh sách địa chỉ thành công,Trả về list AddressResponse đã map đúng,Trả về list hợp lệ,Passed,Automatic,Antigravity Bot,2026-07-30,"User hợp lệ, có 1 địa chỉ","1. Mock trả về 1 UserAddress
+2. Verify kết quả map dto",email=test@gmail.com,
+TC_ADDRESS_03,Tạo địa chỉ bình thường (không phải default),"Lưu DB, isDefault = false","Lưu thành công, không xóa default của địa chỉ khác",Passed,Automatic,Antigravity Bot,2026-07-30,"Req isDefault=false, count > 1","1. Mock countByUserId = 2
+2. Verify gọi save 1 lần",isDefault=false,
+TC_ADDRESS_04,Tạo địa chỉ đầu tiên (auto default),isDefault tự chuyển thành true,Auto set isDefault = true và save thêm 1 lần,Passed,Automatic,Antigravity Bot,2026-07-30,"Req isDefault=false, count = 1","1. Mock countByUserId = 1
+2. Verify gọi save 2 lần (1 lần tạo, 1 lần update default)",isDefault=false,
+TC_ADDRESS_05,Tạo địa chỉ set Default chủ động,"Xóa isDefault của địa chỉ cũ, set cho địa chỉ mới",Cập nhật lại toàn bộ DB đúng logic,Passed,Automatic,Antigravity Bot,2026-07-30,"Req isDefault=true, có địa chỉ default cũ","1. Mock findBy... trả về address default cũ
+2. Verify address cũ bị set false",isDefault=true,
+TC_ADDRESS_06,Cập nhật địa chỉ không tồn tại,Ném EntityNotFoundException,Ném Exception,Passed,Automatic,Antigravity Bot,2026-07-30,ID địa chỉ sai,1. Mock findById rỗng,id=999,
+TC_ADDRESS_07,Cập nhật địa chỉ của người khác (Access Denied),Ném AccessDeniedException,Ném Exception,Passed,Automatic,Antigravity Bot,2026-07-30,Email request khác email chủ địa chỉ,"1. Mock findById ra address của ""other@gmail.com""",email=test@gmail.com,
+TC_ADDRESS_08,Cập nhật thông tin bình thường,Lưu DB với thông tin mới,Cập nhật thành công,Passed,Automatic,Antigravity Bot,2026-07-30,Thông tin hợp lệ,"1. Update name, phone
+2. Verify trả về đúng DTO",name=Jane Doe,
+TC_ADDRESS_09,Cập nhật địa chỉ cũ thành Default mới,"Xóa default của địa chỉ đang nắm giữ, chuyển sang địa chỉ này",Logic clearOtherDefaults chạy đúng,Passed,Automatic,Antigravity Bot,2026-07-30,req.isDefault = true,1. Verify address cũ bị update false,isDefault=true,
+TC_ADDRESS_10,Xóa địa chỉ bình thường,Chỉ xóa khỏi DB,Xóa thành công,Passed,Automatic,Antigravity Bot,2026-07-30,Địa chỉ bị xóa không phải default,1. Verify gọi delete() 1 lần,id=100,
+TC_ADDRESS_11,Xóa địa chỉ default (không còn địa chỉ nào khác),"Xóa thành công, không lỗi","Chỉ xóa, không auto gán default khác",Passed,Automatic,Antigravity Bot,2026-07-30,"wasDefault = true, rest.isEmpty",1. Mock list còn lại rỗng,id=100,
+TC_ADDRESS_12,Xóa địa chỉ default (còn địa chỉ phụ),Tự động lấy địa chỉ phụ đầu tiên làm default mới,Gán default tự động thành công,Passed,Automatic,Antigravity Bot,2026-07-30,"wasDefault = true, có address khác",1. Verify address khác được update isDefault=true,id=100,
+TC_ADDRESS_13,Set default trực tiếp (API riêng),"Xóa default cũ, cập nhật default mới",Logic phân bổ lại default chạy tốt,Passed,Automatic,Antigravity Bot,2026-07-30,id hợp lệ,"1. Gọi setDefault
+2. Verify clearOtherDefaults",id=100,

@@ -16,6 +16,7 @@ interface GuestCartItem {
 
 export const useCartStore = defineStore('cart', {
   state: () => ({
+    guestItems: (localStorage.getItem('guest_cart_items') ? JSON.parse(localStorage.getItem('guest_cart_items')!) : []) as GuestCartItem[],
     cart: null as Cart | null,
     loading: false
   }),
@@ -26,15 +27,7 @@ export const useCartStore = defineStore('cart', {
         return state.cart.items.reduce((sum, item) => sum + item.quantity, 0)
       }
       // Fallback to guest cart from localStorage
-      const guestItems = localStorage.getItem(GUEST_CART_KEY)
-      if (guestItems) {
-        try {
-          const items = JSON.parse(guestItems) as GuestCartItem[]
-          return items.reduce((sum, item) => sum + item.quantity, 0)
-        } catch {
-          return 0
-        }
-      }
+      return state.guestItems.reduce((sum, item) => sum + item.quantity, 0)
       return 0
     },
     totalPrice: (state) => {
@@ -42,15 +35,7 @@ export const useCartStore = defineStore('cart', {
         return state.cart.items.reduce((sum, item) => sum + item.subtotal, 0)
       }
       // Fallback to guest cart from localStorage
-      const guestItems = localStorage.getItem(GUEST_CART_KEY)
-      if (guestItems) {
-        try {
-          const items = JSON.parse(guestItems) as GuestCartItem[]
-          return items.reduce((sum, item) => sum + (item.price || 0) * item.quantity, 0)
-        } catch {
-          return 0
-        }
-      }
+      return state.guestItems.reduce((sum, item) => sum + (item.price || 0) * item.quantity, 0)
       return 0
     },
     items: (state) => state.cart?.items || [],
@@ -59,25 +44,18 @@ export const useCartStore = defineStore('cart', {
       if (state.cart?.items) {
         return state.cart.items
       }
-      // Return guest items with computed id based on variantId
-      const guestItemsStr = localStorage.getItem(GUEST_CART_KEY)
-      if (!guestItemsStr) return []
-      try {
-        const guestItems = JSON.parse(guestItemsStr) as GuestCartItem[]
-        return guestItems.map((item, index) => ({
-          id: `guest-${index}`,
-          variantId: item.variantId,
-          productId: item.productId || 0,
-          productName: item.productName || 'Sản phẩm',
-          productImage: item.productImage || '',
-          size: item.size || '',
-          quantity: item.quantity,
-          price: item.price || 0,
-          subtotal: (item.price || 0) * item.quantity
-        }))
-      } catch {
-        return []
-      }
+      // Return guest items
+      return state.guestItems.map((item, index) => ({
+        id: `guest-${index}`,
+        variantId: item.variantId,
+        productId: item.productId || 0,
+        productName: item.productName || 'Sản phẩm',
+        productImage: item.productImage || '',
+        size: item.size || '',
+        quantity: item.quantity,
+        price: item.price || 0,
+        subtotal: (item.price || 0) * item.quantity
+      }))
     },
     isGuestCart: (state) => state.cart === null
   },
@@ -140,37 +118,50 @@ export const useCartStore = defineStore('cart', {
 
     clearCart() {
       this.cart = null
+      this.guestItems = []
       localStorage.removeItem(GUEST_CART_KEY)
     },
 
     // Merge guest cart (from localStorage) into server cart after login
     async mergeGuestCart() {
-      const guestItemsStr = localStorage.getItem(GUEST_CART_KEY)
-      if (!guestItemsStr) return
-
+      const guestItems = [...this.guestItems];
+      console.log('mergeGuestCart started. Items to merge:', guestItems);
+      if (!guestItems || guestItems.length === 0) return;
       try {
-        const guestItems: GuestCartItem[] = JSON.parse(guestItemsStr)
-        if (guestItems.length === 0) return
-
         // Fetch current server cart
+        console.log('Fetching server cart before merge...');
         await this.fetchCart()
+        console.log('Server cart fetched:', this.cart);
 
+        let hasError = false;
         // Add each guest item to server cart
         for (const guestItem of guestItems) {
           try {
-            await cartService.addCartItem({
+            console.log(`Merging item variantId ${guestItem.variantId} quantity ${guestItem.quantity}`);
+            const resp = await cartService.addCartItem({
               variantId: guestItem.variantId,
               quantity: guestItem.quantity
             })
+            console.log(`Merged item success:`, resp);
           } catch (error) {
             console.error('Failed to merge guest item:', error)
+            hasError = true;
           }
         }
 
         // Refetch cart to get merged result
+        console.log('Fetching server cart after merge...');
         await this.fetchCart()
-        // Clear guest cart after successful merge
-        localStorage.removeItem(GUEST_CART_KEY)
+        console.log('Server cart fetched after merge:', this.cart);
+        
+        // Clear guest cart only if all merges succeeded
+        if (!hasError) {
+          this.guestItems = []
+          localStorage.removeItem(GUEST_CART_KEY)
+          console.log('Guest cart cleared.');
+        } else {
+          console.warn('Guest cart not cleared due to merge errors.');
+        }
       } catch (error) {
         console.error('Failed to merge guest cart:', error)
       }
@@ -178,59 +169,40 @@ export const useCartStore = defineStore('cart', {
 
     // Guest cart localStorage operations
     addToGuestCart(variantId: number, quantity: number, productInfo?: Partial<GuestCartItem>) {
-      const guestItemsStr = localStorage.getItem(GUEST_CART_KEY)
-      const guestItems: GuestCartItem[] = guestItemsStr ? JSON.parse(guestItemsStr) : []
-
-      // Check if variant already exists
-      const existingIndex = guestItems.findIndex(item => item.variantId === variantId)
+      const existingIndex = this.guestItems.findIndex(item => item.variantId === variantId)
       if (existingIndex >= 0) {
-        guestItems[existingIndex].quantity += quantity
+        this.guestItems[existingIndex].quantity += quantity
       } else {
-        guestItems.push({
+        this.guestItems.push({
           variantId,
           quantity,
           ...productInfo
         })
       }
 
-      localStorage.setItem(GUEST_CART_KEY, JSON.stringify(guestItems))
+      localStorage.setItem(GUEST_CART_KEY, JSON.stringify(this.guestItems))
     },
 
     updateGuestCartItem(variantId: number, quantity: number) {
-      const guestItemsStr = localStorage.getItem(GUEST_CART_KEY)
-      if (!guestItemsStr) return
-
-      const guestItems: GuestCartItem[] = JSON.parse(guestItemsStr)
-      const index = guestItems.findIndex(item => item.variantId === variantId)
-
+      const index = this.guestItems.findIndex(item => item.variantId === variantId)
       if (index >= 0) {
         if (quantity <= 0) {
-          guestItems.splice(index, 1)
+          this.guestItems.splice(index, 1)
         } else {
-          guestItems[index].quantity = quantity
+          this.guestItems[index].quantity = quantity
         }
-        localStorage.setItem(GUEST_CART_KEY, JSON.stringify(guestItems))
+        localStorage.setItem(GUEST_CART_KEY, JSON.stringify(this.guestItems))
       }
     },
 
     removeFromGuestCart(variantId: number) {
-      const guestItemsStr = localStorage.getItem(GUEST_CART_KEY)
-      if (!guestItemsStr) return
-
-      const guestItems: GuestCartItem[] = JSON.parse(guestItemsStr)
-      const filtered = guestItems.filter(item => item.variantId !== variantId)
-      localStorage.setItem(GUEST_CART_KEY, JSON.stringify(filtered))
+      this.guestItems = this.guestItems.filter(item => item.variantId !== variantId)
+      localStorage.setItem(GUEST_CART_KEY, JSON.stringify(this.guestItems))
     },
 
     // Get guest cart items (for display before login)
     getGuestCartItems(): GuestCartItem[] {
-      const guestItemsStr = localStorage.getItem(GUEST_CART_KEY)
-      if (!guestItemsStr) return []
-      try {
-        return JSON.parse(guestItemsStr) as GuestCartItem[]
-      } catch {
-        return []
-      }
+      return this.guestItems
     }
   }
 })

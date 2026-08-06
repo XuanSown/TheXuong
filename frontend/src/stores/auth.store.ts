@@ -26,7 +26,7 @@ export const useAuthStore = defineStore('auth', {
     setUser(user: User) {
       this.user = user
       this.isAuthenticated = true
-      this.roles = user.roles || []
+      this.roles = user.roles || (user.role ? [user.role] : [])
     },
 
     async login(credentials: { email: string; password: string }) {

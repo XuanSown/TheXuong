@@ -1,0 +1,28 @@
+﻿TC ID,Testcase title,Expected result,Actual result,Status (Passed/Failed),Run type,Tested by,Date started,Module/Class,Test step details,Test data,Note
+TC_IT_AUTH_01,Đăng ký User mới,Status 201 Created,"Status 201, DB lưu thông tin",Passed,Automatic (Integration),Antigravity Bot,2026-07-31,AuthRestController,"1. POST /api/v1/auth/register
+2. DB có lưu tên","email, pass",
+TC_IT_AUTH_02,Đăng nhập thành công,"Status 200, Set-Cookie JWT","Status 200, Trả về user info, có Cookie JWT",Passed,Automatic (Integration),Antigravity Bot,2026-07-31,AuthRestController,"1. POST /api/v1/auth/login
+2. Kiểm tra Cookie access_token","email, pass",
+TC_IT_AUTH_03,Đăng nhập sai pass,Status 401 Unauthorized,Status 401,Passed,Automatic (Integration),Antigravity Bot,2026-07-31,AuthRestController,"1. POST /api/v1/auth/login sai pass
+2. Kiểm tra lỗi","email, pass sai",
+TC_IT_AUTH_04,Lấy thông tin User hiện tại,"Status 200, Trả về data","Status 200, Trả về email",Passed,Automatic (Integration),Antigravity Bot,2026-07-31,AuthRestController,"1. GET /api/v1/auth/user
+2. Kiểm tra email",Token,
+TC_IT_AUTH_05,Đăng xuất,"Status 200, Xóa JWT Cookie","Status 200, maxAge = 0",Passed,Automatic (Integration),Antigravity Bot,2026-07-31,AuthRestController,"1. POST /api/v1/auth/logout
+2. Kiểm tra cookie hết hạn",,
+TC_IT_ADMIN_PROD_01,Xem danh sách sản phẩm (Quyền ADMIN),Trả về danh sách sản phẩm với status 200,"Status 200, trả về danh sách",Passed,Automatic (Integration),Antigravity Bot,2026-07-31,AdminProductRestController,"1. Dọn DB
+2. GET /api/v1/admin/products
+3. Kiểm tra kết quả","page=0, size=10",
+TC_IT_ADMIN_PROD_02,Tạo sản phẩm mới (Quyền ADMIN) thành công,"Trả về status 201, dữ liệu lưu vào DB","Status 201, lưu DB thành công",Passed,Automatic (Integration),Antigravity Bot,2026-07-31,AdminProductRestController,"1. Mock upload ảnh
+2. POST multipart/form-data
+3. Kiểm tra assert DB","name, price, image",
+TC_IT_ADMIN_PROD_03,Tạo sản phẩm mới thiếu trường bắt buộc,Trả về status 400 Bad Request,Status 400 Bad Request,Passed,Automatic (Integration),Antigravity Bot,2026-07-31,AdminProductRestController,"1. POST /api/v1/admin/products thiếu tên
+2. Kiểm tra status 400",Thiếu name,
+TC_IT_ADMIN_PROD_04,Tạo sản phẩm mới (Quyền USER),Bị từ chối truy cập (403 Forbidden),Status 403 Forbidden,Passed,Automatic (Integration),Antigravity Bot,2026-07-31,AdminProductRestController,"1. MockUser authority=USER
+2. POST /api/v1/admin/products
+3. Kiểm tra status 403",,
+TC_IT_ADMIN_PROD_05,Cập nhật sản phẩm (Quyền ADMIN),Cập nhật thông tin thành công,"Status 200 OK, DB cập nhật",Passed,Automatic (Integration),Antigravity Bot,2026-07-31,AdminProductRestController,"1. Tạo sản phẩm cũ
+2. Gửi PUT multipart/form-data
+3. Kiểm tra DB có giá trị mới",name mới,
+TC_IT_ADMIN_PROD_06,Xóa sản phẩm (Quyền ADMIN),"Xóa thành công, DB trống","Status 200 OK, DB trống",Passed,Automatic (Integration),Antigravity Bot,2026-07-31,AdminProductRestController,"1. Tạo sản phẩm
+2. DELETE /api/v1/admin/products/{id}
+3. Kiểm tra DB không tồn tại",id,

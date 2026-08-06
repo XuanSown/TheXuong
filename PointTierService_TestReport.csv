@@ -1,0 +1,69 @@
+﻿TC ID,Testcase title,Expected result,Actual result,Status (Passed/Failed),Run type (Manual / Automatic),Tested by,Date started,Pre-conditions,Test step details,Test data,Note
+TC_PT_01,getTierForUser - User không tồn tại,"Trả về hạng mặc định ""THUONG""","Trả về ""THUONG""",Passed,Automatic,Antigravity Bot,2026-07-30,userId không hợp lệ,"1. Mock UserRepository trả về rỗng.
+2. Gọi getTierForUser(1L).
+3. Xác minh kết quả trả về là ""THUONG"".",id=1L,
+TC_PT_02,getTierForUser - Không đủ điều kiện (Spent & Points thấp),"Trả về hạng mặc định ""THUONG""","Trả về ""THUONG""",Passed,Automatic,Antigravity Bot,2026-07-30,"Spent = null, Points = null","1. Mock OrderRepo trả null cho sumSpent.
+2. Mock PointTxRepo trả null cho sumPoints.
+3. Mock DB trả danh sách có hạng VIP.
+4. Gọi getTierForUser(1L).
+5. Xác minh trả về THUONG do không thỏa điều kiện VIP.",id=1L,
+TC_PT_03,getTierForUser - Match bằng tổng chi tiêu (Spent),Trả về mã hạng tương ứng (VIP),"Trả về ""VIP""",Passed,Automatic,Antigravity Bot,2026-07-30,"Spent vượt min, Points thiếu","1. Mock OrderRepo sumSpent = 6M (vượt ngưỡng 5M của VIP).
+2. Mock PointTxRepo sumPoints = 10 (chưa đủ 50).
+3. Gọi getTierForUser(1L).
+4. Xác minh trả về VIP do match điều kiện Spent.",spent=6M,
+TC_PT_04,getTierForUser - Match bằng tổng điểm (Points),Trả về mã hạng tương ứng (VIP),"Trả về ""VIP""",Passed,Automatic,Antigravity Bot,2026-07-30,"Spent thiếu, Points vượt min","1. Mock OrderRepo sumSpent = 1M (không đủ 5M).
+2. Mock PointTxRepo sumPoints = 60 (vượt ngưỡng 50).
+3. Gọi getTierForUser(1L).
+4. Xác minh trả về VIP do match điều kiện Points.",points=60,
+TC_PT_05,getLoyaltyProgress - User không tồn tại,Trả về null,Trả về null,Passed,Automatic,Antigravity Bot,2026-07-30,userId sai,"1. Mock UserRepository trả về rỗng.
+2. Gọi getLoyaltyProgress(1L).
+3. Xác minh kết quả trả về là null.",id=1L,
+TC_PT_06,getLoyaltyProgress - Đang ở hạng cao nhất (không có Next Tier),"Trả về DTO, nextTierCode = null",DTO không chứa Next Tier,Passed,Automatic,Antigravity Bot,2026-07-30,"User đang ở VIP, không có hạng VVIP","1. Mock User thuộc hạng VIP.
+2. Mock DB trả về list hạng (chỉ có VIP).
+3. Gọi getLoyaltyProgress(1L).
+4. Xác minh DTO trả về currentTierCode=VIP, nextTierCode=null.",tier=VIP,
+TC_PT_07,"getLoyaltyProgress - Có Next Tier, tính toán còn thiếu bao nhiêu",Tính chính xác Spent Remaining và Points Remaining,Tính toán đúng 4M và 40đ,Passed,Automatic,Antigravity Bot,2026-07-30,"User đang THUONG, tiêu 1M, kiếm 10đ","1. Mock User thuộc THUONG.
+2. Mock sumSpent=1M, sumPoints=10.
+3. Mock DB có hạng VIP yêu cầu 5M hoặc 50đ.
+4. Xác minh DTO tính spentRemainingToNextTier = 4M, pointsRemainingToNextTier = 40.","spent=1M, pts=10",
+TC_PT_08,getLoyaltyProgress - Đã vượt mức min Spent nhưng chưa update hạng,Spent Remaining = 0,Spent Remaining = 0,Passed,Automatic,Antigravity Bot,2026-07-30,"Spent = 6M, yêu cầu 5M","1. Mock sumSpent = 6M.
+2. Mock hạng VIP yêu cầu 5M.
+3. Xác minh spentRemainingToNextTier = 0 (không bị âm).",spent=6M,
+TC_PT_09,upgradeTierIfEligible - User không tồn tại,Return false,Return false,Passed,Automatic,Antigravity Bot,2026-07-30,userId sai,"1. Mock findById rỗng.
+2. Gọi upgradeTierIfEligible(1L).
+3. Xác minh trả về false.",id=1L,
+TC_PT_10,upgradeTierIfEligible - Không có sự nâng hạng (newPriority <= currentPriority),Return false,Return false,Passed,Automatic,Antigravity Bot,2026-07-30,Tier mới không cao hơn,"1. Mock user đang ở VIP.
+2. Mock getTierForUser trả về kết quả là THUONG.
+3. Gọi upgradeTierIfEligible.
+4. Xác minh trả về false.",tier=VIP,
+TC_PT_11,"upgradeTierIfEligible - Thăng hạng, nhưng hạng mới không có phần thưởng","Cập nhật User, ghi Lịch sử, không gọi VoucherService","Update thành công, không gọi phát Voucher",Passed,Automatic,Antigravity Bot,2026-07-30,"Lên hạng VIP, rewardVoucherId = null","1. Mock User đang THUONG, đủ đk lên VIP.
+2. Mock hạng VIP có rewardVoucherId = null.
+3. Gọi upgradeTierIfEligible.
+4. Xác minh user được lưu (setTierPromotedAt != null).
+5. Xác minh TierHistory được lưu.
+6. Xác minh VoucherService KHÔNG được gọi.",tier=THUONG->VIP,
+TC_PT_12,upgradeTierIfEligible - Thăng hạng và có thưởng Voucher,"Cập nhật, ghi lịch sử, gọi VoucherService",Phát hành Voucher thành công,Passed,Automatic,Antigravity Bot,2026-07-30,"Lên hạng VIP, rewardVoucherId = 99","1. Mock hạng VIP có rewardVoucherId = 99.
+2. Gọi upgradeTierIfEligible.
+3. Xác minh VoucherService.issueVoucherToUser(99L, 1L) được gọi chính xác.",reward=99,
+TC_PT_13,upgradeTierIfEligible - Lỗi khi phát Voucher,"Bắt lỗi, in Warn Log, không làm Rollback thăng hạng","Bắt lỗi thành công, return true",Passed,Automatic,Antigravity Bot,2026-07-30,VoucherService ném Exception,"1. Mock VoucherService ném RuntimeException.
+2. Gọi upgradeTierIfEligible.
+3. Xác minh hàm bắt lỗi thành công, không văng Exception và vẫn thăng hạng bình thường (return true).",mock error,
+TC_PT_14,setFirstOrderTier - User không tồn tại,"Return, không gọi Save",Không gọi Save,Passed,Automatic,Antigravity Bot,2026-07-30,userId sai,"1. Mock findById rỗng.
+2. Gọi setFirstOrderTier(1L).
+3. Xác minh userRepository.save không được gọi.",id=1L,
+TC_PT_15,setFirstOrderTier - User đã có hạng,"Return, không gọi Save",Không gọi Save,Passed,Automatic,Antigravity Bot,2026-07-30,User đang ở THUONG hoặc VIP,"1. Mock user đã có tierCode=""VIP"".
+2. Gọi setFirstOrderTier.
+3. Xác minh userRepository.save không được gọi.",tier=VIP,
+TC_PT_16,setFirstOrderTier - User chưa có hạng,"Gán hạng THUONG, lưu Lịch sử",Gán thành công,Passed,Automatic,Antigravity Bot,2026-07-30,User.tierCode = null,"1. Mock user có tierCode = null.
+2. Gọi setFirstOrderTier.
+3. Xác minh gán THUONG, save User và save TierHistory.",tier=null,
+TC_PT_17,updateTierManually - Người dùng / Hạng mới / Hạng cũ không hợp lệ,Throw RuntimeException,Ném các RuntimeException tương ứng,Passed,Automatic,Antigravity Bot,2026-07-30,Các case validation,"1. Test lỗi ""Không tìm thấy người dùng"".
+2. Test lỗi ""Mã hạng không hợp lệ"".
+3. Test lỗi ""Người dùng đã ở hạng này rồi"".
+4. Xác minh thông báo lỗi chuẩn xác từng case.",validations,
+TC_PT_18,updateTierManually - Hạ hạng (Demotion),"Không phát Voucher thưởng, lưu DB thành công",Hạ hạng thành công,Passed,Automatic,Antigravity Bot,2026-07-30,Từ VIP xuống THUONG,"1. Mock user đang ở VIP (minSpent=5M).
+2. Update thủ công xuống THUONG (minSpent=0).
+3. Xác minh tierCode được đổi, History được lưu, VoucherService KHÔNG được gọi.",VIP->THUONG,
+TC_PT_19,updateTierManually - Thăng hạng (Promotion) có thưởng,"Phát Voucher thưởng, lưu DB thành công",Thăng hạng thành công,Passed,Automatic,Antigravity Bot,2026-07-30,Từ THUONG lên VIP,"1. Mock user từ THUONG lên VIP.
+2. Gọi updateTierManually.
+3. Xác minh tierCode thay đổi, VoucherService được gọi để thưởng.",THUONG->VIP,

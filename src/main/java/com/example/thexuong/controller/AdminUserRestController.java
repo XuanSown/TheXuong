@@ -1,4 +1,4 @@
-package com.example.thexuong.controller.api;
+package com.example.thexuong.controller;
 
 import com.example.thexuong.dto.ApiResponse;
 import com.example.thexuong.dto.UserStatusDto;
@@ -161,6 +161,7 @@ UserStatusDto.from(updated)
  }
 
  User updated = userService.getUserById(id);
+ // Tra ve ket qua sau khi cap nhat
  return ResponseEntity.ok(ApiResponse.ok(
  "Cap nhat nguoi dung thanh cong",
  Map.of(
@@ -191,6 +192,7 @@ UserStatusDto.from(updated)
  String email = body.get("email") != null ? body.get("email").toString() : null;
  String username = body.get("username") != null ? body.get("username").toString() : null;
  String fullName = body.get("fullName") != null ? body.get("fullName").toString() : null;
+ String phone = body.get("phone") != null ? body.get("phone").toString() : null;
  String password = body.get("password") != null ? body.get("password").toString() : null;
  String role = body.get("role") != null ? body.get("role").toString() : "CUSTOMER";
 
@@ -201,7 +203,7 @@ UserStatusDto.from(updated)
  return ResponseEntity.badRequest().body(ApiResponse.error("Mat khau khong duoc de trong"));
  }
 
- User created = userService.createUser(email, username, fullName, password, "LOCAL", role);
+ User created = userService.createUser(email, username, fullName, password, "LOCAL", role, phone);
  return ResponseEntity.ok(ApiResponse.ok(
  "Tao nguoi dung thanh cong",
  Map.of(

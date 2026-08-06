@@ -1,0 +1,49 @@
+﻿TC ID,Testcase title,Expected result,Actual result,Status (Passed/Failed),Run type (Manual / Automatic),Tested by,Date started,Pre-conditions,Test step details,Test data,Note
+TC_PT_01,earnPoints - Amount null hoặc 0,Trả về 0,Trả về 0,Passed,Automatic,Antigravity Bot,2026-07-30,amount = null hoặc 0,"1. Gọi earnPoints.
+2. Xác minh trả về 0.","null, 0",
+TC_PT_02,earnPoints - Amount quá nhỏ,Trả về 0 (vì floor),Trả về 0,Passed,Automatic,Antigravity Bot,2026-07-30,amount = 99.000,"1. Gọi earnPoints.
+2. Xác minh điểm = 0.",99000,
+TC_PT_03,earnPoints - Thành công,"Tính điểm, lưu UserPoints và Tx",Lưu thành công,Passed,Automatic,Antigravity Bot,2026-07-30,amount = 250.000,"1. Gọi earnPoints.
+2. Xác minh tính ra 2 điểm, lưu thành công.",250000,
+TC_PT_04,spendPoints - Điểm < 0,Ném Exception,Ném Exception,Passed,Automatic,Antigravity Bot,2026-07-30,points = -5,"1. Gọi spendPoints.
+2. Xác minh IllegalArgumentException.",-5,
+TC_PT_05,spendPoints - Chưa có ví điểm,Ném Exception,Ném Exception,Passed,Automatic,Antigravity Bot,2026-07-30,Không tìm thấy ví,"1. Gọi spendPoints.
+2. Xác minh PointBalanceException.",,
+TC_PT_06,spendPoints - Không đủ điểm,Ném Exception,Ném Exception,Passed,Automatic,Antigravity Bot,2026-07-30,Điểm hiện tại < điểm cần tiêu,"1. Gọi spendPoints.
+2. Xác minh PointBalanceException.","current=10, spend=50",
+TC_PT_07,spendPoints - Thành công,"Trừ điểm, lưu Tx",Thành công,Passed,Automatic,Antigravity Bot,2026-07-30,Đủ điểm,"1. Gọi spendPoints.
+2. Xác minh điểm bị trừ, lưu Tx SPEND.",spend=100,
+TC_PT_08,reversePoints - Không có Tx EARN,Không làm gì,Return early,Passed,Automatic,Antigravity Bot,2026-07-30,Không có giao dịch EARN,"1. Gọi reversePoints.
+2. Xác minh Repo save không bị gọi.",,
+TC_PT_09,reversePoints - Thành công,"Trừ điểm, lưu Tx REVERSE",Thành công,Passed,Automatic,Antigravity Bot,2026-07-30,Có Tx EARN,"1. Gọi reversePoints.
+2. Xác minh điểm bị trừ, lưu REVERSE.",,
+TC_PT_10,reversePoints - Không đủ điểm để trừ,Trừ về 0,"Về 0, không âm",Passed,Automatic,Antigravity Bot,2026-07-30,Điểm EARN > Current points,"1. Gọi reversePoints.
+2. Xác minh điểm về 0, không bị âm.",,
+TC_PT_11,reversePoints - Không tìm thấy User,Ném Exception,Ném RuntimeException,Passed,Automatic,Antigravity Bot,2026-07-30,Có Tx EARN nhưng không có user points,"1. Gọi reversePoints.
+2. Xác minh Exception.",,
+TC_PT_12,refundSpentPoints - Input không hợp lệ,Không làm gì,Return early,Passed,Automatic,Antigravity Bot,2026-07-30,points = 0 hoặc userId null,"1. Gọi refundSpentPoints.
+2. Xác minh không lưu.",points=0,
+TC_PT_13,refundSpentPoints - Thành công,"Cộng điểm, trừ TotalSpent",Thành công,Passed,Automatic,Antigravity Bot,2026-07-30,Input hợp lệ,"1. Gọi refundSpentPoints.
+2. Xác minh điểm cộng, lưu REFUND Tx.",points=50,
+TC_PT_14,adjustPoints - Thiếu note,Ném Exception,Ném IllegalArgumentException,Passed,Automatic,Antigravity Bot,2026-07-30,note = rỗng,"1. Gọi adjustPoints.
+2. Xác minh Exception.","note=""""",
+TC_PT_15,adjustPoints - Số dương,"Cộng điểm, lưu Tx",Thành công,Passed,Automatic,Antigravity Bot,2026-07-30,delta > 0,"1. Gọi adjustPoints(50).
+2. Xác minh điểm cộng.",50,
+TC_PT_16,adjustPoints - Số âm,"Trừ điểm, lưu Tx",Thành công,Passed,Automatic,Antigravity Bot,2026-07-30,delta < 0,"1. Gọi adjustPoints(-100).
+2. Xác minh điểm trừ.",-100,
+TC_PT_17,adjustPoints - Số âm quá lớn,Trừ về 0,"Thành công, không âm",Passed,Automatic,Antigravity Bot,2026-07-30,delta âm > current points,"1. Gọi adjustPoints(-1000).
+2. Xác minh điểm về 0.",-1000,
+TC_PT_18,expireOldPoints - Không tìm thấy user,Bỏ qua,Thành công,Passed,Automatic,Antigravity Bot,2026-07-30,User không tồn tại,"1. Gọi expireOldPoints.
+2. Xác minh bỏ qua.",,
+TC_PT_19,expireOldPoints - Thành công,"Trừ điểm, lưu EXPIRE",Thành công,Passed,Automatic,Antigravity Bot,2026-07-30,Có điểm hết hạn,"1. Gọi expireOldPoints.
+2. Xác minh điểm trừ, lưu Tx.",,
+TC_PT_20,expireOldPoints - Không còn điểm,Không lưu Tx,Thành công,Passed,Automatic,Antigravity Bot,2026-07-30,current points = 0,"1. Gọi expireOldPoints.
+2. Xác minh không lưu EXPIRE Tx.",,
+TC_PT_21,getOrCreateUserPoints - Chưa có,Tạo mới,Tạo ví mới 0 điểm,Passed,Automatic,Antigravity Bot,2026-07-30,Ví rỗng,"1. Gọi getOrCreateUserPoints.
+2. Xác minh tạo mới.",,
+TC_PT_22,getOrCreateUserPoints - Đã có,Trả về ví cũ,Trả về ví cũ,Passed,Automatic,Antigravity Bot,2026-07-30,Có sẵn ví,"1. Gọi getOrCreateUserPoints.
+2. Xác minh không tạo mới.",,
+TC_PT_23,getCurrentPoints - Có/Không ví,Trả về điểm hoặc 0,Thành công,Passed,Automatic,Antigravity Bot,2026-07-30,Cả 2 trường hợp,"1. Gọi getCurrentPoints.
+2. Xác minh đúng kết quả.",,
+TC_PT_24,getHistory - Thành công,Gọi repo,Thành công,Passed,Automatic,Antigravity Bot,2026-07-30,,"1. Gọi getHistory.
+2. Xác minh repo.",,

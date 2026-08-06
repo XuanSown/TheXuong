@@ -4,6 +4,7 @@ import com.example.thexuong.entity.*;
 import com.example.thexuong.exception.IllegalOrderTransitionException;
 import com.example.thexuong.repository.*;
 import com.example.thexuong.service.InventoryService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -30,6 +31,31 @@ private final EmailService emailService;
 private final UserPointsRepository userPointsRepository;
 private final InventoryService inventoryService;
 private final ProductVariantRepository productVariantRepository;
+private final AuditLogService auditLogService;
+private final ObjectMapper objectMapper;
+
+private String toJson(Object obj) {
+    if (obj == null) return null;
+    if (obj instanceof Order) {
+        Order o = (Order) obj;
+        java.util.Map<String, Object> map = new java.util.LinkedHashMap<>();
+        map.put("id", o.getId());
+        map.put("address", o.getAddress());
+        map.put("totalAmount", o.getTotalMoney() != null ? o.getTotalMoney() : BigDecimal.ZERO);
+        map.put("discount", o.getDiscountAmount());
+        map.put("voucherCode", o.getVoucherCode());
+        map.put("status", o.getStatus());
+        map.put("paymentMethod", o.getPaymentMethod());
+        map.put("createdAt", o.getCreatedAt() != null ? o.getCreatedAt().toString() : "");
+        obj = map;
+    }
+    try {
+        return objectMapper.writeValueAsString(obj);
+    } catch (Exception e) {
+        log.error("Loi parse JSON audit log", e);
+        return null;
+    }
+}
 
 @Transactional
 public Order placeOrder(String username, String fullName, String phone, String address,
@@ -323,10 +349,12 @@ public Order refundOrder(Long orderId, String adminUsername) {
 Order order = orderRepository.findById(orderId)
 .orElseThrow(() -> new RuntimeException("Order not found: " + orderId));
 
+String oldState = toJson(order);
+
 if (!order.getStatus().canTransitionTo(OrderStatus.REFUNDED)) {
 throw new IllegalOrderTransitionException(
-"Không thể hoàn tiền từ trạng thái " + order.getStatus()
-+ ". Chỉ chấp nhận khi đơn đã CONFIRMED/SHIPPING/DELIVERED.");
+"Khong the hoan tien tu trang thai " + order.getStatus()
++ ". Chi chap nhan khi don da CONFIRMED/SHIPPING/DELIVERED.");
 }
 
 restoreStockForOrder(order);
@@ -336,9 +364,18 @@ order.setStatus(OrderStatus.REFUNDED);
 order.setRefundedAt(LocalDateTime.now());
 Order saved = orderRepository.save(order);
 
+auditLogService.logAction(
+        "ORDER",
+        "REFUND",
+        String.valueOf(saved.getId()),
+        oldState,
+        toJson(saved),
+        "Admin refunded order: #" + saved.getId()
+);
+
 try {
 pointService.reversePoints(saved.getId(),
-"Hoàn điểm từ refund đơn #" + saved.getId());
+"Hoan diem tu refund don #" + saved.getId());
 } catch (Exception e) {
 log.error("[LOYALTY ERROR] Failed to reverse points for order #{}: {}", saved.getId(), e.getMessage(), e);
 }
@@ -351,10 +388,12 @@ public Order adminUpdateStatus(Long orderId, OrderStatus newStatus) {
 Order order = orderRepository.findById(orderId)
 .orElseThrow(() -> new RuntimeException("Order not found: " + orderId));
 
+String oldState = toJson(order);
+
 OrderStatus current = order.getStatus();
 if (!current.canTransitionTo(newStatus)) {
 throw new IllegalOrderTransitionException(
-"Transition không hợp lệ: " + current + " → " + newStatus);
+"Transition khong hop le: " + current + " -> " + newStatus);
 }
 
 if (newStatus == OrderStatus.CANCELLED || newStatus == OrderStatus.REFUNDED) {
@@ -373,6 +412,17 @@ case CANCELLED -> order.setCancelledAt(now);
 case REFUNDED -> order.setRefundedAt(now);
 default -> {}
 }
-return orderRepository.save(order);
+Order saved = orderRepository.save(order);
+
+auditLogService.logAction(
+        "ORDER",
+        "UPDATE_STATUS",
+        String.valueOf(saved.getId()),
+        oldState,
+        toJson(saved),
+        "Admin updated order status to: " + saved.getStatus()
+);
+
+return saved;
 }
 }

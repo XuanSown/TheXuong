@@ -1,0 +1,34 @@
+﻿TC ID,Testcase title,Expected result,Actual result,Status (Passed/Failed),Run type,Tested by,Date started,Module/Class,Test step details,Test data,Note
+TC_IT_PROD_01,Lấy danh sách sản phẩm (Public),"Trả về status 200, danh sách item","Status 200, danh sách",Passed,Automatic (Integration),Antigravity Bot,2026-07-31,ProductRestController,"1. Dọn DB, Thêm mock Product
+2. GET /api/v1/products
+3. Kiểm tra jsonPath list size","page=0, size=10",
+TC_IT_PROD_02,Lấy chi tiết sản phẩm (Public),"Trả về thông tin chi tiết, tăng view","Status 200, tên đúng, view++ = 1",Passed,Automatic (Integration),Antigravity Bot,2026-07-31,ProductRestController,"1. Lấy ID sản phẩm
+2. GET /api/v1/products/{id}
+3. Kiểm tra view count trong DB",id,
+TC_IT_PROD_03,Lấy sản phẩm mới nhất (New),Trả về danh sách giới hạn số lượng,"Status 200, độ dài danh sách đúng",Passed,Automatic (Integration),Antigravity Bot,2026-07-31,ProductRestController,"1. Thêm nhiều sản phẩm
+2. GET /api/v1/products/new?limit=2
+3. Kiểm tra list chứa 2 item",limit=2,
+TC_IT_ORDER_01,Đặt hàng (COD) thành công,"Trả về thông báo thành công, tổng tiền đúng","Status 200, tạo đơn, trừ hàng",Passed,Automatic (Integration),Antigravity Bot,2026-07-31,OrderRestController,"1. Khởi tạo Giỏ hàng có đồ
+2. POST /api/v1/orders với COD
+3. DB tạo Order thành công","fullName, phone, COD",
+TC_IT_ORDER_02,Xem danh sách đơn hàng,Trả về danh sách đơn đã đặt,"Status 200, list size = 1",Passed,Automatic (Integration),Antigravity Bot,2026-07-31,OrderRestController,"1. Fake 1 đơn hàng trong DB
+2. GET /api/v1/orders
+3. Kiểm tra tên người nhận đúng",,
+TC_IT_ADMIN_ORDER_01,Admin xem danh sách đơn hàng,Trả về list đơn hàng,"Status 200, trả về list",Passed,Automatic (Integration),Antigravity Bot,2026-07-31,AdminOrderRestController,"1. Login quyền ADMIN
+2. GET /api/v1/admin/orders
+3. Assert JSON list trả về đúng",,
+TC_IT_ADMIN_ORDER_02,Admin cập nhật trạng thái đơn,Trạng thái chuyển sang DELIVERING,"Status 200, DB cập nhật DELIVERING",Passed,Automatic (Integration),Antigravity Bot,2026-07-31,AdminOrderRestController,"1. Lấy ID đơn hàng
+2. PUT /api/v1/admin/orders/{id}/status
+3. DB kiểm tra status = DELIVERING",status=DELIVERING,
+TC_IT_ADDRESS_01,Thêm địa chỉ giao hàng,DB lưu địa chỉ mới,"Status 201, trả về address data",Passed,Automatic (Integration),Antigravity Bot,2026-07-31,AddressRestController,"1. Mock User đang login
+2. POST /api/v1/address
+3. Query DB check thông tin","city, district",
+TC_IT_ADDRESS_02,Lấy danh sách sổ địa chỉ,Trả về danh sách của user,"Status 200, list address",Passed,Automatic (Integration),Antigravity Bot,2026-07-31,AddressRestController,"1. Khởi tạo 2 địa chỉ cho user
+2. GET /api/v1/address
+3. Kiểm tra length trả về = 2",,
+TC_IT_ADMIN_VOUCHER_01,Admin tạo Voucher mới,Voucher lưu vào DB,"Status 201, Voucher created",Passed,Automatic (Integration),Antigravity Bot,2026-07-31,AdminVoucherRestController,"1. Cấp quyền ADMIN
+2. POST /api/v1/admin/vouchers
+3. Query Voucher trong DB","discount, code",
+TC_IT_ADMIN_CATE_01,Admin tạo Category,Category lưu vào DB,Status 201,Passed,Automatic (Integration),Antigravity Bot,2026-07-31,AdminCategoryRestController,"1. Mock request multipart
+2. POST /api/v1/admin/categories
+3. Assert Category table",name,
