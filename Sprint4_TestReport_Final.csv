@@ -1,8 +1,0 @@
-﻿"TC ID","Testcase title","Expected result","Actual result","Status (Passed/Failed)","Run type (Manual / Automatic)","Tested by","Date started","Pre-conditions","Test step details","Test data","Note"
-"TC_SP4_SKIPPED_1","AdminStatisticsService - Thống kê admin","N/A","N/A","Skipped","Manual","Antigravity Bot","2026-07-30","N/A","Logic nằm ở AdminStatisticsRestController -> Sẽ test ở pha Integration Test","",""
-"TC_SP4_SKIPPED_2","BrandService - Thương hiệu","N/A","N/A","Skipped","Manual","Antigravity Bot","2026-07-30","N/A","Logic nằm ở AdminProductRestController -> Sẽ test ở pha Integration Test","",""
-"TC_SP4_SKIPPED_3","AuditLogService - Ghi log","N/A","N/A","Skipped","Manual","Antigravity Bot","2026-07-30","N/A","Đã được tích hợp và test chung trong VoucherService (VoucherAuditLog)","",""
-"TC_SP4_SKIPPED_4","NotificationService - Thông báo","N/A","N/A","Skipped","Manual","Antigravity Bot","2026-07-30","N/A","Backend chưa có mã nguồn hỗ trợ (Chưa làm)","",""
-"TC_SP4_SKIPPED_5","WishlistService - Yêu thích","N/A","N/A","Skipped","Manual","Antigravity Bot","2026-07-30","N/A","Backend chưa có mã nguồn hỗ trợ (Chưa làm)","",""
-"TC_SP4_SKIPPED_6","TelegramService - Báo cáo Tele","N/A","N/A","Skipped","Manual","Antigravity Bot","2026-07-30","N/A","Backend chưa có mã nguồn hỗ trợ (Chưa làm)","",""
-"TC_SP4_SKIPPED_7","NewsletterService - Đăng ký tin","N/A","N/A","Skipped","Manual","Antigravity Bot","2026-07-30","N/A","Backend chưa có mã nguồn hỗ trợ (Chưa làm)","",""
