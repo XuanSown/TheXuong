@@ -74,11 +74,17 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 		WHERE (:keyword IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%')))
 		  AND (:sport IS NULL OR p.sport.name = :sport)
 		  AND (:brand IS NULL OR p.brand.name = :brand)
+		  AND (:minPrice IS NULL OR p.price >= :minPrice)
+		  AND (:maxPrice IS NULL OR p.price <= :maxPrice)
+		  AND (:shoeSize IS NULL OR EXISTS (SELECT 1 FROM ProductVariant v WHERE v.product = p AND v.size.name = :shoeSize))
 	""")
 	Page<Product> findByFilters(
 		@Param("keyword") String keyword,
 		@Param("sport") String sport,
 		@Param("brand") String brand,
+		@Param("minPrice") Double minPrice,
+		@Param("maxPrice") Double maxPrice,
+		@Param("shoeSize") String shoeSize,
 		Pageable pageable
 	);
 

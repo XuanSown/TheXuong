@@ -21,7 +21,7 @@ public class UserAddress {
     @Column(name = "recipient_name", columnDefinition = "NVARCHAR(255)", nullable = false)
     private String recipientName;
 
-    @Column(name = "recipient_phone", nullable = false)
+    @Column(name = "recipient_phone", nullable = false, length = 20)
     private String recipientPhone;
 
     @Column(name = "province_code", length = 5, nullable = false)

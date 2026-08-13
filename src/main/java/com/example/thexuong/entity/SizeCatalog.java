@@ -7,7 +7,7 @@ import lombok.*;
 @NoArgsConstructor @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "SizeCatalog")
+@Table(name = "Sizes")
 public class SizeCatalog {
 
     @Id

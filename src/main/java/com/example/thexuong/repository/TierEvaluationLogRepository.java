@@ -22,7 +22,7 @@ public interface TierEvaluationLogRepository extends JpaRepository<TierEvaluatio
             "WHERE tel.evaluatedAt = (" +
             "  SELECT MAX(t2.evaluatedAt) FROM TierEvaluationLog t2 WHERE t2.userId = tel.userId" +
             ") " +
-            "AND tel.newTierCode = 'VIP' " +
+            "AND tel.newTierCode != :baseTierCode " +
             "AND tel.evaluatedAt <= :before")
-    List<TierEvaluationLog> findUsersNearReevaluation(@Param("before") LocalDateTime before);
+    List<TierEvaluationLog> findUsersNearReevaluation(@Param("before") LocalDateTime before, @Param("baseTierCode") String baseTierCode);
 }

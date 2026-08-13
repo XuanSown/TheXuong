@@ -38,19 +38,19 @@
       <section
         class="w-[1250px] mx-auto h-[50px] bg-white border border-[#CFC4C6] mb-[30px] flex items-center overflow-hidden"
       >
-        <div class="relative flex overflow-x-hidden w-full">
-          <div class="py-12 animate-marquee whitespace-nowrap flex items-center justify-around min-w-full gap-[120px]">
+        <div class="flex animate-marquee w-max py-12 whitespace-nowrap">
+          <!-- Group 1 -->
+          <div class="flex items-center gap-[200px] pr-[200px]">
             <span class="font-geist text-lg text-[#1A1C1C] opacity-80">NIKE</span>
             <span class="font-geist text-lg font-bold text-[#1A1C1C] opacity-80">ADIDAS</span>
-            <span class="font-geist text-lg font-bold text-[#1A1C1C] opacity-80">LI-NING</span>
+            <span class="font-geist text-lg text-[#1A1C1C] opacity-80">LI-NING</span>
             <span class="font-geist text-lg font-bold text-[#1A1C1C] opacity-80">PUMA</span>
           </div>
-          <div
-            class="absolute top-0 py-12 animate-marquee2 whitespace-nowrap flex items-center justify-around min-w-full gap-[120px]"
-          >
+          <!-- Group 2 (Duplicate for continuous loop) -->
+          <div class="flex items-center gap-[200px] pr-[200px]">
             <span class="font-geist text-lg text-[#1A1C1C] opacity-80">NIKE</span>
             <span class="font-geist text-lg font-bold text-[#1A1C1C] opacity-80">ADIDAS</span>
-            <span class="font-geist text-lg font-bold text-[#1A1C1C] opacity-80">LI-NING</span>
+            <span class="font-geist text-lg text-[#1A1C1C] opacity-80">LI-NING</span>
             <span class="font-geist text-lg font-bold text-[#1A1C1C] opacity-80">PUMA</span>
           </div>
         </div>
@@ -287,25 +287,11 @@ onMounted(() => {
   }
 
   100% {
-    transform: translateX(-100%);
-  }
-}
-
-@keyframes marquee2 {
-  0% {
-    transform: translateX(100%);
-  }
-
-  100% {
-    transform: translateX(0);
+    transform: translateX(-50%);
   }
 }
 
 .animate-marquee {
   animation: marquee 25s linear infinite;
-}
-
-.animate-marquee2 {
-  animation: marquee2 25s linear infinite;
 }
 </style>

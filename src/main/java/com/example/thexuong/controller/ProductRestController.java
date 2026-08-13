@@ -51,6 +51,9 @@ public class ProductRestController {
 			@RequestParam(required = false) @Pattern(regexp = "^.{0,100}$") String keyword,
 			@RequestParam(required = false) @Pattern(regexp = "^.{0,50}$") String sport,
 			@RequestParam(required = false) @Pattern(regexp = "^.{0,50}$") String brand,
+			@RequestParam(required = false) Double minPrice,
+			@RequestParam(required = false) Double maxPrice,
+			@RequestParam(required = false) String shoeSize,
 			@RequestParam(defaultValue = "newest") @Pattern(regexp = "^(newest|price_asc|price_desc)$") String sort) {
 
 		Sort sorting = Sort.by("id").descending();
@@ -67,7 +70,8 @@ public class ProductRestController {
 		String kw = (keyword != null && !keyword.isEmpty()) ? keyword : null;
 		String sp = (sport    != null && !sport.isEmpty())    ? sport    : null;
 		String br = (brand    != null && !brand.isEmpty())    ? brand    : null;
-		productsPage = productRepository.findByFilters(kw, sp, br, pageable);
+		String sz = (shoeSize != null && !shoeSize.isEmpty()) ? shoeSize : null;
+		productsPage = productRepository.findByFilters(kw, sp, br, minPrice, maxPrice, sz, pageable);
 
 		// Convert to DTOs
 		List<ProductDto> productDtos = productsPage.getContent().stream()

@@ -4,6 +4,7 @@ import com.example.thexuong.dto.admin.UpdateOrderStatusRequest;
 import com.example.thexuong.entity.Order;
 import com.example.thexuong.entity.OrderStatus;
 import com.example.thexuong.repository.OrderRepository;
+import com.example.thexuong.service.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -31,6 +32,7 @@ import java.util.Map;
 public class AdminOrderRestController {
 
     private final OrderRepository orderRepository;
+    private final OrderService orderService;
 
     /**
      * GET /api/v1/admin/orders
@@ -100,35 +102,16 @@ public class AdminOrderRestController {
         String newStatusStr = request.getStatus();
         try {
             OrderStatus newStatus = OrderStatus.valueOf(newStatusStr);
-            Order order = orderRepository.findById(id)
-                    .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng: " + id));
-
-            OrderStatus current = order.getStatus();
-            if (!current.canTransitionTo(newStatus)) {
-                return ResponseEntity.badRequest().body(Map.of(
-                        "error", "Không thể chuyển từ " + current + " sang " + newStatus
-                ));
-            }
-
-            order.setStatus(newStatus);
-            LocalDateTime now = LocalDateTime.now();
-            switch (newStatus) {
-                case CONFIRMED -> order.setPaidAt(now);
-                case SHIPPING -> order.setShippedAt(now);
-                case DELIVERED -> order.setDeliveredAt(now);
-                case COMPLETED -> order.setCompletedAt(now);
-                case CANCELLED -> order.setCancelledAt(now);
-                case REFUNDED -> order.setRefundedAt(now);
-                default -> {}
-            }
-            orderRepository.save(order);
+            Order updatedOrder = orderService.adminUpdateStatus(id, newStatus);
 
             return ResponseEntity.ok(Map.of(
                     "message", "Cập nhật trạng thái thành công",
-                    "order", toOrderSummary(order)
+                    "order", toOrderSummary(updatedOrder)
             ));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(Map.of("error", "Invalid status: " + newStatusStr));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
 

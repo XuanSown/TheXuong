@@ -43,15 +43,15 @@ public class Order {
     @Column(name = "total_money")
     private BigDecimal totalMoney;
 
-    @Column(name = "subtotal")
+    @Column(name = "subtotal", precision = 18, scale = 2)
     private BigDecimal subtotal;
 
     @Builder.Default
-    @Column(name = "shipping_fee")
+    @Column(name = "shipping_fee", precision = 18, scale = 2)
     private BigDecimal shippingFee = BigDecimal.ZERO;
 
     @Builder.Default
-    @Column(name = "discount_amount")
+    @Column(name = "discount_amount", precision = 18, scale = 2)
     private BigDecimal discountAmount = BigDecimal.ZERO;
 
     @Builder.Default
@@ -66,6 +66,7 @@ public class Order {
 
     @Enumerated(EnumType.STRING)
     @Builder.Default
+    @Column(name = "status", columnDefinition = "NVARCHAR(20)")
     private OrderStatus status = OrderStatus.PENDING;
 
     @Column(name = "paid_at")

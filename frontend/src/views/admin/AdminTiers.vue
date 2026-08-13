@@ -1,316 +1,127 @@
 <template>
   <div class="tiers-manager">
-    <div class="main-container">
-      <!-- Toolbar Section -->
-      <div class="toolbar-section">
-        <div class="toolbar-content">
-          <div class="header-left">
-            <h1 class="heading-1">
-              QUẢN LÝ CẤP BẬC KHÁCH HÀNG
-            </h1>
-            <p class="subtitle">
-              Thiết lập và quản lý các hạng khách hàng, điều kiện thăng hạng và đặc quyền.
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Tier List Section -->
+      <section class="tier-list">
+        <!-- Header -->
+        <div class="list-header">
+          <div class="header-info">
+            <h2>Danh sách cấp bậc</h2>
+            <p class="tier-count">
+              Tổng cộng {{ tiers.length }} cấp bậc
             </p>
           </div>
-          <button
-            class="btn-add"
-            @click="openCreateModal"
-          >
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 16 16"
-              fill="none"
-            >
-              <path
-                d="M8 3V13M3 8H13"
-                stroke="white"
-                stroke-width="2"
-                stroke-linecap="round"
-              />
-            </svg>
-            THÊM CẤP BẬC MỚI
+          <button class="btn-primary" @click="openAddModal">
+            + THÊM CẤP BẬC
           </button>
         </div>
-      </div>
 
-      <!-- Table Container -->
-      <div class="tier-table-container">
-        <div class="table-wrapper">
-          <!-- Table Header -->
-          <div class="table-header">
-            <div
-              class="header-cell"
-              style="width: 15%;"
-            >
-              MÃ HẠNG
-            </div>
-            <div
-              class="header-cell"
-              style="width: 20%;"
-            >
-              TÊN HẠNG
-            </div>
-            <div
-              class="header-cell"
-              style="width: 20%;"
-            >
-              ĐIỀU KIỆN (TIỀN / ĐIỂM)
-            </div>
-            <div
-              class="header-cell"
-              style="width: 15%;"
-            >
-              GIẢM GIÁ TỰ ĐỘNG
-            </div>
-            <div
-              class="header-cell"
-              style="width: 20%;"
-            >
-              QUYỀN LỢI KHÁC
-            </div>
-            <div
-              class="header-cell"
-              style="width: 10%; justify-content: flex-end;"
-            >
-              HÀNH ĐỘNG
-            </div>
-          </div>
-
-          <!-- Table Body -->
-          <div class="table-body">
-            <div
-              v-if="isLoading"
-              class="loading-cell"
-            >
-              Đang tải...
-            </div>
-            <div
-              v-else-if="tiers.length === 0"
-              class="empty-cell"
-            >
-              Chưa có hạng nào
-            </div>
-            <div v-else>
-              <div
+        <!-- Table -->
+        <div class="table-container">
+          <table class="tiers-table">
+            <thead>
+              <tr>
+                <th class="col-id">MÃ HẠNG</th>
+                <th class="col-name">TÊN HẠNG</th>
+                <th class="col-condition">ĐIỀU KIỆN (TIỀN / ĐIỂM)</th>
+                <th class="col-discount">GIẢM GIÁ TỰ ĐỘNG</th>
+                <th class="col-actions">THAO TÁC</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-if="isLoading">
+                <td colspan="5" class="loading-cell">Đang tải dữ liệu...</td>
+              </tr>
+              <tr v-else-if="tiers.length === 0">
+                <td colspan="5" class="empty-cell">Không tìm thấy cấp bậc nào</td>
+              </tr>
+              <tr
+                v-else
                 v-for="tier in tiers"
                 :key="tier.id"
-                class="table-row"
               >
-                <div
-                  class="cell"
-                  style="width: 15%;"
-                >
+                <td class="col-id">
                   <span class="badge">{{ tier.code }}</span>
-                </div>
-                <div
-                  class="cell"
-                  style="width: 20%;"
-                >
+                </td>
+                <td class="col-name">
                   <span class="tier-name">{{ tier.name }}</span>
-                </div>
-                <div
-                  class="cell"
-                  style="width: 20%;"
-                >
+                </td>
+                <td class="col-condition">
                   <span class="conditions">
                     {{ formatCurrency(tier.minTotalSpent) }} / {{ formatPoints(tier.minTotalPoints) }}
                   </span>
-                </div>
-                <div
-                  class="cell"
-                  style="width: 15%;"
-                >
+                </td>
+                <td class="col-discount">
                   <span class="discount">{{ tier.autoDiscountPercent || 0 }}%</span>
-                </div>
-                <div
-                  class="cell"
-                  style="width: 20%;"
-                >
-                  <div class="benefits-list">
-                    <span
-                      v-if="tier.rewardVoucherId"
-                      class="reward-badge"
-                    >Tặng Voucher #{{ tier.rewardVoucherId }}</span>
-                    <ul
-                      v-if="getParsedBenefits(tier.benefits).length"
-                      class="benefits-ul"
-                    >
-                      <li
-                        v-for="(b, i) in getParsedBenefits(tier.benefits)"
-                        :key="i"
-                      >
-                        {{ b }}
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-                <div
-                  class="cell"
-                  style="width: 10%; justify-content: flex-end;"
-                >
+                </td>
+                <td class="col-actions">
                   <div class="action-buttons">
-                    <button
-                      class="action-btn edit-btn"
-                      title="Sửa"
-                      @click="openEditModal(tier)"
-                    >
-                      SỬA
+                    <button class="action-btn edit-btn" title="Sửa" @click="openEditModal(tier)">
+                      ✎
                     </button>
-                    <button
-                      class="action-btn delete-btn"
-                      title="Xóa"
-                      @click="handleDelete(tier)"
-                    >
-                      XÓA
+                    <button class="action-btn delete-btn" title="Xóa" @click="deleteTier(tier)">
+                      🗑
                     </button>
                   </div>
-                </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <!-- Modal Form (Add/Edit) -->
+    <div v-if="showModal" class="modal-overlay" @click.self="closeModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>{{ isEditing ? 'Sửa cấp bậc' : 'Thêm cấp bậc' }}</h2>
+          <button class="btn-close" @click="closeModal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <form @submit.prevent="submitForm">
+            <div class="form-group">
+              <label>Mã Hạng (VD: VIP, VVIP)</label>
+              <input type="text" v-model="form.code" required class="form-input" :disabled="isEditing && isBaseTier(form.code)" />
+            </div>
+            
+            <div class="form-group">
+              <label>Tên Hạng</label>
+              <input type="text" v-model="form.name" required class="form-input" />
+            </div>
+
+            <div class="form-row">
+              <div class="form-group half">
+                <label>Số tiền tối thiểu (VNĐ)</label>
+                <input type="number" v-model.number="form.minTotalSpent" required min="0" class="form-input" />
+              </div>
+              <div class="form-group half">
+                <label>Số điểm tối thiểu</label>
+                <input type="number" v-model.number="form.minTotalPoints" required min="0" class="form-input" />
               </div>
             </div>
-          </div>
+
+            <div class="form-group">
+              <label>Giảm giá tự động (%)</label>
+              <input type="number" v-model.number="form.autoDiscountPercent" min="0" max="100" class="form-input" />
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="btn-secondary" @click="closeModal">HỦY</button>
+              <button type="submit" class="btn-primary" :disabled="isSaving">
+                {{ isSaving ? 'ĐANG LƯU...' : 'LƯU LẠI' }}
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
-
-    <!-- Modal -->
-    <Teleport to="body">
-      <Transition name="modal-glass">
-        <div
-          v-if="showModal"
-          class="glass-overlay"
-          @click.self="closeModal"
-          @keydown.esc="closeModal"
-        >
-          <div class="glass-modal-container">
-            <div class="glass-edge-glow" />
-            <button
-              class="glass-close-btn"
-              aria-label="Đóng"
-              @click="closeModal"
-            >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
-                fill="none"
-              >
-                <path
-                  d="M5 5L15 15M15 5L5 15"
-                  stroke="currentColor"
-                  stroke-width="1.8"
-                  stroke-linecap="round"
-                />
-              </svg>
-            </button>
-            <div class="glass-modal-body">
-              <h2 class="modal-title">
-                {{ isEdit ? 'SỬA HẠNG KHÁCH HÀNG' : 'THÊM HẠNG KHÁCH HÀNG' }}
-              </h2>
-              <form
-                class="tier-form"
-                @submit.prevent="saveTier"
-              >
-                <div class="form-group">
-                  <label>Mã Hạng (VD: VIP, THUONG) *</label>
-                  <input
-                    v-model="formData.code"
-                    type="text"
-                    class="form-input"
-                    required
-                    :disabled="isEdit"
-                  >
-                </div>
-                <div class="form-group">
-                  <label>Tên Hạng (VD: Khách Hàng VIP) *</label>
-                  <input
-                    v-model="formData.name"
-                    type="text"
-                    class="form-input"
-                    required
-                  >
-                </div>
-                <div class="form-row">
-                  <div class="form-group">
-                    <label>Chi tiêu tối thiểu (VNĐ) *</label>
-                    <input
-                      v-model.number="formData.minTotalSpent"
-                      type="number"
-                      min="0"
-                      class="form-input"
-                      required
-                    >
-                  </div>
-                  <div class="form-group">
-                    <label>Điểm tích lũy tối thiểu *</label>
-                    <input
-                      v-model.number="formData.minTotalPoints"
-                      type="number"
-                      min="0"
-                      class="form-input"
-                      required
-                    >
-                  </div>
-                </div>
-                <div class="form-row">
-                  <div class="form-group">
-                    <label>Giảm giá tự động (%)</label>
-                    <input
-                      v-model.number="formData.autoDiscountPercent"
-                      type="number"
-                      min="0"
-                      max="100"
-                      step="0.1"
-                      class="form-input"
-                    >
-                  </div>
-                  <div class="form-group">
-                    <label>Tặng Voucher ID (khi thăng hạng)</label>
-                    <input
-                      v-model.number="formData.rewardVoucherId"
-                      type="number"
-                      min="1"
-                      placeholder="Nhập ID Voucher"
-                      class="form-input"
-                    >
-                  </div>
-                </div>
-                <div class="form-group">
-                  <label>Quyền lợi khác (mỗi quyền lợi một dòng)</label>
-                  <textarea
-                    v-model="benefitsInput"
-                    rows="4"
-                    class="form-input"
-                    placeholder="Ưu đãi sinh nhật&#10;Miễn phí vận chuyển"
-                  />
-                </div>
-                <div class="form-actions">
-                  <button
-                    type="button"
-                    class="btn-cancel"
-                    @click="closeModal"
-                  >
-                    HỦY
-                  </button>
-                  <button
-                    type="submit"
-                    class="btn-submit"
-                    :disabled="isSaving"
-                  >
-                    LƯU
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      </Transition>
-    </Teleport>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useToast } from 'vue-toastification'
 import { tierService, type Tier } from '@/services/tierService'
 
@@ -318,19 +129,19 @@ const toast = useToast()
 const tiers = ref<Tier[]>([])
 const isLoading = ref(false)
 
+// Modal State
 const showModal = ref(false)
-const isEdit = ref(false)
+const isEditing = ref(false)
 const isSaving = ref(false)
-const formData = ref<Tier>({
+const currentTierId = ref<number | null>(null)
+
+const form = ref({
   code: '',
   name: '',
   minTotalSpent: 0,
   minTotalPoints: 0,
-  benefits: '',
-  autoDiscountPercent: 0,
-  rewardVoucherId: null
+  autoDiscountPercent: 0
 })
-const benefitsInput = ref('')
 
 const formatCurrency = (val: number | undefined) => {
   if (val === undefined || val === null) return '0 đ'
@@ -340,17 +151,6 @@ const formatCurrency = (val: number | undefined) => {
 const formatPoints = (val: number | undefined) => {
   if (val === undefined || val === null) return '0 điểm'
   return new Intl.NumberFormat('vi-VN').format(val) + ' điểm'
-}
-
-const getParsedBenefits = (benefits: string | undefined): string[] => {
-  if (!benefits) return []
-  try {
-    const parsed = JSON.parse(benefits)
-    if (Array.isArray(parsed)) return parsed
-    return []
-  } catch (e) {
-    return [benefits]
-  }
 }
 
 const loadTiers = async () => {
@@ -367,26 +167,35 @@ const loadTiers = async () => {
   }
 }
 
-const openCreateModal = () => {
-  isEdit.value = false
-  formData.value = {
+const isBaseTier = (code: string) => {
+  if (tiers.value.length === 0) return false
+  return tiers.value[0].code === code
+}
+
+// Modal Actions
+const openAddModal = () => {
+  isEditing.value = false
+  currentTierId.value = null
+  form.value = {
     code: '',
     name: '',
     minTotalSpent: 0,
     minTotalPoints: 0,
-    benefits: '',
-    autoDiscountPercent: 0,
-    rewardVoucherId: null
+    autoDiscountPercent: 0
   }
-  benefitsInput.value = ''
   showModal.value = true
 }
 
 const openEditModal = (tier: Tier) => {
-  isEdit.value = true
-  formData.value = { ...tier }
-  const parsed = getParsedBenefits(tier.benefits)
-  benefitsInput.value = parsed.join('\n')
+  isEditing.value = true
+  currentTierId.value = tier.id!
+  form.value = {
+    code: tier.code,
+    name: tier.name,
+    minTotalSpent: tier.minTotalSpent,
+    minTotalPoints: tier.minTotalPoints,
+    autoDiscountPercent: tier.autoDiscountPercent || 0
+  }
   showModal.value = true
 }
 
@@ -394,47 +203,48 @@ const closeModal = () => {
   showModal.value = false
 }
 
-const saveTier = async () => {
+const submitForm = async () => {
   isSaving.value = true
   try {
-    const payload = { ...formData.value }
-    if (!payload.rewardVoucherId) payload.rewardVoucherId = null
-    
-    // Parse benefits back to JSON string
-    const lines = benefitsInput.value.split('\n').map(l => l.trim()).filter(l => l.length > 0)
-    payload.benefits = JSON.stringify(lines)
-    
-    if (isEdit.value && payload.id) {
-      await tierService.updateTier(payload.id, payload)
-      toast.success('Cập nhật hạng thành công')
+    if (isEditing.value && currentTierId.value) {
+      const res = await tierService.updateTier(currentTierId.value, form.value as Tier)
+      if (res.success) {
+        toast.success('Cập nhật cấp bậc thành công')
+        await loadTiers()
+        closeModal()
+      }
     } else {
-      await tierService.createTier(payload)
-      toast.success('Tạo hạng thành công')
+      const res = await tierService.createTier(form.value as Tier)
+      if (res.success) {
+        toast.success('Thêm cấp bậc thành công')
+        await loadTiers()
+        closeModal()
+      }
     }
-    closeModal()
-    loadTiers()
   } catch (error: any) {
-    toast.error(error.response?.data?.message || 'Lỗi khi lưu hạng')
+    toast.error(error.response?.data?.message || 'Lỗi khi lưu cấp bậc')
   } finally {
     isSaving.value = false
   }
 }
 
-const handleDelete = async (tier: Tier) => {
-  if (confirm(`Bạn có chắc muốn xóa hạng ${tier.name}?`)) {
-    try {
-      await tierService.deleteTier(tier.id!)
-      toast.success('Xóa hạng thành công')
-      loadTiers()
-    } catch (error: any) {
-      toast.error('Lỗi khi xóa hạng')
+const deleteTier = async (tier: Tier) => {
+  if (isBaseTier(tier.code)) {
+    toast.error('Không thể xóa hạng thấp nhất (mặc định)')
+    return
+  }
+  if (!confirm(`Bạn có chắc chắn muốn xóa hạng ${tier.name}?`)) return
+  
+  try {
+    const res = await tierService.deleteTier(tier.id!)
+    if (res.success) {
+      toast.success('Xóa cấp bậc thành công')
+      await loadTiers()
     }
+  } catch (error: any) {
+    toast.error(error.response?.data?.message || 'Lỗi khi xóa cấp bậc')
   }
 }
-
-watch(showModal, (isOpen) => {
-  document.body.style.overflow = isOpen ? 'hidden' : ''
-})
 
 onMounted(() => {
   loadTiers()
@@ -443,353 +253,278 @@ onMounted(() => {
 
 <style scoped>
 .tiers-manager {
-  width: 100%;
-  min-height: 1120px;
+  display: flex;
+  min-height: 100vh;
   background: #F9F9F9;
-  display: flex;
-  flex-direction: column;
 }
 
-.main-container {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 0;
+/* Main Content */
+.main-content {
+  padding: 32px 24px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-/* Toolbar Section */
-.toolbar-section {
+/* Tier List Section */
+.tier-list {
   background: #FFFFFF;
-  border: 1px solid #E2E2E2;
+  border: 1px solid #E8E8E8;
   box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05);
   border-radius: 12px;
-  padding: 24px;
-  margin-bottom: 10px;
+  margin-bottom: 24px;
 }
 
-.toolbar-content {
+.list-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 100%;
-}
-
-.header-left {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.heading-1 {
-  font-family: 'Geist', sans-serif;
-  font-weight: 400;
-  font-size: 30px;
-  line-height: 36px;
-  letter-spacing: -0.75px;
-  text-transform: uppercase;
-  color: #111827;
-  margin: 0;
-}
-
-.subtitle {
-  font-family: 'Geist', sans-serif;
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 20px;
-  color: #6B7280;
-  margin: 0;
-}
-
-.btn-add {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 24px;
-  height: 40px;
-  background: #000000;
-  border: none;
-  cursor: pointer;
-  color: #FFFFFF;
-  font-family: 'Geist', sans-serif;
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 20px;
-  box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05);
-}
-
-.btn-add:hover {
-  background: #1a1a1a;
-}
-
-/* Table */
-.tier-table-container {
+  padding: 20px 24px;
   background: #FFFFFF;
-  border: 1px solid #E5E7EB;
-  box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05);
-  border-radius: 16px;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  min-height: 400px;
+  border-radius: 12px 12px 0 0;
+  border-bottom: 1px solid #E8E8E8;
 }
 
-.table-wrapper {
-  flex: 1;
-  overflow-y: auto;
+.list-header h2 {
+  font-family: 'Geist', sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  color: #000000;
+  margin: 0 0 4px 0;
+  line-height: 28px;
 }
 
-.table-header {
-  display: flex;
-  width: 100%;
-  height: 64.5px;
-  background: #F9FAFB;
-  border-bottom: 1px solid #E5E7EB;
-}
-
-.header-cell {
-  display: flex;
-  align-items: center;
-  padding: 23.5px 24px 25px;
+.tier-count {
   font-family: 'Geist', sans-serif;
   font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.6px;
-  text-transform: uppercase;
-  color: #6B7280;
-  box-sizing: border-box;
+  color: #848484;
+  margin: 0;
 }
 
-.table-body {
-  display: flex;
-  flex-direction: column;
+.btn-primary {
+  background: #000000;
+  color: #FFFFFF;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-family: 'Geist', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.2s;
 }
 
-.table-row {
-  display: flex;
+.btn-primary:hover:not(:disabled) {
+  opacity: 0.9;
+}
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background: #F3F3F4;
+  color: #4C4546;
+  border: 1px solid #E8E8E8;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-family: 'Geist', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-secondary:hover {
+  background: #E8E8E8;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+.tiers-table {
   width: 100%;
-  min-height: 57px;
-  border-top: 1px solid #F3F4F6;
-  box-sizing: border-box;
+  border-collapse: collapse;
 }
 
-.table-row:hover {
-  background: #F9FAFB;
+.tiers-table th {
+  font-family: 'Geist', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #4C4546;
+  text-align: left;
+  padding: 12px 16px;
+  background: #F3F3F4;
+  border-bottom: 1px solid #E8E8E8;
 }
 
-.cell {
-  display: flex;
-  align-items: center;
-  padding: 18px 24px 19px;
-  box-sizing: border-box;
+.tiers-table td {
+  padding: 12px 16px;
+  border-top: 1px solid #E8E8E8;
+  vertical-align: middle;
 }
 
-.loading-cell, .empty-cell {
-  padding: 48px 24px;
+.loading-cell,
+.empty-cell {
+  padding: 32px 16px;
   text-align: center;
   color: #6B7280;
   font-family: 'Geist', sans-serif;
   font-size: 14px;
 }
 
+.col-id { width: 120px; }
+.col-name { width: 200px; }
+.col-condition { width: 250px; }
+.col-discount { width: 150px; }
+.col-actions { width: 100px; text-align: center; }
+
 .badge {
-  background: #DBEAFE;
-  color: #1E40AF;
-  padding: 4px 10px;
+  display: inline-block;
+  padding: 4px 12px;
   border-radius: 9999px;
+  background: #000000;
+  color: #FFFFFF;
   font-family: 'Geist', sans-serif;
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
 }
 
 .tier-name {
   font-family: 'Geist', sans-serif;
-  font-weight: 500;
   font-size: 14px;
-  color: #111827;
+  font-weight: 600;
+  color: #000000;
 }
 
 .conditions {
   font-family: 'Geist', sans-serif;
   font-size: 14px;
-  color: #4B5563;
+  color: #5E5F5C;
 }
 
 .discount {
   font-family: 'Geist', sans-serif;
-  font-weight: 500;
   font-size: 14px;
-  color: #059669; /* Emerald 600 */
-}
-
-.benefits-list {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.benefits-ul {
-  margin: 0;
-  padding-left: 16px;
-  font-family: 'Geist', sans-serif;
-  font-size: 13px;
-  color: #6B7280;
-}
-
-.reward-badge {
-  background: #FEF3C7;
-  color: #D97706;
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-family: 'Geist', sans-serif;
-  font-size: 11px;
   font-weight: 600;
-  display: inline-block;
-  width: max-content;
-  margin-bottom: 4px;
+  color: #991B1B;
 }
 
-/* Action Buttons */
 .action-buttons {
   display: flex;
   gap: 8px;
+  justify-content: center;
 }
 
 .action-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 6px 12px;
-  height: 28px;
-  border: 1px solid;
-  border-radius: 4px;
-  background: transparent;
+  background: none;
+  border: none;
   cursor: pointer;
-  font-family: 'Geist', sans-serif;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 1.2px;
-  text-transform: uppercase;
+  padding: 4px;
+  border-radius: 4px;
+  font-size: 16px;
+  color: #666;
+  transition: all 0.2s;
 }
 
-.edit-btn {
-  border-color: #D1D5DB;
-  color: #374151;
-}
-
-.edit-btn:hover {
-  background: #F3F4F6;
-}
-
-.delete-btn {
-  border-color: rgba(186, 26, 26, 0.4);
-  color: #BA1A1A;
+.action-btn:hover {
+  background: #f0f0f0;
+  color: #000;
 }
 
 .delete-btn:hover {
-  background: rgba(186, 26, 26, 0.05);
+  color: #991B1B;
+  background: #FEE2E2;
 }
 
-/* Glass Modal */
-.glass-overlay {
+/* Modal Styles */
+.modal-overlay {
   position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(17, 24, 39, 0.4);
-  backdrop-filter: blur(4px);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
-  justify-content: center;
   align-items: center;
-  z-index: 9999;
+  justify-content: center;
+  z-index: 1000;
 }
 
-.glass-modal-container {
-  position: relative;
+.modal-content {
+  background: #FFFFFF;
+  border: 1px solid #E8E8E8;
+  border-radius: 12px;
   width: 500px;
-  max-width: 90%;
-  background: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  max-width: 90vw;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 }
 
-.glass-close-btn {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  color: #9CA3AF;
-  padding: 4px;
-  border-radius: 4px;
-}
-
-.glass-close-btn:hover {
-  background: #F3F4F6;
-  color: #4B5563;
-}
-
-.glass-modal-body {
-  padding: 32px;
-}
-
-.modal-title {
-  font-family: 'Geist', sans-serif;
-  font-size: 20px;
-  font-weight: 600;
-  color: #111827;
-  margin-top: 0;
-  margin-bottom: 24px;
-}
-
-/* Form Styles */
-.tier-form {
+.modal-header {
   display: flex;
-  flex-direction: column;
-  gap: 16px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #E8E8E8;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #000000;
+  font-family: 'Geist', sans-serif;
+}
+
+.btn-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #666;
+}
+
+.modal-body {
+  padding: 24px;
 }
 
 .form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+  margin-bottom: 20px;
 }
 
 .form-row {
   display: flex;
   gap: 16px;
 }
-
-.form-row .form-group {
-  flex: 1;
-}
+.half { flex: 1; }
 
 .form-group label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #4C4546;
+  margin-bottom: 8px;
   font-family: 'Geist', sans-serif;
-  font-size: 13px;
-  font-weight: 500;
-  color: #374151;
 }
 
 .form-input {
   width: 100%;
-  padding: 8px 12px;
-  background: #FFFFFF;
-  border: 1px solid #D1D5DB;
+  padding: 10px 12px;
+  border: 1px solid #E8E8E8;
   border-radius: 6px;
   font-family: 'Geist', sans-serif;
   font-size: 14px;
-  color: #111827;
   box-sizing: border-box;
 }
 
 .form-input:focus {
   outline: none;
   border-color: #000000;
-  box-shadow: 0 0 0 1px #000000;
 }
 
 .form-input:disabled {
-  background: #F3F4F6;
-  color: #9CA3AF;
+  background: #F3F3F4;
   cursor: not-allowed;
 }
 
@@ -797,53 +532,6 @@ onMounted(() => {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-  margin-top: 8px;
-}
-
-.btn-cancel {
-  padding: 8px 16px;
-  background: #FFFFFF;
-  border: 1px solid #D1D5DB;
-  border-radius: 6px;
-  font-family: 'Geist', sans-serif;
-  font-size: 14px;
-  font-weight: 500;
-  color: #374151;
-  cursor: pointer;
-}
-
-.btn-cancel:hover {
-  background: #F9FAFB;
-}
-
-.btn-submit {
-  padding: 8px 24px;
-  background: #000000;
-  border: 1px solid #000000;
-  border-radius: 6px;
-  font-family: 'Geist', sans-serif;
-  font-size: 14px;
-  font-weight: 500;
-  color: #FFFFFF;
-  cursor: pointer;
-}
-
-.btn-submit:hover:not(:disabled) {
-  background: #1a1a1a;
-}
-
-.btn-submit:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-/* Modal transition */
-.modal-glass-enter-active,
-.modal-glass-leave-active {
-  transition: opacity 0.3s ease;
-}
-.modal-glass-enter-from,
-.modal-glass-leave-to {
-  opacity: 0;
+  margin-top: 32px;
 }
 </style>

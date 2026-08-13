@@ -164,6 +164,7 @@
                 <select
                   v-model="productForm.category"
                   class="field-select"
+                  @change="handleCategoryChange"
                 >
                   <option
                     value=""
@@ -524,16 +525,11 @@ async function fetchSizes() {
   }
 }
 
-// Fetch sizes whenever the category changes
-watch(
-  () => productForm.value.category,
-  (newCategory, oldCategory) => {
-    if (newCategory && newCategory !== oldCategory) {
-      productForm.value.sizes = {}
-      fetchSizes()
-    }
-  }
-)
+// Handle category change manually
+const handleCategoryChange = () => {
+  productForm.value.sizes = {}
+  fetchSizes()
+}
 
 // ── Image upload state ──────────────────────────────────────────
 const imageFiles = ref<File[]>([])

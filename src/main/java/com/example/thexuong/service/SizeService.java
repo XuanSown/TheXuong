@@ -58,9 +58,44 @@ public class SizeService {
 
     @Transactional
     public void updateVariants(Long productId, Map<String, Integer> sizeQuantities) {
-        productVariantRepository.deleteByProductId(productId);
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Khong tim thay san pham: " + productId));
-        createVariants(product, sizeQuantities);
+
+        List<ProductVariant> existingVariants = productVariantRepository.findByProductId(productId);
+        Map<String, ProductVariant> existingMap = new HashMap<>();
+        for (ProductVariant v : existingVariants) {
+            if (v.getSize() != null) {
+                existingMap.put(v.getSize().getName(), v);
+            }
+        }
+
+        for (Map.Entry<String, Integer> e : sizeQuantities.entrySet()) {
+            String sizeName = e.getKey();
+            Integer qty = e.getValue() == null ? 0 : e.getValue();
+            
+            if (existingMap.containsKey(sizeName)) {
+                ProductVariant v = existingMap.get(sizeName);
+                v.setQuantity(qty);
+                productVariantRepository.save(v);
+                existingMap.remove(sizeName);
+            } else {
+                Size size = sizeRepository.findByName(sizeName).orElse(null);
+                if (size != null) {
+                    ProductVariant v = ProductVariant.builder()
+                            .product(product)
+                            .size(size)
+                            .quantity(qty)
+                            .sku(product.getId() + "-" + sizeName)
+                            .build();
+                    productVariantRepository.save(v);
+                }
+            }
+        }
+        
+        // Cac variant khong duoc gui len (admin xoa tren UI) -> set ve 0 de tranh loi khoa ngoai (CartItems)
+        for (ProductVariant v : existingMap.values()) {
+            v.setQuantity(0);
+            productVariantRepository.save(v);
+        }
     }
 }

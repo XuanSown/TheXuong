@@ -42,6 +42,7 @@ public class CheckoutRestController {
     private final VoucherRepository voucherRepository;
     private final com.example.thexuong.service.VoucherService voucherService;
     private final com.example.thexuong.repository.PointTierRepository pointTierRepository;
+    private final com.example.thexuong.service.PointTierService pointTierService;
 
     /**
      * GET /api/checkout
@@ -130,7 +131,7 @@ public class CheckoutRestController {
                 .collect(Collectors.toList());
 
         // Get tier info
-        String tierCode = user.getTierCode() != null ? user.getTierCode() : "THUONG";
+        String tierCode = user.getTierCode() != null ? user.getTierCode() : pointTierService.getBaseTierCode();
         BigDecimal autoDiscountPercent = BigDecimal.ZERO;
         BigDecimal tierDiscountAmount = BigDecimal.ZERO;
 

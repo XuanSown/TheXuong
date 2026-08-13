@@ -915,8 +915,9 @@ const handleSubmit = async () => {
 
     closeModal()
     fetchVouchers()
-  } catch (error) {
+  } catch (error: any) {
     console.error('Failed to save voucher:', error)
+    toast.error('Lưu voucher thất bại: ' + (error.response?.data?.message || 'Có lỗi xảy ra'))
   } finally {
     isSubmitting.value = false
   }
@@ -962,8 +963,9 @@ const handleDelete = (voucher: VoucherResponse) => {
       try {
         await voucherService.deleteVoucher(voucher.id)
         fetchVouchers()
-      } catch (error) {
+      } catch (error: any) {
         console.error('Failed to delete voucher:', error)
+        toast.error('Chuyển EXPIRED thất bại: ' + (error.response?.data?.message || 'Có lỗi xảy ra'))
       }
     },
     'CHUYỂN EXPIRED',
@@ -983,8 +985,9 @@ const handleBulkLock = () => {
         })
         selectedIds.value = []
         fetchVouchers()
-      } catch (error) {
+      } catch (error: any) {
         console.error('Failed to bulk lock:', error)
+        toast.error('Tạm dừng thất bại: ' + (error.response?.data?.message || 'Có lỗi xảy ra'))
       }
     }
   )
@@ -1002,8 +1005,9 @@ const handleBulkUnlock = () => {
         })
         selectedIds.value = []
         fetchVouchers()
-      } catch (error) {
+      } catch (error: any) {
         console.error('Failed to bulk unlock:', error)
+        toast.error('Kích hoạt thất bại: ' + (error.response?.data?.message || 'Có lỗi xảy ra'))
       }
     }
   )
@@ -1021,8 +1025,9 @@ const handleBulkDelete = () => {
         })
         selectedIds.value = []
         fetchVouchers()
-      } catch (error) {
+      } catch (error: any) {
         console.error('Failed to bulk delete:', error)
+        toast.error('Chuyển EXPIRED thất bại: ' + (error.response?.data?.message || 'Có lỗi xảy ra'))
       }
     },
     'CHUYỂN EXPIRED',
@@ -1043,8 +1048,9 @@ const handleBulkSetVip = () => {
         })
         selectedIds.value = []
         fetchVouchers()
-      } catch (error) {
+      } catch (error: any) {
         console.error('Failed to bulk set VIP:', error)
+        toast.error('Thiết lập VIP thất bại: ' + (error.response?.data?.message || 'Có lỗi xảy ra'))
       }
     },
     'XÁC NHẬN',

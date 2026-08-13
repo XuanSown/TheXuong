@@ -33,15 +33,5 @@ export const loyaltyAdminService = {
   async getTierHistory(userId: number) {
     const { data } = await http.get(`/admin/loyalty/users/${userId}/history`)
     return data
-  },
-  
-  async adjustPoints(userId: number, points: number, note: string) {
-    const { data } = await http.post(`/admin/loyalty/users/${userId}/adjust-points`, { points, note })
-    return data
-  },
-
-  async updateTier(userId: number, newTierCode: string, reason: string) {
-    const { data } = await http.post(`/admin/loyalty/users/${userId}/update-tier`, { newTierCode, reason })
-    return data
   }
 }

@@ -155,9 +155,11 @@ import { toTypedSchema } from '@vee-validate/zod'
 import { registerSchema } from '@/utils/validators'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
+import { useToast } from 'vue-toastification'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const toast = useToast()
 
 // Validation setup
 const { handleSubmit, isSubmitting } = useForm({
@@ -180,7 +182,7 @@ const onSubmit = handleSubmit(async (values) => {
     router.push({ name: 'login', query: { registered: 'success' } })
   } catch (error: any) {
     console.error('Registration failed:', error)
-    // Removed alert, handled by global toast
+    toast.error(error.response?.data?.message || 'Đăng ký thất bại. Email có thể đã tồn tại!')
   }
 })
 </script>

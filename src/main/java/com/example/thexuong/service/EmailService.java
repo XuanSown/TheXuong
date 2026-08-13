@@ -121,24 +121,23 @@ public class EmailService {
     // ============================================================
 
     /**
-     * Task 4.21: Gửi email chúc mừng khi user vừa lên hạng VIP lần đầu.
+     * Task 4.21: Gửi email chúc mừng khi user vừa lên hạng mới.
      * Gọi từ OrderService.confirmReceived (sau khi upgrade tier thành công).
      */
     public void sendVipWelcome(String toEmail, String fullName) {
-        String subject = "Chúc mừng anh/chị đã lên hạng VIP! - TheXuong";
+        String subject = "Chúc mừng anh/chị đã thăng hạng thành viên! - TheXuong";
         String html = """
                 <div style="font-family: Arial; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #e0e0e0;">
                     <h2 style="color: #d4af37; text-align: center;">THE XUONG - CHÚC MỪNG!</h2>
                     <p>Xin chào <strong>%s</strong>,</p>
-                    <p>Chúc mừng anh/chị đã chính thức trở thành <strong style="color: #d4af37;">Khách hàng VIP</strong> của TheXuong!</p>
-                    <h3>Quyền lợi VIP:</h3>
+                    <p>Chúc mừng anh/chị đã chính thức được <strong style="color: #d4af37;">thăng hạng thành viên</strong> tại TheXuong!</p>
+                    <h3>Quyền lợi hạng mới:</h3>
                     <ul>
-                        <li>🚚 <strong>Free ship</strong> tất cả các đơn hàng</li>
-                        <li>⭐ <strong>+1 điểm bonus</strong> cho mỗi đơn hoàn tất</li>
-                        <li>🎁 Voucher VIP riêng (chỉ VIP mới đổi được)</li>
-                        <li>🛒 Ưu tiên hỗ trợ đặc biệt</li>
+                        <li>✨ Tận hưởng các ưu đãi đặc quyền theo cấp bậc</li>
+                        <li>🔥 Nhận Voucher thưởng thăng hạng (nếu có)</li>
+                        <li>💎 Ưu tiên hỗ trợ đặc biệt</li>
                     </ul>
-                    <p>Để giữ hạng VIP, anh/chị cần duy trì tổng chi tiêu 5 triệu đồng HOẶC 50 điểm tích luỹ trong 365 ngày. Hệ thống sẽ tự động re-evaluate vào ngày 1 hàng tháng.</p>
+                    <p>Để giữ hạng, anh/chị cần duy trì tổng chi tiêu hoặc điểm tích lũy theo quy định của hạng. Hệ thống sẽ tự động đánh giá lại vào ngày 1 hàng tháng.</p>
                     <div style="text-align: center; margin: 30px 0;">
                         <a href="https://thexuong.xuansown.id.vn/loyalty" style="background-color: #d4af37; color: #fff; padding: 10px 20px; text-decoration: none; font-weight: bold;">XEM ĐIỂM THƯỞNG</a>
                     </div>
@@ -149,23 +148,19 @@ public class EmailService {
     }
 
     /**
-     * Task 4.22: Gửi email thông báo user vừa bị hạ từ VIP xuống THUONG.
+     * Task 4.22: Gửi email thông báo user vừa bị hạ hạng.
      * Gọi từ TierReevaluateService khi re-evaluate hạ tier.
      */
     public void sendVipDowngraded(String toEmail, String fullName, String reason) {
         String subject = "Thông báo điều chỉnh hạng thành viên - TheXuong";
         String html = """
                 <div style="font-family: Arial; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #e0e0e0;">
-                    <h2 style="color: #555;">THE XUONG - HẠ HẠNG</h2>
+                    <h2 style="color: #555;">THE XUONG - ĐIỀU CHỈNH HẠNG</h2>
                     <p>Xin chào <strong>%s</strong>,</p>
-                    <p>Theo chính sách re-evaluate hàng tháng, tài khoản của anh/chị đã được chuyển từ <strong>VIP</strong> về <strong>Khách hàng thường</strong>.</p>
+                    <p>Theo chính sách đánh giá định kỳ, tài khoản của anh/chị đã được <strong>điều chỉnh hạ bậc thành viên</strong>.</p>
                     <p><strong>Lý do:</strong> %s</p>
-                    <p>Để lên lại VIP, anh/chị chỉ cần:</p>
-                    <ul>
-                        <li>Mua hàng với tổng chi tiêu <strong>5 triệu đồng</strong> trong 365 ngày, HOẶC</li>
-                        <li>Tích luỹ <strong>50 điểm</strong> từ các đơn hàng hoàn tất</li>
-                    </ul>
-                    <p>Hệ thống sẽ tự động nâng hạng khi anh/chị đạt ngưỡng (không cần đăng ký).</p>
+                    <p>Để thăng hạng trở lại, anh/chị chỉ cần tiếp tục mua sắm và tích lũy điểm thưởng theo quy định của các cấp bậc.</p>
+                    <p>Hệ thống sẽ tự động nâng hạng ngay khi anh/chị đạt đủ điều kiện (không cần chờ đến kỳ đánh giá).</p>
                     <div style="text-align: center; margin: 30px 0;">
                         <a href="https://thexuong.xuansown.id.vn/products" style="background-color: #000; color: #fff; padding: 10px 20px; text-decoration: none; font-weight: bold;">MUA SẮM NGAY</a>
                     </div>
@@ -176,24 +171,20 @@ public class EmailService {
     }
 
     /**
-     * Task 4.23: Gửi email cảnh báo user VIP sắp đến hạn re-evaluate (trong 30 ngày tới).
+     * Task 4.23: Gửi email cảnh báo user sắp đến hạn re-evaluate (trong 30 ngày tới).
      * Gọi từ TierWarningJob (cron daily 09:00).
      */
     public void sendVipExpiryWarning(String toEmail, String fullName, java.time.LocalDateTime nextEvaluation) {
-        String subject = "Cảnh báo: Hạng VIP sắp được đánh giá lại - TheXuong";
+        String subject = "Cảnh báo: Hạng thành viên sắp được đánh giá lại - TheXuong";
         String dateStr = nextEvaluation.toLocalDate().toString();
         String html = """
                 <div style="font-family: Arial; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #e0e0e0;">
-                    <h2 style="color: #d4af37;">THE XUONG - CẢNH BÁO VIP</h2>
+                    <h2 style="color: #d4af37;">THE XUONG - CẢNH BÁO HẠNG THÀNH VIÊN</h2>
                     <p>Xin chào <strong>%s</strong>,</p>
-                    <p>Hạng <strong>VIP</strong> của anh/chị sẽ được đánh giá lại vào ngày <strong>%s</strong>.</p>
-                    <p>Để giữ hạng VIP, anh/chị cần duy trì trong 365 ngày qua:</p>
-                    <ul>
-                        <li>Tổng chi tiêu <strong>5 triệu đồng</strong> trở lên, HOẶC</li>
-                        <li>Tổng điểm tích luỹ <strong>50 điểm</strong> trở lên</li>
-                    </ul>
-                    <p>Nếu không đạt, hạng sẽ tự động chuyển về <strong>Khách hàng thường</strong> vào ngày đánh giá.</p>
-                    <p>👉 Hãy mua sắm thêm hoặc giới thiệu bạn bè để tích điểm và giữ hạng!</p>
+                    <p>Hạng thành viên của anh/chị sẽ được đánh giá lại vào ngày <strong>%s</strong>.</p>
+                    <p>Để duy trì hạng hiện tại, anh/chị cần đảm bảo tổng chi tiêu hoặc điểm tích lũy trong 365 ngày qua đạt mức tối thiểu của hạng.</p>
+                    <p>Nếu không đạt, hạng sẽ tự động được điều chỉnh giảm vào ngày đánh giá.</p>
+                    <p>🎁 Hãy mua sắm thêm hoặc giới thiệu bạn bè để tích điểm và giữ hạng nhé!</p>
                     <div style="text-align: center; margin: 30px 0;">
                         <a href="https://thexuong.xuansown.id.vn/products" style="background-color: #d4af37; color: #fff; padding: 10px 20px; text-decoration: none; font-weight: bold;">MUA SẮM NGAY</a>
                     </div>

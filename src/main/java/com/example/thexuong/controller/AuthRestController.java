@@ -168,11 +168,12 @@ public class AuthRestController {
             // Create user
             userService.createUser(
                     request.getEmail(),
-                    null, // username = null → use email
+                    null, // username = null -> use email
                     request.getFullName(),
                     request.getPassword(),
                     "LOCAL",
-                    null // role = USER by default
+                    null, // role = USER by default
+                    null // phone
             );
 
             return ResponseEntity.status(HttpStatus.CREATED)

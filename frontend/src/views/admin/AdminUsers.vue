@@ -232,7 +232,7 @@
             Điền thông tin để đăng ký tài khoản mới
           </p>
         </div>
-        <form @submit.prevent="handleSubmit">
+        <form @submit.prevent="handleSubmit" autocomplete="off">
           <div class="form-grid">
             <!-- Email -->
             <div class="form-group">
@@ -242,6 +242,7 @@
                 type="email"
                 placeholder="example@thexuong.com"
                 class="form-input"
+                autocomplete="off"
                 required
               >
             </div>
@@ -254,6 +255,7 @@
                 type="text"
                 placeholder="username123"
                 class="form-input"
+                autocomplete="off"
                 required
               >
             </div>
@@ -266,7 +268,20 @@
                 type="text"
                 placeholder="Ho va ten"
                 class="form-input"
+                autocomplete="off"
                 required
+              >
+            </div>
+
+            <!-- Phone Number -->
+            <div class="form-group">
+              <label>PHONE</label>
+              <input
+                v-model="formData.phone"
+                type="text"
+                placeholder="So dien thoai"
+                class="form-input"
+                autocomplete="off"
               >
             </div>
 
@@ -278,6 +293,7 @@
                 type="password"
                 placeholder="........"
                 class="form-input"
+                autocomplete="new-password"
                 required
                 minlength="8"
               >
@@ -353,13 +369,14 @@
           </button>
         </div>
         <div class="modal-body">
-          <form @submit.prevent="submitEdit">
+          <form @submit.prevent="submitEdit" autocomplete="off">
             <div class="form-group">
               <label>EMAIL</label>
               <input
                 v-model="editForm.email"
                 type="email"
                 class="form-input"
+                autocomplete="off"
                 disabled
               >
             </div>
@@ -369,7 +386,17 @@
                 v-model="editForm.fullName"
                 type="text"
                 class="form-input"
+                autocomplete="off"
                 required
+              >
+            </div>
+            <div class="form-group">
+              <label>PHONE</label>
+              <input
+                v-model="editForm.phone"
+                type="text"
+                class="form-input"
+                autocomplete="off"
               >
             </div>
             <div class="form-group">
@@ -413,6 +440,7 @@
                 type="password"
                 class="form-input"
                 placeholder="Nhập mật khẩu mới..."
+                autocomplete="new-password"
                 minlength="8"
               >
             </div>
@@ -426,6 +454,7 @@
                 type="password"
                 class="form-input"
                 placeholder="Nhập lại mật khẩu mới..."
+                autocomplete="new-password"
                 minlength="8"
               >
             </div>
@@ -481,6 +510,17 @@
             </div>
           </div>
           
+          <div class="loyalty-stats">
+            <div class="stat-card">
+              <span class="stat-label">Tổng chi tiêu (365 ngày)</span>
+              <span class="stat-value">{{ formatCurrency(loyaltyData.totalSpent365Days) }}</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label">Tổng điểm kiếm được (365 ngày)</span>
+              <span class="stat-value">{{ loyaltyData.totalPointsEarned365Days }} điểm</span>
+            </div>
+          </div>
+
           <div
             v-if="loyaltyData.nextTierCode"
             class="progress-section"
@@ -489,7 +529,7 @@
             <p>
               Cần thêm: 
               <strong>{{ formatCurrency(loyaltyData.spentRemainingToNextTier) }}</strong> chi tiêu
-              hoặc <strong>{{ loyaltyData.pointsRemainingToNextTier }}</strong> điểm
+              or <strong>{{ loyaltyData.pointsRemainingToNextTier }}</strong> điểm
             </p>
           </div>
           <div
@@ -497,130 +537,6 @@
             class="progress-section"
           >
             <h3>Khách hàng đã đạt hạng cao nhất!</h3>
-          </div>
-
-          <hr class="divider">
-
-          <div class="adjust-points-section">
-            <h3 style="margin-bottom: 16px;">
-              Cộng/Trừ Điểm Thủ Công
-            </h3>
-            <form
-              style="padding: 0;"
-              @submit.prevent="submitAdjustPoints"
-            >
-              <div
-                class="form-row loyalty-form-row"
-                style="display: flex; gap: 16px; align-items: flex-start; margin-bottom: 16px;"
-              >
-                <div
-                  class="form-group"
-                  style="flex: 1;"
-                >
-                  <label>Số điểm (nhập số âm để trừ)</label>
-                  <input
-                    v-model.number="adjustForm.points"
-                    type="number"
-                    required
-                    class="form-input"
-                  >
-                </div>
-                <div
-                  class="form-group"
-                  style="flex: 2;"
-                >
-                  <label>Lý do (bắt buộc)</label>
-                  <input
-                    v-model="adjustForm.note"
-                    type="text"
-                    required
-                    placeholder="VD: Đền bù đơn hàng..."
-                    class="form-input"
-                  >
-                </div>
-              </div>
-              <div
-                class="form-actions"
-                style="margin-top: 16px;"
-              >
-                <button
-                  type="submit"
-                  class="btn-primary"
-                  :disabled="isAdjusting"
-                  style="width: 100%;"
-                >
-                  {{ isAdjusting ? 'Đang xử lý...' : 'Thực Hiện' }}
-                </button>
-              </div>
-            </form>
-          </div>
-
-          <hr class="divider">
-
-          <div class="adjust-tier-section">
-            <h3 style="margin-bottom: 16px;">
-              Điều Chỉnh Hạng Thủ Công
-            </h3>
-            <form
-              style="padding: 0;"
-              @submit.prevent="submitUpdateTier"
-            >
-              <div
-                class="form-row loyalty-form-row"
-                style="display: flex; gap: 16px; align-items: flex-start; margin-bottom: 16px;"
-              >
-                <div
-                  class="form-group"
-                  style="flex: 1;"
-                >
-                  <label>Hạng Mới</label>
-                  <select
-                    v-model="tierForm.newTierCode"
-                    required
-                    class="form-input"
-                  >
-                    <option
-                      value=""
-                      disabled
-                    >
-                      -- Chọn Hạng --
-                    </option>
-                    <option value="THUONG">
-                      Khách hàng thường (THUONG)
-                    </option>
-                    <option value="VIP">
-                      Khách hàng VIP (VIP)
-                    </option>
-                  </select>
-                </div>
-                <div
-                  class="form-group"
-                  style="flex: 2;"
-                >
-                  <label>Lý do (bắt buộc)</label>
-                  <input
-                    v-model="tierForm.note"
-                    type="text"
-                    required
-                    placeholder="VD: Đặc cách thăng hạng..."
-                    class="form-input"
-                  >
-                </div>
-              </div>
-              <div
-                class="form-actions"
-                style="margin-top: 16px;"
-              >
-                <button
-                  type="submit"
-                  class="btn-primary"
-                  :disabled="isUpdatingTier"
-                  style="width: 100%; background: #333;"
-                >
-                  {{ isUpdatingTier ? 'Đang xử lý...' : 'Cập Nhật Hạng' }}
-                </button>
-              </div>
-            </form>
           </div>
         </div>
         <div
@@ -655,6 +571,7 @@ const formData = ref({
   email: '',
   username: '',
   fullName: '',
+  phone: '',
   password: '',
   role: 'CUSTOMER' as 'CUSTOMER' | 'ADMIN' | 'BOTH'
 })
@@ -665,6 +582,7 @@ const editingUser = ref<any>(null)
 const editForm = ref({
   email: '',
   fullName: '',
+  phone: '',
   role: 'CUSTOMER',
   active: 'true',
   password: '',
@@ -675,10 +593,6 @@ const editForm = ref({
 const showLoyaltyModal = ref(false)
 const loyaltyData = ref<UserLoyaltyProgress | null>(null)
 const loyaltyUser = ref<any>(null)
-const adjustForm = ref({ points: 0, note: '' })
-const tierForm = ref({ newTierCode: '', note: '' })
-const isAdjusting = ref(false)
-const isUpdatingTier = ref(false)
 
 const formatCurrency = (val: number | undefined) => {
   if (val === undefined || val === null) return '0 đ'
@@ -695,6 +609,7 @@ const fetchUsers = async () => {
         idDisplay: '#' + String(u.id).padStart(3, '0'),
         email: u.email || '',
         fullName: u.fullName || '',
+        phone: u.phone || '',
         role: u.role || 'CUSTOMER',
         roleClass: getRoleClass(u.role),
         isActive: u.active !== false,
@@ -751,6 +666,7 @@ const editUser = (user: any) => {
   editForm.value = {
     email: user.email,
     fullName: user.fullName,
+    phone: user.phone,
     role: user.role,
     active: user.isActive ? 'true' : 'false',
     password: '',
@@ -775,6 +691,7 @@ const submitEdit = async () => {
     const isActiveBoolean = editForm.value.active === 'true'
     const payload: any = {
       fullName: editForm.value.fullName,
+      phoneNumber: editForm.value.phone,
       role: editForm.value.role,
       active: isActiveBoolean
     }
@@ -784,6 +701,7 @@ const submitEdit = async () => {
     await adminService.updateUser(editingUser.value.id, payload)
     // Update local data
     editingUser.value.fullName = editForm.value.fullName
+    editingUser.value.phone = editForm.value.phone
     editingUser.value.role = editForm.value.role
     editingUser.value.roleClass = getRoleClass(editForm.value.role)
     editingUser.value.isActive = isActiveBoolean
@@ -820,6 +738,7 @@ const handleSubmit = async () => {
       email: formData.value.email,
       username: formData.value.username,
       fullName: formData.value.fullName,
+      phone: formData.value.phone,
       password: formData.value.password,
       role: formData.value.role
     })
@@ -838,6 +757,7 @@ const resetForm = () => {
     email: '',
     username: '',
     fullName: '',
+    phone: '',
     password: '',
     role: 'CUSTOMER'
   }
@@ -847,8 +767,6 @@ const resetForm = () => {
 const openLoyaltyModal = async (user: any) => {
   loyaltyUser.value = user
   loyaltyData.value = null
-  adjustForm.value = { points: 0, note: '' }
-  tierForm.value = { newTierCode: '', note: '' }
   showLoyaltyModal.value = true
   
   try {
@@ -864,58 +782,6 @@ const openLoyaltyModal = async (user: any) => {
 const closeLoyaltyModal = () => {
   showLoyaltyModal.value = false
   loyaltyUser.value = null
-}
-
-const submitAdjustPoints = async () => {
-  if (!loyaltyUser.value) return
-  if (adjustForm.value.points === 0) {
-    toast.error('Số điểm điều chỉnh phải khác 0')
-    return
-  }
-  isAdjusting.value = true
-  try {
-    await loyaltyAdminService.adjustPoints(loyaltyUser.value.id, adjustForm.value.points, adjustForm.value.note)
-    toast.success('Điều chỉnh điểm thành công')
-    // Refresh data
-    const res = await loyaltyAdminService.getLoyaltyProgress(loyaltyUser.value.id)
-    if (res.success) {
-      loyaltyData.value = res.data
-    }
-    fetchUsers() // To update tierCode in the main list if changed
-    adjustForm.value = { points: 0, note: '' }
-  } catch (error: any) {
-    toast.error('Lỗi khi điều chỉnh điểm: ' + (error.response?.data?.message || ''))
-  } finally {
-    isAdjusting.value = false
-  }
-}
-
-const submitUpdateTier = async () => {
-  if (!loyaltyUser.value) return
-  if (!tierForm.value.newTierCode) {
-    toast.error('Vui lòng chọn hạng mới')
-    return
-  }
-  if (tierForm.value.newTierCode === loyaltyData.value?.currentTierCode) {
-    toast.error('Người dùng đang ở hạng này rồi')
-    return
-  }
-  isUpdatingTier.value = true
-  try {
-    await loyaltyAdminService.updateTier(loyaltyUser.value.id, tierForm.value.newTierCode, tierForm.value.note)
-    toast.success('Cập nhật hạng thành công')
-    // Refresh data
-    const res = await loyaltyAdminService.getLoyaltyProgress(loyaltyUser.value.id)
-    if (res.success) {
-      loyaltyData.value = res.data
-    }
-    fetchUsers() // To update tierCode in the main list
-    tierForm.value = { newTierCode: '', note: '' }
-  } catch (error: any) {
-    toast.error('Lỗi khi cập nhật hạng: ' + (error.response?.data?.message || error.response?.data?.error || error.message))
-  } finally {
-    isUpdatingTier.value = false
-  }
 }
 
 onMounted(() => {

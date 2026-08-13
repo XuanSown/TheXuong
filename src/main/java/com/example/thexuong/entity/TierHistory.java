@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "tier_history")
+@Table(name = "TierHistories")
 public class TierHistory {
 
     @Id

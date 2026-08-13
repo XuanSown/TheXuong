@@ -247,10 +247,12 @@ import { toTypedSchema } from '@vee-validate/zod'
 import { loginSchema } from '@/utils/validators'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
+import { useToast } from 'vue-toastification'
 
 const router = useRouter()
 const route = useRoute()
 const authStore = useAuthStore()
+const toast = useToast()
 
 // Validate redirect URL to prevent open redirect attacks
 const isValidRedirect = (path: string): boolean => {
@@ -314,11 +316,11 @@ try {
   } else if (authStore.isAdmin) {
   router.push('/admin')
   } else {
-  router.push('/cart')
+  router.push('/')
   }
 } catch (error: any) {
   console.error('Login failed:', error)
-  // Removed the alert here because toast notification handles it globally now!
+  toast.error(error.response?.data?.message || 'Đăng nhập thất bại. Vui lòng kiểm tra lại!')
 }
 })
 

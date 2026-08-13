@@ -41,6 +41,7 @@ public class User {
     private String email;
 
     @Builder.Default
+    @Column(columnDefinition = "NVARCHAR(20)")
     private String provider = "LOCAL"; // 'LOCAL' hoặc 'GOOGLE'
 
     /**

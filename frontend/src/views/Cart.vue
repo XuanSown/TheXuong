@@ -8,7 +8,7 @@
             GIỎ HÀNG
           </h1>
           <p
-            v-if="cartStore.isGuestCart"
+            v-if="!authStore.isAuthenticated"
             class="font-gelasio text-base text-[#5E5F5C]"
           >
             Bạn đang mua sắm với tư cách khách. Vui lòng <router-link
@@ -230,7 +230,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.store'
 import { useCartStore } from '@/stores/cart.store'
@@ -244,6 +244,12 @@ const isUpdating = ref(false)
 
 // Use displayItems which works for both authenticated and guest users
 const cartItems = computed(() => cartStore.displayItems)
+
+watchEffect(() => {
+  console.log('Cart.vue: cartItems =', cartItems.value)
+  console.log('Cart.vue: cartStore.totalItems =', cartStore.totalItems)
+  console.log('Cart.vue: cartStore.cart =', cartStore.cart)
+})
 
 const formatPrice = (price: number): string => {
   return new Intl.NumberFormat('vi-VN').format(price) + ' đ'

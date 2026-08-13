@@ -4,7 +4,8 @@ import type { User } from '@/types'
 export const adminService = {
 	// Users
 	async getUsers(): Promise<User[]> {
-		return (await http.get('/admin/users')).data
+		const res = (await http.get('/admin/users')).data
+		return res.data || []
 	},
 
 	async toggleUserActive(id: number): Promise<any> {

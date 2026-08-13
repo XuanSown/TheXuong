@@ -19,6 +19,7 @@ public class UserStatusDto {
 private Long id;
 private String email;
 private String fullName;
+private String phone;
 private String role;
 private Boolean active;
 private String provider;
@@ -30,6 +31,7 @@ return UserStatusDto.builder()
 .id(user.getId())
 .email(user.getEmail())
 .fullName(user.getFullName())
+.phone(user.getPhoneNumber())
 .role(user.getRole())
 .active(user.getActive())
 .provider(user.getProvider())

@@ -35,7 +35,7 @@ public class PointTier {
     private String name;
 
     @Builder.Default
-    @Column(name = "min_total_spent", nullable = false)
+    @Column(name = "min_total_spent", nullable = false, precision = 18, scale = 2)
     private BigDecimal minTotalSpent = BigDecimal.ZERO;
 
     @Builder.Default
