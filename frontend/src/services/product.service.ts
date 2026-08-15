@@ -1,5 +1,5 @@
 import http from './http'
-import type { ProductListResponse, Product } from '@/types'
+import type { ProductListResponse, Product, RecommendationProduct } from '@/types'
 
 export const productService = {
   async getProducts(params: {
@@ -16,6 +16,10 @@ export const productService = {
 
   async getNewProducts(limit: number = 8): Promise<Product[]> {
     return (await http.get('/products/new', { params: { limit } })).data
+  },
+
+  async getCartRecommendations(productIds: number[], limit: number = 8): Promise<RecommendationProduct[]> {
+    return (await http.post('/products/recommendations/cart', { productIds, limit })).data
   },
 
   async getSports(): Promise<string[]> {

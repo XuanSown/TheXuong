@@ -33,3 +33,13 @@ export interface ProductListResponse {
   size: number
   number: number
 }
+
+export interface RecommendationProduct {
+  id: number
+  name: string
+  price: number
+  imageUrl: string
+  sport: string
+  brand: string
+  category: string
+}

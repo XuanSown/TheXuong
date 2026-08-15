@@ -1,5 +1,6 @@
 package com.example.thexuong.repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -109,4 +110,53 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
 	@Query(value = "SELECT * FROM Products WHERE id = :id", nativeQuery = true)
 	Optional<Product> findByIdIncludingInactive(@Param("id") Long id);
+
+	// ========== CART RECOMMENDATION ==========
+	// Chỉ fetch to-one associations (sport/category/brand), KHÔNG fetch collections
+	// -> tránh JOIN FETCH collection + pagination warning (HHH90003004) và N+1.
+	@Query("""
+		SELECT p FROM Product p
+		LEFT JOIN FETCH p.sport
+		LEFT JOIN FETCH p.category
+		LEFT JOIN FETCH p.brand
+		WHERE p.id IN :ids
+	""")
+	List<Product> findAllByIdsWithAttributes(@Param("ids") Collection<Long> ids);
+
+	// Candidate pool: active, còn hàng (EXISTS thay vì load toàn bộ variants),
+	// loại sản phẩm đang trong cart, giới hạn theo sport/category/brand của cart.
+	@Query("""
+		SELECT p FROM Product p
+		LEFT JOIN FETCH p.sport
+		LEFT JOIN FETCH p.category
+		LEFT JOIN FETCH p.brand
+		WHERE p.active = true
+		  AND p.id NOT IN :excludedIds
+		  AND EXISTS (SELECT 1 FROM ProductVariant pv WHERE pv.product = p AND pv.quantity > 0)
+		  AND (:matchSports = false OR p.sport.id IN :sportIds)
+		  AND (:matchCategories = false OR p.category.id IN :categoryIds)
+		  AND (:matchBrands = false OR p.brand.id IN :brandIds)
+	""")
+	List<Product> findRecommendationCandidates(
+		@Param("excludedIds") Collection<Long> excludedIds,
+		@Param("matchSports") boolean matchSports,
+		@Param("sportIds") Collection<Long> sportIds,
+		@Param("matchCategories") boolean matchCategories,
+		@Param("categoryIds") Collection<Long> categoryIds,
+		@Param("matchBrands") boolean matchBrands,
+		@Param("brandIds") Collection<Long> brandIds
+	);
+
+	// Fallback: sản phẩm phổ biến (viewCount) còn hàng, loại cart + đã chọn.
+	@Query("""
+		SELECT p FROM Product p
+		LEFT JOIN FETCH p.sport
+		LEFT JOIN FETCH p.category
+		LEFT JOIN FETCH p.brand
+		WHERE p.active = true
+		  AND p.id NOT IN :excludedIds
+		  AND EXISTS (SELECT 1 FROM ProductVariant pv WHERE pv.product = p AND pv.quantity > 0)
+		ORDER BY p.viewCount DESC, p.id DESC
+	""")
+	List<Product> findPopularInStock(@Param("excludedIds") Collection<Long> excludedIds, Pageable pageable);
 }
