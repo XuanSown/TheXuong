@@ -9,15 +9,21 @@
             <div class="w-[82px] h-[75px] bg-[url('@/assets/logo.png')] bg-contain bg-no-repeat bg-center" />
             <div class="mt-1 flex flex-col items-center">
               <p class="font-geist text-base text-[#4C4546] leading-[26px]">
-                Quên mật khẩu
+                {{ t('auth.forgotPasswordTitle') }}
               </p>
             </div>
           </div>
 
           <!-- Info Text -->
-          <p class="font-gelasio text-sm text-[#7E7576] leading-relaxed text-center">
-            Nhập email đã đăng ký để nhận link đặt lại mật khẩu. Link có hiệu lực trong <strong class="text-black">2 giờ</strong>.
-          </p>
+          <i18n-t
+            keypath="auth.forgotPasswordDesc"
+            tag="p"
+            class="font-gelasio text-sm text-[#7E7576] leading-relaxed text-center"
+          >
+            <template #strong>
+              <strong class="text-black">2</strong>
+            </template>
+          </i18n-t>
 
           <!-- Success Message -->
           <div
@@ -88,7 +94,7 @@
             <BaseInput
               v-model="email"
               type="email"
-              placeholder="Nhập email của bạn"
+              :placeholder="t('auth.emailPlaceholder')"
               :error="emailError"
               class="!h-[59.59px]"
             >
@@ -120,7 +126,7 @@
               :loading="isSubmitting"
               class="w-full !h-[56px]"
             >
-              Gửi link đặt lại mật khẩu
+              {{ t('auth.sendResetLink') }}
             </BaseButton>
           </form>
 
@@ -130,7 +136,7 @@
               to="/login"
               class="font-gelasio text-base text-[#7E7576] hover:text-black transition-colors"
             >
-              ← Quay lại đăng nhập
+              ← {{ t('auth.backToLogin') }}
             </router-link>
           </div>
         </div>
@@ -145,8 +151,12 @@ import authService from '@/services/auth.service'
 import { useForm, useField } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import { forgotPasswordSchema } from '@/utils/validators'
+import { getApiErrorMessage } from '@/utils/apiError'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const successMsg = ref('')
 const errorMsg = ref('')
@@ -162,9 +172,9 @@ const onSubmit = handleSubmit(async (values) => {
   errorMsg.value = ''
   try {
     const res = await authService.forgotPassword(values.email)
-    successMsg.value = res.message || 'Đã gửi link đặt lại mật khẩu vào email của bạn!'
+    successMsg.value = res.message || t('auth.resetLinkSent')
   } catch (error: any) {
-    errorMsg.value = error.response?.data?.message || 'Có lỗi xảy ra, vui lòng thử lại'
+    errorMsg.value = getApiErrorMessage(error, 'errors.generic')
   }
 })
 </script>

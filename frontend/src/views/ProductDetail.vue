@@ -7,7 +7,7 @@
           to="/"
           class="font-geist text-[12px] font-semibold uppercase tracking-[1.8px] text-[#646562] hover:text-black transition-colors"
         >
-          TRANG CHỦ
+          {{ t('common.home') }}
         </router-link>
         <svg
           class="w-[4.32px] h-[7px]"
@@ -23,7 +23,7 @@
           to="/products"
           class="font-geist text-[12px] font-semibold uppercase tracking-[1.8px] text-[#646562] hover:text-black transition-colors"
         >
-          SẢN PHẨM
+          {{ t('nav.products') }}
         </router-link>
         <svg
           class="w-[4.32px] h-[7px]"
@@ -80,7 +80,7 @@
               <div class="absolute right-4 bottom-4 flex gap-2">
                 <button
                   class="w-10 h-10 bg-white/80 backdrop-blur-[4px] rounded-full flex items-center justify-center shadow hover:bg-white transition-colors"
-                  aria-label="Zoom in"
+                  :aria-label="t('product.zoomIn')"
                   @click="handleZoomIn"
                 >
                   <svg
@@ -100,7 +100,7 @@
                 </button>
                 <button
                   class="w-10 h-10 bg-white/80 backdrop-blur-[4px] rounded-full flex items-center justify-center shadow hover:bg-white transition-colors"
-                  aria-label="Zoom out"
+                  :aria-label="t('product.zoomOut')"
                   @click="handleZoomOut"
                 >
                   <svg
@@ -146,7 +146,7 @@
                     d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
                   />
                 </svg>
-                <span class="font-geist text-base text-[#4C4546]">{{ product.viewCount }} lượt xem</span>
+                <span class="font-geist text-base text-[#4C4546]">{{ t('product.views', { count: product.viewCount }) }}</span>
               </div>
 
               <h1 class="font-geist text-[32px] font-semibold leading-[38px] tracking-[-0.32px] text-black">
@@ -158,7 +158,7 @@
                   formatPrice(product.price) }}</span>
                 <button
                   class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition-all active:scale-90"
-                  aria-label="Toggle wishlist"
+                  :aria-label="t('product.toggleWishlist')"
                   @click="handleToggleFavorite"
                 >
                   <svg
@@ -190,7 +190,7 @@
             <div class="flex flex-col gap-4">
               <div class="flex items-center gap-2">
                 <span class="font-geist text-[12px] font-bold uppercase tracking-[1.2px] text-black">
-                  CHỌN KÍCH Cỡ:
+                  {{ t('product.selectSize') }}
                 </span>
               </div>
 
@@ -213,7 +213,7 @@
                 v-if="!selectedSize"
                 class="text-red-500 text-sm"
               >
-                Vui lòng chọn kích cỡ
+                {{ t('product.pleaseSelectSize') }}
               </p>
             </div>
 
@@ -221,7 +221,7 @@
             <div class="flex flex-col gap-4">
               <div class="flex items-center gap-2">
                 <span class="font-geist text-[12px] font-bold uppercase tracking-[1.2px] text-black">
-                  SỐ LƯỢNG:
+                  {{ t('common.quantity') }}:
                 </span>
               </div>
               <div class="flex items-center gap-4">
@@ -256,7 +256,7 @@
                 :disabled="isAdding || !selectedSize"
                 @click="handleAddToCart"
               >
-                <span v-if="!isAdding">THÊM VÀO GIỎ HÀNG</span>
+                <span v-if="!isAdding">{{ t('cart.addToCart') }}</span>
                 <span
                   v-else
                   class="flex items-center gap-2"
@@ -280,7 +280,7 @@
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                     />
                   </svg>
-                  Đang thêm...
+                  {{ t('product.adding') }}
                 </span>
               </button>
               <button
@@ -288,7 +288,7 @@
                 :disabled="!selectedSize"
                 @click="handleBuyNow"
               >
-                MUA NGAY
+                {{ t('product.buyNow') }}
               </button>
             </div>
 
@@ -310,8 +310,8 @@
                     d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"
                   />
                 </svg>
-                <span class="font-geist text-[10px] leading-[12px] text-center text-[#1A1C1C]">
-                  ĐỔI TRẢ<br>TRONG 30 NGÀY
+                <span class="font-geist text-[10px] leading-[12px] text-center text-[#1A1C1C] whitespace-pre-line">
+                  {{ t('product.returns30d') }}
                 </span>
               </div>
 
@@ -331,8 +331,8 @@
                     d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"
                   />
                 </svg>
-                <span class="font-geist text-[10px] leading-[12px] text-center text-[#1A1C1C]">
-                  BẢO HÀNH<br>CHÍNH HÃNG
+                <span class="font-geist text-[10px] leading-[12px] text-center text-[#1A1C1C] whitespace-pre-line">
+                  {{ t('product.genuineWarranty') }}
                 </span>
               </div>
 
@@ -352,8 +352,8 @@
                     d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12"
                   />
                 </svg>
-                <span class="font-geist text-[10px] leading-[12px] text-center text-[#1A1C1C]">
-                  FREESHIP<br>TOÀN QUỐC
+                <span class="font-geist text-[10px] leading-[12px] text-center text-[#1A1C1C] whitespace-pre-line">
+                  {{ t('product.freeShipping') }}
                 </span>
               </div>
             </div>
@@ -420,13 +420,13 @@
         class="text-center py-16"
       >
         <p class="font-gelasio text-xl text-[#5E5F5C] mb-8">
-          Không tìm thấy sản phẩm
+          {{ t('errors.productNotFound') }}
         </p>
         <router-link
           to="/products"
           class="text-black hover:underline"
         >
-          Quay lại danh sách sản phẩm
+          {{ t('product.backToList') }}
         </router-link>
       </div>
     </main>
@@ -442,6 +442,10 @@ import { useFavoriteStore } from '@/stores/favorite.store'
 import BaseSkeleton from '@/components/ui/BaseSkeleton.vue'
 import { productService } from '@/services/product.service'
 import { useToast } from 'vue-toastification'
+import { useI18n } from 'vue-i18n'
+import { formatCurrency } from '@/utils/formatters'
+
+const { t } = useI18n()
 
 const route = useRoute()
 const router = useRouter()
@@ -469,19 +473,19 @@ const handleZoomOut = () => {
 // Get product ID from route
 const productId = computed(() => Number(route.params.id))
 
-const productName = computed(() => product.value?.name || 'Sản phẩm')
+const productName = computed(() => product.value?.name || t('product.genericName'))
 
 const formatPrice = (price: number): string => {
-  return new Intl.NumberFormat('vi-VN').format(price) + 'đ'
+  return formatCurrency(price)
 }
 
 const handleToggleFavorite = () => {
   if (product.value) {
     favoriteStore.toggleFavorite(product.value)
     if (favoriteStore.isFavorite(product.value.id)) {
-      toast.success('Đã thêm vào danh sách yêu thích!')
+      toast.success(t('toast.addedToFavorite'))
     } else {
-      toast.info('Đã xóa khỏi danh sách yêu thích.')
+      toast.info(t('toast.removedFromFavorite'))
     }
   }
 }
@@ -499,15 +503,16 @@ const handleAddToCart = async () => {
     const variant = getSelectedVariant.value
     await cartStore.addItem(variant.id, quantity.value, {
       variantId: variant.id,
+      productId: product.value.id,
       productName: product.value.name,
       productImage: product.value.imageUrl,
       size: selectedSize.value,
       price: product.value.price
     }, authStore.isAuthenticated)
-    toast.success('Đã thêm vào giỏ hàng!')
+    toast.success(t('toast.addedToCart'))
   } catch (error) {
     console.error('Failed to add to cart:', error)
-    toast.error('Không thể thêm vào giỏ hàng. Vui lòng thử lại.')
+    toast.error(t('toast.addToCartFailed'))
   } finally {
     isAdding.value = false
   }
@@ -521,6 +526,7 @@ const handleBuyNow = async () => {
     const variant = getSelectedVariant.value
     await cartStore.addItem(variant.id, quantity.value, {
       variantId: variant.id,
+      productId: product.value.id,
       productName: product.value.name,
       productImage: product.value.imageUrl,
       size: selectedSize.value,
@@ -535,7 +541,7 @@ const handleBuyNow = async () => {
     }
   } catch (error) {
     console.error('Failed to add to cart:', error)
-    toast.error('Không thể thêm vào giỏ hàng. Vui lòng thử lại.')
+    toast.error(t('toast.addToCartFailed'))
   } finally {
     isAdding.value = false
   }

@@ -31,7 +31,7 @@
           class="font-geist text-[12px] uppercase tracking-[1.8px] text-white/60 mb-6 hero-anim hero-fade"
           style="animation-delay:.1s"
         >
-          VỀ CHÚNG TÔI
+          {{ t('about.heroEyebrow') }}
         </p>
         <h1 class="font-lobster font-normal text-white leading-[0.95] mb-6">
           <span
@@ -47,14 +47,14 @@
           class="font-geist text-base sm:text-lg text-white/70 leading-[29px] max-w-[640px] mx-auto mb-10 hero-anim hero-fade"
           style="animation-delay:.6s"
         >
-          Sàn thương mại điện tử đồ thể thao chính hãng — đồng hành cùng vận động viên và người yêu thể thao Việt Nam.
+          {{ t('about.heroDesc') }}
         </p>
         <router-link
           to="/products"
           class="liquid-btn px-10 py-5 bg-white/10 text-white text-[12px] font-semibold uppercase tracking-[1.8px] leading-[12px] rounded-full hover:bg-white/20 transition-colors hero-anim hero-fade"
           style="animation-delay:.75s"
         >
-          KHÁM PHÁ SẢN PHẨM
+          {{ t('about.heroCta') }}
         </router-link>
       </div>
       <div
@@ -76,10 +76,10 @@
           data-reveal
         >
           <p class="font-geist text-[12px] uppercase tracking-[1.8px] text-[#5E5F5C] mb-4">
-            SỨ MỆNH
+            {{ t('about.storyEyebrow') }}
           </p>
           <h2 class="font-geist text-[40px] sm:text-[56px] md:text-[64px] leading-[70px] tracking-[-1.28px] uppercase text-[#1A1C1C]">
-            Câu chuyện của chúng tôi
+            {{ t('about.storyTitle') }}
           </h2>
         </div>
         <div
@@ -89,13 +89,13 @@
           <div class="liquid-glass relative rounded-2xl border border-white/60 bg-white/50 p-8 md:p-10 shadow-[0_8px_32px_rgba(26,28,28,0.12)]">
             <span class="glass-sheen pointer-events-none" />
             <p class="font-geist text-base text-[#1A1C1C] leading-[29px] mb-5">
-              THE XUONG SPORT ra đời với mong muốn biến việc sở hữu đồ thể thao chính hãng trở nên dễ dàng và đáng tin cậy đối với mọi vận động viên và người yêu thể thao tại Việt Nam.
+              {{ t('about.storyP1') }}
             </p>
             <p class="font-geist text-base text-[#5E5F5C] leading-[29px] mb-5">
-              Chúng tôi tin rằng thiết bị phù hợp không chỉ nâng cao thành tích mà còn nuôi dưỡng đam mê. Mỗi sản phẩm trên sàn đều được tuyển chọn kỹ lưỡng từ những thương hiệu hàng đầu thế giới.
+              {{ t('about.storyP2') }}
             </p>
             <p class="font-geist text-base text-[#5E5F5C] leading-[29px]">
-              Tầm nhìn của chúng tôi là trở thành điểm đến uy tín nhất cho đồ thể thao chính hãng, nơi niềm tin của khách hàng được đặt lên hàng đầu.
+              {{ t('about.storyP3') }}
             </p>
           </div>
         </div>
@@ -112,10 +112,10 @@
         data-reveal
       >
         <p class="font-geist text-[12px] uppercase tracking-[1.8px] text-[#5E5F5C] mb-4">
-          CAM KẾT
+          {{ t('about.commitmentEyebrow') }}
         </p>
         <h2 class="font-geist text-[40px] sm:text-[56px] md:text-[64px] leading-[70px] tracking-[-1.28px] uppercase text-[#1A1C1C]">
-          Bốn trụ cột của chúng tôi
+          {{ t('about.commitmentTitle') }}
         </h2>
       </div>
       <div class="relative">
@@ -150,10 +150,10 @@
         data-reveal
       >
         <p class="font-geist text-[12px] uppercase tracking-[1.8px] text-[#5E5F5C] mb-4">
-          GIÁ TRỊ CỐT LÕI
+          {{ t('about.valuesEyebrow') }}
         </p>
         <h2 class="font-geist text-[40px] sm:text-[56px] md:text-[64px] leading-[70px] tracking-[-1.28px] uppercase text-[#1A1C1C]">
-          Điều chúng tôi tin
+          {{ t('about.valuesTitle') }}
         </h2>
       </div>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -195,10 +195,10 @@
         data-reveal
       >
         <p class="font-geist text-[12px] uppercase tracking-[1.8px] text-[#5E5F5C] mb-4">
-          KHÁCH HÀNG
+          {{ t('about.testimonialsEyebrow') }}
         </p>
         <h2 class="font-geist text-[40px] sm:text-[56px] md:text-[64px] leading-[70px] tracking-[-1.28px] uppercase text-[#1A1C1C]">
-          Khách hàng nói gì
+          {{ t('about.testimonialsTitle') }}
         </h2>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -233,13 +233,13 @@
         data-reveal
       >
         <h2 class="font-geist text-[40px] sm:text-[56px] md:text-[64px] leading-[70px] tracking-[-1.28px] text-white mb-8">
-          Sẵn sàng nâng tầm trải nghiệm thể thao?
+          {{ t('about.ctaTitle') }}
         </h2>
         <router-link
           to="/products"
           class="liquid-btn px-10 py-5 bg-white/10 text-white text-[12px] font-semibold uppercase tracking-[1.8px] leading-[12px] rounded-full hover:bg-white/20 transition-colors"
         >
-          KHÁM PHÁ SẢN PHẨM
+          {{ t('about.heroCta') }}
         </router-link>
       </div>
     </section>
@@ -253,12 +253,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import BrandMarquee from '@/components/about/BrandMarquee.vue'
 import StatCard from '@/components/about/StatCard.vue'
 import { useScrollReveal } from '@/composables/useScrollReveal'
 import { useReveal } from '@/composables/useReveal'
 import { useSpiralVortex } from '@/composables/useSpiralVortex'
+
+const { t } = useI18n()
 
 const rootRef = ref<HTMLElement | null>(null)
 const heroRef = ref<HTMLElement | null>(null)
@@ -305,34 +308,34 @@ onUnmounted(() => {
   if (glowRaf) cancelAnimationFrame(glowRaf)
 })
 
-const commitments = [
-  { title: 'Chính hãng 100%', copy: 'Mọi sản phẩm đều có nguồn gốc rõ ràng từ NIKE, ADIDAS, LI-NING, PUMA. Phát hiện hàng giả, đền bù gấp 10 lần.' },
-  { title: 'Đa dạng môn thể thao', copy: 'Bóng đá, cầu lông, chạy bộ, bóng rổ… đầy đủ dụng cụ và trang phục cho mọi nhu cầu vận động.' },
-  { title: 'Dịch vụ khách hàng tận tâm', copy: 'Hỗ trợ nhanh chóng, đổi trả linh hoạt, giao hàng toàn quốc — luôn đồng hành cùng bạn.' },
-  { title: 'Cam kết giá & chất lượng', copy: 'Giá cạnh tranh, chất lượng đảm bảo, chính sách bảo hành minh bạch và rõ ràng.' },
-]
+const commitments = computed(() => [
+  { title: t('about.commitment1Title'), copy: t('about.commitment1Copy') },
+  { title: t('about.commitment2Title'), copy: t('about.commitment2Copy') },
+  { title: t('about.commitment3Title'), copy: t('about.commitment3Copy') },
+  { title: t('about.commitment4Title'), copy: t('about.commitment4Copy') }
+])
 
-const values = [
-  { title: 'Tín nhiệm', copy: 'Uy tín là nền tảng mọi hoạt động — giữ lời hứa với khách hàng.' },
-  { title: 'Đam mê', copy: 'Yêu thể thao và truyền tải nhiệt huyết ấy vào từng sản phẩm.' },
-  { title: 'Khách hàng là trọng tâm', copy: 'Mọi quyết định đều xuất phát từ lợi ích và trải nghiệm của khách hàng.' },
-  { title: 'Đổi mới', copy: 'Liên tục cập nhật sản phẩm và dịch vụ để vượt mong đợi.' },
-  { title: 'Trách nhiệm', copy: 'Minh bạch trong nguồn hàng, giá cả và chính sách bảo hành.' },
-  { title: 'Cộng đồng', copy: 'Góp phần xây dựng cộng đồng thể thao Việt Nam phát triển.' },
-]
+const values = computed(() => [
+  { title: t('about.value1Title'), copy: t('about.value1Copy') },
+  { title: t('about.value2Title'), copy: t('about.value2Copy') },
+  { title: t('about.value3Title'), copy: t('about.value3Copy') },
+  { title: t('about.value4Title'), copy: t('about.value4Copy') },
+  { title: t('about.value5Title'), copy: t('about.value5Copy') },
+  { title: t('about.value6Title'), copy: t('about.value6Copy') }
+])
 
-const stats = [
-  { value: 10, suffix: 'K+', label: 'Khách hàng' },
-  { value: 500, suffix: '+', label: 'Sản phẩm' },
-  { value: 4, suffix: '', label: 'Môn thể thao' },
-  { value: 100, suffix: '%', label: 'Chính hãng' },
-]
+const stats = computed(() => [
+  { value: 10, suffix: 'K+', label: t('about.statCustomers') },
+  { value: 500, suffix: '+', label: t('about.statProducts') },
+  { value: 4, suffix: '', label: t('about.statSports') },
+  { value: 100, suffix: '%', label: t('about.statGenuine') }
+])
 
-const testimonials = [
-  { quote: 'Mua giày chạy bộ tại TheXuong lần đầu mà nhận đúng đồ chính hãng, đóng gói kỹ. Chắc chắn sẽ quay lại.', name: 'Minh Anh', role: 'Vận động viên chạy bộ' },
-  { quote: 'Cần dụng cụ cầu lông gấp, shop tư vấn nhiệt tình, giao đúng hẹn. Dịch vụ tận tâm đúng như cam kết.', name: 'Hoàng Nam', role: 'Cầu thủ cầu lông' },
-  { quote: 'Sàn đồ thể thao đáng tin cậy. Mỗi sản phẩm đều rõ nguồn gốc, giá cạnh tranh so với nơi khác.', name: 'Thu Hà', role: 'Người yêu thể thao' },
-]
+const testimonials = computed(() => [
+  { quote: t('about.testimonial1Quote'), name: 'Minh Anh', role: t('about.testimonial1Role') },
+  { quote: t('about.testimonial2Quote'), name: 'Hoàng Nam', role: t('about.testimonial2Role') },
+  { quote: t('about.testimonial3Quote'), name: 'Thu Hà', role: t('about.testimonial3Role') }
+])
 </script>
 
 <style scoped>

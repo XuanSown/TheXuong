@@ -14,7 +14,7 @@
               class="text-[#9CA3AF] text-sm leading-[24px] font-normal"
               style="font-family: 'Geist', sans-serif;"
             >
-              Nơi đam mê thể thao hội tụ. Chúng tôi cam kết mang đến những sản phẩm chất lượng nhất cho cộng đồng yêu thể thao Việt Nam.
+              {{ t('footer.description') }}
             </p>
 
             <!-- Contact Info -->
@@ -102,32 +102,32 @@
               class="text-[#D1D5DB] text-xs uppercase tracking-wider leading-[16px]"
               style="font-family: 'Geist', sans-serif;"
             >
-              HỖ TRỢ KHÁCH HÀNG
+              {{ t('footer.customerSupport') }}
             </h4>
             <div class="flex flex-col gap-4">
               <router-link
                 to="/guide/size"
                 class="text-[#9CA3AF] text-sm hover:text-white transition-colors"
               >
-                Hướng dẫn chọn size
+                {{ t('footer.sizeGuide') }}
               </router-link>
               <router-link
                 to="/policy/returns"
                 class="text-[#9CA3AF] text-sm hover:text-white transition-colors"
               >
-                Chính sách đổi trả
+                {{ t('footer.returnsPolicy') }}
               </router-link>
               <router-link
                 to="/payment-methods"
                 class="text-[#9CA3AF] text-sm hover:text-white transition-colors"
               >
-                Phương thức thanh toán
+                {{ t('footer.paymentMethods') }}
               </router-link>
               <router-link
                 to="/order-tracking"
                 class="text-[#9CA3AF] text-sm hover:text-white transition-colors"
               >
-                Kiểm tra đơn hàng
+                {{ t('footer.orderTracking') }}
               </router-link>
             </div>
           </div>
@@ -138,26 +138,26 @@
               class="text-[#D1D5DB] text-xs uppercase tracking-wider leading-[16px]"
               style="font-family: 'Geist', sans-serif;"
             >
-              ĐIỀU KHOẢN & CHÍNH SÁCH
+              {{ t('footer.termsPolicies') }}
             </h4>
             <div class="flex flex-col gap-4">
               <router-link
                 to="/policy/privacy"
                 class="text-[#9CA3AF] text-sm hover:text-white transition-colors"
               >
-                Chính sách bảo mật
+                {{ t('footer.privacyPolicy') }}
               </router-link>
               <router-link
                 to="/terms-of-service"
                 class="text-[#9CA3AF] text-sm hover:text-white transition-colors"
               >
-                Điều khoản dịch vụ
+                {{ t('footer.termsOfService') }}
               </router-link>
               <router-link
                 to="/policy/shipping"
                 class="text-[#9CA3AF] text-sm hover:text-white transition-colors"
               >
-                Chính sách vận chuyển
+                {{ t('footer.shippingPolicy') }}
               </router-link>
             </div>
           </div>
@@ -168,20 +168,20 @@
               class="text-[#D1D5DB] text-xs uppercase tracking-wider leading-[16px]"
               style="font-family: 'Geist', sans-serif;"
             >
-              ĐĂNG KÝ NHẬN ƯU ĐÃI
+              {{ t('footer.newsletter') }}
             </h4>
 
             <!-- Newsletter Form -->
             <div class="relative">
               <input
                 type="email"
-                placeholder="Email của bạn..."
+                :placeholder="t('footer.newsletterPlaceholder')"
                 class="w-full bg-[#171A1F] border border-white/10 rounded-md px-4 py-3 text-sm text-white placeholder:text-[#6B7280] outline-none focus:border-white/30 transition-colors"
               >
               <button
                 type="button"
                 class="absolute right-0 top-0 bottom-0 w-12 flex items-center justify-center"
-                aria-label="Submit email"
+                :aria-label="t('footer.newsletterSubmit')"
               >
                 <svg
                   class="w-4 h-3"
@@ -212,7 +212,7 @@
               class="text-[#6B7280] text-xs uppercase tracking-wider leading-[16px] mt-4"
               style="font-family: 'Geist', sans-serif;"
             >
-              MẠNG XÃ HỘI
+              {{ t('footer.social') }}
             </h5>
 
             <!-- Social Icons -->
@@ -318,7 +318,7 @@
             to="/about"
             class="hover:text-white transition-colors"
           >
-            Về chúng tôi
+            {{ t('footer.aboutUs') }}
           </router-link>
         </div>
       </div>
@@ -327,7 +327,9 @@
 </template>
 
 <script setup lang="ts">
-// No script logic needed for static footer
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 </script>
 
 <style scoped>

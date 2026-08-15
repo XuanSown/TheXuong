@@ -17,23 +17,23 @@
           class="font-geist text-[12px] uppercase tracking-[1.8px] text-white/60 mb-6 hero-anim hero-fade"
           style="animation-delay:.1s"
         >
-          PHÁP LÝ
+          {{ t('terms.heroEyebrow') }}
         </p>
         <h1 class="font-geist font-bold text-white leading-[0.95] mb-6">
           <span
             class="block text-4xl sm:text-6xl md:text-7xl hero-anim hero-reveal"
             style="letter-spacing:-1.28px;animation-delay:.25s"
-          >ĐIỀU KHOẢN</span>
+          >{{ t('terms.heroTitle1') }}</span>
           <span
             class="block text-4xl sm:text-6xl md:text-7xl -mt-1 hero-anim hero-reveal text-white/80"
             style="letter-spacing:-0.64px;animation-delay:.42s"
-          >DỊCH VỤ</span>
+          >{{ t('terms.heroTitle2') }}</span>
         </h1>
         <p
           class="font-geist text-base sm:text-lg text-white/70 leading-[29px] max-w-[640px] mx-auto hero-anim hero-fade"
           style="animation-delay:.6s"
         >
-          Quy định và điều khoản sử dụng dịch vụ tại THE XUONG SPORT — cập nhật lần cuối: tháng 7/2025.
+          {{ t('terms.heroDesc') }}
         </p>
       </div>
       <div
@@ -52,10 +52,10 @@
           data-reveal
         >
           <p class="font-geist text-[12px] uppercase tracking-[1.8px] text-[#5E5F5C] mb-4">
-            MỤC LỤC
+            {{ t('terms.tocEyebrow') }}
           </p>
           <h2 class="font-geist text-[32px] sm:text-[40px] leading-[48px] tracking-[-0.64px] text-[#1A1C1C]">
-            Nội dung chính
+            {{ t('terms.tocTitle') }}
           </h2>
         </div>
         <nav
@@ -139,23 +139,23 @@
         data-reveal
       >
         <h2 class="font-geist text-[40px] sm:text-[56px] md:text-[64px] leading-[70px] tracking-[-1.28px] text-white mb-8">
-          Có thắc mắc về điều khoản?
+          {{ t('terms.ctaTitle') }}
         </h2>
         <p class="font-geist text-base text-white/70 leading-[29px] mb-10 max-w-[560px] mx-auto">
-          Liên hệ với chúng tôi để được giải đáp mọi thắc mắc liên quan đến điều khoản dịch vụ.
+          {{ t('terms.ctaDesc') }}
         </p>
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
           <router-link
             to="/contact"
             class="liquid-btn px-10 py-5 bg-white/10 text-white text-[12px] font-semibold uppercase tracking-[1.8px] leading-[12px] rounded-full hover:bg-white/20 transition-colors"
           >
-            LIÊN HỆ NGAY
+            {{ t('terms.ctaContact') }}
           </router-link>
           <router-link
             to="/policy/privacy"
             class="liquid-btn px-10 py-5 bg-white/10 text-white text-[12px] font-semibold uppercase tracking-[1.8px] leading-[12px] rounded-full hover:bg-white/20 transition-colors"
           >
-            CHÍNH SÁCH BẢO MẬT
+            {{ t('terms.ctaPrivacy') }}
           </router-link>
         </div>
       </div>
@@ -164,8 +164,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onUnmounted } from 'vue'
+import { ref, computed, onUnmounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useReveal } from '@/composables/useReveal'
+
+const { t } = useI18n()
 
 const rootRef = ref<HTMLElement | null>(null)
 const heroRef = ref<HTMLElement | null>(null)
@@ -190,17 +193,17 @@ onUnmounted(() => {
   if (glowRaf) cancelAnimationFrame(glowRaf)
 })
 
-const tocItems = [
-  'Giới thiệu chung',
-  'Tài khoản người dùng',
-  'Sản phẩm & đặt hàng',
-  'Thanh toán & giao hàng',
-  'Đổi trả & hoàn tiền',
-  'Bảo mật thông tin',
-  'Sở hữu trí tuệ',
-  'Giải quyết tranh chấp',
-  'Thay đổi điều khoản'
-]
+const tocItems = computed(() => [
+  t('terms.s1Title'),
+  t('terms.s2Title'),
+  t('terms.s3Title'),
+  t('terms.s4Title'),
+  t('terms.s5Title'),
+  t('terms.s6Title'),
+  t('terms.s7Title'),
+  t('terms.s8Title'),
+  t('terms.s9Title'),
+])
 
 interface Block {
   subtitle?: string
@@ -208,129 +211,82 @@ interface Block {
   list?: string[]
 }
 
-const sections: { title: string; blocks: Block[] }[] = [
+const sections = computed<{ title: string; blocks: Block[] }[]>(() => [
   {
-    title: 'Giới thiệu chung',
+    title: t('terms.s1Title'),
+    blocks: [
+      { content: t('terms.s1b1') },
+      { subtitle: t('terms.s1b2Sub'), content: t('terms.s1b2') }
+    ]
+  },
+  {
+    title: t('terms.s2Title'),
     blocks: [
       {
-        content: 'Chào mừng bạn đến với THE XUONG SPORT — sàn thương mại điện tử chuyên cung cấp đồ thể thao chính hãng. Bằng việc truy cập và sử dụng website, bạn đồng ý tuân thủ các điều khoản và điều kiện dưới đây.'
+        subtitle: t('terms.s2b1Sub'),
+        content: t('terms.s2b1'),
+        list: [t('terms.s2b1l1'), t('terms.s2b1l2'), t('terms.s2b1l3')]
       },
-      {
-        subtitle: 'Phạm vi áp dụng',
-        content: 'Các điều khoản này áp dụng cho mọi hoạt động trên website thexuong.xuansown.id.vn, bao gồm duyệt sản phẩm, đặt hàng, thanh toán và sử dụng tài khoản.'
-      }
+      { subtitle: t('terms.s2b2Sub'), content: t('terms.s2b2') }
     ]
   },
   {
-    title: 'Tài khoản người dùng',
+    title: t('terms.s3Title'),
+    blocks: [
+      { subtitle: t('terms.s3b1Sub'), content: t('terms.s3b1') },
+      { subtitle: t('terms.s3b2Sub'), content: t('terms.s3b2') }
+    ]
+  },
+  {
+    title: t('terms.s4Title'),
     blocks: [
       {
-        subtitle: 'Đăng ký & bảo mật',
-        content: 'Bạn chịu trách nhiệm cung cấp thông tin chính xác khi đăng ký tài khoản và bảo mật mật khẩu của mình.',
-        list: [
-          'Mỗi cá nhân chỉ được phép tạo một tài khoản duy nhất',
-          'Bạn chịu trách nhiệm cho mọi hoạt động diễn ra dưới tài khoản của mình',
-          'Thông báo ngay cho chúng tôi nếu phát hiện tài khoản bị truy cập trái phép'
-        ]
+        subtitle: t('terms.s4b1Sub'),
+        content: t('terms.s4b1'),
+        list: [t('terms.s4b1l1'), t('terms.s4b1l2'), t('terms.s4b1l3')]
       },
+      { subtitle: t('terms.s4b2Sub'), content: t('terms.s4b2') }
+    ]
+  },
+  {
+    title: t('terms.s5Title'),
+    blocks: [
       {
-        subtitle: 'Quyền hạn của THE XUONG',
-        content: 'Chúng tôi có quyền tạm khóa hoặc xóa tài khoản nếu phát hiện hành vi gian lận, vi phạm điều khoản hoặc gây ảnh hưởng đến người dùng khác.'
+        content: t('terms.s5b1'),
+        list: [t('terms.s5b1l1'), t('terms.s5b1l2'), t('terms.s5b1l3'), t('terms.s5b1l4')]
       }
     ]
   },
   {
-    title: 'Sản phẩm & đặt hàng',
+    title: t('terms.s6Title'),
+    blocks: [
+      { subtitle: t('terms.s6b1Sub'), content: t('terms.s6b1') },
+      { subtitle: t('terms.s6b2Sub'), content: t('terms.s6b2') }
+    ]
+  },
+  {
+    title: t('terms.s7Title'),
     blocks: [
       {
-        subtitle: 'Thông tin sản phẩm',
-        content: 'THE XUONG SPORT cam kết cung cấp thông tin sản phẩm chính xác bao gồm mô tả, hình ảnh, giá bán và tình trạng hàng. Tuy nhiên, màu sắc thực tế có thể khác biệt nhẹ do thiết bị hiển thị.'
-      },
-      {
-        subtitle: 'Xác nhận đơn hàng',
-        content: 'Đơn hàng được xác nhận khi bạn nhận được email xác nhận từ hệ thống. Chúng tôi có quyền từ chối đơn hàng nếu phát hiện dấu hiệu gian lận hoặc thông tin không chính xác.'
+        content: t('terms.s7b1'),
+        list: [t('terms.s7b1l1'), t('terms.s7b1l2'), t('terms.s7b1l3')]
       }
     ]
   },
   {
-    title: 'Thanh toán & giao hàng',
+    title: t('terms.s8Title'),
     blocks: [
-      {
-        subtitle: 'Phương thức thanh toán',
-        content: 'Chúng tôi hỗ trợ nhiều phương thức thanh toán bao gồm thẻ tín dụng/ghi nợ, chuyển khoản ngân hàng, ví điện tử và thanh toán khi nhận hàng (COD).',
-        list: [
-          'Giá hiển thị trên website đã bao gồm VAT',
-          'Phí vận chuyển được tính riêng và hiển thị trước khi thanh toán',
-          'Giao dịch được mã hóa SSL để đảm bảo an toàn'
-        ]
-      },
-      {
-        subtitle: 'Giao hàng',
-        content: 'Thời gian giao hàng từ 2-7 ngày làm việc tùy theo khu vực. THE XUONG SPORT không chịu trách nhiệm cho các trường hợp chậm giao do yếu tố bất khả kháng như thiên tai, dịch bệnh.'
-      }
+      { content: t('terms.s8b1') },
+      { subtitle: t('terms.s8b2Sub'), content: t('terms.s8b2') }
     ]
   },
   {
-    title: 'Đổi trả & hoàn tiền',
+    title: t('terms.s9Title'),
     blocks: [
-      {
-        content: 'Chính sách đổi trả được quy định chi tiết tại trang Chính sách đổi trả. Tóm tắt:',
-        list: [
-          'Đổi trả trong vòng 7 ngày kể từ ngày nhận hàng',
-          'Sản phẩm phải còn nguyên tem mác, chưa qua sử dụng',
-          'Hoàn tiền được xử lý trong 3-5 ngày làm việc',
-          'Phí vận chuyển đổi trả do khách hàng chi trả (trừ lỗi nhà sản xuất)'
-        ]
-      }
-    ]
-  },
-  {
-    title: 'Bảo mật thông tin',
-    blocks: [
-      {
-        subtitle: 'Thu thập & sử dụng',
-        content: 'Chúng tôi thu thập thông tin cá nhân (tên, email, số điện thoại, địa chỉ) chỉ để phục vụ xử lý đơn hàng và cải thiện trải nghiệm người dùng. Thông tin không được chia sẻ cho bên thứ ba trừ khi có yêu cầu pháp lý.'
-      },
-      {
-        subtitle: 'Bảo vệ dữ liệu',
-        content: 'Mọi giao dịch và dữ liệu cá nhân được bảo vệ bằng mã hóa SSL. Chúng tôi tuân thủ các tiêu chuẩn bảo mật ngành để đảm bảo an toàn thông tin khách hàng.'
-      }
-    ]
-  },
-  {
-    title: 'Sở hữu trí tuệ',
-    blocks: [
-      {
-        content: 'Toàn bộ nội dung trên website bao gồm văn bản, hình ảnh, logo, thiết kế và mã nguồn thuộc quyền sở hữu của THE XUONG SPORT hoặc các đối tác cấp phép.',
-        list: [
-          'Không được sao chép, phân phối hoặc sử dụng nội dung khi chưa có sự đồng ý bằng văn bản',
-          'Tên thương hiệu và logo của các đối tác (Nike, Adidas, Li-Ning, Puma) thuộc sở hữu của respective chủ sở hữu',
-          'Vi phạm sở hữu trí tuệ sẽ bị xử lý theo quy định pháp luật'
-        ]
-      }
-    ]
-  },
-  {
-    title: 'Giải quyết tranh chấp',
-    blocks: [
-      {
-        content: 'Mọi tranh chấp phát sinh từ việc sử dụng dịch vụ sẽ được giải quyết thông qua thương lượng trực tiếp giữa hai bên. Nếu không đạt được thỏa thuận, tranh chấp sẽ được đưa ra Tòa án có thẩm quyền tại Việt Nam.'
-      },
-      {
-        subtitle: 'Khiếu nại',
-        content: 'Để gửi khiếu nại, vui lòng liên hệ qua email hoặc trang liên hệ với mô tả chi tiết về vấn đề. Chúng tôi cam kết phản hồi trong vòng 48 giờ làm việc.'
-      }
-    ]
-  },
-  {
-    title: 'Thay đổi điều khoản',
-    blocks: [
-      {
-        content: 'THE XUONG SPORT có quyền thay đổi, bổ sung điều khoản bất kỳ lúc nào mà không cần thông báo trước. Phiên bản mới nhất sẽ được cập nhật trên trang này. Việc tiếp tục sử dụng dịch vụ sau khi thay đổi được coi là chấp nhận điều khoản mới.'
-      }
+      { content: t('terms.s9b1') }
     ]
   }
-]
+])
 </script>
 
 <style scoped>

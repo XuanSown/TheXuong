@@ -22,7 +22,7 @@
             >
               <div class="flex justify-center items-center">
                 <div class="spinner" />
-                <span class="ml-2 text-gray-500">Đang tải dữ liệu...</span>
+                <span class="ml-2 text-gray-500">{{ t('common.loading') }}</span>
               </div>
             </td>
           </tr>
@@ -31,7 +31,7 @@
               :colspan="columns.length"
               class="table-td text-center py-8 text-gray-500"
             >
-              {{ emptyText }}
+              {{ emptyText || t('common.noData') }}
             </td>
           </tr>
           <template v-else>
@@ -63,6 +63,9 @@
 </template>
 
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 export interface TableColumn {
   key: string
@@ -79,9 +82,9 @@ export interface Props {
   emptyText?: string
 }
 
-const props = withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<Props>(), {
   loading: false,
-  emptyText: 'Không có dữ liệu'
+  emptyText: ''
 })
 </script>
 

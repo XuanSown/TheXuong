@@ -5,7 +5,7 @@
       <section class="bg-white border-y border-[#CFC4C6] py-16 mb-8">
         <div class="w-[1152px] mx-auto">
           <h1 class="font-geist text-[56px] leading-[20px] font-bold text-[#1A1C1C] tracking-[-1.12px] uppercase">
-            DANH SÁCH SẢN PHẨM
+            {{ t('products.pageTitle') }}
           </h1>
         </div>
       </section>
@@ -18,7 +18,7 @@
             <!-- Sports Filter Section -->
             <div class="mb-8">
               <h3 class="font-geist text-sm font-semibold uppercase tracking-[1.2px] text-[#1A1C1C] mb-4">
-                Thể thao
+                {{ t('common.sport') }}
               </h3>
               <ul class="flex flex-col gap-3">
                 <li>
@@ -26,7 +26,7 @@
                     :to="getFilterUrl('sport', null)"
                     :class="['text-sm', activeSport === '' ? 'text-black font-semibold' : 'text-[#5E5F5C] hover:text-black']"
                   >
-                    Tất cả
+                    {{ t('common.all') }}
                   </router-link>
                 </li>
                 <li>
@@ -34,7 +34,7 @@
                     :to="getFilterUrl('sport', 'football')"
                     :class="['text-sm', activeSport === 'football' ? 'text-black font-semibold' : 'text-[#5E5F5C] hover:text-black']"
                   >
-                    Bóng đá
+                    {{ t('sports.football') }}
                   </router-link>
                 </li>
                 <li>
@@ -42,7 +42,7 @@
                     :to="getFilterUrl('sport', 'badminton')"
                     :class="['text-sm', activeSport === 'badminton' ? 'text-black font-semibold' : 'text-[#5E5F5C] hover:text-black']"
                   >
-                    Cầu lông
+                    {{ t('sports.badminton') }}
                   </router-link>
                 </li>
                 <li>
@@ -50,7 +50,7 @@
                     :to="getFilterUrl('sport', 'running')"
                     :class="['text-sm', activeSport === 'running' ? 'text-black font-semibold' : 'text-[#5E5F5C] hover:text-black']"
                   >
-                    Chạy bộ
+                    {{ t('sports.running') }}
                   </router-link>
                 </li>
                 <li>
@@ -58,7 +58,7 @@
                     :to="getFilterUrl('sport', 'other')"
                     :class="['text-sm', activeSport === 'other' ? 'text-black font-semibold' : 'text-[#5E5F5C] hover:text-black']"
                   >
-                    Khác
+                    {{ t('common.other') }}
                   </router-link>
                 </li>
               </ul>
@@ -70,7 +70,7 @@
             <!-- Brand Filter Section -->
             <div>
               <h3 class="font-geist text-sm font-semibold uppercase tracking-[1.2px] text-[#1A1C1C] mb-4">
-                Thương hiệu
+                {{ t('common.brand') }}
               </h3>
               <ul class="flex flex-col gap-3">
                 <li>
@@ -78,7 +78,7 @@
                     :to="getFilterUrl('brand', null)"
                     :class="['text-sm', activeBrand === '' ? 'text-black font-semibold' : 'text-[#5E5F5C] hover:text-black']"
                   >
-                    Tất cả
+                    {{ t('common.all') }}
                   </router-link>
                 </li>
                 <li>
@@ -118,7 +118,7 @@
                     :to="getFilterUrl('brand', 'other')"
                     :class="['text-sm', activeBrand === 'other' ? 'text-black font-semibold' : 'text-[#5E5F5C] hover:text-black']"
                   >
-                    Khác
+                    {{ t('common.other') }}
                   </router-link>
                 </li>
               </ul>
@@ -127,7 +127,7 @@
             <!-- Price Filter Section -->
             <div class="mb-6 mt-6">
               <h3 class="font-geist text-sm font-semibold uppercase tracking-[1.2px] text-[#1A1C1C] mb-4">
-                Mức giá
+                {{ t('products.priceRange') }}
               </h3>
               <ul class="flex flex-col gap-3">
                 <li>
@@ -135,7 +135,7 @@
                     :to="getFilterUrl('price', null)"
                     :class="['text-sm', !activeMinPrice && !activeMaxPrice ? 'text-black font-semibold' : 'text-[#5E5F5C] hover:text-black']"
                   >
-                    Tất cả
+                    {{ t('common.all') }}
                   </router-link>
                 </li>
                 <li>
@@ -143,7 +143,7 @@
                     :to="getFilterUrl('price', '<1m')"
                     :class="['text-sm', !activeMinPrice && activeMaxPrice === '1000000' ? 'text-black font-semibold' : 'text-[#5E5F5C] hover:text-black']"
                   >
-                    Dưới 1.000.000₫
+                    {{ t('products.under', { price: formatCurrency(1000000) }) }}
                   </router-link>
                 </li>
                 <li>
@@ -151,7 +151,7 @@
                     :to="getFilterUrl('price', '1m-2m')"
                     :class="['text-sm', activeMinPrice === '1000000' && activeMaxPrice === '2000000' ? 'text-black font-semibold' : 'text-[#5E5F5C] hover:text-black']"
                   >
-                    1.000.000₫ - 2.000.000₫
+                    {{ t('products.priceRangeLabel', { from: formatCurrency(1000000), to: formatCurrency(2000000) }) }}
                   </router-link>
                 </li>
                 <li>
@@ -159,7 +159,7 @@
                     :to="getFilterUrl('price', '2m-5m')"
                     :class="['text-sm', activeMinPrice === '2000000' && activeMaxPrice === '5000000' ? 'text-black font-semibold' : 'text-[#5E5F5C] hover:text-black']"
                   >
-                    2.000.000₫ - 5.000.000₫
+                    {{ t('products.priceRangeLabel', { from: formatCurrency(2000000), to: formatCurrency(5000000) }) }}
                   </router-link>
                 </li>
                 <li>
@@ -167,7 +167,7 @@
                     :to="getFilterUrl('price', '>5m')"
                     :class="['text-sm', activeMinPrice === '5000000' && !activeMaxPrice ? 'text-black font-semibold' : 'text-[#5E5F5C] hover:text-black']"
                   >
-                    Trên 5.000.000₫
+                    {{ t('products.above', { price: formatCurrency(5000000) }) }}
                   </router-link>
                 </li>
               </ul>
@@ -179,12 +179,12 @@
             <!-- Size Filter Section -->
             <div>
               <h3 class="font-geist text-sm font-semibold uppercase tracking-[1.2px] text-[#1A1C1C] mb-4">
-                Kích cỡ
+                {{ t('products.size') }}
               </h3>
 
               <!-- Shoes -->
               <div class="mb-4">
-                <span class="text-xs text-[#5E5F5C] uppercase font-semibold mb-2 block">Giày dép</span>
+                <span class="text-xs text-[#5E5F5C] uppercase font-semibold mb-2 block">{{ t('products.shoes') }}</span>
                 <div class="grid grid-cols-3 gap-2">
                   <router-link
                     v-for="size in ['36', '37', '38', '39', '40', '41', '42', '43', '44', '45']"
@@ -202,7 +202,7 @@
 
               <!-- Clothing -->
               <div class="mb-4">
-                <span class="text-xs text-[#5E5F5C] uppercase font-semibold mb-2 block">Quần áo</span>
+                <span class="text-xs text-[#5E5F5C] uppercase font-semibold mb-2 block">{{ t('products.clothing') }}</span>
                 <div class="grid grid-cols-3 gap-2">
                   <router-link
                     v-for="size in ['S', 'M', 'L', 'XL', 'XXL', 'XXXL']"
@@ -220,7 +220,7 @@
 
               <!-- Accessories -->
               <div>
-                <span class="text-xs text-[#5E5F5C] uppercase font-semibold mb-2 block">Phụ kiện</span>
+                <span class="text-xs text-[#5E5F5C] uppercase font-semibold mb-2 block">{{ t('products.accessories') }}</span>
                 <div class="grid grid-cols-3 gap-2">
                   <router-link
                     v-for="size in ['FreeSize']"
@@ -246,13 +246,13 @@
             v-if="activeSport || activeBrand || activeKeyword || activeMinPrice || activeMaxPrice || activeShoeSize"
             class="mb-6 flex items-center gap-2"
           >
-            <span class="text-sm text-[#5E5F5C]">Đang lọc:</span>
+            <span class="text-sm text-[#5E5F5C]">{{ t('products.filteringBy') }}</span>
             <div
               v-if="activeKeyword"
               class="flex items-center gap-2"
             >
               <span class="px-3 py-1 bg-[#E5E7EB] text-sm text-[#1A1C1C] rounded flex items-center">
-                Từ khóa: "{{ activeKeyword }}"
+                {{ t('products.keyword', { keyword: activeKeyword }) }}
                 <button
                   class="ml-2 hover:text-red-500"
                   @click="clearKeyword"
@@ -264,7 +264,7 @@
               class="flex items-center gap-2"
             >
               <span class="px-3 py-1 bg-[#E5E7EB] text-sm text-[#1A1C1C] rounded flex items-center">
-                Thể thao: {{ getSportLabel(activeSport) }}
+                {{ t('products.sport', { sport: getSportLabel(activeSport) }) }}
                 <button
                   class="ml-2 hover:text-red-500"
                   @click="clearSport"
@@ -276,7 +276,7 @@
               class="flex items-center gap-2"
             >
               <span class="px-3 py-1 bg-[#E5E7EB] text-sm text-[#1A1C1C] rounded flex items-center">
-                Thương hiệu: {{ getBrandLabel(activeBrand) }}
+                {{ t('products.brand', { brand: getBrandLabel(activeBrand) }) }}
                 <button
                   class="ml-2 hover:text-red-500"
                   @click="clearBrand"
@@ -288,7 +288,7 @@
               class="flex items-center gap-2"
             >
               <span class="px-3 py-1 bg-[#E5E7EB] text-sm text-[#1A1C1C] rounded flex items-center">
-                Giá: {{ activePriceLabel }}
+                {{ t('products.price', { price: activePriceLabel }) }}
                 <button
                   class="ml-2 hover:text-red-500"
                   @click="clearPrice"
@@ -300,7 +300,7 @@
               class="flex items-center gap-2"
             >
               <span class="px-3 py-1 bg-[#E5E7EB] text-sm text-[#1A1C1C] rounded flex items-center">
-                Size: {{ activeShoeSize }}
+                {{ t('products.sizeLabel', { size: activeShoeSize }) }}
                 <button
                   class="ml-2 hover:text-red-500"
                   @click="clearShoeSize"
@@ -313,7 +313,7 @@
               class="text-sm text-[#5E5F5C] hover:text-black underline"
               @click="clearAllFilters"
             >
-              Xóa tất cả
+              {{ t('products.clearAll') }}
             </button>
           </div>
 
@@ -364,13 +364,13 @@
               class="absolute inset-0 flex flex-col items-center justify-center py-16"
             >
               <p class="font-gelasio text-xl text-[#5E5F5C] mb-4">
-                Không tìm thấy sản phẩm phù hợp
+                {{ t('products.noProductsFound') }}
               </p>
               <button
                 class="px-6 py-3 bg-black text-white text-sm font-semibold uppercase tracking-[1.2px] rounded-sm hover:bg-gray-900 transition-colors"
                 @click="clearAllFilters"
               >
-                Xóa bộ lọc
+                {{ t('products.clearFilters') }}
               </button>
             </div>
           </div>
@@ -385,7 +385,7 @@
               class="px-4 py-2 border border-[#CFC4C6] rounded-sm text-sm uppercase tracking-[1.8px] text-[#1A1C1C] hover:bg-black hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               @click="changePage(currentPage - 1)"
             >
-              PREV
+              {{ t('common.previous') }}
             </button>
             <button
               v-for="page in totalPages"
@@ -400,7 +400,7 @@
               class="px-5 py-2 border border-[#CFC4C6] rounded-sm text-sm uppercase tracking-[1.8px] text-[#1A1C1C] hover:bg-black hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               @click="changePage(currentPage + 1)"
             >
-              NEXT
+              {{ t('common.next') }}
             </button>
           </div>
         </section>
@@ -416,6 +416,11 @@ import { productService } from '@/services/product.service'
 import type { Product } from '@/types'
 import ProductCard from '@/components/ui/ProductCard.vue'
 import BaseSkeleton from '@/components/ui/BaseSkeleton.vue'
+import { useI18n } from 'vue-i18n'
+import { formatCurrency } from '@/utils/formatters'
+import { sportTranslationPath } from '@/i18n/labels'
+
+const { t } = useI18n()
 
 const route = useRoute()
 const router = useRouter()
@@ -441,10 +446,10 @@ const activeMaxPrice = computed(() => route.query.maxPrice as string || '')
 const activeShoeSize = computed(() => route.query.shoeSize as string || '')
 
 const getPriceLabel = (min: string, max: string) => {
-  if (!min && max === '1000000') return 'Dưới 1.000.000₫'
-  if (min === '1000000' && max === '2000000') return '1.000.000₫ - 2.000.000₫'
-  if (min === '2000000' && max === '5000000') return '2.000.000₫ - 5.000.000₫'
-  if (min === '5000000' && !max) return 'Trên 5.000.000₫'
+  if (!min && max === '1000000') return t('products.under', { price: formatCurrency(1000000) })
+  if (min === '1000000' && max === '2000000') return t('products.priceRangeLabel', { from: formatCurrency(1000000), to: formatCurrency(2000000) })
+  if (min === '2000000' && max === '5000000') return t('products.priceRangeLabel', { from: formatCurrency(2000000), to: formatCurrency(5000000) })
+  if (min === '5000000' && !max) return t('products.above', { price: formatCurrency(5000000) })
   return ''
 }
 const activePriceLabel = computed(() => getPriceLabel(activeMinPrice.value, activeMaxPrice.value))
@@ -506,8 +511,11 @@ const BRAND_NAME: Record<string, string> = {
 
 const getApiSportName = (sport: string): string => SPORT_NAME[sport] || sport
 const getApiBrandName = (brand: string): string => BRAND_NAME[brand] || brand
-const getSportLabel = (sport: string): string => (SPORT_NAME[sport] || sport).toUpperCase()
-const getBrandLabel = (brand: string): string => (BRAND_NAME[brand] || brand).toUpperCase()
+const getSportLabel = (sport: string): string => t(sportTranslationPath(sport)).toUpperCase()
+const getBrandLabel = (brand: string): string => {
+  if (brand === 'other') return t('common.other').toUpperCase()
+  return (BRAND_NAME[brand] || brand).toUpperCase()
+}
 
 const fetchProducts = async () => {
   isLoading.value = true

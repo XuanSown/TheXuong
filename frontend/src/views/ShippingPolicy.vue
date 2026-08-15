@@ -17,19 +17,19 @@
           class="font-geist text-[12px] uppercase tracking-[1.8px] text-white/60 mb-6 hero-anim hero-fade"
           style="animation-delay:.1s"
         >
-          CHÍNH SÁCH
+          {{ t('shippingPolicy.heroEyebrow') }}
         </p>
         <h1 class="font-geist font-bold text-white leading-[0.95] mb-6">
           <span
             class="block text-5xl sm:text-7xl md:text-8xl hero-anim hero-reveal"
             style="letter-spacing:-1.28px;animation-delay:.25s"
-          >VẬN CHUYỂN</span>
+          >{{ t('shippingPolicy.heroTitle') }}</span>
         </h1>
         <p
           class="font-geist text-base sm:text-lg text-white/70 leading-[29px] max-w-[640px] mx-auto hero-anim hero-fade"
           style="animation-delay:.5s"
         >
-          Giao hàng toàn quốc — nhanh chóng, an toàn và minh bạch từ kho đến tay bạn.
+          {{ t('shippingPolicy.heroDesc') }}
         </p>
       </div>
       <div
@@ -48,10 +48,10 @@
           data-reveal
         >
           <p class="font-geist text-[12px] uppercase tracking-[1.8px] text-[#5E5F5C] mb-4">
-            TỔNG QUAN
+            {{ t('shippingPolicy.overviewEyebrow') }}
           </p>
           <h2 class="font-geist text-[40px] sm:text-[56px] md:text-[64px] leading-[70px] tracking-[-1.28px] uppercase text-[#1A1C1C]">
-            Chính sách vận chuyển
+            {{ t('shippingPolicy.overviewTitle') }}
           </h2>
         </div>
         <div
@@ -61,13 +61,19 @@
           <div class="liquid-glass relative rounded-2xl border border-white/60 bg-white/50 p-8 md:p-10 shadow-[0_8px_32px_rgba(26,28,28,0.12)]">
             <span class="glass-sheen pointer-events-none" />
             <p class="font-geist text-base text-[#1A1C1C] leading-[29px] mb-5">
-              THE XUONG SPORT hợp tác với các đơn vị vận chuyển uy tín để đảm bảo đơn hàng được giao đến bạn nhanh nhất và an toàn nhất.
+              {{ t('shippingPolicy.overviewP1') }}
             </p>
-            <p class="font-geist text-base text-[#5E5F5C] leading-[29px] mb-5">
-              Hỗ trợ giao hàng toàn quốc với nhiều lựa chọn tốc độ. Miễn phí vận chuyển cho đơn hàng từ <strong>500.000đ</strong>.
-            </p>
+            <i18n-t
+              keypath="shippingPolicy.overviewP2"
+              tag="p"
+              class="font-geist text-base text-[#5E5F5C] leading-[29px] mb-5"
+            >
+              <template #amount>
+                <strong>500.000đ</strong>
+              </template>
+            </i18n-t>
             <p class="font-geist text-base text-[#5E5F5C] leading-[29px]">
-              Mọi đơn hàng đều được đóng gói cẩn thận và có mã theo dõi để bạn dễ dàng kiểm tra hành trình.
+              {{ t('shippingPolicy.overviewP3') }}
             </p>
           </div>
         </div>
@@ -84,10 +90,10 @@
         data-reveal
       >
         <p class="font-geist text-[12px] uppercase tracking-[1.8px] text-[#5E5F5C] mb-4">
-          LỰA CHỌN
+          {{ t('shippingPolicy.optionsEyebrow') }}
         </p>
         <h2 class="font-geist text-[40px] sm:text-[56px] md:text-[64px] leading-[70px] tracking-[-1.28px] uppercase text-[#1A1C1C]">
-          Hình thức giao hàng
+          {{ t('shippingPolicy.optionsTitle') }}
         </h2>
       </div>
       <div class="relative">
@@ -129,10 +135,10 @@
         data-reveal
       >
         <p class="font-geist text-[12px] uppercase tracking-[1.8px] text-[#5E5F5C] mb-4">
-          BIỂU PHÍ
+          {{ t('shippingPolicy.feeEyebrow') }}
         </p>
         <h2 class="font-geist text-[40px] sm:text-[56px] md:text-[64px] leading-[70px] tracking-[-1.28px] uppercase text-[#1A1C1C]">
-          Thời gian & phí giao hàng
+          {{ t('shippingPolicy.feeTitle') }}
         </h2>
       </div>
       <div
@@ -145,16 +151,16 @@
             <thead>
               <tr class="border-b border-[#CFC4C6]">
                 <th class="font-geist text-[13px] uppercase tracking-[1.2px] text-[#5E5F5C] py-4 px-3 text-left">
-                  Khu vực
+                  {{ t('shippingPolicy.feeThRegion') }}
                 </th>
                 <th class="font-geist text-[13px] uppercase tracking-[1.2px] text-[#5E5F5C] py-4 px-3 text-left">
-                  Thời gian
+                  {{ t('shippingPolicy.feeThTime') }}
                 </th>
                 <th class="font-geist text-[13px] uppercase tracking-[1.2px] text-[#5E5F5C] py-4 px-3 text-left">
-                  Phí tiêu chuẩn
+                  {{ t('shippingPolicy.feeThFee') }}
                 </th>
                 <th class="font-geist text-[13px] uppercase tracking-[1.2px] text-[#5E5F5C] py-4 px-3 text-left">
-                  Giao nhanh
+                  {{ t('shippingPolicy.feeThExpress') }}
                 </th>
               </tr>
             </thead>
@@ -190,10 +196,10 @@
         data-reveal
       >
         <p class="font-geist text-[12px] uppercase tracking-[1.8px] text-[#5E5F5C] mb-4">
-          CAM KẾT
+          {{ t('shippingPolicy.featuresEyebrow') }}
         </p>
         <h2 class="font-geist text-[40px] sm:text-[56px] md:text-[64px] leading-[70px] tracking-[-1.28px] uppercase text-[#1A1C1C]">
-          Đóng gói & giao nhận
+          {{ t('shippingPolicy.featuresTitle') }}
         </h2>
       </div>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -226,10 +232,10 @@
           data-reveal
         >
           <p class="font-geist text-[12px] uppercase tracking-[1.8px] text-white/60 mb-4">
-            LƯU Ý
+            {{ t('shippingPolicy.notesEyebrow') }}
           </p>
           <h2 class="font-geist text-[40px] sm:text-[56px] md:text-[64px] leading-[70px] tracking-[-1.28px] text-white">
-            Điều cần biết
+            {{ t('shippingPolicy.notesTitle') }}
           </h2>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -259,10 +265,10 @@
           data-reveal
         >
           <p class="font-geist text-[12px] uppercase tracking-[1.8px] text-[#5E5F5C] mb-4">
-            THEO DÕI
+            {{ t('shippingPolicy.trackingEyebrow') }}
           </p>
           <h2 class="font-geist text-[40px] sm:text-[56px] md:text-[64px] leading-[70px] tracking-[-1.28px] uppercase text-[#1A1C1C]">
-            Kiểm tra hành trình
+            {{ t('shippingPolicy.trackingTitle') }}
           </h2>
         </div>
         <div
@@ -271,14 +277,26 @@
         >
           <div class="liquid-glass relative rounded-2xl border border-white/60 bg-white/50 p-8 md:p-10 shadow-[0_8px_32px_rgba(26,28,28,0.12)]">
             <span class="glass-sheen pointer-events-none" />
-            <p class="font-geist text-base text-[#1A1C1C] leading-[29px] mb-5">
-              Sau khi đơn hàng được giao cho đơn vị vận chuyển, bạn sẽ nhận được email và thông báo với <strong>mã vận đơn</strong> để theo dõi hành trình.
-            </p>
-            <p class="font-geist text-base text-[#5E5F5C] leading-[29px] mb-5">
-              Đăng nhập tài khoản và vào mục "Đơn hàng" để xem trạng thái giao hàng real-time, vị trí kiện hàng và thời gian dự kiến nhận.
-            </p>
+            <i18n-t
+              keypath="shippingPolicy.trackingP1"
+              tag="p"
+              class="font-geist text-base text-[#1A1C1C] leading-[29px] mb-5"
+            >
+              <template #code>
+                <strong>{{ t('shippingPolicy.trackingCode') }}</strong>
+              </template>
+            </i18n-t>
+            <i18n-t
+              keypath="shippingPolicy.trackingP2"
+              tag="p"
+              class="font-geist text-base text-[#5E5F5C] leading-[29px] mb-5"
+            >
+              <template #orders>
+                <strong>{{ t('shippingPolicy.trackingOrders') }}</strong>
+              </template>
+            </i18n-t>
             <p class="font-geist text-base text-[#5E5F5C] leading-[29px]">
-              Nếu đơn hàng không cập nhật trạng thái trong 48 giờ, vui lòng liên hệ hỗ trợ để được kiểm tra.
+              {{ t('shippingPolicy.trackingP3') }}
             </p>
           </div>
         </div>
@@ -293,23 +311,23 @@
         data-reveal
       >
         <h2 class="font-geist text-[40px] sm:text-[56px] md:text-[64px] leading-[70px] tracking-[-1.28px] text-white mb-8">
-          Cần hỗ trợ vận chuyển?
+          {{ t('shippingPolicy.ctaTitle') }}
         </h2>
         <p class="font-geist text-base text-white/70 leading-[29px] mb-10 max-w-[560px] mx-auto">
-          Đội ngũ chăm sóc khách hàng sẵn sàng hỗ trợ bạn theo dõi và xử lý mọi vấn đề giao hàng.
+          {{ t('shippingPolicy.ctaDesc') }}
         </p>
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
           <router-link
             to="/about"
             class="liquid-btn px-10 py-5 bg-white/10 text-white text-[12px] font-semibold uppercase tracking-[1.8px] leading-[12px] rounded-full hover:bg-white/20 transition-colors"
           >
-            LIÊN HỆ NGAY
+            {{ t('shippingPolicy.ctaContact') }}
           </router-link>
           <router-link
             to="/orders"
             class="liquid-btn px-10 py-5 bg-white/10 text-white text-[12px] font-semibold uppercase tracking-[1.8px] leading-[12px] rounded-full hover:bg-white/20 transition-colors"
           >
-            XEM ĐƠN HÀNG
+            {{ t('shippingPolicy.ctaViewOrders') }}
           </router-link>
         </div>
       </div>
@@ -318,9 +336,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onUnmounted } from 'vue'
+import { ref, computed, onUnmounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useReveal } from '@/composables/useReveal'
 import { useScrollReveal } from '@/composables/useScrollReveal'
+
+const { t } = useI18n()
 
 const rootRef = ref<HTMLElement | null>(null)
 const heroRef = ref<HTMLElement | null>(null)
@@ -347,88 +368,52 @@ onUnmounted(() => {
   if (glowRaf) cancelAnimationFrame(glowRaf)
 })
 
-const shippingOptions = [
+const shippingOptions = computed(() => [
   {
-    title: 'Giao hàng tiêu chuẩn',
-    desc: 'Phương thức phổ biến với chi phí hợp lý. Phù hợp cho đơn hàng không cần gấp, giao trong thời gian dự kiến.',
-    tags: ['Toàn quốc', 'Tiết kiệm', '2-5 ngày']
+    title: t('shippingPolicy.option1Title'),
+    desc: t('shippingPolicy.option1Desc'),
+    tags: [t('shippingPolicy.option1Tag1'), t('shippingPolicy.option1Tag2'), t('shippingPolicy.option1Tag3')]
   },
   {
-    title: 'Giao hàng nhanh',
-    desc: 'Ưu tiên xử lý và vận chuyển nhanh hơn. Phù hợp khi cần nhận hàng sớm, đặc biệt trong nội thành.',
-    tags: ['Ưu tiên', 'Nội thành', '1-2 ngày']
+    title: t('shippingPolicy.option2Title'),
+    desc: t('shippingPolicy.option2Desc'),
+    tags: [t('shippingPolicy.option2Tag1'), t('shippingPolicy.option2Tag2'), t('shippingPolicy.option2Tag3')]
   },
   {
-    title: 'Giao hàng hỏa tốc',
-    desc: 'Giao trong ngày cho khu vực nội thành TP.HCM và Hà Nội. Nhận hàng chỉ sau vài giờ đặt đơn.',
-    tags: ['Trong ngày', 'HCM & HN', '2-4 giờ']
+    title: t('shippingPolicy.option3Title'),
+    desc: t('shippingPolicy.option3Desc'),
+    tags: [t('shippingPolicy.option3Tag1'), t('shippingPolicy.option3Tag2'), t('shippingPolicy.option3Tag3')]
   },
   {
-    title: 'Giao hàng COD',
-    desc: 'Thanh toán khi nhận hàng. Kiểm tra sản phẩm trước khi thanh toán cho nhân viên giao hàng.',
-    tags: ['Thanh toán khi nhận', 'Kiểm tra hàng', 'Toàn quốc']
+    title: t('shippingPolicy.option4Title'),
+    desc: t('shippingPolicy.option4Desc'),
+    tags: [t('shippingPolicy.option4Tag1'), t('shippingPolicy.option4Tag2'), t('shippingPolicy.option4Tag3')]
   }
-]
+])
 
-const deliveryTable = [
-  { region: 'Nội thành (HCM, Hà Nội)', time: '1-2 ngày', fee: '25.000đ', express: '45.000đ (trong ngày)' },
-  { region: 'Ngoại thành', time: '2-3 ngày', fee: '30.000đ', express: '55.000đ (1 ngày)' },
-  { region: 'Tỉnh / Thành phố khác', time: '3-5 ngày', fee: '35.000đ', express: '65.000đ (2-3 ngày)' },
-  { region: 'Vùng sâu, vùng xa', time: '5-7 ngày', fee: '45.000đ', express: 'Không hỗ trợ' },
-  { region: 'Đơn từ 500.000đ', time: 'Theo khu vực', fee: 'Miễn phí', express: 'Giảm 50%' }
-]
+const deliveryTable = computed(() => [
+  { region: t('shippingPolicy.feeRow1Region'), time: t('shippingPolicy.feeRow1Time'), fee: t('shippingPolicy.feeRow1Fee'), express: t('shippingPolicy.feeRow1Express') },
+  { region: t('shippingPolicy.feeRow2Region'), time: t('shippingPolicy.feeRow2Time'), fee: t('shippingPolicy.feeRow2Fee'), express: t('shippingPolicy.feeRow2Express') },
+  { region: t('shippingPolicy.feeRow3Region'), time: t('shippingPolicy.feeRow3Time'), fee: t('shippingPolicy.feeRow3Fee'), express: t('shippingPolicy.feeRow3Express') },
+  { region: t('shippingPolicy.feeRow4Region'), time: t('shippingPolicy.feeRow4Time'), fee: t('shippingPolicy.feeRow4Fee'), express: t('shippingPolicy.feeRow4Express') },
+  { region: t('shippingPolicy.feeRow5Region'), time: t('shippingPolicy.feeRow5Time'), fee: t('shippingPolicy.feeRow5Fee'), express: t('shippingPolicy.feeRow5Express') }
+])
 
-const features = [
-  {
-    icon: '📦',
-    title: 'Đóng gói cẩn thận',
-    desc: 'Mọi sản phẩm được đóng gói chống sốc, bảo vệ nguyên vẹn từ kho đến tay khách hàng.'
-  },
-  {
-    icon: '🔍',
-    title: 'Mã vận đơn theo dõi',
-    desc: 'Nhận mã tracking ngay sau khi đơn hàng được giao cho đối tác vận chuyển.'
-  },
-  {
-    icon: '📍',
-    title: 'Cập nhật real-time',
-    desc: 'Theo dõi vị trí và trạng thái đơn hàng trực tiếp trên website hoặc ứng dụng.'
-  },
-  {
-    icon: '📞',
-    title: 'Liên hệ trước khi giao',
-    desc: 'Nhân viên giao hàng sẽ gọi xác nhận trước khi đến địa chỉ giao hàng.'
-  },
-  {
-    icon: '🔄',
-    title: 'Giao lại miễn phí',
-    desc: 'Nếu vắng nhà, đơn hàng được giao lại tối đa 3 lần hoàn toàn miễn phí.'
-  },
-  {
-    icon: '✅',
-    title: 'Kiểm tra khi nhận',
-    desc: 'Với COD, bạn được kiểm tra sản phẩm trước khi thanh toán cho shipper.'
-  }
-]
+const features = computed(() => [
+  { icon: '📦', title: t('shippingPolicy.feature1Title'), desc: t('shippingPolicy.feature1Desc') },
+  { icon: '🔍', title: t('shippingPolicy.feature2Title'), desc: t('shippingPolicy.feature2Desc') },
+  { icon: '📍', title: t('shippingPolicy.feature3Title'), desc: t('shippingPolicy.feature3Desc') },
+  { icon: '📞', title: t('shippingPolicy.feature4Title'), desc: t('shippingPolicy.feature4Desc') },
+  { icon: '🔄', title: t('shippingPolicy.feature5Title'), desc: t('shippingPolicy.feature5Desc') },
+  { icon: '✅', title: t('shippingPolicy.feature6Title'), desc: t('shippingPolicy.feature6Desc') }
+])
 
-const notes = [
-  {
-    title: 'Thời gian xử lý đơn',
-    desc: 'Đơn đặt trước 15h được xử lý và giao cho vận chuyển trong ngày. Đơn sau 15h được xử lý vào ngày hôm sau.'
-  },
-  {
-    title: 'Thay đổi địa chỉ giao hàng',
-    desc: 'Có thể thay đổi địa chỉ trước khi đơn được giao cho vận chuyển. Sau đó, vui lòng liên hệ hỗ trợ.'
-  },
-  {
-    title: 'Đơn hàng bị thất lạc',
-    desc: 'Nếu đơn không nhận được sau 7 ngày so với thời gian dự kiến, liên hệ ngay để được xử lý và đền bù.'
-  },
-  {
-    title: 'Hàng dễ vỡ & cồng kềnh',
-    desc: 'Một số sản phẩm đặc biệt có thể áp dụng phí đóng gói bổ sung. Thông tin được hiển thị rõ khi đặt hàng.'
-  }
-]
+const notes = computed(() => [
+  { title: t('shippingPolicy.note1Title'), desc: t('shippingPolicy.note1Desc') },
+  { title: t('shippingPolicy.note2Title'), desc: t('shippingPolicy.note2Desc') },
+  { title: t('shippingPolicy.note3Title'), desc: t('shippingPolicy.note3Desc') },
+  { title: t('shippingPolicy.note4Title'), desc: t('shippingPolicy.note4Desc') }
+])
 </script>
 
 <style scoped>

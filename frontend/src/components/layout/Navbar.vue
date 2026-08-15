@@ -7,7 +7,7 @@
       <router-link
         to="/"
         class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[74px] h-[64px] bg-[url('@/assets/logo.png')] bg-contain bg-no-repeat bg-center z-10"
-        aria-label="Sportify Home"
+        :aria-label="t('nav.ariaHome')"
       />
 
       <!-- Left Navigation -->
@@ -21,7 +21,7 @@
           <span
             class="font-geist text-base text-[#5E5F5C] leading-[26px]"
           >
-            SẢN PHẨM
+            {{ t('nav.products') }}
           </span>
         </router-link>
 
@@ -34,7 +34,7 @@
           <span
             class="font-geist text-base text-[#5E5F5C] leading-[26px]"
           >
-            THỂ THAO
+            {{ t('nav.sports') }}
           </span>
         </router-link>
 
@@ -47,7 +47,7 @@
           <span
             class="font-geist text-base text-[#5E5F5C] leading-[26px]"
           >
-            THƯƠNG HIỆU
+            {{ t('nav.brands') }}
           </span>
         </router-link>
       </div>
@@ -55,6 +55,26 @@
       
       <!-- Right Side -->
       <div class="flex items-center gap-[16px] absolute right-[24px] top-1/2 transform -translate-y-1/2">
+        <!-- Language Switcher -->
+        <div class="flex items-center border border-[#E5E5E5] rounded-full overflow-hidden" role="group" :aria-label="t('nav.ariaLanguage')">
+          <button
+            class="px-2.5 h-[32px] font-geist text-xs font-semibold transition-colors whitespace-nowrap"
+            :class="currentLocale === 'vi' ? 'bg-black text-white' : 'text-[#707072] hover:text-black'"
+            :aria-pressed="currentLocale === 'vi'"
+            @click="setLocale('vi')"
+          >
+            VI
+          </button>
+          <button
+            class="px-2.5 h-[32px] font-geist text-xs font-semibold transition-colors whitespace-nowrap"
+            :class="currentLocale === 'en' ? 'bg-black text-white' : 'text-[#707072] hover:text-black'"
+            :aria-pressed="currentLocale === 'en'"
+            @click="setLocale('en')"
+          >
+            EN
+          </button>
+        </div>
+
         <!-- Search Trigger Button -->
         <button
           class="relative w-[180px] h-[40px] bg-[#F5F5F5] hover:bg-[#EAEAEA] rounded-full flex items-center px-4 transition-colors group"
@@ -72,7 +92,7 @@
             <circle cx="11" cy="11" r="8" />
             <line x1="21" y1="21" x2="16.65" y2="16.65" />
           </svg>
-          <span class="ml-3 font-geist text-[15px] font-medium text-[#707072] group-hover:text-black transition-colors whitespace-nowrap">Tìm kiếm</span>
+          <span class="ml-3 font-geist text-[15px] font-medium text-[#707072] group-hover:text-black transition-colors whitespace-nowrap">{{ t('nav.search') }}</span>
         </button>
 
         <!-- Favorite Link -->
@@ -80,7 +100,7 @@
           v-if="isAuthenticated"
           to="/favorite"
           class="w-[36px] h-[34px] flex items-center justify-center hover:opacity-70 transition-opacity"
-          aria-label="Favorite"
+          :aria-label="t('nav.ariaFavorite')"
         >
           <svg
             class="w-[20px] h-[20px] text-[#5E5F5C]"
@@ -99,7 +119,7 @@
         <div v-if="isAuthenticated" class="relative group">
           <button
             class="w-[34px] h-[34px] flex items-center justify-center hover:opacity-70 transition-opacity"
-            aria-label="Profile Menu"
+            :aria-label="t('nav.ariaProfile')"
           >
             <svg
               class="w-[20px] h-[20px] text-[#5E5F5C]"
@@ -126,26 +146,26 @@
                 to="/profile"
                 class="block px-4 py-3 text-[14px] font-geist text-[#5E5F5C] hover:bg-[#F9F9F9] hover:text-black transition-colors"
               >
-                Hồ sơ của tôi
+                {{ t('nav.profile') }}
               </router-link>
               <router-link
                 to="/orders"
                 class="block px-4 py-3 text-[14px] font-geist text-[#5E5F5C] hover:bg-[#F9F9F9] hover:text-black transition-colors border-t border-[#F0F0F0]"
               >
-                Lịch sử đơn hàng
+                {{ t('nav.orderHistory') }}
               </router-link>
               <router-link
                 to="/my-rewards"
                 class="block px-4 py-3 text-[14px] font-geist text-[#5E5F5C] hover:bg-[#F9F9F9] hover:text-black transition-colors border-t border-[#F0F0F0]"
               >
-                Điểm & Voucher
+                {{ t('nav.pointsVouchers') }}
               </router-link>
               <router-link
                 v-if="authStore.isAdmin"
                 to="/admin"
                 class="block px-4 py-3 text-[14px] font-geist text-blue-600 font-bold hover:bg-[#F9F9F9] hover:text-blue-800 transition-colors border-t border-[#F0F0F0]"
               >
-                Trang Quản Trị
+                {{ t('nav.admin') }}
               </router-link>
             </div>
           </div>
@@ -155,7 +175,7 @@
         <router-link
           to="/cart"
           class="w-[36px] h-[34px] flex items-center justify-center hover:opacity-70 transition-opacity relative"
-          aria-label="Cart"
+          :aria-label="t('nav.ariaCart')"
         >
           <svg
             class="w-[20px] h-[20px] text-[#5E5F5C]"
@@ -183,7 +203,7 @@
         <button
           v-if="isAuthenticated"
           class="flex items-center justify-center w-[34px] h-[34px] rounded-full border border-[#CFC4C6] hover:border-black transition-colors"
-          aria-label="Logout"
+          :aria-label="t('nav.ariaLogout')"
           @click="handleLogout"
         >
           <svg
@@ -206,7 +226,7 @@
           class="flex items-center justify-center w-[114px] h-[40px] bg-black rounded-full hover:bg-[#333333] transition-colors"
         >
           <span class="font-geist text-xs font-semibold text-white leading-[14.88px] tracking-[1.2px]">
-            ĐĂNG NHẬP
+            {{ t('nav.login') }}
           </span>
         </router-link>
       </div>
@@ -236,7 +256,7 @@
                 ref="searchInputRef"
                 v-model="searchQuery"
                 type="text"
-                placeholder="Tìm kiếm"
+                :placeholder="t('nav.search')"
                 class="w-full h-[48px] bg-[#F5F5F5] hover:bg-[#EAEAEA] rounded-full pl-[56px] pr-4 text-base font-geist text-[#111] outline-none transition-colors"
                 @keyup.enter="handleSearch"
               />
@@ -258,7 +278,7 @@
               class="font-geist text-base font-medium text-[#111] hover:text-[#707072] transition-colors whitespace-nowrap"
               @click="closeSearch"
             >
-              Hủy
+              {{ t('common.cancel') }}
             </button>
           </div>
 
@@ -267,7 +287,7 @@
             
             <!-- Popular Search Terms -->
             <div>
-              <h3 class="font-geist text-base text-[#707072] mb-4">Từ khóa phổ biến</h3>
+              <h3 class="font-geist text-base text-[#707072] mb-4">{{ t('nav.popularSearchTerms') }}</h3>
               <div class="flex flex-wrap gap-2">
                 <button
                   v-for="term in popularSearches"
@@ -282,7 +302,7 @@
 
             <!-- Recent Searches -->
             <div v-if="recentSearches.length > 0">
-              <h3 class="font-geist text-base text-[#707072] mb-4">Tìm kiếm gần đây</h3>
+              <h3 class="font-geist text-base text-[#707072] mb-4">{{ t('nav.recentSearches') }}</h3>
               <div class="flex flex-col gap-1">
                 <div
                   v-for="(term, index) in recentSearches"
@@ -326,6 +346,13 @@ import { useAuthStore } from '@/stores/auth.store'
 import { useCartStore } from '@/stores/cart.store'
 import { useRouter, useRoute } from 'vue-router'
 import { useToast } from 'vue-toastification'
+import { useLocale } from '@/composables/useLocale'
+
+const { currentLocale, setLocale } = useLocale()
+
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const authStore = useAuthStore()
 const cartStore = useCartStore()
@@ -338,14 +365,14 @@ const isSearchOpen = ref(false)
 const searchInputRef = ref<HTMLInputElement | null>(null)
 const recentSearches = ref<string[]>([])
 
-const popularSearches = [
-  'Nike Air Force 1',
-  'Jordan 1',
-  'Adidas Ultraboost',
-  'Giày chạy bộ',
-  'Giày bóng đá',
-  'Balo thể thao'
-]
+const popularSearches = computed(() => [
+  t('nav.popular.airForce1'),
+  t('nav.popular.jordan1'),
+  t('nav.popular.ultraboost'),
+  t('nav.popular.runningShoes'),
+  t('nav.popular.footballShoes'),
+  t('nav.popular.sportsBags')
+])
 
 onMounted(() => {
   const saved = localStorage.getItem('recent_searches')
@@ -397,7 +424,7 @@ const handleSearch = () => {
     // Check for special characters often used in SQL injection
     const invalidCharsRegex = /['";=%*/\\]/
     if (invalidCharsRegex.test(term)) {
-      toast.error('Từ khóa không được chứa ký tự đặc biệt')
+      toast.error(t('nav.searchInvalidChars'))
       return
     }
 

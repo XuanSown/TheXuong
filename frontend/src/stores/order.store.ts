@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { type Order, OrderStatus } from '@/types'
 import { orderService } from '@/services/order.service'
+import { getApiErrorMessage } from '@/utils/apiError'
 
 export const useOrderStore = defineStore('order', {
   state: () => ({
@@ -16,7 +17,7 @@ export const useOrderStore = defineStore('order', {
       try {
         this.orders = await orderService.getOrders()
       } catch (e: any) {
-        this.error = e?.response?.data?.message || 'Không thể tải danh sách đơn hàng'
+        this.error = getApiErrorMessage(e, 'orders.loadFailed')
         this.orders = []
       } finally {
         this.loading = false
@@ -29,7 +30,7 @@ export const useOrderStore = defineStore('order', {
         this.currentOrder = await orderService.getOrder(Number(id))
         return this.currentOrder
       } catch (e: any) {
-        this.error = e?.response?.data?.message || 'Không thể tải chi tiết đơn hàng'
+        this.error = getApiErrorMessage(e, 'orders.loadDetailFailed')
         this.currentOrder = null
         throw e
       } finally {
@@ -50,7 +51,7 @@ export const useOrderStore = defineStore('order', {
           this.currentOrder.status = OrderStatus.CANCELLED
         }
       } catch (e: any) {
-        this.error = e?.response?.data?.message || 'Không thể hủy đơn hàng'
+        this.error = getApiErrorMessage(e, 'orders.cancelFailed')
         throw e
       } finally {
         this.loading = false

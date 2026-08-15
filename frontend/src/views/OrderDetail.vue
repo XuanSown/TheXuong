@@ -22,7 +22,7 @@
                   fill="none"
                 />
               </svg>
-              <span class="font-gelasio text-[14px]">Quay lại lịch sử đơn hàng</span>
+              <span class="font-gelasio text-[14px]">{{ t('order.backToHistory') }}</span>
             </router-link>
           </div>
 
@@ -30,10 +30,10 @@
           <div class="flex items-center justify-between">
             <div class="flex flex-col gap-2">
               <h1 class="font-geist text-[30px] font-bold leading-[36px] tracking-[-0.75px] text-[#111111]">
-                Chi tiết đơn hàng #{{ orderId }}
+                {{ t('order.detail', { id: orderId }) }}
               </h1>
               <span class="font-geist text-[14px] text-[#666666]">
-                Ngày đặt: {{ formatDate(order?.createdAt || '') }}
+                {{ t('order.placedAt', { date: formatDate(order?.createdAt || '') }) }}
               </span>
             </div>
             <div
@@ -46,7 +46,7 @@
                 :disabled="isCancelling"
                 @click="confirmCancelOrder"
               >
-                {{ isCancelling ? 'Đang xử lý...' : 'Yêu cầu hủy đơn' }}
+                {{ isCancelling ? t('order.processing') : t('order.cancelRequest') }}
               </button>
               <button
                 v-if="order.status === 'DELIVERED'"
@@ -54,7 +54,7 @@
                 :disabled="isConfirmingReceived"
                 @click="confirmReceivedOrder"
               >
-                {{ isConfirmingReceived ? 'Đang xử lý...' : 'Đã nhận được hàng' }}
+                {{ isConfirmingReceived ? t('order.processing') : t('order.receivedGoods') }}
               </button>
               <div class="px-3 py-1 bg-[#FEF3C3] rounded">
                 <span class="font-geist text-[12px] font-semibold text-[#92400E] uppercase tracking-[0.6px]">
@@ -73,14 +73,14 @@
             <div class="bg-[#F9F9F9] border border-[#F0F0F0] rounded-lg p-6">
               <div class="flex justify-between items-center mb-4">
                 <h2 class="font-geist text-[14px] font-bold leading-[20px] tracking-[0.7px] uppercase text-[#111111]">
-                  THÔNG TIN NGƯỜI NHẬN
+                  {{ t('order.recipientInfo') }}
                 </h2>
                 <button
                   v-if="order?.status === 'PENDING' && !isEditing"
                   class="text-blue-600 text-[14px] font-medium hover:underline"
                   @click="startEdit"
                 >
-                  Sửa
+                  {{ t('common.edit') }}
                 </button>
               </div>
               <div
@@ -88,15 +88,15 @@
                 class="flex flex-col gap-4"
               >
                 <div class="flex flex-col gap-1">
-                  <span class="font-geist text-[14px] text-[#666666]">Họ và tên</span>
+                  <span class="font-geist text-[14px] text-[#666666]">{{ t('order.fullName') }}</span>
                   <span class="font-geist text-[14px] font-medium text-[#111111]">{{ order.fullName }}</span>
                 </div>
                 <div class="flex flex-col gap-1">
-                  <span class="font-geist text-[14px] text-[#666666]">Số điện thoại</span>
+                  <span class="font-geist text-[14px] text-[#666666]">{{ t('order.phone') }}</span>
                   <span class="font-geist text-[14px] font-medium text-[#111111]">{{ order.phoneNumber }}</span>
                 </div>
                 <div class="flex flex-col gap-1">
-                  <span class="font-geist text-[14px] text-[#666666]">Địa chỉ giao hàng</span>
+                  <span class="font-geist text-[14px] text-[#666666]">{{ t('order.shippingAddress') }}</span>
                   <span class="font-geist text-[14px] font-medium text-[#111111] leading-[23px]">
                     {{ order.address }}
                   </span>
@@ -105,7 +105,7 @@
                   v-if="order.note"
                   class="flex flex-col gap-1 pt-2 border-t border-[#F0F0F0]"
                 >
-                  <span class="font-geist text-[14px] text-[#666666]">Ghi chú</span>
+                  <span class="font-geist text-[14px] text-[#666666]">{{ t('order.note') }}</span>
                   <span class="font-geist text-[14px] font-medium text-[#111111]">{{ order.note }}</span>
                 </div>
               </div>
@@ -116,20 +116,20 @@
                 class="flex flex-col gap-4"
               >
                 <div class="flex flex-col gap-1">
-                  <label class="text-[12px] text-[#666666]">Số điện thoại</label>
+                  <label class="text-[12px] text-[#666666]">{{ t('order.phone') }}</label>
                   <input
                     v-model="editForm.phoneNumber"
                     class="border border-[#E0E0E0] px-3 py-2 rounded-md w-full text-[14px] font-medium text-[#111111] outline-none focus:border-black"
-                    placeholder="Nhập số điện thoại mới"
+                    :placeholder="t('order.newPhonePlaceholder')"
                   >
                 </div>
                 <div class="flex flex-col gap-1">
-                  <label class="text-[12px] text-[#666666]">Địa chỉ giao hàng</label>
+                  <label class="text-[12px] text-[#666666]">{{ t('order.shippingAddress') }}</label>
                   <textarea
                     v-model="editForm.address"
                     class="border border-[#E0E0E0] px-3 py-2 rounded-md w-full text-[14px] font-medium text-[#111111] outline-none focus:border-black resize-none"
                     rows="3"
-                    placeholder="Nhập địa chỉ mới"
+                    :placeholder="t('order.newAddressPlaceholder')"
                   />
                 </div>
                 <div class="flex gap-3 justify-end mt-2">
@@ -138,14 +138,14 @@
                     :disabled="isSaving"
                     @click="isEditing = false"
                   >
-                    Hủy
+                    {{ t('order.cancel') }}
                   </button>
                   <button
                     class="px-4 py-2 bg-black text-white text-[14px] font-medium rounded-md hover:bg-gray-900 transition-colors flex items-center justify-center min-w-[80px]"
                     :disabled="isSaving"
                     @click="saveShippingInfo"
                   >
-                    <span v-if="!isSaving">Lưu</span>
+                    <span v-if="!isSaving">{{ t('order.save') }}</span>
                     <div
                       v-else
                       class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"
@@ -158,7 +158,7 @@
             <!-- Payment Info Card -->
             <div class="bg-[#F9F9F9] border border-[#F0F0F0] rounded-lg p-6">
               <h2 class="font-geist text-[14px] font-bold leading-[20px] tracking-[0.7px] uppercase text-[#111111] mb-4">
-                PHƯƠNG THỨC THANH TOÁN
+                {{ t('order.paymentMethod') }}
               </h2>
               <div v-if="order">
                 <span class="font-geist text-[14px] font-medium text-[#111111]">
@@ -173,7 +173,7 @@
             <!-- Header -->
             <div class="bg-[#F9F9F9] border-b border-[#F0F0F0] px-6 py-6">
               <h2 class="font-geist text-[14px] font-bold leading-[20px] tracking-[0.7px] uppercase text-[#111111]">
-                SẢN PHẨM ĐÃ MUA
+                {{ t('order.purchasedProducts') }}
               </h2>
             </div>
 
@@ -230,7 +230,7 @@
                           {{ item.productName }}
                         </h3>
                         <p class="font-geist text-[14px] text-[#666666]">
-                          Size: {{ item.size }} | SL: {{ item.quantity }}
+                          {{ t('order.itemSizeQty', { size: item.size, qty: item.quantity }) }}
                         </p>
                       </div>
                       <div class="flex flex-col items-end gap-1">
@@ -256,17 +256,17 @@
                 class="flex flex-col gap-4"
               >
                 <div class="flex justify-between items-center">
-                  <span class="font-geist text-[14px] text-[#666666]">Tạm tính</span>
+                  <span class="font-geist text-[14px] text-[#666666]">{{ t('common.subtotal') }}</span>
                   <span class="font-geist text-[14px] font-medium text-[#111111]">{{ formatPrice(order.subtotal) }}</span>
                 </div>
                 <div class="flex justify-between items-center">
-                  <span class="font-geist text-[14px] text-[#666666]">Phí vận chuyển</span>
-                  <span class="font-geist text-[14px] font-medium text-[#111111]">Miễn phí</span>
+                  <span class="font-geist text-[14px] text-[#666666]">{{ t('cart.shippingFee') }}</span>
+                  <span class="font-geist text-[14px] font-medium text-[#111111]">{{ t('cart.free') }}</span>
                 </div>
                 <div class="border-t border-[#F0F0F0] pt-4">
                   <div class="flex justify-between items-center">
                     <span class="font-geist text-[14px] font-bold leading-[20px] tracking-[0.7px] uppercase text-[#111111]">
-                      TỔNG THANH TOÁN
+                      {{ t('order.totalPay') }}
                     </span>
                     <span class="font-geist text-[20px] font-bold text-[#111111]">{{ formatPrice(order.totalMoney || order.total || 0) }}</span>
                   </div>
@@ -287,6 +287,11 @@ import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useOrderStore } from '@/stores/order.store'
 import orderService from '@/services/order.service'
+import { useI18n } from 'vue-i18n'
+import { formatCurrency, formatDate as formatDateByLocale } from '@/utils/formatters'
+import { getApiErrorMessage } from '@/utils/apiError'
+
+const { t } = useI18n()
 
 const route = useRoute()
 const orderStore = useOrderStore()
@@ -316,7 +321,7 @@ const startEdit = () => {
 const saveShippingInfo = async () => {
   if (!order.value) return
   if (!editForm.value.phoneNumber.trim() || !editForm.value.address.trim()) {
-    alert('Vui lòng nhập đầy đủ thông tin')
+    alert(t('order.fillInfo'))
     return
   }
   
@@ -328,7 +333,7 @@ const saveShippingInfo = async () => {
     isEditing.value = false
   } catch (error: any) {
     console.error('Failed to update info', error)
-    alert(error?.response?.data?.error || 'Đã xảy ra lỗi khi cập nhật thông tin')
+    alert(getApiErrorMessage(error, 'order.updateError'))
   } finally {
     isSaving.value = false
   }
@@ -336,18 +341,18 @@ const saveShippingInfo = async () => {
 
 const confirmCancelOrder = async () => {
   if (!order.value) return
-  if (!confirm('Bạn có chắc chắn muốn yêu cầu hủy đơn hàng này không?')) {
+  if (!confirm(t('order.cancelConfirm'))) {
     return
   }
 
   try {
     isCancelling.value = true
     await orderService.cancelOrder(orderId.value)
-    alert('Yêu cầu hủy đơn hàng đã được gửi thành công.')
+    alert(t('order.cancelSent'))
     await orderStore.fetchOrderById(orderId.value)
   } catch (error: any) {
     console.error('Failed to cancel order:', error)
-    alert(error?.response?.data?.error || 'Đã xảy ra lỗi khi hủy đơn hàng')
+    alert(getApiErrorMessage(error, 'order.cancelError'))
   } finally {
     isCancelling.value = false
   }
@@ -357,18 +362,18 @@ const isConfirmingReceived = ref(false)
 
 const confirmReceivedOrder = async () => {
   if (!order.value) return
-  if (!confirm('Bạn xác nhận đã nhận được hàng? (Đơn hàng sẽ chuyển sang trạng thái Hoàn thành và bạn sẽ được cộng điểm)')) {
+  if (!confirm(t('order.receivedConfirm'))) {
     return
   }
 
   try {
     isConfirmingReceived.value = true
     await orderService.confirmReceived(orderId.value)
-    alert('Cảm ơn bạn đã xác nhận nhận hàng! Đơn hàng đã hoàn tất.')
+    alert(t('order.receivedThanks'))
     await orderStore.fetchOrderById(orderId.value)
   } catch (error: any) {
     console.error('Failed to confirm received:', error)
-    alert(error?.response?.data?.error || 'Đã xảy ra lỗi khi xác nhận nhận hàng')
+    alert(getApiErrorMessage(error, 'order.receivedError'))
   } finally {
     isConfirmingReceived.value = false
   }
@@ -376,34 +381,33 @@ const confirmReceivedOrder = async () => {
 
 const getStatusLabel = (status: string) => {
   const labels: Record<string, string> = {
-    'processing': 'ĐANG XỬ LÝ',
-    'PENDING': 'CHỜ XỬ LÝ',
-    'CONFIRMED': 'ĐÃ XÁC NHẬN',
-    'SHIPPING': 'ĐANG VẬN CHUYỂN',
-    'DELIVERED': 'ĐÃ GIAO',
-    'COMPLETED': 'HOÀN THÀNH',
-    'CANCELLED': 'ĐÃ HỦY',
-    'CANCEL_REQUESTED': 'YÊU CẦU HỦY',
-    'REFUNDED': 'ĐÃ HOÀN TIỀN',
-    'refunded': 'ĐÃ HOÀN TIỀN'
+    'processing': t('orderStatus.processing'),
+    'PENDING': t('orderStatus.pending'),
+    'CONFIRMED': t('orderStatus.confirmed'),
+    'SHIPPING': t('orderStatus.shipping'),
+    'DELIVERED': t('orderStatus.delivered'),
+    'COMPLETED': t('orderStatus.completed'),
+    'CANCELLED': t('orderStatus.cancelled'),
+    'CANCEL_REQUESTED': t('orderStatus.cancelRequested'),
+    'REFUNDED': t('orderStatus.refunded'),
+    'refunded': t('orderStatus.refunded')
   }
   return labels[status] || status.toUpperCase()
 }
 
 const getPaymentMethodLabel = (method: string) => {
   const labels: Record<string, string> = {
-    'cod': 'Thanh toán khi nhận hàng (COD)',
-    'vnpay': 'Thanh toán qua VNPay',
-    'bank_transfer': 'Chuyển khoản ngân hàng',
-    'momo': 'Thanh toán qua Momo'
+    'cod': t('paymentMethod.cod'),
+    'vnpay': t('paymentMethod.vnpay'),
+    'bank_transfer': t('paymentMethod.bankTransfer'),
+    'momo': t('paymentMethod.momo')
   }
   return labels[method] || method
 }
 
 const formatDate = (dateString: string) => {
   if (!dateString) return 'N/A'
-  const date = new Date(dateString)
-  return date.toLocaleDateString('vi-VN', {
+  return formatDateByLocale(dateString, {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
@@ -413,12 +417,7 @@ const formatDate = (dateString: string) => {
 }
 
 const formatPrice = (price: number) => {
-  return new Intl.NumberFormat('vi-VN', {
-    style: 'currency',
-    currency: 'VND',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0
-  }).format(price).replace('₫', 'đ')
+  return formatCurrency(price)
 }
 
 onMounted(async () => {

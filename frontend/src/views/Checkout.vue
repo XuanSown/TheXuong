@@ -22,7 +22,7 @@
                   fill="none"
                 />
               </svg>
-              <span class="font-gelasio text-base">Quay lại trang chủ</span>
+              <span class="font-gelasio text-base">{{ t('checkout.backToHome') }}</span>
             </router-link>
           </div>
 
@@ -40,7 +40,7 @@
               />
             </svg>
             <h1 class="font-geist text-[20px] leading-[30px] text-black">
-              THANH TOÁN
+              {{ t('checkout.title') }}
             </h1>
           </div>
         </header>
@@ -50,7 +50,7 @@
           <!-- Left: Shipping Info -->
           <div class="bg-white border border-[#EEEEEE] shadow-[0px_8px_30px_rgba(0,0,0,0.04)] rounded-xl p-8">
             <h2 class="font-geist text-[16px] font-bold leading-[24px] tracking-[0.8px] uppercase text-[#4C4546] mb-6">
-              Thông tin giao hàng
+              {{ t('checkout.shippingInfo') }}
             </h2>
 
             <form @submit.prevent="onSubmit">
@@ -59,12 +59,12 @@
                 <label
                   class="block font-geist text-[12px] font-semibold leading-[12px] tracking-[1.2px] uppercase text-[#4C4546] opacity-80 mb-2"
                 >
-                  HỌ VÀ TÊN
+                  {{ t('checkout.fullName') }}
                 </label>
                 <BaseInput
                   v-model="fullName"
                   type="text"
-                  placeholder="Nhập họ tên"
+                  :placeholder="t('checkout.fullNamePlaceholder')"
                   :error="fullNameError"
                   class="!h-[50px]"
                 />
@@ -75,12 +75,12 @@
                 <label
                   class="block font-geist text-[12px] font-semibold leading-[12px] tracking-[1.2px] uppercase text-[#4C4546] opacity-80 mb-2"
                 >
-                  SỐ ĐIỆN THOẠI
+                  {{ t('checkout.phone') }}
                 </label>
                 <BaseInput
                   v-model="phoneNumber"
                   type="tel"
-                  placeholder="Nhập số điện thoại"
+                  :placeholder="t('checkout.phonePlaceholder')"
                   :error="phoneNumberError"
                   class="!h-[50px]"
                 />
@@ -89,7 +89,7 @@
               <!-- Address Picker -->
               <div class="mb-6">
                 <label class="block font-geist text-[12px] font-semibold leading-[12px] tracking-[1.2px] uppercase text-[#4C4546] opacity-80 mb-2">
-                  ĐỊA CHỈ GIAO HÀNG
+                  {{ t('checkout.shippingAddress') }}
                 </label>
                 <div
                   v-if="addressStore.hasAddresses"
@@ -113,7 +113,7 @@
                         <span
                           v-if="a.isDefault"
                           class="ml-2 text-[10px] bg-black text-white px-1 rounded"
-                        >Mặc định</span>
+                        >{{ t('checkout.default') }}</span>
                         <span
                           v-if="a.label"
                           class="ml-2 text-[10px] text-gray-500"
@@ -127,7 +127,7 @@
                       type="button"
                       class="text-xs underline"
                       @click="editAtCheckout(a)"
-                    >Sửa</button>
+                    >{{ t('common.edit') }}</button>
                   </label>
                 </div>
                 <button
@@ -135,11 +135,11 @@
                   class="text-sm underline self-start mb-3"
                   @click="openAddressModal"
                 >
-                  + Thêm địa chỉ mới
+                  {{ t('checkout.addNewAddress') }}
                 </button>
                 <textarea
                   v-model="address"
-                  placeholder="Nhập địa chỉ chi tiết"
+                  :placeholder="t('checkout.addressPlaceholder')"
                   rows="3"
                   class="w-full h-[98px] bg-white border border-[#CFC4C5] rounded-lg px-4 py-3 font-gelasio text-[16px] text-[#1A1C1C] outline-none focus:border-black transition-colors resize-none overflow-y-auto"
                   :class="{ 'border-red-500 focus:border-red-500': addressError }"
@@ -153,7 +153,7 @@
               <!-- Address Modal -->
               <BaseModal
                 v-model="showAddressModal"
-                :title="editingAddress ? 'Sửa địa chỉ' : 'Thêm địa chỉ'"
+                :title="editingAddress ? t('checkout.editAddress') : t('checkout.addAddress')"
               >
                 <AddressForm
                   :model-value="editingAddress || undefined"
@@ -167,7 +167,7 @@
                 <label
                   class="font-geist text-[12px] font-semibold leading-[12px] tracking-[1.2px] uppercase text-[#4C4546] opacity-80"
                 >
-                  PHƯƠNG THỨC THANH TOÁN
+                  {{ t('checkout.paymentMethod') }}
                 </label>
                 <div class="flex gap-4">
                   <label class="flex items-center gap-2 cursor-pointer">
@@ -177,7 +177,7 @@
                       value="COD"
                       class="accent-black"
                     >
-                    <span class="font-gelasio text-[14px] text-[#4C4546]">Thanh toán khi nhận hàng (COD)</span>
+                    <span class="font-gelasio text-[14px] text-[#4C4546]">{{ t('checkout.cod') }}</span>
                   </label>
                   <label class="flex items-center gap-2 cursor-pointer">
                     <input
@@ -186,7 +186,7 @@
                       value="VNPAY"
                       class="accent-black"
                     >
-                    <span class="font-gelasio text-[14px] text-[#4C4546]">Chuyển khoản (VNPay)</span>
+                    <span class="font-gelasio text-[14px] text-[#4C4546]">{{ t('checkout.vnpayTransfer') }}</span>
                   </label>
                 </div>
                 <span
@@ -200,12 +200,12 @@
                 <label
                   class="font-geist text-[12px] font-semibold leading-[12px] tracking-[1.2px] uppercase text-[#4C4546] opacity-80"
                 >
-                  GHI CHÚ (TÙY CHỌN)
+                  {{ t('checkout.note') }}
                 </label>
                 <textarea
                   v-model="note"
                   rows="2"
-                  placeholder="Ghi chú cho đơn hàng..."
+                  :placeholder="t('checkout.notePlaceholder')"
                   class="w-full h-[60px] bg-white border border-[#CFC4C5] rounded-lg px-4 py-3 font-gelasio text-[16px] text-[#1A1C1C] outline-none focus:border-black transition-colors resize-none overflow-y-auto"
                 />
               </div>
@@ -215,7 +215,7 @@
           <!-- Right: Order Summary -->
           <div class="bg-white border border-[#EEEEEE] shadow-[0px_8px_30px_rgba(0,0,0,0.04)] rounded-xl p-8 h-fit">
             <h2 class="font-geist text-[16px] font-bold leading-[24px] tracking-[0.8px] uppercase text-[#4C4546] mb-6">
-              Tóm tắt đơn hàng
+              {{ t('checkout.orderSummary') }}
             </h2>
 
             <!-- Cart Items -->
@@ -239,7 +239,7 @@
                     {{ item.productName }}
                   </h3>
                   <p class="font-gelasio text-[12px] text-[#848484]">
-                    Size: {{ item.size }}
+                    {{ t('cart.itemSize', { size: item.size }) }}
                   </p>
                   <div class="flex justify-between items-center mt-2">
                     <span class="font-gelasio text-[14px] font-semibold text-black">
@@ -257,12 +257,12 @@
               v-else
               class="text-center py-8 text-[#848484]"
             >
-              <p>Giỏ hàng trống</p>
+              <p>{{ t('cart.empty') }}</p>
               <router-link
                 to="/products"
                 class="text-blue-600 hover:underline"
               >
-                Tiếp tục mua sắm
+                {{ t('cart.continueShopping') }}
               </router-link>
             </div>
 
@@ -274,13 +274,13 @@
               <label
                 class="block font-geist text-[12px] font-semibold leading-[12px] tracking-[1.2px] uppercase text-[#4C4546] opacity-80 mb-2"
               >
-                MÃ GIẢM GIÁ
+                {{ t('checkout.voucherCode') }}
               </label>
               <div class="flex gap-2">
                 <input
                   v-model="voucherCode"
                   type="text"
-                  placeholder="Nhập mã giảm giá..."
+                  :placeholder="t('checkout.voucherPlaceholder')"
                   class="flex-1 h-[48px] px-4 border border-[#EEEEEE] rounded-lg focus:outline-none focus:border-black font-gelasio"
                   :disabled="!!appliedVoucher"
                 >
@@ -291,14 +291,14 @@
                   class="!w-auto !px-6"
                   @click="applyVoucher"
                 >
-                  ÁP DỤNG
+                  {{ t('checkout.apply') }}
                 </BaseButton>
                 <BaseButton
                   v-else
                   class="!w-auto !px-6 !bg-red-500 hover:!bg-red-600"
                   @click="removeVoucher"
                 >
-                  XÓA
+                  {{ t('common.delete') }}
                 </BaseButton>
               </div>
               <p
@@ -333,7 +333,7 @@
                       d="M19 9l-7 7-7-7"
                     />
                   </svg>
-                  Chọn voucher của bạn ({{ myVouchers.length }})
+                  {{ t('checkout.chooseVoucher', { count: myVouchers.length }) }}
                 </button>
 
                 <div
@@ -341,7 +341,7 @@
                   class="flex flex-col gap-2 mt-3 bg-gray-50 p-4 rounded-lg border border-[#EEEEEE]"
                 >
                   <p class="text-xs text-gray-500 mb-1">
-                    Click vào mã để tự động điền và áp dụng
+                    {{ t('checkout.voucherHint') }}
                   </p>
                   <div class="flex flex-wrap gap-2">
                     <button
@@ -366,10 +366,10 @@
               <label
                 class="block font-geist text-[12px] font-semibold leading-[12px] tracking-[1.2px] uppercase text-[#4C4546] opacity-80 mb-2"
               >
-                SỬ DỤNG ĐIỂM THƯỞNG
+                {{ t('checkout.usePoints') }}
               </label>
               <p class="text-sm font-gelasio text-[#4C4546] mb-2">
-                Bạn đang có <strong>{{ formatPrice(currentPoints) }}</strong> (1 điểm = 1đ)
+                {{ t('checkout.pointsBalance', { points: formatPrice(currentPoints) }) }}
               </p>
               <div class="flex gap-2">
                 <input
@@ -377,14 +377,14 @@
                   type="number"
                   min="0"
                   :max="currentPoints"
-                  placeholder="Nhập số điểm..."
+                  :placeholder="t('checkout.pointsPlaceholder')"
                   class="flex-1 h-[48px] px-4 border border-[#EEEEEE] rounded-lg focus:outline-none focus:border-black font-gelasio"
                 >
                 <BaseButton
                   class="!w-auto !px-4 !bg-[#f1c40f] hover:!bg-[#f39c12] !text-black"
                   @click="applyAllPoints"
                 >
-                  DÙNG TẤT CẢ
+                  {{ t('checkout.useAll') }}
                 </BaseButton>
               </div>
               <p
@@ -401,36 +401,36 @@
               class="space-y-3 pt-4 border-t border-[#E8E8E8]"
             >
               <div class="flex justify-between">
-                <span class="font-gelasio text-[14px] text-[#4C4546]">Tạm tính</span>
+                <span class="font-gelasio text-[14px] text-[#4C4546]">{{ t('common.subtotal') }}</span>
                 <span class="font-gelasio text-[14px] text-black">{{ formatPrice(cartTotal) }}</span>
               </div>
               <div class="flex justify-between">
-                <span class="font-gelasio text-[14px] text-[#4C4546]">Phí vận chuyển</span>
+                <span class="font-gelasio text-[14px] text-[#4C4546]">{{ t('cart.shippingFee') }}</span>
                 <span class="font-gelasio text-[14px] text-black">{{ formatPrice(shippingFee) }}</span>
               </div>
               <div
                 v-if="tierDiscountAmount > 0"
                 class="flex justify-between text-green-600"
               >
-                <span class="font-gelasio text-[14px]">Giảm giá hạng TV ({{ autoDiscountPercent }}%)</span>
+                <span class="font-gelasio text-[14px]">{{ t('checkout.tierDiscount', { percent: autoDiscountPercent }) }}</span>
                 <span class="font-gelasio text-[14px]">-{{ formatPrice(tierDiscountAmount) }}</span>
               </div>
               <div
                 v-if="appliedVoucher"
                 class="flex justify-between text-green-600"
               >
-                <span class="font-gelasio text-[14px]">Mã giảm giá ({{ appliedVoucher.code }})</span>
+                <span class="font-gelasio text-[14px]">{{ t('checkout.voucherDiscount', { code: appliedVoucher.code }) }}</span>
                 <span class="font-gelasio text-[14px]">-{{ formatPrice(appliedVoucher.discountAmount) }}</span>
               </div>
               <div
                 v-if="pointsToUse > 0"
                 class="flex justify-between text-green-600"
               >
-                <span class="font-gelasio text-[14px]">Trừ điểm thưởng</span>
+                <span class="font-gelasio text-[14px]">{{ t('checkout.pointsDeduction') }}</span>
                 <span class="font-gelasio text-[14px]">-{{ formatPrice(pointsToUse) }}</span>
               </div>
               <div class="flex justify-between text-lg font-bold">
-                <span class="font-gelasio text-[16px] text-black">Tổng cộng</span>
+                <span class="font-gelasio text-[16px] text-black">{{ t('common.total') }}</span>
                 <span class="font-gelasio text-[16px] text-black">{{ formatPrice(finalTotal) }}</span>
               </div>
             </div>
@@ -443,7 +443,7 @@
               class="w-full mt-6 !h-[56px]"
               @click="onSubmit"
             >
-              ĐẶT HÀNG
+              {{ t('checkout.placeOrder') }}
             </BaseButton>
           </div>
         </div>
@@ -462,6 +462,7 @@ import { useRouter } from 'vue-router'
 import { useForm, useField } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import { checkoutSchema } from '@/utils/validators'
+import { getApiErrorMessage } from '@/utils/apiError'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import orderService from '@/services/order.service'
@@ -472,6 +473,10 @@ import AddressForm from '@/components/address/AddressForm.vue'
 import BaseModal from '@/components/ui/BaseModal.vue'
 import { useToast } from 'vue-toastification'
 import type { Address } from '@/types'
+import { useI18n } from 'vue-i18n'
+import { formatCurrency } from '@/utils/formatters'
+
+const { t } = useI18n()
 
 const cartStore = useCartStore()
 const authStore = useAuthStore()
@@ -604,12 +609,12 @@ const onSubmitAddressAtCheckout = async (data: any) => {
       : await addressStore.create(data)
     showAddressModal.value = false
     selectAddress(saved)
-    checkoutToast.success('Đã lưu địa chỉ')
-  } catch (e: any) { checkoutToast.error(e.response?.data?.message || 'Không thể lưu địa chỉ') }
+    checkoutToast.success(t('toast.addressSaved'))
+  } catch (e: any) { checkoutToast.error(getApiErrorMessage(e, 'toast.addressSaveFailed')) }
 }
 
 const formatPrice = (price: number) => {
-  return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price)
+  return formatCurrency(price)
 }
 
 const applyVoucher = async () => {
@@ -626,12 +631,12 @@ const applyVoucher = async () => {
         code: data.code,
         discountAmount: data.discountAmount
       }
-      voucherMessage.value = 'Áp dụng mã giảm giá thành công!'
+      voucherMessage.value = t('toast.voucherApplied')
     }
   } catch (error: any) {
     console.error('Failed to apply voucher:', error)
     voucherError.value = true
-    voucherMessage.value = error.response?.data?.message || 'Mã giảm giá không hợp lệ hoặc đã hết hạn.'
+    voucherMessage.value = getApiErrorMessage(error, 'toast.voucherInvalid')
   } finally {
     isApplyingVoucher.value = false
   }
@@ -660,7 +665,7 @@ const onSubmit = handleSubmit(async (values) => {
   }
 
   if (pointsToUse.value > currentPoints.value) {
-    pointsError.value = 'Số điểm sử dụng vượt quá số điểm hiện có.'
+    pointsError.value = t('checkout.pointsExceeded')
     return
   }
   pointsError.value = ''
@@ -689,7 +694,7 @@ const onSubmit = handleSubmit(async (values) => {
 
   } catch (error: any) {
     console.error('Failed to place order:', error)
-    checkoutToast.error('Đặt hàng thất bại. Vui lòng thử lại.')
+    checkoutToast.error(t('toast.orderFailed'))
   }
 })
 </script>

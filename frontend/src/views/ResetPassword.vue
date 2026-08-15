@@ -9,7 +9,7 @@
             <div class="w-[82px] h-[75px] bg-[url('@/assets/logo.png')] bg-contain bg-no-repeat bg-center" />
             <div class="mt-1 flex flex-col items-center">
               <p class="font-geist text-base text-[#4C4546] leading-[26px]">
-                Đặt lại mật khẩu
+                {{ t('auth.resetPasswordTitle') }}
               </p>
             </div>
           </div>
@@ -82,7 +82,7 @@
             <BaseInput
               v-model="password"
               type="password"
-              placeholder="Mật khẩu mới (ít nhất 8 ký tự)"
+              :placeholder="t('auth.newPasswordPlaceholder')"
               :error="passwordError"
               class="!h-[59.59px]"
             >
@@ -111,7 +111,7 @@
             <BaseInput
               v-model="confirmPassword"
               type="password"
-              placeholder="Xác nhận mật khẩu mới"
+              :placeholder="t('auth.confirmNewPasswordPlaceholder')"
               :error="confirmPasswordError"
               class="!h-[59.59px]"
             >
@@ -143,7 +143,7 @@
               :loading="isSubmitting"
               class="w-full !h-[56px]"
             >
-              Đặt lại mật khẩu
+              {{ t('auth.updatePassword') }}
             </BaseButton>
           </form>
 
@@ -153,7 +153,7 @@
               to="/forgot-password"
               class="font-gelasio text-base text-[#7E7576] hover:text-black transition-colors"
             >
-              ← Yêu cầu link mới
+              ← {{ t('auth.requestNewLink') }}
             </router-link>
           </div>
         </div>
@@ -169,8 +169,12 @@ import authService from '@/services/auth.service'
 import { useForm, useField } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import { resetPasswordSchema } from '@/utils/validators'
+import { getApiErrorMessage } from '@/utils/apiError'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const route = useRoute()
 const router = useRouter()
@@ -190,13 +194,13 @@ onMounted(() => {
   if (route.query.token) {
     token.value = route.query.token as string
   } else {
-    errorMsg.value = 'Token không hợp lệ hoặc đã hết hạn.'
+    errorMsg.value = t('auth.invalidToken')
   }
 })
 
 const onSubmit = handleSubmit(async (values) => {
   if (!token.value) {
-    errorMsg.value = 'Không tìm thấy token đặt lại mật khẩu'
+    errorMsg.value = t('auth.missingToken')
     return
   }
 
@@ -209,12 +213,12 @@ const onSubmit = handleSubmit(async (values) => {
       password: values.password,
       confirmPassword: values.confirmPassword
     })
-    successMsg.value = res.message || 'Đặt lại mật khẩu thành công!'
+    successMsg.value = res.message || t('auth.passwordResetSuccess')
     setTimeout(() => {
       router.push('/login')
     }, 2000)
   } catch (error: any) {
-    errorMsg.value = error.response?.data?.message || 'Có lỗi xảy ra, vui lòng thử lại'
+    errorMsg.value = getApiErrorMessage(error, 'errors.generic')
   }
 })
 </script>

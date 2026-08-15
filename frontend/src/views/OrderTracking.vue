@@ -17,23 +17,23 @@
           class="font-geist text-[12px] uppercase tracking-[1.8px] text-white/60 mb-6 hero-anim hero-fade"
           style="animation-delay:.1s"
         >
-          TRA CỨU
+          {{ t('tracking.eyebrow') }}
         </p>
         <h1 class="font-geist font-bold text-white leading-[0.95] mb-6">
           <span
             class="block text-5xl sm:text-7xl md:text-8xl hero-anim hero-reveal"
             style="letter-spacing:-1.28px;animation-delay:.25s"
-          >KIỂM TRA</span>
+          >{{ t('tracking.title1') }}</span>
           <span
             class="block text-4xl sm:text-5xl md:text-6xl -mt-1 hero-anim hero-reveal text-white/80"
             style="letter-spacing:-0.64px;animation-delay:.42s"
-          >ĐƠN HÀNG</span>
+          >{{ t('tracking.title2') }}</span>
         </h1>
         <p
           class="font-geist text-base sm:text-lg text-white/70 leading-[29px] max-w-[560px] mx-auto hero-anim hero-fade"
           style="animation-delay:.6s"
         >
-          Nhập mã đơn hàng để theo dõi tình trạng giao hàng nhanh chóng.
+          {{ t('tracking.description') }}
         </p>
       </div>
     </section>
@@ -50,20 +50,20 @@
           @submit.prevent="handleTrack"
         >
           <div>
-            <label class="font-geist text-[13px] font-medium uppercase tracking-[1.2px] text-[#5E5F5C] mb-2 block">Mã đơn hàng</label>
+            <label class="font-geist text-[13px] font-medium uppercase tracking-[1.2px] text-[#5E5F5C] mb-2 block">{{ t('tracking.orderCodeLabel') }}</label>
             <input
               v-model="trackingCode"
               type="text"
-              placeholder="VD: #12345 hoặc THEX-12345"
+              :placeholder="t('tracking.orderCodePlaceholder')"
               class="w-full h-[52px] px-5 bg-white/70 border border-[#CFC4C6] rounded-xl font-geist text-[16px] text-[#1A1C1C] placeholder:text-[#CFC4C6] focus:outline-none focus:border-black transition-colors"
             >
           </div>
           <div>
-            <label class="font-geist text-[13px] font-medium uppercase tracking-[1.2px] text-[#5E5F5C] mb-2 block">Email hoặc số điện thoại</label>
+            <label class="font-geist text-[13px] font-medium uppercase tracking-[1.2px] text-[#5E5F5C] mb-2 block">{{ t('tracking.contactLabel') }}</label>
             <input
               v-model="contact"
               type="text"
-              placeholder="Email hoặc SĐT đặt hàng"
+              :placeholder="t('tracking.contactPlaceholder')"
               class="w-full h-[52px] px-5 bg-white/70 border border-[#CFC4C6] rounded-xl font-geist text-[16px] text-[#1A1C1C] placeholder:text-[#CFC4C6] focus:outline-none focus:border-black transition-colors"
             >
           </div>
@@ -88,7 +88,7 @@
               />
               <path d="M12 2a10 10 0 0 1 10 10" />
             </svg>
-            <span>{{ loading ? 'ĐANG TÌM KIẾM...' : 'TRA CỨU ĐƠN HÀNG' }}</span>
+            <span>{{ loading ? t('tracking.searching') : t('tracking.submit') }}</span>
           </button>
         </form>
       </div>
@@ -131,7 +131,7 @@
           </svg>
         </div>
         <h3 class="font-geist text-[20px] text-[#1A1C1C] mb-2">
-          Không tìm thấy đơn hàng
+          {{ t('tracking.notFound') }}
         </h3>
         <p class="font-geist text-sm text-[#5E5F5C] leading-[24px] mb-6">
           {{ error }}
@@ -140,7 +140,7 @@
           class="px-6 py-3 border border-black rounded-lg font-geist text-[12px] font-semibold uppercase tracking-[1.2px] hover:bg-black hover:text-white transition-colors"
           @click="resetForm"
         >
-          THỬ LẠI
+          {{ t('tracking.retry') }}
         </button>
       </div>
     </section>
@@ -159,7 +159,7 @@
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-5">
           <div>
             <p class="font-geist text-[12px] uppercase tracking-[1.8px] text-[#5E5F5C] mb-2">
-              MÃ ĐƠN HÀNG
+              {{ t('tracking.orderCode') }}
             </p>
             <h2 class="font-geist text-[28px] md:text-[32px] tracking-[-0.32px] text-[#1A1C1C]">
               #{{ order.id }}
@@ -173,7 +173,7 @@
         <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mt-8 pt-8 border-t border-[#CFC4C6]/50">
           <div>
             <p class="font-geist text-[11px] uppercase tracking-[1.8px] text-[#5E5F5C] mb-1">
-              Ngày đặt
+              {{ t('tracking.placedOn') }}
             </p>
             <p class="font-geist text-[15px] text-[#1A1C1C]">
               {{ formatDate(order.createdAt) }}
@@ -181,7 +181,7 @@
           </div>
           <div>
             <p class="font-geist text-[11px] uppercase tracking-[1.8px] text-[#5E5F5C] mb-1">
-              Thanh toán
+              {{ t('tracking.payment') }}
             </p>
             <p class="font-geist text-[15px] text-[#1A1C1C]">
               {{ order.paymentMethod }}
@@ -189,7 +189,7 @@
           </div>
           <div>
             <p class="font-geist text-[11px] uppercase tracking-[1.8px] text-[#5E5F5C] mb-1">
-              Tổng tiền
+              {{ t('tracking.total') }}
             </p>
             <p class="font-geist text-[15px] font-semibold text-[#1A1C1C]">
               {{ formatPrice(order.total || order.totalMoney || 0) }}
@@ -197,10 +197,10 @@
           </div>
           <div>
             <p class="font-geist text-[11px] uppercase tracking-[1.8px] text-[#5E5F5C] mb-1">
-              Trạng thái TT
+              {{ t('tracking.paymentStatus') }}
             </p>
             <p class="font-geist text-[15px] text-[#1A1C1C]">
-              {{ order.paymentStatus === 'PAID' ? 'Đã thanh toán' : 'Chưa thanh toán' }}
+              {{ order.paymentStatus === 'PAID' ? t('tracking.paid') : t('tracking.unpaid') }}
             </p>
           </div>
         </div>
@@ -213,7 +213,7 @@
       >
         <span class="glass-sheen pointer-events-none" />
         <h3 class="font-geist text-[20px] text-[#1A1C1C] mb-8">
-          Tiến trình đơn hàng
+          {{ t('tracking.timeline') }}
         </h3>
         <div class="relative pl-8">
           <div class="absolute left-[11px] top-2 bottom-2 w-px bg-[#CFC4C6]" />
@@ -266,12 +266,12 @@
         >
           <span class="glass-sheen pointer-events-none" />
           <h3 class="font-geist text-[20px] text-[#1A1C1C] mb-6">
-            Thông tin giao hàng
+            {{ t('tracking.shippingInfo') }}
           </h3>
           <div class="space-y-4">
             <div>
               <p class="font-geist text-[11px] uppercase tracking-[1.8px] text-[#5E5F5C] mb-1">
-                Người nhận
+                {{ t('tracking.recipient') }}
               </p>
               <p class="font-geist text-[15px] text-[#1A1C1C]">
                 {{ order.fullName || order.shippingName }}
@@ -279,7 +279,7 @@
             </div>
             <div>
               <p class="font-geist text-[11px] uppercase tracking-[1.8px] text-[#5E5F5C] mb-1">
-                Số điện thoại
+                {{ t('tracking.phone') }}
               </p>
               <p class="font-geist text-[15px] text-[#1A1C1C]">
                 {{ order.phoneNumber || order.shippingPhone }}
@@ -287,7 +287,7 @@
             </div>
             <div>
               <p class="font-geist text-[11px] uppercase tracking-[1.8px] text-[#5E5F5C] mb-1">
-                Địa chỉ
+                {{ t('tracking.address') }}
               </p>
               <p class="font-geist text-[15px] text-[#1A1C1C] leading-[24px]">
                 {{ order.address || order.shippingAddress }}
@@ -295,7 +295,7 @@
             </div>
             <div v-if="order.note">
               <p class="font-geist text-[11px] uppercase tracking-[1.8px] text-[#5E5F5C] mb-1">
-                Ghi chú
+                {{ t('order.note') }}
               </p>
               <p class="font-geist text-[15px] text-[#5E5F5C] leading-[24px]">
                 {{ order.note }}
@@ -311,7 +311,7 @@
         >
           <span class="glass-sheen pointer-events-none" />
           <h3 class="font-geist text-[20px] text-[#1A1C1C] mb-6">
-            Sản phẩm ({{ order.items?.length || 0 }})
+            {{ t('tracking.products', { count: order.items?.length || 0 }) }}
           </h3>
           <div class="space-y-4">
             <div
@@ -356,7 +356,7 @@
                   {{ item.productName }}
                 </p>
                 <p class="font-geist text-[12px] text-[#5E5F5C]">
-                  Size {{ item.size }} x {{ item.quantity }}
+                  {{ t('tracking.itemSize', { size: item.size, qty: item.quantity }) }}
                 </p>
               </div>
               <p class="font-geist text-[14px] font-semibold text-[#1A1C1C] flex-shrink-0">
@@ -366,15 +366,15 @@
           </div>
           <div class="pt-4 mt-4 border-t border-[#CFC4C6] space-y-2">
             <div class="flex justify-between">
-              <span class="font-geist text-[13px] text-[#5E5F5C]">Tạm tính</span>
+              <span class="font-geist text-[13px] text-[#5E5F5C]">{{ t('common.subtotal') }}</span>
               <span class="font-geist text-[14px] text-[#1A1C1C]">{{ formatPrice(order.subtotal || 0) }}</span>
             </div>
             <div class="flex justify-between">
-              <span class="font-geist text-[13px] text-[#5E5F5C]">Phí vận chuyển</span>
+              <span class="font-geist text-[13px] text-[#5E5F5C]">{{ t('cart.shippingFee') }}</span>
               <span class="font-geist text-[14px] text-[#1A1C1C]">{{ formatPrice(order.shippingFee || 0) }}</span>
             </div>
             <div class="flex justify-between pt-2 border-t border-[#CFC4C6]/30">
-              <span class="font-geist text-[15px] font-semibold text-[#1A1C1C]">Tổng cộng</span>
+              <span class="font-geist text-[15px] font-semibold text-[#1A1C1C]">{{ t('common.total') }}</span>
               <span class="font-geist text-[15px] font-semibold text-[#1A1C1C]">{{ formatPrice(order.total || order.totalMoney || 0) }}</span>
             </div>
           </div>
@@ -388,15 +388,14 @@
       class="w-full max-w-[680px] mx-auto px-4 py-16 text-center"
       data-reveal
     >
-      <p class="font-geist text-sm text-[#5E5F5C] leading-[26px] mb-6">
-        Mã đơn hàng được gửi qua email xác nhận sau khi đặt hàng thành công.<br>
-        Nếu gặp khó khăn, vui lòng liên hệ bộ phận hỗ trợ.
+      <p class="font-geist text-sm text-[#5E5F5C] leading-[26px] mb-6 whitespace-pre-line">
+        {{ t('tracking.helpText') }}
       </p>
       <router-link
         to="/contact"
         class="inline-flex items-center gap-2 px-6 py-3 border border-black rounded-lg font-geist text-[12px] font-semibold uppercase tracking-[1.2px] hover:bg-black hover:text-white transition-colors"
       >
-        LIÊN HỆ HỖ TRỢ
+        {{ t('tracking.contact') }}
       </router-link>
     </section>
   </div>
@@ -407,6 +406,10 @@ import { ref, computed, onUnmounted } from 'vue'
 import { useReveal } from '@/composables/useReveal'
 import { orderService } from '@/services/order.service'
 import type { Order } from '@/types'
+import { useI18n } from 'vue-i18n'
+import { formatCurrency, formatDate as formatDateByLocale } from '@/utils/formatters'
+
+const { t } = useI18n()
 
 const rootRef = ref<HTMLElement | null>(null)
 const heroRef = ref<HTMLElement | null>(null)
@@ -440,11 +443,11 @@ const statusOrder = ['PENDING', 'CONFIRMED', 'SHIPPING', 'DELIVERED', 'COMPLETED
 
 const timelineSteps = computed(() => {
   const steps = [
-    { label: 'Đơn hàng đã đặt', key: 'PENDING' },
-    { label: 'Đã xác nhận', key: 'CONFIRMED' },
-    { label: 'Đang vận chuyển', key: 'SHIPPING' },
-    { label: 'Đã giao hàng', key: 'DELIVERED' },
-    { label: 'Hoàn thành', key: 'COMPLETED' }
+    { label: t('tracking.stepPlaced'), key: 'PENDING' },
+    { label: t('tracking.stepConfirmed'), key: 'CONFIRMED' },
+    { label: t('tracking.stepShipping'), key: 'SHIPPING' },
+    { label: t('tracking.stepDelivered'), key: 'DELIVERED' },
+    { label: t('tracking.stepCompleted'), key: 'COMPLETED' }
   ]
   const currentIdx = order.value
     ? statusOrder.indexOf(order.value.status)
@@ -466,13 +469,13 @@ const handleTrack = async () => {
     const code = trackingCode.value.replace('#', '').replace(/[^0-9]/g, '')
     const id = parseInt(code)
     if (isNaN(id)) {
-      error.value = 'Mã đơn hàng không hợp lệ. Vui lòng nhập đúng định dạng số.'
+      error.value = t('tracking.invalidCode')
       return
     }
     const result = await orderService.getOrder(id)
     order.value = result
   } catch {
-    error.value = 'Không tìm thấy đơn hàng với thông tin đã cung cấp. Vui lòng kiểm tra lại mã đơn hàng và email/SĐT.'
+    error.value = t('tracking.notFoundDetail')
   } finally {
     loading.value = false
   }
@@ -499,25 +502,22 @@ const getStatusBadgeClass = (status: string) => {
 }
 
 const getStatusLabel = (status: string) => {
-  switch (status) {
-    case 'PENDING': return 'ĐANG XỬ LÝ'
-    case 'CONFIRMED': return 'ĐÃ XÁC NHẬN'
-    case 'SHIPPING': return 'ĐANG VẬN CHUYỂN'
-    case 'DELIVERED': return 'ĐÃ GIAO'
-    case 'COMPLETED': return 'HOÀN THÀNH'
-    case 'CANCELLED': return 'ĐÃ HỦY'
-    case 'REFUNDED': return 'ĐÃ HOÀN TIỀN'
-    default: return status
+  const keyMap: Record<string, string> = {
+    PENDING: 'orderStatus.pending',
+    CONFIRMED: 'orderStatus.confirmed',
+    SHIPPING: 'orderStatus.shipping',
+    DELIVERED: 'orderStatus.delivered',
+    COMPLETED: 'orderStatus.completed',
+    CANCELLED: 'orderStatus.cancelled',
+    REFUNDED: 'orderStatus.refunded'
   }
+  return keyMap[status] ? t(keyMap[status]) : status
 }
 
-const formatDate = (dateString: string) => {
-  if (!dateString) return ''
-  return new Date(dateString).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })
-}
+const formatDate = (dateString: string) => formatDateByLocale(dateString)
 
 const formatPrice = (price: number) => {
-  return new Intl.NumberFormat('vi-VN').format(price) + ' đ'
+  return formatCurrency(price)
 }
 </script>
 

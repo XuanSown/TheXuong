@@ -17,19 +17,19 @@
           class="font-geist text-[12px] uppercase tracking-[1.8px] text-white/60 mb-6 hero-anim hero-fade"
           style="animation-delay:.1s"
         >
-          CHÍNH SÁCH
+          {{ t('privacy.heroEyebrow') }}
         </p>
         <h1 class="font-geist font-bold text-white leading-[0.95] mb-6">
           <span
             class="block text-5xl sm:text-7xl md:text-8xl hero-anim hero-reveal"
             style="letter-spacing:-1.28px;animation-delay:.25s"
-          >BẢO MẬT</span>
+          >{{ t('privacy.heroTitle') }}</span>
         </h1>
         <p
           class="font-geist text-base sm:text-lg text-white/70 leading-[29px] max-w-[640px] mx-auto hero-anim hero-fade"
           style="animation-delay:.5s"
         >
-          Cam kết bảo vệ dữ liệu cá nhân của bạn — minh bạch, an toàn và tuân thủ pháp luật.
+          {{ t('privacy.heroDesc') }}
         </p>
       </div>
       <div
@@ -48,10 +48,10 @@
           data-reveal
         >
           <p class="font-geist text-[12px] uppercase tracking-[1.8px] text-[#5E5F5C] mb-4">
-            TỔNG QUAN
+            {{ t('privacy.overviewEyebrow') }}
           </p>
           <h2 class="font-geist text-[40px] sm:text-[56px] md:text-[64px] leading-[70px] tracking-[-1.28px] uppercase text-[#1A1C1C]">
-            Chính sách bảo mật
+            {{ t('privacy.overviewTitle') }}
           </h2>
         </div>
         <div
@@ -61,14 +61,20 @@
           <div class="liquid-glass relative rounded-2xl border border-white/60 bg-white/50 p-8 md:p-10 shadow-[0_8px_32px_rgba(26,28,28,0.12)]">
             <span class="glass-sheen pointer-events-none" />
             <p class="font-geist text-base text-[#1A1C1C] leading-[29px] mb-5">
-              THE XUONG SPORT cam kết bảo vệ quyền riêng tư và dữ liệu cá nhân của khách hàng. Chính sách này giải thích cách chúng tôi thu thập, sử dụng và bảo vệ thông tin của bạn.
+              {{ t('privacy.overviewP1') }}
             </p>
             <p class="font-geist text-base text-[#5E5F5C] leading-[29px] mb-5">
-              Bằng việc sử dụng dịch vụ của chúng tôi, bạn đồng ý với các điều khoản được mô tả trong chính sách này. Chúng tôi tuân thủ đầy đủ các quy định của pháp luật Việt Nam về bảo vệ dữ liệu cá nhân.
+              {{ t('privacy.overviewP2') }}
             </p>
-            <p class="font-geist text-base text-[#5E5F5C] leading-[29px]">
-              Chính sách được cập nhật lần cuối: <strong>01/01/2025</strong>
-            </p>
+            <i18n-t
+              keypath="privacy.overviewP3"
+              tag="p"
+              class="font-geist text-base text-[#5E5F5C] leading-[29px]"
+            >
+              <template #date>
+                <strong>01/01/2025</strong>
+              </template>
+            </i18n-t>
           </div>
         </div>
       </div>
@@ -84,10 +90,10 @@
         data-reveal
       >
         <p class="font-geist text-[12px] uppercase tracking-[1.8px] text-[#5E5F5C] mb-4">
-          THU THẬP
+          {{ t('privacy.collectionEyebrow') }}
         </p>
         <h2 class="font-geist text-[40px] sm:text-[56px] md:text-[64px] leading-[70px] tracking-[-1.28px] uppercase text-[#1A1C1C]">
-          Thông tin chúng tôi thu thập
+          {{ t('privacy.collectionTitle') }}
         </h2>
       </div>
       <div class="relative">
@@ -122,10 +128,10 @@
         data-reveal
       >
         <p class="font-geist text-[12px] uppercase tracking-[1.8px] text-[#5E5F5C] mb-4">
-          MỤC ĐÍCH
+          {{ t('privacy.purposeEyebrow') }}
         </p>
         <h2 class="font-geist text-[40px] sm:text-[56px] md:text-[64px] leading-[70px] tracking-[-1.28px] uppercase text-[#1A1C1C]">
-          Cách chúng tôi sử dụng
+          {{ t('privacy.purposeTitle') }}
         </h2>
       </div>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -158,10 +164,10 @@
           data-reveal
         >
           <p class="font-geist text-[12px] uppercase tracking-[1.8px] text-white/60 mb-4">
-            BẢO MẬT
+            {{ t('privacy.securityEyebrow') }}
           </p>
           <h2 class="font-geist text-[40px] sm:text-[56px] md:text-[64px] leading-[70px] tracking-[-1.28px] text-white">
-            Biện pháp bảo vệ
+            {{ t('privacy.securityTitle') }}
           </h2>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -190,10 +196,10 @@
         data-reveal
       >
         <p class="font-geist text-[12px] uppercase tracking-[1.8px] text-[#5E5F5C] mb-4">
-          QUYỀN LỢI
+          {{ t('privacy.rightsEyebrow') }}
         </p>
         <h2 class="font-geist text-[40px] sm:text-[56px] md:text-[64px] leading-[70px] tracking-[-1.28px] uppercase text-[#1A1C1C]">
-          Quyền của bạn
+          {{ t('privacy.rightsTitle') }}
         </h2>
       </div>
       <div
@@ -206,10 +212,10 @@
             <thead>
               <tr class="border-b border-[#CFC4C6]">
                 <th class="font-geist text-[13px] uppercase tracking-[1.2px] text-[#5E5F5C] py-4 px-3 text-left">
-                  Quyền
+                  {{ t('privacy.rightsThRight') }}
                 </th>
                 <th class="font-geist text-[13px] uppercase tracking-[1.2px] text-[#5E5F5C] py-4 px-3 text-left">
-                  Mô tả
+                  {{ t('privacy.rightsThDesc') }}
                 </th>
               </tr>
             </thead>
@@ -240,10 +246,10 @@
           data-reveal
         >
           <p class="font-geist text-[12px] uppercase tracking-[1.8px] text-[#5E5F5C] mb-4">
-            COOKIES
+            {{ t('privacy.cookiesEyebrow') }}
           </p>
           <h2 class="font-geist text-[40px] sm:text-[56px] md:text-[64px] leading-[70px] tracking-[-1.28px] uppercase text-[#1A1C1C]">
-            Cookie & theo dõi
+            {{ t('privacy.cookiesTitle') }}
           </h2>
         </div>
         <div
@@ -253,16 +259,28 @@
           <div class="liquid-glass relative rounded-2xl border border-white/60 bg-white/50 p-8 md:p-10 shadow-[0_8px_32px_rgba(26,28,28,0.12)]">
             <span class="glass-sheen pointer-events-none" />
             <p class="font-geist text-base text-[#1A1C1C] leading-[29px] mb-5">
-              Chúng tôi sử dụng cookie để cải thiện trải nghiệm của bạn trên website. Cookie là các tệp nhỏ được lưu trên trình duyệt của bạn.
+              {{ t('privacy.cookiesP1') }}
             </p>
-            <p class="font-geist text-base text-[#5E5F5C] leading-[29px] mb-5">
-              <strong>Cookie cần thiết:</strong> Giúp website hoạt động đúng cách (đăng nhập, giỏ hàng, bảo mật).
-            </p>
-            <p class="font-geist text-base text-[#5E5F5C] leading-[29px] mb-5">
-              <strong>Cookie phân tích:</strong> Giúp chúng tôi hiểu cách bạn sử dụng website để cải thiện dịch vụ.
-            </p>
+            <i18n-t
+              keypath="privacy.cookiesNecessary"
+              tag="p"
+              class="font-geist text-base text-[#5E5F5C] leading-[29px] mb-5"
+            >
+              <template #name>
+                <strong>{{ t('privacy.cookiesNecessaryName') }}</strong>
+              </template>
+            </i18n-t>
+            <i18n-t
+              keypath="privacy.cookiesAnalytics"
+              tag="p"
+              class="font-geist text-base text-[#5E5F5C] leading-[29px] mb-5"
+            >
+              <template #name>
+                <strong>{{ t('privacy.cookiesAnalyticsName') }}</strong>
+              </template>
+            </i18n-t>
             <p class="font-geist text-base text-[#5E5F5C] leading-[29px]">
-              Bạn có thể tắt cookie trong cài đặt trình duyệt, nhưng một số tính năng có thể không hoạt động đúng.
+              {{ t('privacy.cookiesP4') }}
             </p>
           </div>
         </div>
@@ -277,23 +295,23 @@
         data-reveal
       >
         <h2 class="font-geist text-[40px] sm:text-[56px] md:text-[64px] leading-[70px] tracking-[-1.28px] text-white mb-8">
-          Có thắc mắc về bảo mật?
+          {{ t('privacy.ctaTitle') }}
         </h2>
         <p class="font-geist text-base text-white/70 leading-[29px] mb-10 max-w-[560px] mx-auto">
-          Đội ngũ của chúng tôi sẵn sàng giải đáp mọi thắc mắc về chính sách bảo mật và quyền riêng tư của bạn.
+          {{ t('privacy.ctaDesc') }}
         </p>
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
           <router-link
             to="/about"
             class="liquid-btn px-10 py-5 bg-white/10 text-white text-[12px] font-semibold uppercase tracking-[1.8px] leading-[12px] rounded-full hover:bg-white/20 transition-colors"
           >
-            LIÊN HỆ NGAY
+            {{ t('privacy.ctaContact') }}
           </router-link>
           <router-link
             to="/policy/returns"
             class="liquid-btn px-10 py-5 bg-white/10 text-white text-[12px] font-semibold uppercase tracking-[1.8px] leading-[12px] rounded-full hover:bg-white/20 transition-colors"
           >
-            CHÍNH SÁCH ĐỔI TRẢ
+            {{ t('privacy.ctaReturns') }}
           </router-link>
         </div>
       </div>
@@ -302,9 +320,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onUnmounted } from 'vue'
+import { ref, computed, onUnmounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useReveal } from '@/composables/useReveal'
 import { useScrollReveal } from '@/composables/useScrollReveal'
+
+const { t } = useI18n()
 
 const rootRef = ref<HTMLElement | null>(null)
 const heroRef = ref<HTMLElement | null>(null)
@@ -331,85 +352,37 @@ onUnmounted(() => {
   if (glowRaf) cancelAnimationFrame(glowRaf)
 })
 
-const dataCollection = [
-  {
-    title: 'Thông tin cá nhân',
-    desc: 'Họ tên, email, số điện thoại, địa chỉ giao hàng khi bạn đăng ký tài khoản hoặc đặt hàng.'
-  },
-  {
-    title: 'Thông tin đơn hàng',
-    desc: 'Lịch sử mua hàng, phương thức thanh toán, địa chỉ giao nhận để xử lý và theo dõi đơn hàng.'
-  },
-  {
-    title: 'Dữ liệu thiết bị',
-    desc: 'Địa chỉ IP, loại trình duyệt, thiết bị sử dụng để cải thiện trải nghiệm và bảo mật tài khoản.'
-  },
-  {
-    title: 'Dữ liệu sử dụng',
-    desc: 'Các trang đã xem, thời gian truy cập, tương tác trên website để phân tích và tối ưu hóa dịch vụ.'
-  }
-]
+const dataCollection = computed(() => [
+  { title: t('privacy.collection1Title'), desc: t('privacy.collection1Desc') },
+  { title: t('privacy.collection2Title'), desc: t('privacy.collection2Desc') },
+  { title: t('privacy.collection3Title'), desc: t('privacy.collection3Desc') },
+  { title: t('privacy.collection4Title'), desc: t('privacy.collection4Desc') }
+])
 
-const purposes = [
-  {
-    icon: '📦',
-    title: 'Xử lý đơn hàng',
-    desc: 'Xác nhận, đóng gói, giao hàng và xử lý các yêu cầu đổi trả, hoàn tiền.'
-  },
-  {
-    icon: '👤',
-    title: 'Quản lý tài khoản',
-    desc: 'Duy trì tài khoản, lịch sử đơn hàng, điểm tích lũy và ưu đãi cá nhân hóa.'
-  },
-  {
-    icon: '📧',
-    title: 'Thông báo & hỗ trợ',
-    desc: 'Gửi thông tin đơn hàng, cập nhật trạng thái, và phản hồi yêu cầu hỗ trợ.'
-  },
-  {
-    icon: '📊',
-    title: 'Phân tích & cải thiện',
-    desc: 'Hiểu hành vi người dùng để tối ưu giao diện, tính năng và trải nghiệm mua sắm.'
-  },
-  {
-    icon: '🔒',
-    title: 'Bảo mật & an toàn',
-    desc: 'Phát hiện và ngăn chặn gian lận, bảo vệ tài khoản và dữ liệu khách hàng.'
-  },
-  {
-    icon: '📢',
-    title: 'Marketing (có sự đồng ý)',
-    desc: 'Gửi thông tin khuyến mãi, sản phẩm mới khi bạn đã đồng ý nhận thông tin từ chúng tôi.'
-  }
-]
+const purposes = computed(() => [
+  { icon: '📦', title: t('privacy.purpose1Title'), desc: t('privacy.purpose1Desc') },
+  { icon: '👤', title: t('privacy.purpose2Title'), desc: t('privacy.purpose2Desc') },
+  { icon: '📧', title: t('privacy.purpose3Title'), desc: t('privacy.purpose3Desc') },
+  { icon: '📊', title: t('privacy.purpose4Title'), desc: t('privacy.purpose4Desc') },
+  { icon: '🔒', title: t('privacy.purpose5Title'), desc: t('privacy.purpose5Desc') },
+  { icon: '📢', title: t('privacy.purpose6Title'), desc: t('privacy.purpose6Desc') }
+])
 
-const securityMeasures = [
-  {
-    title: 'Mã hóa SSL/TLS',
-    desc: 'Mọi dữ liệu truyền tải giữa trình duyệt và máy chủ được mã hóa bằng giao thức SSL/TLS 256-bit.'
-  },
-  {
-    title: 'Bảo vệ thanh toán',
-    desc: 'Thông tin thanh toán được xử lý qua cổng thanh toán đạt chuẩn PCI DSS, không lưu trữ trên hệ thống.'
-  },
-  {
-    title: 'Kiểm soát truy cập',
-    desc: 'Chỉ nhân viên được ủy quyền mới có quyền truy cập dữ liệu khách hàng, với ghi nhật ký đầy đủ.'
-  },
-  {
-    title: 'Sao lưu & phục hồi',
-    desc: 'Dữ liệu được sao lưu định kỳ và có kế hoạch phục hồi khi xảy ra sự cố.'
-  }
-]
+const securityMeasures = computed(() => [
+  { title: t('privacy.security1Title'), desc: t('privacy.security1Desc') },
+  { title: t('privacy.security2Title'), desc: t('privacy.security2Desc') },
+  { title: t('privacy.security3Title'), desc: t('privacy.security3Desc') },
+  { title: t('privacy.security4Title'), desc: t('privacy.security4Desc') }
+])
 
-const userRights = [
-  { right: 'Truy cập', desc: 'Xem thông tin cá nhân mà chúng tôi đang lưu trữ về bạn.' },
-  { right: 'Chỉnh sửa', desc: 'Yêu cầu cập nhật, sửa đổi thông tin không chính xác hoặc đã thay đổi.' },
-  { right: 'Xóa', desc: 'Yêu cầu xóa dữ liệu cá nhân, trừ khi pháp luật yêu cầu lưu giữ.' },
-  { right: 'Phản đối', desc: 'Từ chối việc xử lý dữ liệu cho mục đích marketing trực tiếp.' },
-  { right: 'Rút lại đồng ý', desc: 'Hủy bỏ sự đồng ý đã cấp trước đó bất kỳ lúc nào.' },
-  { right: 'Khiếu nại', desc: 'Gửi khiếu nại đến cơ quan có thẩm quyền nếu cho rằng quyền bị vi phạm.' }
-]
+const userRights = computed(() => [
+  { right: t('privacy.right1Right'), desc: t('privacy.right1Desc') },
+  { right: t('privacy.right2Right'), desc: t('privacy.right2Desc') },
+  { right: t('privacy.right3Right'), desc: t('privacy.right3Desc') },
+  { right: t('privacy.right4Right'), desc: t('privacy.right4Desc') },
+  { right: t('privacy.right5Right'), desc: t('privacy.right5Desc') },
+  { right: t('privacy.right6Right'), desc: t('privacy.right6Desc') }
+])
 </script>
 
 <style scoped>

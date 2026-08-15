@@ -5,12 +5,10 @@
         <!-- Header -->
         <header class="mb-10 text-center">
           <h1 class="font-geist text-[32px] font-bold text-black mb-2">
-            ĐIỂM & VOUCHER
+            {{ t('rewards.title') }}
           </h1>
           <p class="font-gelasio text-lg text-[#5E5F5C]">
-            Số điểm hiện tại của bạn: <span
-              class="font-bold text-black text-2xl"
-            >{{ currentPoints }}</span>
+            {{ t('rewards.pointsBalance', { points: currentPoints }) }}
           </p>
         </header>
 
@@ -21,14 +19,14 @@
             :class="activeTab === 'catalog' ? 'text-black border-b-2 border-black' : 'text-[#848484] hover:text-black'"
             @click="activeTab = 'catalog'"
           >
-            Đổi Voucher
+            {{ t('rewards.tabCatalog') }}
           </button>
           <button
             class="pb-4 font-geist text-[16px] font-bold tracking-[1px] uppercase transition-colors"
             :class="activeTab === 'my-vouchers' ? 'text-black border-b-2 border-black' : 'text-[#848484] hover:text-black'"
             @click="activeTab = 'my-vouchers'"
           >
-            Voucher của tôi
+            {{ t('rewards.tabMyVouchers') }}
           </button>
         </div>
 
@@ -40,13 +38,13 @@
               v-if="isLoadingCatalog"
               class="text-center py-10"
             >
-              Đang tải danh mục...
+              {{ t('rewards.loadingCatalog') }}
             </div>
             <div
               v-else-if="catalog.length === 0"
               class="text-center py-10 text-[#848484]"
             >
-              Hiện tại không có voucher nào để đổi.
+              {{ t('rewards.emptyCatalog') }}
             </div>
             <div
               v-else
@@ -59,21 +57,20 @@
               >
                 <div>
                   <div class="flex justify-between items-start mb-4">
-                    <span class="bg-black text-white text-xs font-bold px-3 py-1 rounded">Giảm {{
-                      formatPrice(item.discountAmount) }}</span>
+                    <span class="bg-black text-white text-xs font-bold px-3 py-1 rounded">{{ t('rewards.discount', { price: formatPrice(item.discountAmount) }) }}</span>
                     <span
                       v-if="item.vipOnly"
                       class="bg-yellow-400 text-black text-xs font-bold px-3 py-1 rounded"
                     >VIP</span>
                   </div>
                   <h3 class="font-geist font-bold text-lg mb-2">
-                    Voucher {{ formatPrice(item.discountAmount) }}
+                    {{ t('rewards.voucherName', { price: formatPrice(item.discountAmount) }) }}
                   </h3>
                   <p class="font-gelasio text-sm text-[#5E5F5C] mb-1">
-                    Đơn tối thiểu: {{ item.minOrderAmount > 0 ? formatPrice(item.minOrderAmount) : 'Không yêu cầu' }}
+                    {{ item.minOrderAmount > 0 ? t('rewards.minOrder', { price: formatPrice(item.minOrderAmount) }) : t('rewards.noMinOrder') }}
                   </p>
                   <p class="font-gelasio text-sm text-[#5E5F5C] mb-4">
-                    Điểm cần để đổi: <strong class="text-black">{{ item.requiredPoints }} điểm</strong>
+                    {{ t('rewards.pointsNeeded', { points: item.requiredPoints }) }}
                   </p>
                 </div>
                 <BaseButton
@@ -82,7 +79,7 @@
                   class="w-full !h-[44px]"
                   @click="handleRedeem(item)"
                 >
-                  {{ currentPoints >= item.requiredPoints ? 'Đổi ngay' : 'Không đủ điểm' }}
+                  {{ currentPoints >= item.requiredPoints ? t('rewards.redeemNow') : t('rewards.notEnoughPoints') }}
                 </BaseButton>
               </div>
             </div>
@@ -106,13 +103,13 @@
               v-if="isLoadingMyVouchers"
               class="text-center py-10"
             >
-              Đang tải voucher của bạn...
+              {{ t('rewards.loadingMyVouchers') }}
             </div>
             <div
               v-else-if="filteredMyVouchers.length === 0"
               class="text-center py-10 text-[#848484]"
             >
-              Bạn chưa có voucher nào trong trạng thái này.
+              {{ t('rewards.emptyMyVouchers') }}
             </div>
             <div
               v-else
@@ -135,16 +132,16 @@
                     </span>
                   </div>
                   <p class="font-gelasio text-sm text-[#5E5F5C] mb-1">
-                    Ngày đổi: {{ formatDate(uv.issuedAt) }}
+                    {{ t('rewards.issuedOn', { date: formatDate(uv.issuedAt) }) }}
                   </p>
                   <p class="font-gelasio text-sm text-[#5E5F5C]">
-                    Hạn dùng: {{ formatDate(uv.expiresAt) }}
+                    {{ t('rewards.expiresOn', { date: formatDate(uv.expiresAt) }) }}
                   </p>
                   <p
                     v-if="uv.status === 'USED'"
                     class="font-gelasio text-sm text-green-600 mt-2"
                   >
-                    Đã dùng ngày: {{ formatDate(uv.usedAt) }}
+                    {{ t('rewards.usedOn', { date: formatDate(uv.usedAt) }) }}
                   </p>
                 </div>
               </div>
@@ -160,6 +157,11 @@
 import { ref, onMounted, computed } from 'vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import loyaltyService from '@/services/loyaltyService'
+import { useI18n } from 'vue-i18n'
+import { formatCurrency, formatDate as formatDateByLocale } from '@/utils/formatters'
+import { getApiErrorMessage } from '@/utils/apiError'
+
+const { t } = useI18n()
 
 const currentPoints = ref(0)
 const catalog = ref<any[]>([])
@@ -214,19 +216,19 @@ const filteredMyVouchers = computed(() => {
 })
 
 const handleRedeem = async (item: any) => {
-  if (!confirm(`Bạn có chắc chắn muốn đổi ${item.requiredPoints} điểm lấy voucher này?`)) return
+  if (!confirm(t('rewards.redeemConfirm', { points: item.requiredPoints }))) return
 
   isRedeeming.value = true
   redeemingId.value = item.id
   try {
     await loyaltyService.redeemVoucher(item.id)
-    alert('Đổi voucher thành công! Hãy kiểm tra trong tab Voucher của tôi.')
+    alert(t('rewards.redeemSuccess'))
     await loadPoints()
     await loadMyVouchers()
     activeTab.value = 'my-vouchers'
     voucherFilter.value = 'UNUSED'
   } catch (error: any) {
-    alert(error.response?.data?.message || 'Có lỗi xảy ra khi đổi voucher.')
+    alert(getApiErrorMessage(error, 'rewards.redeemFailed'))
   } finally {
     isRedeeming.value = false
     redeemingId.value = null
@@ -234,23 +236,19 @@ const handleRedeem = async (item: any) => {
 }
 
 const formatPrice = (price: number) => {
-  return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price)
+  return formatCurrency(price)
 }
 
-const formatDate = (dateStr: string) => {
-  if (!dateStr) return ''
-  const d = new Date(dateStr)
-  return d.toLocaleDateString('vi-VN')
-}
+const formatDate = (dateStr: string) => formatDateByLocale(dateStr)
 
 const statusLabel = (status: string) => {
-  switch (status) {
-    case 'ALL': return 'Tất cả'
-    case 'UNUSED': return 'Chưa dùng'
-    case 'USED': return 'Đã dùng'
-    case 'EXPIRED': return 'Hết hạn'
-    default: return status
+  const labels: Record<string, string> = {
+    'ALL': t('rewards.statusAll'),
+    'UNUSED': t('rewards.statusUnused'),
+    'USED': t('rewards.statusUsed'),
+    'EXPIRED': t('rewards.statusExpired')
   }
+  return labels[status] || status
 }
 
 const statusBadgeClass = (status: string) => {

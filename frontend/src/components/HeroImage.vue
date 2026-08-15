@@ -37,13 +37,13 @@
         class="block font-jetbrains italic font-normal text-5xl sm:text-7xl md:text-8xl hero-anim hero-reveal"
         :style="{ letterSpacing: '-0.05em', animationDelay: '0.25s' }"
       >
-        Layers hold
+        {{ t('hero.line1') }}
       </span>
       <span
         class="block font-normal text-5xl sm:text-7xl md:text-8xl -mt-1 hero-anim hero-reveal"
         :style="{ letterSpacing: '-0.08em', animationDelay: '0.42s' }"
       >
-        tales of time
+        {{ t('hero.line2') }}
       </span>
     </h1>
 
@@ -53,8 +53,7 @@
       :style="{ animationDelay: '0.7s' }"
     >
       <p class="text-sm text-white/80 leading-relaxed">
-        — "Sports are not just about winning; they are about pushing your limits, embracing the sweat, and discovering
-        the champion hidden inside you. Every drop of sweat brings you closer to your goals."
+        {{ t('hero.quote1') }}
       </p>
     </div>
 
@@ -64,14 +63,13 @@
       :style="{ animationDelay: '0.85s' }"
     >
       <p class="text-xs sm:text-sm text-white/80 leading-relaxed">
-        — "Your body can stand almost anything; it is your mind that you have to convince. Train hard, stay focused, and
-        let your passion speak louder than your excuses today."
+        {{ t('hero.quote2') }}
       </p>
       <router-link
         to="/products"
         class="px-8 py-3 bg-white text-black text-xs font-semibold uppercase tracking-[1.8px] leading-[12px] rounded-sm hover:bg-gray-200 transition-colors"
       >
-        KHÁM PHÁ NGAY
+        {{ t('hero.exploreNow') }}
       </router-link>
     </div>
   </section>
@@ -79,8 +77,11 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import heroImage1 from '@/assets/hero_image1.jpeg'
 import heroImage2 from '@/assets/hero_image2.jpeg'
+
+const { t } = useI18n()
 
 withDefaults(defineProps<{
   bgImage1?: string

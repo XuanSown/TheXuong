@@ -5,32 +5,32 @@
   >
     <BaseInput
       v-model="form.label"
-      label="Nhãn (vd: Nhà, Công ty)"
-      placeholder="Nhà"
+      :label="t('address.label')"
+      :placeholder="t('address.labelPlaceholder')"
     />
     <div class="grid grid-cols-2 gap-3">
       <BaseInput
         v-model="form.recipientName"
-        label="Tên người nhận"
+        :label="t('address.recipientName')"
         required
       />
       <BaseInput
         v-model="form.recipientPhone"
         type="tel"
-        label="SĐT người nhận"
+        :label="t('address.recipientPhone')"
         required
       />
     </div>
     <div class="grid grid-cols-3 gap-3">
       <div>
-        <label class="text-xs uppercase text-[#4C4546]">Tỉnh/Thành</label>
+        <label class="text-xs uppercase text-[#4C4546]">{{ t('address.province') }}</label>
         <select
           v-model="form.provinceCode"
           class="w-full h-[50px] border border-[#CFC4C5] rounded-lg px-2 font-gelasio text-[16px]"
           @change="onProvinceChange"
         >
           <option value="">
-            Chọn...
+            {{ t('address.select') }}
           </option>
           <option
             v-for="p in provinces"
@@ -42,7 +42,7 @@
         </select>
       </div>
       <div>
-        <label class="text-xs uppercase text-[#4C4546]">Quận/Huyện</label>
+        <label class="text-xs uppercase text-[#4C4546]">{{ t('address.district') }}</label>
         <select
           v-model="form.districtCode"
           :disabled="!form.provinceCode"
@@ -50,7 +50,7 @@
           @change="onDistrictChange"
         >
           <option value="">
-            Chọn...
+            {{ t('address.select') }}
           </option>
           <option
             v-for="d in districts"
@@ -62,14 +62,14 @@
         </select>
       </div>
       <div>
-        <label class="text-xs uppercase text-[#4C4546]">Phường/Xã</label>
+        <label class="text-xs uppercase text-[#4C4546]">{{ t('address.ward') }}</label>
         <select
           v-model="form.wardCode"
           :disabled="!form.districtCode"
           class="w-full h-[50px] border border-[#CFC4C5] rounded-lg px-2 font-gelasio text-[16px] disabled:bg-gray-100"
         >
           <option value="">
-            Chọn...
+            {{ t('address.select') }}
           </option>
           <option
             v-for="w in wards"
@@ -82,10 +82,10 @@
       </div>
     </div>
     <div class="flex flex-col gap-1">
-      <label class="text-xs uppercase text-[#4C4546]">Số nhà, tên đường</label>
+      <label class="text-xs uppercase text-[#4C4546]">{{ t('address.street') }}</label>
       <input
         v-model="form.streetDetail"
-        placeholder="Nhập số nhà, tên đường"
+        :placeholder="t('address.streetPlaceholder')"
         class="w-full h-[50px] border border-[#CFC4C5] rounded-lg px-3 font-gelasio text-[16px] outline-none focus:border-black"
       >
       <button
@@ -93,26 +93,26 @@
         class="self-start text-xs flex items-center gap-1 text-gray-400 underline mt-1"
         @click="notifyDev"
       >
-        Dùng vị trí của tôi
+        {{ t('address.useMyLocation') }}
       </button>
       <p class="text-[11px] text-gray-400 italic">
-        Gợi ý địa chỉ &amp; định vị tự động đang được phát triển
+        {{ t('address.locatingComingSoon') }}
       </p>
     </div>
     <label class="flex items-center gap-2"><input
       v-model="form.isDefault"
       type="checkbox"
-    > Đặt làm mặc định</label>
+    > {{ t('address.setDefault') }}</label>
     <div class="flex justify-end gap-2">
       <BaseButton
         variant="outline"
-        label="Hủy"
+        :label="t('common.cancel')"
         @click="$emit('cancel')"
       />
       <BaseButton
         variant="primary"
         type="submit"
-        label="Lưu"
+        :label="t('common.save')"
       />
     </div>
   </form>
@@ -121,9 +121,12 @@
 import { reactive, computed } from 'vue'
 import { getProvinces, getDistricts, getWards } from '@/utils/vn-regions'
 import { useToast } from 'vue-toastification'
+import { useI18n } from 'vue-i18n'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import type { Address } from '@/types'
+
+const { t } = useI18n()
 
 const props = defineProps<{ modelValue?: Partial<Address> }>()
 const emit = defineEmits<{ submit: [data: any]; cancel: [] }>()
@@ -147,11 +150,11 @@ const wards = computed(() => (form.provinceCode && form.districtCode) ? getWards
 const onProvinceChange = () => { form.districtCode = ''; form.wardCode = '' }
 const onDistrictChange = () => { form.wardCode = '' }
 
-const notifyDev = () => toast.info('Tính năng định vị tự động đang được phát triển')
+const notifyDev = () => toast.info(t('address.locatingDev'))
 
 const onSubmit = () => {
-  if (!form.provinceCode || !form.districtCode || !form.wardCode) { toast.error('Vui lòng chọn đủ Tỉnh/Quận/Phường'); return }
-  if (!form.recipientName || !form.recipientPhone) { toast.error('Vui lòng nhập tên và SĐT người nhận'); return }
+  if (!form.provinceCode || !form.districtCode || !form.wardCode) { toast.error(t('address.selectRequired')); return }
+  if (!form.recipientName || !form.recipientPhone) { toast.error(t('address.recipientRequired')); return }
   emit('submit', { ...form })
 }
 </script>

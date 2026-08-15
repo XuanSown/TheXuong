@@ -17,19 +17,19 @@
           class="font-geist text-[12px] uppercase tracking-[1.8px] text-white/60 mb-6 hero-anim hero-fade"
           style="animation-delay:.1s"
         >
-          CHÍNH SÁCH
+          {{ t('returnsPolicy.heroEyebrow') }}
         </p>
         <h1 class="font-geist font-bold text-white leading-[0.95] mb-6">
           <span
             class="block text-5xl sm:text-7xl md:text-8xl hero-anim hero-reveal"
             style="letter-spacing:-1.28px;animation-delay:.25s"
-          >ĐỔI TRẢ</span>
+          >{{ t('returnsPolicy.heroTitle') }}</span>
         </h1>
         <p
           class="font-geist text-base sm:text-lg text-white/70 leading-[29px] max-w-[640px] mx-auto hero-anim hero-fade"
           style="animation-delay:.5s"
         >
-          Cam kết đổi trả minh bạch, nhanh chóng — quyền lợi khách hàng luôn được đặt lên hàng đầu.
+          {{ t('returnsPolicy.heroDesc') }}
         </p>
       </div>
       <div
@@ -48,10 +48,10 @@
           data-reveal
         >
           <p class="font-geist text-[12px] uppercase tracking-[1.8px] text-[#5E5F5C] mb-4">
-            TỔNG QUAN
+            {{ t('returnsPolicy.overviewEyebrow') }}
           </p>
           <h2 class="font-geist text-[40px] sm:text-[56px] md:text-[64px] leading-[70px] tracking-[-1.28px] uppercase text-[#1A1C1C]">
-            Chính sách đổi trả
+            {{ t('returnsPolicy.overviewTitle') }}
           </h2>
         </div>
         <div
@@ -60,15 +60,27 @@
         >
           <div class="liquid-glass relative rounded-2xl border border-white/60 bg-white/50 p-8 md:p-10 shadow-[0_8px_32px_rgba(26,28,28,0.12)]">
             <span class="glass-sheen pointer-events-none" />
-            <p class="font-geist text-base text-[#1A1C1C] leading-[29px] mb-5">
-              THE XUONG SPORT hỗ trợ đổi trả trong vòng <strong>7 ngày</strong> kể từ ngày nhận hàng đối với sản phẩm còn nguyên tem mác, chưa qua sử dụng.
-            </p>
+            <i18n-t
+              keypath="returnsPolicy.overviewP1"
+              tag="p"
+              class="font-geist text-base text-[#1A1C1C] leading-[29px] mb-5"
+            >
+              <template #days>
+                <strong>{{ t('returnsPolicy.overviewDays') }}</strong>
+              </template>
+            </i18n-t>
             <p class="font-geist text-base text-[#5E5F5C] leading-[29px] mb-5">
-              Sản phẩm đổi trả phải còn đầy đủ bao bì, phụ kiện đi kèm và hóa đơn mua hàng. Phí vận chuyển đổi trả do khách hàng chi trả trừ trường hợp lỗi từ nhà sản xuất.
+              {{ t('returnsPolicy.overviewP2') }}
             </p>
-            <p class="font-geist text-base text-[#5E5F5C] leading-[29px]">
-              Hoàn tiền được xử lý trong vòng <strong>3-5 ngày làm việc</strong> sau khi sản phẩm đổi trả được kiểm tra và xác nhận.
-            </p>
+            <i18n-t
+              keypath="returnsPolicy.overviewP3"
+              tag="p"
+              class="font-geist text-base text-[#5E5F5C] leading-[29px]"
+            >
+              <template #days>
+                <strong>{{ t('returnsPolicy.overviewRefundDays') }}</strong>
+              </template>
+            </i18n-t>
           </div>
         </div>
       </div>
@@ -84,10 +96,10 @@
         data-reveal
       >
         <p class="font-geist text-[12px] uppercase tracking-[1.8px] text-[#5E5F5C] mb-4">
-          QUY TRÌNH
+          {{ t('returnsPolicy.processEyebrow') }}
         </p>
         <h2 class="font-geist text-[40px] sm:text-[56px] md:text-[64px] leading-[70px] tracking-[-1.28px] uppercase text-[#1A1C1C]">
-          Các bước đổi trả
+          {{ t('returnsPolicy.processTitle') }}
         </h2>
       </div>
       <div class="relative">
@@ -122,10 +134,10 @@
         data-reveal
       >
         <p class="font-geist text-[12px] uppercase tracking-[1.8px] text-[#5E5F5C] mb-4">
-          ĐIỀU KIỆN
+          {{ t('returnsPolicy.conditionsEyebrow') }}
         </p>
         <h2 class="font-geist text-[40px] sm:text-[56px] md:text-[64px] leading-[70px] tracking-[-1.28px] uppercase text-[#1A1C1C]">
-          Điều kiện đổi trả
+          {{ t('returnsPolicy.conditionsTitle') }}
         </h2>
       </div>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -158,10 +170,10 @@
           data-reveal
         >
           <p class="font-geist text-[12px] uppercase tracking-[1.8px] text-white/60 mb-4">
-            LƯU Ý
+            {{ t('returnsPolicy.exclusionsEyebrow') }}
           </p>
           <h2 class="font-geist text-[40px] sm:text-[56px] md:text-[64px] leading-[70px] tracking-[-1.28px] text-white">
-            Trường hợp không hỗ trợ
+            {{ t('returnsPolicy.exclusionsTitle') }}
           </h2>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -190,10 +202,10 @@
         data-reveal
       >
         <p class="font-geist text-[12px] uppercase tracking-[1.8px] text-[#5E5F5C] mb-4">
-          HOÀN TIỀN
+          {{ t('returnsPolicy.refundEyebrow') }}
         </p>
         <h2 class="font-geist text-[40px] sm:text-[56px] md:text-[64px] leading-[70px] tracking-[-1.28px] uppercase text-[#1A1C1C]">
-          Thời gian hoàn tiền
+          {{ t('returnsPolicy.refundTitle') }}
         </h2>
       </div>
       <div
@@ -206,10 +218,10 @@
             <thead>
               <tr class="border-b border-[#CFC4C6]">
                 <th class="font-geist text-[13px] uppercase tracking-[1.2px] text-[#5E5F5C] py-4 px-3 text-left">
-                  Phương thức thanh toán
+                  {{ t('returnsPolicy.refundThMethod') }}
                 </th>
                 <th class="font-geist text-[13px] uppercase tracking-[1.2px] text-[#5E5F5C] py-4 px-3 text-left">
-                  Thời gian hoàn tiền
+                  {{ t('returnsPolicy.refundThTime') }}
                 </th>
               </tr>
             </thead>
@@ -240,23 +252,23 @@
         data-reveal
       >
         <h2 class="font-geist text-[40px] sm:text-[56px] md:text-[64px] leading-[70px] tracking-[-1.28px] text-white mb-8">
-          Cần hỗ trợ đổi trả?
+          {{ t('returnsPolicy.ctaTitle') }}
         </h2>
         <p class="font-geist text-base text-white/70 leading-[29px] mb-10 max-w-[560px] mx-auto">
-          Đội ngũ chăm sóc khách hàng sẵn sàng hỗ trợ bạn 24/7.
+          {{ t('returnsPolicy.ctaDesc') }}
         </p>
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
           <router-link
             to="/contact"
             class="liquid-btn px-10 py-5 bg-white/10 text-white text-[12px] font-semibold uppercase tracking-[1.8px] leading-[12px] rounded-full hover:bg-white/20 transition-colors"
           >
-            LIÊN HỆ NGAY
+            {{ t('returnsPolicy.ctaContact') }}
           </router-link>
           <router-link
             to="/orders"
             class="liquid-btn px-10 py-5 bg-white/10 text-white text-[12px] font-semibold uppercase tracking-[1.8px] leading-[12px] rounded-full hover:bg-white/20 transition-colors"
           >
-            XEM ĐƠN HÀNG
+            {{ t('returnsPolicy.ctaViewOrders') }}
           </router-link>
         </div>
       </div>
@@ -265,9 +277,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onUnmounted } from 'vue'
+import { ref, computed, onUnmounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useReveal } from '@/composables/useReveal'
 import { useScrollReveal } from '@/composables/useScrollReveal'
+
+const { t } = useI18n()
 
 const rootRef = ref<HTMLElement | null>(null)
 const heroRef = ref<HTMLElement | null>(null)
@@ -294,87 +309,36 @@ onUnmounted(() => {
   if (glowRaf) cancelAnimationFrame(glowRaf)
 })
 
-const processSteps = [
-  {
-    title: 'Liên hệ hỗ trợ',
-    desc: 'Gửi yêu cầu đổi trả qua trang liên hệ hoặc email với mã đơn hàng và lý do đổi trả.'
-  },
-  {
-    title: 'Đóng gói sản phẩm',
-    desc: 'Đóng gói sản phẩm còn nguyên tem mác, bao bì và phụ kiện đi kèm. Kèm hóa đơn mua hàng.'
-  },
-  {
-    title: 'Gửi hàng đổi trả',
-    desc: 'Gửi hàng về địa chỉ được cung cấp. Giữ lại mã vận đơn để theo dõi.'
-  },
-  {
-    title: 'Kiểm tra & xử lý',
-    desc: 'Sản phẩm được kiểm tra trong 2-3 ngày làm việc. Kết quả sẽ được thông báo qua email.'
-  },
-  {
-    title: 'Hoàn tiền hoặc gửi hàng mới',
-    desc: 'Hoàn tiền về phương thức thanh toán ban đầu hoặc gửi sản phẩm mới theo yêu cầu.'
-  }
-]
+const processSteps = computed(() => [
+  { title: t('returnsPolicy.step1Title'), desc: t('returnsPolicy.step1Desc') },
+  { title: t('returnsPolicy.step2Title'), desc: t('returnsPolicy.step2Desc') },
+  { title: t('returnsPolicy.step3Title'), desc: t('returnsPolicy.step3Desc') },
+  { title: t('returnsPolicy.step4Title'), desc: t('returnsPolicy.step4Desc') },
+  { title: t('returnsPolicy.step5Title'), desc: t('returnsPolicy.step5Desc') }
+])
 
-const conditions = [
-  {
-    icon: '📦',
-    title: 'Còn nguyên bao bì',
-    desc: 'Sản phẩm phải còn đầy đủ bao bì, tem mác và phụ kiện đi kèm.'
-  },
-  {
-    icon: '🏷️',
-    title: 'Chưa qua sử dụng',
-    desc: 'Sản phẩm chưa được sử dụng, giặt ủi hoặc có dấu hiệu đã qua sử dụng.'
-  },
-  {
-    icon: '📅',
-    title: 'Trong 7 ngày',
-    desc: 'Yêu cầu đổi trả phải được gửi trong vòng 7 ngày kể từ ngày nhận hàng.'
-  },
-  {
-    icon: '🧾',
-    title: 'Có hóa đơn',
-    desc: 'Cung cấp hóa đơn mua hàng hoặc mã đơn hàng để xác minh giao dịch.'
-  },
-  {
-    icon: '✅',
-    title: 'Đúng sản phẩm',
-    desc: 'Sản phẩm đổi trả phải đúng với sản phẩm đã mua trên đơn hàng.'
-  },
-  {
-    icon: '🔍',
-    title: 'Qua kiểm tra',
-    desc: 'Sản phẩm phải qua kiểm tra chất lượng trước khi được chấp nhận đổi trả.'
-  }
-]
+const conditions = computed(() => [
+  { icon: '📦', title: t('returnsPolicy.condition1Title'), desc: t('returnsPolicy.condition1Desc') },
+  { icon: '🏷️', title: t('returnsPolicy.condition2Title'), desc: t('returnsPolicy.condition2Desc') },
+  { icon: '📅', title: t('returnsPolicy.condition3Title'), desc: t('returnsPolicy.condition3Desc') },
+  { icon: '🧾', title: t('returnsPolicy.condition4Title'), desc: t('returnsPolicy.condition4Desc') },
+  { icon: '✅', title: t('returnsPolicy.condition5Title'), desc: t('returnsPolicy.condition5Desc') },
+  { icon: '🔍', title: t('returnsPolicy.condition6Title'), desc: t('returnsPolicy.condition6Desc') }
+])
 
-const exclusions = [
-  {
-    title: 'Sản phẩm đã qua sử dụng',
-    desc: 'Sản phẩm có dấu hiệu đã mặc, giặt ủi, hoặc sử dụng không được hỗ trợ đổi trả.'
-  },
-  {
-    title: 'Hết thời hạn đổi trả',
-    desc: 'Yêu cầu đổi trả sau 7 ngày kể từ ngày nhận hàng sẽ không được xử lý.'
-  },
-  {
-    title: 'Sản phẩm khuyến mãi',
-    desc: 'Một số sản phẩm trong chương trình khuyến mãi đặc biệt có thể không áp dụng đổi trả.'
-  },
-  {
-    title: 'Thiếu phụ kiện hoặc bao bì',
-    desc: 'Sản phẩm thiếu tem mác, bao bì gốc hoặc phụ kiện đi kèm không được chấp nhận.'
-  }
-]
+const exclusions = computed(() => [
+  { title: t('returnsPolicy.exclusion1Title'), desc: t('returnsPolicy.exclusion1Desc') },
+  { title: t('returnsPolicy.exclusion2Title'), desc: t('returnsPolicy.exclusion2Desc') },
+  { title: t('returnsPolicy.exclusion3Title'), desc: t('returnsPolicy.exclusion3Desc') },
+  { title: t('returnsPolicy.exclusion4Title'), desc: t('returnsPolicy.exclusion4Desc') }
+])
 
-const refundTimeline = [
-  { method: 'Thẻ tín dụng / Ghi nợ', duration: '3-5 ngày làm việc' },
-  { method: 'Chuyển khoản ngân hàng', duration: '2-3 ngày làm việc' },
-  { method: 'Ví điện tử (MoMo, ZaloPay)', duration: '1-2 ngày làm việc' },
-  { method: 'Thanh toán khi nhận hàng (COD)', duration: '5-7 ngày làm việc' }
-]
+const refundTimeline = computed(() => [
+  { method: t('returnsPolicy.refundRow1Method'), duration: t('returnsPolicy.refundRow1Time') },
+  { method: t('returnsPolicy.refundRow2Method'), duration: t('returnsPolicy.refundRow2Time') },
+  { method: t('returnsPolicy.refundRow3Method'), duration: t('returnsPolicy.refundRow3Time') },
+  { method: t('returnsPolicy.refundRow4Method'), duration: t('returnsPolicy.refundRow4Time') }
+])
 </script>
 
 <style scoped>

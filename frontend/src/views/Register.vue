@@ -7,7 +7,7 @@
             <div class="w-[82px] h-[75px] bg-[url('@/assets/logo.png')] bg-contain bg-no-repeat bg-center" />
             <div class="mt-1 flex flex-col items-center">
               <p class="font-geist text-base text-[#4C4546] leading-[26px]">
-                Tạo tài khoản thành viên mới
+                {{ t('auth.createAccountTitle') }}
               </p>
             </div>
           </div>
@@ -19,7 +19,7 @@
             <BaseInput
               v-model="fullName"
               type="text"
-              placeholder="Họ và tên"
+              :placeholder="t('auth.fullNamePlaceholder')"
               :error="fullNameError"
             >
               <template #prefix>
@@ -45,7 +45,7 @@
             <BaseInput
               v-model="email"
               type="email"
-              placeholder="Email của bạn"
+              :placeholder="t('auth.emailPlaceholder')"
               :error="emailError"
             >
               <template #prefix>
@@ -72,7 +72,7 @@
             <BaseInput
               v-model="password"
               type="password"
-              placeholder="Mật khẩu"
+              :placeholder="t('auth.passwordPlaceholder')"
               :error="passwordError"
             >
               <template #prefix>
@@ -99,7 +99,7 @@
             <BaseInput
               v-model="confirmPassword"
               type="password"
-              placeholder="Nhập lại mật khẩu"
+              :placeholder="t('auth.confirmPasswordPlaceholder')"
               :error="confirmPasswordError"
             >
               <template #prefix>
@@ -128,17 +128,17 @@
               full-width
               :loading="isSubmitting"
             >
-              ĐĂNG KÝ NGAY
+              {{ t('auth.registerNowCta') }}
             </BaseButton>
           </form>
 
           <div class="flex justify-center items-center gap-2">
-            <span class="font-gelasio text-base text-[#4C4546]">Đã có tài khoản?</span>
+            <span class="font-gelasio text-base text-[#4C4546]">{{ t('auth.alreadyHaveAccount') }}</span>
             <router-link
               to="/login"
               class="font-gelasio text-base font-bold text-black hover:underline"
             >
-              Đăng nhập ngay
+              {{ t('auth.loginNow') }}
             </router-link>
           </div>
         </div>
@@ -153,9 +153,13 @@ import { useAuthStore } from '@/stores/auth.store'
 import { useForm, useField } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import { registerSchema } from '@/utils/validators'
+import { getApiErrorMessage } from '@/utils/apiError'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import { useToast } from 'vue-toastification'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -182,7 +186,7 @@ const onSubmit = handleSubmit(async (values) => {
     router.push({ name: 'login', query: { registered: 'success' } })
   } catch (error: any) {
     console.error('Registration failed:', error)
-    toast.error(error.response?.data?.message || 'Đăng ký thất bại. Email có thể đã tồn tại!')
+    toast.error(getApiErrorMessage(error, 'auth.registerFailedEmailExists'))
   }
 })
 </script>

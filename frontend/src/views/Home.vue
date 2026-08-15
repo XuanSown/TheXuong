@@ -10,7 +10,7 @@
             THE XUONG SPORT
           </h1>
           <p class="font-gelasio text-lg text-[#5E5F5C] leading-[29px] max-w-[672px] mx-auto">
-            Nâng tầm trải nghiệm sản phẩm thể thao
+            {{ t('home.tagline') }}
           </p>
         </div>
 
@@ -20,13 +20,13 @@
             to="/products"
             class="px-10 py-5 bg-black text-white text-[12px] font-semibold uppercase tracking-[1.8px] leading-[12px] rounded-sm hover:bg-gray-900 transition-colors"
           >
-            KHÁM PHÁ NGAY
+            {{ t('home.exploreNow') }}
           </router-link>
           <router-link
             to="/about"
             class="px-10 py-5 border border-black text-black text-[12px] font-semibold uppercase tracking-[1.8px] leading-[12px] rounded-sm hover:bg-black hover:text-white transition-colors"
           >
-            VỀ CHÚNG TÔI
+            {{ t('home.aboutUs') }}
           </router-link>
         </div>
 
@@ -83,13 +83,12 @@
           <h3
             class="absolute left-[49px] right-[49px] top-[219.83px] font-gelasio text-[32px] leading-[38px] text-[#1A1C1C] tracking-[-0.32px]"
           >
-            CÔNG NGHỆ VƯỢT TRỘI
+            {{ t('home.superiorTech') }}
           </h3>
           <p
             class="absolute left-[49px] right-[263px] bottom-[49px] max-w-[448px] font-gelasio text-base text-[#5E5F5C] leading-[26px]"
           >
-            Tất cả sản phẩm tại TheXuong đều được tuyển chọn kỹ lưỡng, đảm bảo tích hợp những công nghệ hỗ trợ vận động
-            tiên tiến nhất hiện nay.
+            {{ t('home.superiorTechDesc') }}
           </p>
         </div>
 
@@ -117,11 +116,11 @@
           </svg>
           <div class="flex flex-col gap-4">
             <h3 class="font-gelasio text-[28px] leading-[34px] text-white tracking-[-0.32px] whitespace-nowrap">
-              CAM KẾT CHÍNH HÃNG
+              {{ t('home.authenticGuarantee') }}
             </h3>
             <div class="relative w-[261.59px] min-h-[107.39px] h-auto bg-[#0E0E0E] p-6">
               <p class="font-gelasio text-base text-[rgba(255,255,255,0.6)] leading-[26px]">
-                Chúng tôi cam kết 100% sản phẩm là hàng chính hãng, phát hiện hàng giả đền bù gấp 10 lần.
+                {{ t('home.authenticDesc') }}
               </p>
             </div>
           </div>
@@ -150,10 +149,10 @@
             <path d="M8 15h8" />
           </svg>
           <h3 class="font-gelasio text-[32px] leading-[38px] text-[#1A1C1C] tracking-[-0.32px] mb-4">
-            UY TÍN
+            {{ t('home.reputation') }}
           </h3>
           <p class="font-gelasio text-base text-black leading-[26px] max-w-[270px]">
-            THEXUONG tự tin với chất lượng sản phẩm.
+            {{ t('home.reputationDesc') }}
           </p>
         </div>
 
@@ -164,10 +163,10 @@
           <div class="absolute inset-0 bg-white/60" />
           <div class="absolute bottom-0 left-0 right-0 p-12">
             <h3 class="font-gelasio text-[32px] leading-[38px] text-[#1A1C1C] tracking-[-0.32px] mb-4">
-              CHĂM SÓC
+              {{ t('home.care') }}
             </h3>
             <p class="font-gelasio text-base text-black leading-[26px] max-w-[384px]">
-              THEXUONG luôn luôn hỗ trợ khi khách hàng cần chúng tôi.
+              {{ t('home.careDesc') }}
             </p>
           </div>
         </div>
@@ -177,10 +176,10 @@
       <section class="w-[1121px] mx-auto mb-[30px]">
         <div class="text-center mb-16">
           <p class="font-gelasio text-[12px] uppercase tracking-[1.8px] text-[#5E5F5C] mb-4">
-            BẢN SẮC THỂ THAO
+            {{ t('home.sportIdentity') }}
           </p>
           <h2 class="font-geist text-[64px] leading-[77px] text-[#1A1C1C] tracking-[-1.28px] uppercase">
-            SẢN PHẨM MỚI
+            {{ t('home.newProducts') }}
           </h2>
         </div>
 
@@ -232,7 +231,7 @@
             class="flex justify-center items-center h-full py-12"
           >
             <p class="text-gray-500 font-gelasio">
-              Chưa có sản phẩm mới nào.
+              {{ t('home.noNewProducts') }}
             </p>
           </div>
 
@@ -242,7 +241,7 @@
               to="/products"
               class="px-10 py-3 bg-black text-white text-[12px] font-semibold uppercase tracking-[1.8px] leading-[12px] rounded-sm hover:bg-gray-900 transition-colors"
             >
-              XEM TẤT CẢ
+              {{ t('home.viewAll') }}
             </router-link>
           </div>
         </div>
@@ -258,6 +257,9 @@ import ProductCard from '@/components/ui/ProductCard.vue'
 import BaseSkeleton from '@/components/ui/BaseSkeleton.vue'
 import { productService } from '@/services/product.service'
 import type { Product } from '@/types'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const newProducts = ref<Product[]>([])
 const isLoading = ref(true)

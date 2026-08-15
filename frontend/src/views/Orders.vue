@@ -22,7 +22,7 @@
                   fill="none"
                 />
               </svg>
-              <span class="font-gelasio text-base">Quay lại trang chủ</span>
+              <span class="font-gelasio text-base">{{ t('checkout.backToHome') }}</span>
             </router-link>
           </div>
 
@@ -40,7 +40,7 @@
               />
             </svg>
             <h1 class="font-geist text-[20px] leading-[30px] text-black">
-              LỊCH SỬ ĐƠN HÀNG
+              {{ t('orders.title') }}
             </h1>
           </div>
         </header>
@@ -69,30 +69,24 @@
           <!-- Table Header -->
           <div class="flex border-b border-[#CFC4C5] bg-[#F3F3F3]">
             <div class="w-[143.36px] h-[44px] flex items-center px-8">
-              <span class="font-geist text-[12px] font-semibold leading-[12px] tracking-[1.8px] text-[#5E5F5C]">MÃ
-                ĐH</span>
+              <span class="font-geist text-[12px] font-semibold leading-[12px] tracking-[1.8px] text-[#5E5F5C]">{{ t('orders.orderCode') }}</span>
             </div>
             <div class="w-[173.5px] h-[44px] flex items-center px-6">
-              <span class="font-geist text-[12px] font-semibold leading-[12px] tracking-[1.8px] text-[#5E5F5C]">NGÀY
-                ĐẶT</span>
+              <span class="font-geist text-[12px] font-semibold leading-[12px] tracking-[1.8px] text-[#5E5F5C]">{{ t('orders.orderDate') }}</span>
             </div>
             <div class="w-[317.3px] h-[44px] flex items-center px-6">
-              <span class="font-geist text-[12px] font-semibold leading-[12px] tracking-[1.8px] text-[#5E5F5C]">ĐỊA CHỈ
-                NHẬN HÀNG</span>
+              <span class="font-geist text-[12px] font-semibold leading-[12px] tracking-[1.8px] text-[#5E5F5C]">{{ t('orders.shippingAddress') }}</span>
             </div>
             <div class="w-[186.61px] h-[44px] flex items-center px-6">
-              <span class="font-geist text-[12px] font-semibold leading-[12px] tracking-[1.8px] text-[#5E5F5C]">TỔNG
-                TIỀN</span>
+              <span class="font-geist text-[12px] font-semibold leading-[12px] tracking-[1.8px] text-[#5E5F5C]">{{ t('orders.total') }}</span>
             </div>
             <div class="w-[194.73px] h-[44px] flex items-center px-6">
-              <span class="font-geist text-[12px] font-semibold leading-[12px] tracking-[1.8px] text-[#5E5F5C]">TRẠNG
-                THÁI</span>
+              <span class="font-geist text-[12px] font-semibold leading-[12px] tracking-[1.8px] text-[#5E5F5C]">{{ t('orders.status') }}</span>
             </div>
             <div class="w-[183.5px] h-[44px] flex items-center justify-end px-8">
               <span
                 class="font-geist text-[12px] font-semibold leading-[12px] tracking-[1.8px] text-[#5E5F5C] text-right"
-              >CHI
-                TIẾT</span>
+              >{{ t('orders.detail') }}</span>
             </div>
           </div>
 
@@ -116,7 +110,7 @@
               class="px-6 py-2 bg-black text-white text-sm rounded hover:bg-gray-900"
               @click="orderStore.fetchOrders()"
             >
-              Thử lại
+              {{ t('orders.retry') }}
             </button>
           </div>
 
@@ -126,13 +120,13 @@
             class="flex flex-col items-center justify-center py-16"
           >
             <p class="font-gelasio text-lg text-[#5E5F5C] mb-4">
-              Bạn chưa có đơn hàng nào
+              {{ t('orders.empty') }}
             </p>
             <router-link
               to="/products"
               class="px-6 py-2 bg-black text-white text-sm rounded hover:bg-gray-900"
             >
-              Mua sắm ngay
+              {{ t('orders.shopNow') }}
             </router-link>
           </div>
 
@@ -194,7 +188,7 @@
                   >
                     <path d="M5 12h14M12 5l7 7-7 7" />
                   </svg>
-                  <span class="font-geist text-[11px]">Xem</span>
+                  <span class="font-geist text-[11px]">{{ t('orders.view') }}</span>
                 </button>
               </div>
             </div>
@@ -206,7 +200,7 @@
           <button
             class="font-gelasio text-[12px] font-semibold leading-[12px] tracking-[1.8px] text-[#5E5F5C] hover:text-black transition-colors"
           >
-            Xem tất cả lịch sử
+            {{ t('orders.viewAll') }}
           </button>
         </div>
       </div>
@@ -221,21 +215,25 @@ import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.store'
 import { useOrderStore } from '@/stores/order.store'
+import { useI18n } from 'vue-i18n'
+import { formatCurrency, formatDate } from '@/utils/formatters'
 
 import type { OrderStatus } from '@/types'
+
+const { t } = useI18n()
 
 const router = useRouter()
 const authStore = useAuthStore()
 const orderStore = useOrderStore()
 
-const tabs = [
-  { label: 'Tất cả', value: 'ALL' },
-  { label: 'Chờ xử lý', value: 'PENDING' },
-  { label: 'Đang vận chuyển', value: 'SHIPPING' },
-  { label: 'Đã giao', value: 'DELIVERED' },
-  { label: 'Hoàn thành', value: 'COMPLETED' },
-  { label: 'Đã hủy', value: 'CANCELLED' }
-]
+const tabs = computed(() => [
+  { label: t('orders.tabAll'), value: 'ALL' },
+  { label: t('orders.tabPending'), value: 'PENDING' },
+  { label: t('orders.tabShipping'), value: 'SHIPPING' },
+  { label: t('orders.tabDelivered'), value: 'DELIVERED' },
+  { label: t('orders.tabCompleted'), value: 'COMPLETED' },
+  { label: t('orders.tabCancelled'), value: 'CANCELLED' }
+])
 const activeTab = ref('ALL')
 
 onMounted(async () => {
@@ -268,30 +266,21 @@ const getStatusBadgeClass = (status: OrderStatus | string) => {
 }
 
 const getStatusLabel = (status: OrderStatus | string) => {
-  switch (status) {
-    case 'PENDING': return 'ĐANG XỬ LÝ'
-    case 'CONFIRMED': return 'ĐÃ XÁC NHẬN'
-    case 'CANCEL_REQUESTED': return 'YÊU CẦU HỦY'
-    case 'SHIPPING': return 'ĐANG VẬN CHUYỂN'
-    case 'DELIVERED': return 'ĐÃ GIAO'
-    case 'COMPLETED': return 'HOÀN THÀNH'
-    case 'CANCELLED': return 'ĐÃ HỦY'
-    case 'REFUNDED': return 'ĐÃ HOÀN TIỀN'
-    default: return status.toUpperCase()
+  const keyMap: Record<string, string> = {
+    PENDING: 'orderStatus.pending',
+    CONFIRMED: 'orderStatus.confirmed',
+    CANCEL_REQUESTED: 'orderStatus.cancelRequested',
+    SHIPPING: 'orderStatus.shipping',
+    DELIVERED: 'orderStatus.delivered',
+    COMPLETED: 'orderStatus.completed',
+    CANCELLED: 'orderStatus.cancelled',
+    REFUNDED: 'orderStatus.refunded'
   }
-}
-
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString)
-  return date.toLocaleDateString('vi-VN', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric'
-  })
+  return keyMap[status] ? t(keyMap[status]) : status.toUpperCase()
 }
 
 const formatPrice = (price: number) => {
-  return new Intl.NumberFormat('vi-VN').format(price) + ' đ'
+  return formatCurrency(price)
 }
 
 const viewOrderDetail = (orderId: number) => {

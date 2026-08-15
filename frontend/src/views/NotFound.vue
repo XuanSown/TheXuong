@@ -6,10 +6,10 @@
       </h1>
       <div class="mt-4">
         <p class="font-gelasio text-2xl text-[#5E5F5C] mb-2">
-          Trang không tìm thấy
+          {{ t('notFound.title') }}
         </p>
         <p class="font-gelasio text-base text-[#5E5F5C] mb-8">
-          Trang bạn đang tìm kiếm không tồn tại hoặc đã bị di chuyển.
+          {{ t('notFound.desc') }}
         </p>
       </div>
       <router-link
@@ -23,14 +23,16 @@
         >
           <path d="M8 1L1 7l7 6 7-6-7-7zM8 8L1 14l7-6 7 6-7-6z" />
         </svg>
-        Về trang chủ
+        {{ t('notFound.backHome') }}
       </router-link>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-// Not Found Page
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 </script>
 
 <style scoped>

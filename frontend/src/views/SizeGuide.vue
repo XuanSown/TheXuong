@@ -17,29 +17,29 @@
           class="font-geist text-[12px] uppercase tracking-[1.8px] text-white/60 mb-6 hero-anim hero-fade"
           style="animation-delay:.1s"
         >
-          HƯỚNG DẪN
+          {{ t('sizeGuide.heroEyebrow') }}
         </p>
         <h1 class="font-geist font-bold text-white leading-[0.95] mb-6">
           <span
             class="block text-5xl sm:text-7xl md:text-8xl hero-anim hero-reveal"
             style="letter-spacing:-1.28px;animation-delay:.25s"
-          >CHỌN SIZE</span>
+          >{{ t('sizeGuide.heroTitle1') }}</span>
           <span
             class="block text-4xl sm:text-5xl md:text-6xl -mt-1 hero-anim hero-reveal text-white/80"
             style="letter-spacing:-0.64px;animation-delay:.42s"
-          >CHUẨN XÁC</span>
+          >{{ t('sizeGuide.heroTitle2') }}</span>
         </h1>
         <p
           class="font-geist text-base sm:text-lg text-white/70 leading-[29px] max-w-[640px] mx-auto mb-10 hero-anim hero-fade"
           style="animation-delay:.6s"
         >
-          Hướng dẫn chi tiết cách đo cơ thể và bảng size chuẩn cho từng loại trang phục, giày dép.
+          {{ t('sizeGuide.heroDesc') }}
         </p>
         <a
           href="#measuring-guide"
           class="liquid-btn px-10 py-5 bg-white/10 text-white text-[12px] font-semibold uppercase tracking-[1.8px] leading-[12px] rounded-full hover:bg-white/20 transition-colors hero-anim hero-fade"
           style="animation-delay:.75s"
-        >XEM HƯỚNG DẪN</a>
+        >{{ t('sizeGuide.heroCta') }}</a>
       </div>
       <div
         class="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 hero-anim hero-fade"
@@ -60,13 +60,13 @@
           data-reveal
         >
           <p class="font-geist text-[12px] uppercase tracking-[1.8px] text-[#5E5F5C] mb-4">
-            BƯỚC 1
+            {{ t('sizeGuide.step1Eyebrow') }}
           </p>
           <h2 class="font-geist text-[40px] sm:text-[56px] md:text-[64px] leading-[70px] tracking-[-1.28px] uppercase text-[#1A1C1C]">
-            Đo cơ thể
+            {{ t('sizeGuide.step1Title') }}
           </h2>
           <p class="font-geist text-base text-[#5E5F5C] leading-[29px] mt-6">
-            Sử dụng thước dây mềm để đo các vòng cơ thể. Đảm bảo thước không quá chặt hoặc quá lỏng.
+            {{ t('sizeGuide.step1Desc') }}
           </p>
         </div>
         <div class="space-y-5">
@@ -103,10 +103,10 @@
         data-reveal
       >
         <p class="font-geist text-[12px] uppercase tracking-[1.8px] text-[#5E5F5C] mb-4">
-          BƯỚC 2
+          {{ t('sizeGuide.step2Eyebrow') }}
         </p>
         <h2 class="font-geist text-[40px] sm:text-[56px] md:text-[64px] leading-[70px] tracking-[-1.28px] uppercase text-[#1A1C1C]">
-          Bảng size
+          {{ t('sizeGuide.step2Title') }}
         </h2>
       </div>
 
@@ -170,7 +170,7 @@
           </table>
         </div>
         <p class="font-geist text-xs text-[#5E5F5C] mt-6 italic">
-          * Số liệu có thể chênh lệch 1-2cm tùy theo từng thương hiệu
+          {{ t('sizeGuide.chartNote') }}
         </p>
       </div>
     </section>
@@ -184,10 +184,10 @@
           data-reveal
         >
           <p class="font-geist text-[12px] uppercase tracking-[1.8px] text-white/60 mb-4">
-            LƯU Ý
+            {{ t('sizeGuide.tipsEyebrow') }}
           </p>
           <h2 class="font-geist text-[40px] sm:text-[56px] md:text-[64px] leading-[70px] tracking-[-1.28px] text-white">
-            Mẹo chọn size
+            {{ t('sizeGuide.tipsTitle') }}
           </h2>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -218,23 +218,23 @@
       data-reveal
     >
       <h2 class="font-geist text-[32px] sm:text-[40px] md:text-[48px] leading-[56px] tracking-[-0.96px] text-[#1A1C1C] mb-6">
-        Vẫn chưa chắc chắn về size?
+        {{ t('sizeGuide.ctaTitle') }}
       </h2>
       <p class="font-geist text-base text-[#5E5F5C] leading-[29px] mb-10 max-w-[560px] mx-auto">
-        Đội ngũ hỗ trợ của chúng tôi sẵn sàng tư vấn size phù hợp nhất cho bạn.
+        {{ t('sizeGuide.ctaDesc') }}
       </p>
       <div class="flex flex-col sm:flex-row gap-4 justify-center">
         <router-link
           to="/contact"
           class="liquid-btn px-8 py-4 bg-black text-white text-[12px] font-semibold uppercase tracking-[1.8px] leading-[12px] rounded-full hover:bg-[#1A1C1C] transition-colors border border-black/20"
         >
-          LIÊN HỆ TƯ VẤN
+          {{ t('sizeGuide.ctaContact') }}
         </router-link>
         <router-link
           to="/products"
           class="liquid-btn px-8 py-4 bg-white/50 text-[#1A1C1C] text-[12px] font-semibold uppercase tracking-[1.8px] leading-[12px] rounded-full hover:bg-white/75 transition-colors border border-white/60"
         >
-          XEM SẢN PHẨM
+          {{ t('sizeGuide.ctaProducts') }}
         </router-link>
       </div>
     </section>
@@ -243,7 +243,10 @@
 
 <script setup lang="ts">
 import { ref, computed, onUnmounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useReveal } from '@/composables/useReveal'
+
+const { t } = useI18n()
 
 const rootRef = ref<HTMLElement | null>(null)
 const heroRef = ref<HTMLElement | null>(null)
@@ -268,40 +271,25 @@ onUnmounted(() => {
   if (glowRaf) cancelAnimationFrame(glowRaf)
 })
 
-const measuringSteps = [
-  {
-    title: 'Vòng ngực',
-    desc: 'Đo quanh phần đầy nhất của ngực, giữ thước ngang với mặt đất. Không siết chặt.'
-  },
-  {
-    title: 'Vòng eo',
-    desc: 'Đo quanh phần hẹp nhất của eo, thường nằm trên rốn khoảng 2-3cm.'
-  },
-  {
-    title: 'Vòng hông',
-    desc: 'Đo quanh phần rộng nhất của hông và mông, giữ thước song song với mặt đất.'
-  },
-  {
-    title: 'Chiều cao',
-    desc: 'Đứng thẳng, không mang giày, đo từ đỉnh đầu đến gót chân.'
-  },
-  {
-    title: 'Chiều dài chân',
-    desc: 'Đo từ háng xuống gót chân để chọn size quần phù hợp.'
-  }
-]
+const measuringSteps = computed(() => [
+  { title: t('sizeGuide.measure1Title'), desc: t('sizeGuide.measure1Desc') },
+  { title: t('sizeGuide.measure2Title'), desc: t('sizeGuide.measure2Desc') },
+  { title: t('sizeGuide.measure3Title'), desc: t('sizeGuide.measure3Desc') },
+  { title: t('sizeGuide.measure4Title'), desc: t('sizeGuide.measure4Desc') },
+  { title: t('sizeGuide.measure5Title'), desc: t('sizeGuide.measure5Desc') }
+])
 
-const tabs = [
-  { id: 'tops', label: 'Áo' },
-  { id: 'bottoms', label: 'Quần' },
-  { id: 'shoes', label: 'Giày' }
-]
+const tabs = computed(() => [
+  { id: 'tops', label: t('sizeGuide.tabTops') },
+  { id: 'bottoms', label: t('sizeGuide.tabBottoms') },
+  { id: 'shoes', label: t('sizeGuide.tabShoes') }
+])
 
 const activeTab = ref('tops')
 
-const sizeCharts = {
+const sizeCharts = computed(() => ({
   tops: {
-    columns: ['Size', 'Ngực (cm)', 'Eo (cm)', 'Chiều cao (cm)'],
+    columns: [t('sizeGuide.colSize'), t('sizeGuide.colChest'), t('sizeGuide.colWaist'), t('sizeGuide.colHeight')],
     rows: [
       ['XS', '80-84', '64-68', '160-165'],
       ['S', '85-89', '69-73', '165-170'],
@@ -312,7 +300,7 @@ const sizeCharts = {
     ]
   },
   bottoms: {
-    columns: ['Size', 'Eo (cm)', 'Hông (cm)', 'Dài chân (cm)'],
+    columns: [t('sizeGuide.colSize'), t('sizeGuide.colWaist'), t('sizeGuide.colHip'), t('sizeGuide.colInseam')],
     rows: [
       ['28', '70-72', '88-90', '76-78'],
       ['30', '74-76', '92-94', '78-80'],
@@ -323,7 +311,7 @@ const sizeCharts = {
     ]
   },
   shoes: {
-    columns: ['Size VN', 'Size US', 'Size EU', 'Chiều dài chân (cm)'],
+    columns: [t('sizeGuide.colSizeVN'), t('sizeGuide.colSizeUS'), t('sizeGuide.colSizeEU'), t('sizeGuide.colFootLength')],
     rows: [
       ['39', '7', '39', '24.5'],
       ['40', '8', '40', '25.0'],
@@ -333,42 +321,18 @@ const sizeCharts = {
       ['44', '12', '44', '27.0']
     ]
   }
-}
+}))
 
-const currentChart = computed(() => sizeCharts[activeTab.value as keyof typeof sizeCharts])
+const currentChart = computed(() => sizeCharts.value[activeTab.value as keyof typeof sizeCharts.value])
 
-const tips = [
-  {
-    icon: '📏',
-    title: 'Đo vào buổi sáng',
-    desc: 'Cơ thể có xu hướng nhỏ hơn vào buổi sáng sau khi ngủ dậy.'
-  },
-  {
-    icon: '👕',
-    title: 'Mặc đồ mỏng khi đo',
-    desc: 'Đo trên lớp quần áo mỏng để có số liệu chính xác nhất.'
-  },
-  {
-    icon: '📐',
-    title: 'Giữ thước song song',
-    desc: 'Đảm bảo thước đo luôn song song với mặt đất khi đo vòng.'
-  },
-  {
-    icon: '🤔',
-    title: 'Ở giữa 2 size?',
-    desc: 'Nếu số đo nằm giữa 2 size, hãy chọn size lớn hơn để thoải mái.'
-  },
-  {
-    icon: '👟',
-    title: 'Đo cả 2 chân',
-    desc: 'Chân trái và phải có thể khác nhau, hãy dùng số đo của chân lớn hơn.'
-  },
-  {
-    icon: '📞',
-    title: 'Cần hỗ trợ?',
-    desc: 'Liên hệ với chúng tôi để được tư vấn size chính xác cho từng thương hiệu.'
-  }
-]
+const tips = computed(() => [
+  { icon: '📏', title: t('sizeGuide.tip1Title'), desc: t('sizeGuide.tip1Desc') },
+  { icon: '👕', title: t('sizeGuide.tip2Title'), desc: t('sizeGuide.tip2Desc') },
+  { icon: '📐', title: t('sizeGuide.tip3Title'), desc: t('sizeGuide.tip3Desc') },
+  { icon: '🤔', title: t('sizeGuide.tip4Title'), desc: t('sizeGuide.tip4Desc') },
+  { icon: '👟', title: t('sizeGuide.tip5Title'), desc: t('sizeGuide.tip5Desc') },
+  { icon: '📞', title: t('sizeGuide.tip6Title'), desc: t('sizeGuide.tip6Desc') }
+])
 </script>
 
 <style scoped>

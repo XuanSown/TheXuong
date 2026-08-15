@@ -12,7 +12,7 @@
         <!-- Chat Button (Draggable) -->
         <div
           class="cursor-pointer flex items-center justify-center w-[60px] h-[60px] rounded-full bg-[#0088cc] hover:bg-[#0077b5] shadow-lg hover:shadow-xl transition-colors duration-200 group relative"
-          title="Chat với tư vấn viên"
+          :title="t('chat.chatWithAdvisor')"
           @click="handleClick"
         >
           <!-- Telegram SVG Icon -->
@@ -28,8 +28,8 @@
         <!-- Close / Hide Button -->
         <button
           class="absolute -top-1 -right-1 w-5 h-5 bg-gray-500 hover:bg-gray-600 text-white rounded-full flex items-center justify-center text-xs leading-none shadow transition-colors z-10"
-          aria-label="Ẩn nút chat"
-          title="Ẩn"
+          :aria-label="t('chat.hideButton')"
+          :title="t('chat.hide')"
           @click.stop="hide"
         >
           ×
@@ -37,7 +37,7 @@
 
         <!-- Tooltip -->
         <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-gray-800 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg">
-          Chat tư vấn
+          {{ t('chat.tooltip') }}
           <div class="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-gray-800" />
         </div>
       </div>
@@ -49,8 +49,8 @@
         v-show="!visible && hasPosition"
         class="fixed z-[9999] flex items-center justify-center w-10 h-10 rounded-full bg-[#0088cc] hover:bg-[#0077b5] shadow-md hover:shadow-lg transition-colors duration-200 snap-transition"
         :style="{ left: (position.x + 10) + 'px', top: (position.y + 10) + 'px' }"
-        aria-label="Hiện nút chat Telegram"
-        title="Chat với tư vấn viên"
+        :aria-label="t('chat.showButton')"
+        :title="t('chat.chatWithAdvisor')"
         @click="show"
       >
         <svg
@@ -67,7 +67,9 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const STORAGE_KEY = 'telegram-chat-btn-state'
 
 const visible = ref(true)

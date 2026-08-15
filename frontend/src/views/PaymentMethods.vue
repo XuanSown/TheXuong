@@ -17,19 +17,19 @@
           class="font-geist text-[12px] uppercase tracking-[1.8px] text-white/60 mb-6 hero-anim hero-fade"
           style="animation-delay:.1s"
         >
-          THANH TOÁN
+          {{ t('paymentMethodsPage.heroEyebrow') }}
         </p>
         <h1 class="font-geist font-bold text-white leading-[0.95] mb-6">
           <span
             class="block text-5xl sm:text-7xl md:text-8xl hero-anim hero-reveal"
             style="letter-spacing:-1.28px;animation-delay:.25s"
-          >PHƯƠNG THỨC</span>
+          >{{ t('paymentMethodsPage.heroTitle') }}</span>
         </h1>
         <p
           class="font-geist text-base sm:text-lg text-white/70 leading-[29px] max-w-[640px] mx-auto hero-anim hero-fade"
           style="animation-delay:.5s"
         >
-          Đa dạng phương thức thanh toán — an toàn, nhanh chóng và tiện lợi cho mọi đơn hàng.
+          {{ t('paymentMethodsPage.heroDesc') }}
         </p>
       </div>
       <div
@@ -48,10 +48,10 @@
           data-reveal
         >
           <p class="font-geist text-[12px] uppercase tracking-[1.8px] text-[#5E5F5C] mb-4">
-            TỔNG QUAN
+            {{ t('paymentMethodsPage.overviewEyebrow') }}
           </p>
           <h2 class="font-geist text-[40px] sm:text-[56px] md:text-[64px] leading-[70px] tracking-[-1.28px] uppercase text-[#1A1C1C]">
-            Thanh toán dễ dàng
+            {{ t('paymentMethodsPage.overviewTitle') }}
           </h2>
         </div>
         <div
@@ -61,13 +61,13 @@
           <div class="liquid-glass relative rounded-2xl border border-white/60 bg-white/50 p-8 md:p-10 shadow-[0_8px_32px_rgba(26,28,28,0.12)]">
             <span class="glass-sheen pointer-events-none" />
             <p class="font-geist text-base text-[#1A1C1C] leading-[29px] mb-5">
-              THE XUONG SPORT hỗ trợ nhiều phương thức thanh toán phổ biến, giúp bạn dễ dàng hoàn tất đơn hàng một cách nhanh chóng và an toàn.
+              {{ t('paymentMethodsPage.overviewP1') }}
             </p>
             <p class="font-geist text-base text-[#5E5F5C] leading-[29px] mb-5">
-              Tất cả giao dịch đều được mã hóa SSL/TLS và xử lý qua các cổng thanh toán uy tín, đạt chuẩn bảo mật quốc tế PCI DSS.
+              {{ t('paymentMethodsPage.overviewP2') }}
             </p>
             <p class="font-geist text-base text-[#5E5F5C] leading-[29px]">
-              Mọi thắc mắc về thanh toán, vui lòng liên hệ đội ngũ hỗ trợ để được giải đáp nhanh nhất.
+              {{ t('paymentMethodsPage.overviewP3') }}
             </p>
           </div>
         </div>
@@ -84,10 +84,10 @@
         data-reveal
       >
         <p class="font-geist text-[12px] uppercase tracking-[1.8px] text-[#5E5F5C] mb-4">
-          PHƯƠNG THỨC
+          {{ t('paymentMethodsPage.methodsEyebrow') }}
         </p>
         <h2 class="font-geist text-[40px] sm:text-[56px] md:text-[64px] leading-[70px] tracking-[-1.28px] uppercase text-[#1A1C1C]">
-          Các hình thức thanh toán
+          {{ t('paymentMethodsPage.methodsTitle') }}
         </h2>
       </div>
       <div class="relative">
@@ -129,10 +129,10 @@
         data-reveal
       >
         <p class="font-geist text-[12px] uppercase tracking-[1.8px] text-[#5E5F5C] mb-4">
-          ƯU ĐIỂM
+          {{ t('paymentMethodsPage.featuresEyebrow') }}
         </p>
         <h2 class="font-geist text-[40px] sm:text-[56px] md:text-[64px] leading-[70px] tracking-[-1.28px] uppercase text-[#1A1C1C]">
-          Tại sao chọn chúng tôi
+          {{ t('paymentMethodsPage.featuresTitle') }}
         </h2>
       </div>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -165,10 +165,10 @@
           data-reveal
         >
           <p class="font-geist text-[12px] uppercase tracking-[1.8px] text-white/60 mb-4">
-            AN TOÀN
+            {{ t('paymentMethodsPage.securityEyebrow') }}
           </p>
           <h2 class="font-geist text-[40px] sm:text-[56px] md:text-[64px] leading-[70px] tracking-[-1.28px] text-white">
-            Bảo mật thanh toán
+            {{ t('paymentMethodsPage.securityTitle') }}
           </h2>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -197,10 +197,10 @@
         data-reveal
       >
         <p class="font-geist text-[12px] uppercase tracking-[1.8px] text-[#5E5F5C] mb-4">
-          HỎI ĐÁP
+          {{ t('paymentMethodsPage.faqEyebrow') }}
         </p>
         <h2 class="font-geist text-[40px] sm:text-[56px] md:text-[64px] leading-[70px] tracking-[-1.28px] uppercase text-[#1A1C1C]">
-          Câu hỏi thường gặp
+          {{ t('paymentMethodsPage.faqTitle') }}
         </h2>
       </div>
       <div
@@ -213,10 +213,10 @@
             <thead>
               <tr class="border-b border-[#CFC4C6]">
                 <th class="font-geist text-[13px] uppercase tracking-[1.2px] text-[#5E5F5C] py-4 px-3 text-left">
-                  Câu hỏi
+                  {{ t('paymentMethodsPage.faqThQ') }}
                 </th>
                 <th class="font-geist text-[13px] uppercase tracking-[1.2px] text-[#5E5F5C] py-4 px-3 text-left">
-                  Trả lời
+                  {{ t('paymentMethodsPage.faqThA') }}
                 </th>
               </tr>
             </thead>
@@ -247,23 +247,23 @@
         data-reveal
       >
         <h2 class="font-geist text-[40px] sm:text-[56px] md:text-[64px] leading-[70px] tracking-[-1.28px] text-white mb-8">
-          Sẵn sàng mua sắm?
+          {{ t('paymentMethodsPage.ctaTitle') }}
         </h2>
         <p class="font-geist text-base text-white/70 leading-[29px] mb-10 max-w-[560px] mx-auto">
-          Khám phá bộ sưu tập đồ thể thao chính hãng và thanh toán dễ dàng với phương thức yêu thích của bạn.
+          {{ t('paymentMethodsPage.ctaDesc') }}
         </p>
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
           <router-link
             to="/products"
             class="liquid-btn px-10 py-5 bg-white/10 text-white text-[12px] font-semibold uppercase tracking-[1.8px] leading-[12px] rounded-full hover:bg-white/20 transition-colors"
           >
-            MUA SẮM NGAY
+            {{ t('paymentMethodsPage.ctaShop') }}
           </router-link>
           <router-link
             to="/about"
             class="liquid-btn px-10 py-5 bg-white/10 text-white text-[12px] font-semibold uppercase tracking-[1.8px] leading-[12px] rounded-full hover:bg-white/20 transition-colors"
           >
-            LIÊN HỆ HỖ TRỢ
+            {{ t('paymentMethodsPage.ctaContact') }}
           </router-link>
         </div>
       </div>
@@ -272,9 +272,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onUnmounted } from 'vue'
+import { ref, computed, onUnmounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useReveal } from '@/composables/useReveal'
 import { useScrollReveal } from '@/composables/useScrollReveal'
+
+const { t } = useI18n()
 
 const rootRef = ref<HTMLElement | null>(null)
 const heroRef = ref<HTMLElement | null>(null)
@@ -301,94 +304,58 @@ onUnmounted(() => {
   if (glowRaf) cancelAnimationFrame(glowRaf)
 })
 
-const paymentMethods = [
+const paymentMethods = computed(() => [
   {
-    title: 'Thanh toán khi nhận hàng (COD)',
-    desc: 'Thanh toán tiền mặt trực tiếp cho nhân viên giao hàng khi nhận sản phẩm. Kiểm tra hàng trước khi thanh toán, an tâm tuyệt đối.',
-    tags: ['Tiền mặt', 'Kiểm tra hàng', 'Toàn quốc']
+    title: t('paymentMethodsPage.method1Title'),
+    desc: t('paymentMethodsPage.method1Desc'),
+    tags: [t('paymentMethodsPage.method1Tag1'), t('paymentMethodsPage.method1Tag2'), t('paymentMethodsPage.method1Tag3')]
   },
   {
-    title: 'Ví điện tử',
-    desc: 'Thanh toán nhanh chóng qua MoMo, ZaloPay, ShopeePay. Quét mã QR hoặc xác nhận trong ứng dụng, giao dịch hoàn tất trong vài giây.',
-    tags: ['MoMo', 'ZaloPay', 'ShopeePay', 'QR Code']
+    title: t('paymentMethodsPage.method2Title'),
+    desc: t('paymentMethodsPage.method2Desc'),
+    tags: [t('paymentMethodsPage.method2Tag1'), t('paymentMethodsPage.method2Tag2'), t('paymentMethodsPage.method2Tag3'), t('paymentMethodsPage.method2Tag4')]
   },
   {
-    title: 'Thẻ ngân hàng nội địa',
-    desc: 'Thanh toán qua thẻ ATM của các ngân hàng Việt Nam thông qua cổng thanh toán Napas. Hỗ trợ hơn 40 ngân hàng trong nước.',
-    tags: ['Napas', 'ATM', '40+ ngân hàng']
+    title: t('paymentMethodsPage.method3Title'),
+    desc: t('paymentMethodsPage.method3Desc'),
+    tags: [t('paymentMethodsPage.method3Tag1'), t('paymentMethodsPage.method3Tag2'), t('paymentMethodsPage.method3Tag3')]
   },
   {
-    title: 'Thẻ quốc tế',
-    desc: 'Chấp nhận thẻ Visa, Mastercard, JCB. Giao dịch được mã hóa SSL và xác thực 3D-Secure để bảo vệ thông tin thẻ.',
-    tags: ['Visa', 'Mastercard', 'JCB', '3D-Secure']
+    title: t('paymentMethodsPage.method4Title'),
+    desc: t('paymentMethodsPage.method4Desc'),
+    tags: [t('paymentMethodsPage.method4Tag1'), t('paymentMethodsPage.method4Tag2'), t('paymentMethodsPage.method4Tag3'), t('paymentMethodsPage.method4Tag4')]
   },
   {
-    title: 'Chuyển khoản ngân hàng',
-    desc: 'Chuyển khoản trực tiếp qua Internet Banking hoặc tại quầy. Hệ thống tự động xác nhận khi nhận được thanh toán.',
-    tags: ['Internet Banking', 'QR chuyển khoản', 'Tự động']
+    title: t('paymentMethodsPage.method5Title'),
+    desc: t('paymentMethodsPage.method5Desc'),
+    tags: [t('paymentMethodsPage.method5Tag1'), t('paymentMethodsPage.method5Tag2'), t('paymentMethodsPage.method5Tag3')]
   }
-]
+])
 
-const features = [
-  {
-    icon: '⚡',
-    title: 'Xử lý tức thì',
-    desc: 'Giao dịch được xác nhận trong vài giây, đơn hàng được xử lý ngay sau khi thanh toán thành công.'
-  },
-  {
-    icon: '🔒',
-    title: 'Bảo mật tuyệt đối',
-    desc: 'Mã hóa SSL/TLS, cổng thanh toán đạt chuẩn PCI DSS, không lưu trữ thông tin thẻ.'
-  },
-  {
-    icon: '🌍',
-    title: 'Đa dạng lựa chọn',
-    desc: 'Từ tiền mặt đến ví điện tử, thẻ ngân hàng — phù hợp với mọi nhu cầu.'
-  },
-  {
-    icon: '📱',
-    title: 'Thanh toán di động',
-    desc: 'Quét mã QR, xác nhận vân tay, thanh toán một chạm trên điện thoại.'
-  },
-  {
-    icon: '✅',
-    title: 'Kiểm tra trước khi trả',
-    desc: 'Với COD, bạn có thể kiểm tra sản phẩm trước khi thanh toán cho shipper.'
-  },
-  {
-    icon: '💬',
-    title: 'Hỗ trợ 24/7',
-    desc: 'Đội ngũ hỗ trợ sẵn sàng giải đáp mọi thắc mắc về thanh toán bất cứ lúc nào.'
-  }
-]
+const features = computed(() => [
+  { icon: '⚡', title: t('paymentMethodsPage.feature1Title'), desc: t('paymentMethodsPage.feature1Desc') },
+  { icon: '🔒', title: t('paymentMethodsPage.feature2Title'), desc: t('paymentMethodsPage.feature2Desc') },
+  { icon: '🌍', title: t('paymentMethodsPage.feature3Title'), desc: t('paymentMethodsPage.feature3Desc') },
+  { icon: '📱', title: t('paymentMethodsPage.feature4Title'), desc: t('paymentMethodsPage.feature4Desc') },
+  { icon: '✅', title: t('paymentMethodsPage.feature5Title'), desc: t('paymentMethodsPage.feature5Desc') },
+  { icon: '💬', title: t('paymentMethodsPage.feature6Title'), desc: t('paymentMethodsPage.feature6Desc') }
+])
 
-const security = [
-  {
-    title: 'Mã hóa SSL/TLS 256-bit',
-    desc: 'Mọi dữ liệu thanh toán được truyền tải qua kết nối mã hóa, ngăn chặn đánh cắp thông tin.'
-  },
-  {
-    title: 'Cổng thanh toán PCI DSS',
-    desc: 'Hợp tác với các cổng thanh toán đạt chuẩn bảo mật quốc tế, đảm bảo an toàn giao dịch.'
-  },
-  {
-    title: 'Xác thực 3D-Secure',
-    desc: 'Lớp bảo mật bổ sung cho thẻ quốc tế, yêu cầu xác nhận từ ngân hàng phát hành.'
-  },
-  {
-    title: 'Không lưu trữ thông tin thẻ',
-    desc: 'Thông tin thẻ chỉ được xử lý bởi cổng thanh toán, không lưu trên hệ thống của chúng tôi.'
-  }
-]
+const security = computed(() => [
+  { title: t('paymentMethodsPage.security1Title'), desc: t('paymentMethodsPage.security1Desc') },
+  { title: t('paymentMethodsPage.security2Title'), desc: t('paymentMethodsPage.security2Desc') },
+  { title: t('paymentMethodsPage.security3Title'), desc: t('paymentMethodsPage.security3Desc') },
+  { title: t('paymentMethodsPage.security4Title'), desc: t('paymentMethodsPage.security4Desc') }
+])
 
-const faqs = [
-  { question: 'Thanh toán thất bại phải làm sao?', answer: 'Kiểm tra số dư, hạn mức thẻ hoặc thử phương thức khác. Liên hệ hỗ trợ nếu vẫn gặp lỗi.' },
-  { question: 'COD có mất phí không?', answer: 'Không phát sinh phụ phí. Bạn chỉ thanh toán đúng giá trị đơn hàng khi nhận sản phẩm.' },
-  { question: 'Ví điện tử nào được hỗ trợ?', answer: 'Hiện hỗ trợ MoMo, ZaloPay và ShopeePay. Các ví khác sẽ được cập nhật trong tương lai.' },
-  { question: 'Thẻ quốc tế có an toàn không?', answer: 'Có. Giao dịch được bảo vệ bởi 3D-Secure và không lưu thông tin thẻ trên hệ thống.' },
-  { question: 'Chuyển khoản bao lâu xác nhận?', answer: 'Thông thường trong 5-15 phút. Nếu quá 1 giờ chưa nhận được xác nhận, vui lòng liên hệ hỗ trợ.' },
-  { question: 'Có trả góp không?', answer: 'Hiện chưa hỗ trợ trả góp. Tính năng sẽ được triển khai trong thời gian tới.' }
-]
+const faqs = computed(() => [
+  { question: t('paymentMethodsPage.faq1Q'), answer: t('paymentMethodsPage.faq1A') },
+  { question: t('paymentMethodsPage.faq2Q'), answer: t('paymentMethodsPage.faq2A') },
+  { question: t('paymentMethodsPage.faq3Q'), answer: t('paymentMethodsPage.faq3A') },
+  { question: t('paymentMethodsPage.faq4Q'), answer: t('paymentMethodsPage.faq4A') },
+  { question: t('paymentMethodsPage.faq5Q'), answer: t('paymentMethodsPage.faq5A') },
+  { question: t('paymentMethodsPage.faq6Q'), answer: t('paymentMethodsPage.faq6A') }
+])
 </script>
 
 <style scoped>

@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import type { Cart, CartItem } from '@/types'
 import cartService from '@/services/cart.service'
+import i18n from '@/i18n'
 
 const GUEST_CART_KEY = 'guest_cart_items'
 
@@ -28,7 +29,6 @@ export const useCartStore = defineStore('cart', {
       }
       // Fallback to guest cart from localStorage
       return state.guestItems.reduce((sum, item) => sum + item.quantity, 0)
-      return 0
     },
     totalPrice: (state) => {
       if (state.cart?.items) {
@@ -36,7 +36,6 @@ export const useCartStore = defineStore('cart', {
       }
       // Fallback to guest cart from localStorage
       return state.guestItems.reduce((sum, item) => sum + (item.price || 0) * item.quantity, 0)
-      return 0
     },
     items: (state) => state.cart?.items || [],
     // Get display items (from server or guest localStorage)
@@ -49,7 +48,7 @@ export const useCartStore = defineStore('cart', {
         id: `guest-${index}`,
         variantId: item.variantId,
         productId: item.productId || 0,
-        productName: item.productName || 'Sản phẩm',
+        productName: item.productName || i18n.global.t('product.genericName'),
         productImage: item.productImage || '',
         size: item.size || '',
         quantity: item.quantity,
@@ -125,24 +124,19 @@ export const useCartStore = defineStore('cart', {
     // Merge guest cart (from localStorage) into server cart after login
     async mergeGuestCart() {
       const guestItems = [...this.guestItems];
-      console.log('mergeGuestCart started. Items to merge:', guestItems);
       if (!guestItems || guestItems.length === 0) return;
       try {
         // Fetch current server cart
-        console.log('Fetching server cart before merge...');
         await this.fetchCart()
-        console.log('Server cart fetched:', this.cart);
 
         let hasError = false;
         // Add each guest item to server cart
         for (const guestItem of guestItems) {
           try {
-            console.log(`Merging item variantId ${guestItem.variantId} quantity ${guestItem.quantity}`);
-            const resp = await cartService.addCartItem({
+            await cartService.addCartItem({
               variantId: guestItem.variantId,
               quantity: guestItem.quantity
             })
-            console.log(`Merged item success:`, resp);
           } catch (error) {
             console.error('Failed to merge guest item:', error)
             hasError = true;
@@ -150,17 +144,14 @@ export const useCartStore = defineStore('cart', {
         }
 
         // Refetch cart to get merged result
-        console.log('Fetching server cart after merge...');
         await this.fetchCart()
-        console.log('Server cart fetched after merge:', this.cart);
         
         // Clear guest cart only if all merges succeeded
         if (!hasError) {
           this.guestItems = []
           localStorage.removeItem(GUEST_CART_KEY)
-          console.log('Guest cart cleared.');
         } else {
-          console.warn('Guest cart not cleared due to merge errors.');
+          console.warn('Guest cart not cleared due to merge errors.')
         }
       } catch (error) {
         console.error('Failed to merge guest cart:', error)

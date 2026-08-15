@@ -5,20 +5,25 @@
         <!-- Header Section -->
         <header class="flex flex-col gap-[15px] mb-16">
           <h1 class="font-geist text-[64px] font-normal leading-[70px] tracking-[-1.28px] text-black">
-            SẢN PHẨM YÊU THÍCH
+            {{ t('favorite.title') }}
           </h1>
           <p
             v-if="!authStore.isAuthenticated"
             class="font-gelasio text-base text-[#5E5F5C]"
           >
-            Bạn đang xem với tư cách khách.
-            <router-link
-              to="/login?redirect=/favorite"
-              class="text-black font-semibold hover:underline"
+            <i18n-t
+              keypath="favorite.guestNotice"
+              tag="span"
             >
-              Đăng nhập
-            </router-link>
-            để lưu yêu thích.
+              <template #login>
+                <router-link
+                  to="/login?redirect=/favorite"
+                  class="text-black font-semibold hover:underline"
+                >
+                  {{ t('favorite.login') }}
+                </router-link>
+              </template>
+            </i18n-t>
           </p>
         </header>
 
@@ -78,7 +83,7 @@
                 <!-- Remove from favorite button -->
                 <button
                   class="absolute top-3 right-3 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-md hover:bg-red-50 transition-colors z-10"
-                  aria-label="Remove from favorites"
+                  :aria-label="t('product.toggleWishlist')"
                   @click="handleToggleFavorite(product)"
                 >
                   <svg
@@ -95,7 +100,7 @@
               <!-- Info -->
               <div class="p-4 flex flex-col gap-2">
                 <p class="font-geist text-xs text-[#5E5F5C] uppercase tracking-wider">
-                  {{ product.brand || 'Khác' }}
+                  {{ product.brand || t('common.other') }}
                 </p>
                 <router-link
                   :to="`/product-detail/${product.id}`"
@@ -112,7 +117,7 @@
                   class="w-full h-[40px] bg-black text-white font-geist text-xs uppercase tracking-wider hover:bg-gray-900 transition-colors mt-2"
                   @click="addToCart(product)"
                 >
-                  Thêm vào giỏ
+                  {{ t('favorite.addToCart') }}
                 </button>
               </div>
             </div>
@@ -136,13 +141,13 @@
             <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
           </svg>
           <p class="font-gelasio text-xl text-[#5E5F5C] mb-4">
-            Danh sách yêu thích trống
+            {{ t('favorite.empty') }}
           </p>
           <router-link
             to="/products"
             class="px-8 py-3 bg-black text-white font-geist text-sm uppercase tracking-wider hover:bg-gray-900 transition-colors"
           >
-            Khám phá sản phẩm
+            {{ t('favorite.explore') }}
           </router-link>
         </div>
       </div>
@@ -158,9 +163,13 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.store'
 import { useFavoriteStore } from '@/stores/favorite.store'
 import { useCartStore } from '@/stores/cart.store'
+import { useI18n } from 'vue-i18n'
+import { formatCurrency } from '@/utils/formatters'
 
 import BaseSkeleton from '@/components/ui/BaseSkeleton.vue'
 import type { Product } from '@/types'
+
+const { t } = useI18n()
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -174,7 +183,7 @@ onMounted(() => {
 })
 
 const formatPrice = (price: number): string => {
-  return new Intl.NumberFormat('vi-VN').format(price) + ' đ'
+  return formatCurrency(price)
 }
 
 const handleToggleFavorite = (product: Product) => {

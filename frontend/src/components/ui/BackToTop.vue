@@ -3,7 +3,7 @@
     <button
       v-if="isVisible"
       class="fixed bottom-8 right-8 w-12 h-12 bg-black text-white rounded-full flex items-center justify-center shadow-lg hover:bg-gray-800 transition-colors z-50 focus:outline-none"
-      aria-label="Back to top"
+      :aria-label="t('common.backToTop')"
       @click="scrollToTop"
     >
       <svg
@@ -25,6 +25,9 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const isVisible = ref(false)
 

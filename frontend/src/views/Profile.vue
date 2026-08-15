@@ -22,7 +22,7 @@
                   fill="none"
                 />
               </svg>
-              <span class="font-gelasio text-base">Quay lại trang chủ</span>
+              <span class="font-gelasio text-base">{{ t('checkout.backToHome') }}</span>
             </router-link>
           </div>
 
@@ -43,7 +43,7 @@
               />
             </svg>
             <h1 class="font-geist text-[20px] leading-[30px] text-black">
-              HỒ SƠ CÁ NHÂN
+              {{ t('profile.title') }}
             </h1>
           </div>
         </header>
@@ -67,7 +67,7 @@
               />
             </svg>
             <h2 class="font-gelasio text-[18px] leading-[28px] tracking-[0.45px] uppercase text-white">
-              HỒ SƠ CÁ NHÂN
+              {{ t('profile.title') }}
             </h2>
           </div>
 
@@ -80,7 +80,7 @@
                 <label
                   class="font-geist text-[12px] font-semibold leading-[12px] tracking-[1.2px] uppercase text-[#4C4546] opacity-80"
                 >
-                  EMAIL
+                  {{ t('profile.email') }}
                 </label>
                 <input
                   type="email"
@@ -95,12 +95,12 @@
                 <label
                   class="font-geist text-[12px] font-semibold leading-[12px] tracking-[1.2px] uppercase text-[#4C4546] opacity-80"
                 >
-                  HỌ VÀ TÊN
+                  {{ t('checkout.fullName') }}
                 </label>
                 <input
                   v-model="profileForm.fullName"
                   type="text"
-                  placeholder="Nhập họ tên"
+                  :placeholder="t('checkout.fullNamePlaceholder')"
                   class="w-[308px] h-[50px] bg-white border border-[#CFC4C5] rounded-lg px-4 font-gelasio text-[16px] text-[#1A1C1C] outline-none focus:border-black transition-colors"
                 >
               </div>
@@ -110,12 +110,12 @@
                 <label
                   class="font-geist text-[12px] font-semibold leading-[12px] tracking-[1.2px] uppercase text-[#4C4546] opacity-80"
                 >
-                  SỐ ĐIỆN THOẠI
+                  {{ t('checkout.phone') }}
                 </label>
                 <input
                   v-model="profileForm.phoneNumber"
                   type="tel"
-                  placeholder="Nhập số điện thoại"
+                  :placeholder="t('checkout.phonePlaceholder')"
                   class="w-[308px] h-[50px] bg-white border border-[#CFC4C5] rounded-lg px-4 font-gelasio text-[16px] text-[#1A1C1C] outline-none focus:border-black transition-colors"
                 >
               </div>
@@ -124,21 +124,21 @@
               <div class="flex flex-col gap-3">
                 <div class="flex items-center justify-between">
                   <label class="font-geist text-[12px] font-semibold leading-[12px] tracking-[1.2px] uppercase text-[#4C4546] opacity-80">
-                    SỔ ĐỊA CHỈ
+                    {{ t('profile.addressBook') }}
                   </label>
                   <button
                     type="button"
                     class="text-sm underline hover:text-black"
                     @click="openCreateAddress"
                   >
-                    + Thêm địa chỉ
+                    {{ t('profile.addAddress') }}
                   </button>
                 </div>
                 <div
                   v-if="addressStore.addresses.length === 0"
                   class="text-sm text-gray-500 italic py-2"
                 >
-                  Chưa có địa chỉ nào. Bấm "Thêm địa chỉ" để tạo mới.
+                  {{ t('profile.noAddresses') }}
                 </div>
                 <div
                   v-else
@@ -155,7 +155,7 @@
                         <span
                           v-if="a.isDefault"
                           class="ml-2 text-[10px] bg-black text-white px-1 rounded"
-                        >Mặc định</span>
+                        >{{ t('checkout.default') }}</span>
                         <span
                           v-if="a.label"
                           class="ml-2 text-[10px] text-gray-500"
@@ -172,21 +172,21 @@
                         class="underline hover:text-black"
                         @click="onSetDefault(a.id)"
                       >
-                        Đặt mặc định
+                        {{ t('profile.setDefault') }}
                       </button>
                       <button
                         type="button"
                         class="underline hover:text-black"
                         @click="openEditAddress(a)"
                       >
-                        Sửa
+                        {{ t('common.edit') }}
                       </button>
                       <button
                         type="button"
                         class="underline text-red-500 hover:text-red-700"
                         @click="onDeleteAddress(a.id)"
                       >
-                        Xóa
+                        {{ t('common.delete') }}
                       </button>
                     </div>
                   </div>
@@ -196,7 +196,7 @@
               <!-- Address Modal -->
               <BaseModal
                 v-model="showAddressModal"
-                :title="editingAddress ? 'Sửa địa chỉ' : 'Thêm địa chỉ'"
+                :title="editingAddress ? t('checkout.editAddress') : t('checkout.addAddress')"
               >
                 <AddressForm
                   :model-value="editingAddress || undefined"
@@ -216,11 +216,11 @@
                 <div class="flex items-center gap-3">
                   <div class="w-[23px] h-[12px] bg-[#4C4546]" />
                   <h3 class="font-geist text-[16px] font-bold leading-[24px] tracking-[0.8px] uppercase text-[#4C4546]">
-                    ĐỔI MẬT KHẨU
+                    {{ t('profile.changePassword') }}
                   </h3>
                 </div>
                 <p class="font-gelasio text-[12px] italic text-[#848484]">
-                  Bỏ trống nếu không muốn thay đổi mật khẩu.
+                  {{ t('profile.passwordHint') }}
                 </p>
 
                 <div class="flex flex-col gap-4">
@@ -229,12 +229,12 @@
                     <label
                       class="font-geist text-[12px] leading-[12px] tracking-[1.2px] uppercase text-[#4C4546] opacity-80"
                     >
-                      MẬT KHẨU HIỆN TẠI
+                      {{ t('profile.currentPassword') }}
                     </label>
                     <input
                       v-model="passwordForm.currentPassword"
                       type="password"
-                      placeholder="Nhập mật khẩu hiện tại..."
+                      :placeholder="t('profile.currentPasswordPlaceholder')"
                       class="w-full h-[51px] bg-white border border-[#CFC4C5] rounded-lg px-4 font-gelasio text-[16px] text-[#6B7280] outline-none focus:border-black transition-all"
                     >
                   </div>
@@ -245,12 +245,12 @@
                       <label
                         class="font-geist text-[12px] leading-[12px] tracking-[1.2px] uppercase text-[#4C4546] opacity-80"
                       >
-                        MẬT KHẨU MỚI
+                        {{ t('profile.newPassword') }}
                       </label>
                       <input
                         v-model="passwordForm.newPassword"
                         type="password"
-                        placeholder="Nhập mật khẩu mới..."
+                        :placeholder="t('profile.newPasswordPlaceholder')"
                         class="w-full h-[51px] bg-white border border-[#CFC4C5] rounded-lg px-4 font-gelasio text-[16px] text-[#6B7280] outline-none focus:border-black transition-all"
                       >
                     </div>
@@ -260,12 +260,12 @@
                       <label
                         class="font-geist text-[12px] leading-[12px] tracking-[1.2px] uppercase text-[#4C4546] opacity-80"
                       >
-                        XÁC NHẬN MẬT KHẨU
+                        {{ t('profile.confirmPassword') }}
                       </label>
                       <input
                         v-model="passwordForm.confirmPassword"
                         type="password"
-                        placeholder="Nhập lại mật khẩu mới..."
+                        :placeholder="t('profile.confirmPasswordPlaceholder')"
                         class="w-full h-[51px] bg-white border border-[#CFC4C5] rounded-lg px-4 font-gelasio text-[16px] text-[#6B7280] outline-none focus:border-black transition-all"
                       >
                     </div>
@@ -279,7 +279,7 @@
                 class="flex flex-col gap-4 p-4 bg-[#F3F3F4] rounded-lg"
               >
                 <p class="font-gelasio text-sm text-[#5E5F5C]">
-                  Tài khoản của bạn được liên kết với Google. Bạn không thể đặt lại mật khẩu thông qua tính năng này.
+                  {{ t('profile.oauthNote') }}
                 </p>
               </div>
             </div>
@@ -304,7 +304,7 @@
                     d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3"
                   />
                 </svg>
-                <span class="font-geist text-[16px] leading-[24px] text-black">Quay lại</span>
+                <span class="font-geist text-[16px] leading-[24px] text-black">{{ t('common.back') }}</span>
               </button>
 
               <button
@@ -327,7 +327,7 @@
                   />
                 </svg>
                 <span class="font-geist text-[16px] leading-[24px] text-white">
-                  {{ isLoading ? 'Đang lưu...' : 'Lưu thay đổi' }}
+                  {{ isLoading ? t('profile.saving') : t('profile.saveChanges') }}
                 </span>
               </button>
             </div>
@@ -346,10 +346,14 @@ import { useAuthStore } from '@/stores/auth.store'
 import { useToast } from 'vue-toastification'
 import authService from '@/services/auth.service'
 import { useAddressStore } from '@/stores/address.store'
+import { getApiErrorMessage } from '@/utils/apiError'
 import AddressForm from '@/components/address/AddressForm.vue'
 import BaseModal from '@/components/ui/BaseModal.vue'
 import { formatAddress } from '@/utils/vn-regions'
+import { useI18n } from 'vue-i18n'
 import type { Address } from '@/types'
+
+const { t } = useI18n()
 
 const authStore = useAuthStore()
 const toast = useToast()
@@ -380,17 +384,17 @@ const onSubmitAddress = async (data: any) => {
     if (editingAddress.value) await addressStore.update(editingAddress.value.id, data)
     else await addressStore.create(data)
     showAddressModal.value = false
-    toast.success('Lưu địa chỉ thành công')
-  } catch (e: any) { toast.error(e.response?.data?.message || 'Không thể lưu địa chỉ') }
+    toast.success(t('profile.addressSaved'))
+  } catch (e: any) { toast.error(getApiErrorMessage(e, 'toast.addressSaveFailed')) }
 }
 const onDeleteAddress = async (id: number) => {
-  if (!confirm('Xóa địa chỉ này?')) return
-  try { await addressStore.remove(id); toast.success('Đã xóa') }
-  catch (e: any) { toast.error(e.response?.data?.message || 'Không thể xóa') }
+  if (!confirm(t('profile.deleteAddressConfirm'))) return
+  try { await addressStore.remove(id); toast.success(t('profile.addressDeleted')) }
+  catch (e: any) { toast.error(getApiErrorMessage(e, 'profile.addressDeleteFailed')) }
 }
 const onSetDefault = async (id: number) => {
-  try { await addressStore.setDefault(id); toast.success('Đã đặt mặc định') }
-  catch (e: any) { toast.error(e.response?.data?.message || 'Không thể đặt mặc định') }
+  try { await addressStore.setDefault(id); toast.success(t('profile.defaultSet')) }
+  catch (e: any) { toast.error(getApiErrorMessage(e, 'profile.defaultSetFailed')) }
 }
 
 onMounted(() => {
@@ -403,7 +407,7 @@ onMounted(() => {
 
 const handleSave = async () => {
   if (passwordForm.newPassword && passwordForm.newPassword !== passwordForm.confirmPassword) {
-    toast.error('Mật khẩu xác nhận không khớp!')
+    toast.error(t('profile.passwordMismatch'))
     return
   }
 
@@ -416,7 +420,7 @@ const handleSave = async () => {
 
     if (passwordForm.newPassword) {
       if (!passwordForm.currentPassword) {
-        toast.error('Vui lòng nhập mật khẩu hiện tại để đổi mật khẩu mới!')
+        toast.error(t('profile.currentPasswordRequired'))
         isLoading.value = false
         return
       }
@@ -427,13 +431,13 @@ const handleSave = async () => {
       })
     }
 
-    toast.success('Cập nhật hồ sơ thành công!')
+    toast.success(t('profile.saved'))
     passwordForm.currentPassword = ''
     passwordForm.newPassword = ''
     passwordForm.confirmPassword = ''
   } catch (error) {
     console.error('Failed to update profile:', error)
-    toast.error('Cập nhật thất bại. Vui lòng thử lại.')
+    toast.error(t('profile.saveFailed'))
   } finally {
     isLoading.value = false
   }

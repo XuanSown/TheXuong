@@ -1,29 +1,36 @@
 <template>
   <div class="min-h-screen bg-[#F9F9F9]">
     <main class="w-full max-w-[1280px] mx-auto px-4 pt-[120px] pb-8">
-      <div class="w-[1152px] mx-auto">
+      <div class="w-full max-w-[1152px] mx-auto">
         <!-- Header Section -->
         <header class="flex flex-col gap-[15px] mb-16">
           <h1 class="font-geist text-[64px] font-normal leading-[70px] tracking-[-1.28px] text-black">
-            GIỎ HÀNG
+            {{ t('cart.title') }}
           </h1>
           <p
             v-if="!authStore.isAuthenticated"
             class="font-gelasio text-base text-[#5E5F5C]"
           >
-            Bạn đang mua sắm với tư cách khách. Vui lòng <router-link
-              to="/login?redirect=/cart"
-              class="text-black font-semibold hover:underline"
+            <i18n-t
+              keypath="cart.guestNotice"
+              tag="span"
             >
-              đăng nhập
-            </router-link> để hoàn tất đơn hàng.
+              <template #login>
+                <router-link
+                  to="/login?redirect=/cart"
+                  class="text-black font-semibold hover:underline"
+                >
+                  {{ t('cart.login') }}
+                </router-link>
+              </template>
+            </i18n-t>
           </p>
         </header>
 
         <!-- Cart Content -->
         <div
           v-if="cartItems.length > 0"
-          class="flex gap-8 mb-16"
+          class="flex flex-col lg:flex-row gap-8 mb-16"
         >
           <!-- Cart Items List -->
           <div class="flex-1 flex flex-col gap-8">
@@ -46,7 +53,7 @@
                     v-else
                     class="w-full h-full bg-gray-200 flex items-center justify-center"
                   >
-                    <span class="text-gray-400 text-sm">No image</span>
+                    <span class="text-gray-400 text-sm">{{ t('cart.noImage') }}</span>
                   </div>
                 </div>
 
@@ -60,7 +67,7 @@
                       v-if="item.size"
                       class="font-geist text-sm text-[#5E5F5C]"
                     >
-                      Size: {{ item.size }}
+                      {{ t('cart.itemSize', { size: item.size }) }}
                     </p>
                   </div>
 
@@ -107,7 +114,7 @@
                 <button
                   class="flex items-center gap-2 text-[#5E5F5C] hover:text-red-500 transition-colors"
                   :disabled="isUpdating"
-                  @click="removeItem(item.variantId)"
+                  @click="removeItem(cartItemKey(item))"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -123,36 +130,36 @@
                       d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
                     />
                   </svg>
-                  <span class="font-gelasio text-base">Xóa khỏi giỏ</span>
+                  <span class="font-gelasio text-base">{{ t('cart.remove') }}</span>
                 </button>
               </div>
             </div>
           </div>
 
           <!-- Order Summary Sidebar -->
-          <div class="w-[466px] flex-shrink-0">
+          <div class="w-full lg:w-[466px] flex-shrink-0">
             <div class="bg-[#F3F3F4] border border-[rgba(207,196,197,0.2)] p-8 flex flex-col gap-6">
               <h2 class="font-geist text-2xl font-semibold leading-[38px] text-[#1A1C1C]">
-                Tạm tính
+                {{ t('common.subtotal') }}
               </h2>
 
               <div class="flex flex-col gap-4">
                 <!-- Subtotal -->
                 <div class="flex justify-between items-center">
-                  <span class="font-geist text-base text-[#5E5F5C]">Tạm tính ({{ cartStore.totalItems }} sản phẩm)</span>
+                  <span class="font-geist text-base text-[#5E5F5C]">{{ t('common.subtotal') }} ({{ t('cart.itemCount', { count: cartStore.totalItems }) }})</span>
                   <span class="font-geist text-base text-black">{{ formatPrice(cartStore.totalPrice) }}</span>
                 </div>
 
                 <!-- Shipping -->
                 <div class="flex justify-between items-center">
-                  <span class="font-geist text-base text-[#5E5F5C]">Phí vận chuyển</span>
-                  <span class="font-gelasio text-base text-black">Miễn phí</span>
+                  <span class="font-geist text-base text-[#5E5F5C]">{{ t('cart.shippingFee') }}</span>
+                  <span class="font-gelasio text-base text-black">{{ t('cart.free') }}</span>
                 </div>
 
                 <!-- Divider -->
                 <div class="border-t border-[rgba(207,196,197,0.3)] pt-4">
                   <div class="flex justify-between items-center">
-                    <span class="font-geist text-2xl font-semibold leading-[38px] tracking-[-0.32px] text-[#1A1C1C]">Tổng cộng</span>
+                    <span class="font-geist text-2xl font-semibold leading-[38px] tracking-[-0.32px] text-[#1A1C1C]">{{ t('common.total') }}</span>
                     <span class="font-geist text-2xl text-black">{{ formatPrice(cartStore.totalPrice) }}</span>
                   </div>
                 </div>
@@ -164,7 +171,7 @@
                 :disabled="isUpdating"
                 @click="handleCheckout"
               >
-                <span v-if="!isUpdating">THANH TOÁN NGAY</span>
+                <span v-if="!isUpdating">{{ t('cart.checkout') }}</span>
                 <span
                   v-else
                   class="flex items-center gap-2"
@@ -188,7 +195,7 @@
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                     />
                   </svg>
-                  Đang xử lý...
+                  {{ t('cart.processing') }}
                 </span>
               </button>
 
@@ -201,7 +208,7 @@
                 >
                   <path d="M8 1C4.5 4 2 6.5 2 9C2 10.5 3 11.5 4.5 11.5C5 11.5 5.5 11.4 6 11.3C6.5 11.4 7 11.5 7.5 11.5C9 11.5 10 10.5 10 9C10 6.5 7.5 4 6 1Z" />
                 </svg>
-                <span>Thanh toán an toàn & bảo mật</span>
+                <span>{{ t('cart.securePayment') }}</span>
               </div>
             </div>
           </div>
@@ -213,15 +220,65 @@
           class="text-center py-16"
         >
           <p class="font-gelasio text-xl text-[#5E5F5C] mb-8">
-            Giỏ hàng của bạn đang trống
+            {{ t('cart.empty') }}
           </p>
           <router-link
             to="/products"
             class="inline-block w-[200px] h-[56px] bg-black text-white font-geist text-base flex items-center justify-center hover:bg-gray-900 transition-colors"
           >
-            TIẾP TỤC MUA SẮM
+            {{ t('cart.continueShopping') }}
           </router-link>
         </div>
+
+        <!-- Recommendation Section -->
+        <section
+          v-if="showRecommendations"
+          class="mb-16"
+        >
+          <h2 class="font-geist text-2xl font-semibold leading-[38px] text-[#1A1C1C] mb-8">
+            {{ t('recommendation.title') }}
+          </h2>
+
+          <!-- Loading Skeleton -->
+          <div
+            v-if="recommendationLoading"
+            class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-12"
+          >
+            <div
+              v-for="i in 4"
+              :key="i"
+              class="w-full flex flex-col gap-4"
+            >
+              <BaseSkeleton type="image" />
+              <div class="flex flex-col gap-2">
+                <BaseSkeleton
+                  type="text"
+                  class="w-1/4"
+                />
+                <BaseSkeleton
+                  type="title"
+                  class="w-3/4"
+                />
+                <BaseSkeleton
+                  type="text"
+                  class="w-1/3"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Recommendation Cards -->
+          <div
+            v-else
+            class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-12"
+          >
+            <ProductCard
+              v-for="product in recommendations"
+              :key="product.id"
+              :product="product"
+            />
+          </div>
+        </section>
       </div>
     </main>
 
@@ -230,11 +287,18 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watchEffect } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.store'
 import { useCartStore } from '@/stores/cart.store'
+import { productService } from '@/services/product.service'
+import type { RecommendationProduct } from '@/types'
+import ProductCard from '@/components/ui/ProductCard.vue'
+import BaseSkeleton from '@/components/ui/BaseSkeleton.vue'
+import { useI18n } from 'vue-i18n'
+import { formatCurrency } from '@/utils/formatters'
 
+const { t } = useI18n()
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -245,20 +309,54 @@ const isUpdating = ref(false)
 // Use displayItems which works for both authenticated and guest users
 const cartItems = computed(() => cartStore.displayItems)
 
-watchEffect(() => {
-  console.log('Cart.vue: cartItems =', cartItems.value)
-  console.log('Cart.vue: cartStore.totalItems =', cartStore.totalItems)
-  console.log('Cart.vue: cartStore.cart =', cartStore.cart)
-})
+// Recommendation state - load độc lập với Cart, fail không ảnh hưởng cart/checkout
+const recommendations = ref<RecommendationProduct[]>([])
+const recommendationLoading = ref(false)
+const recommendationError = ref(false)
+
+const showRecommendations = computed(() =>
+  !recommendationError.value && (recommendationLoading.value || recommendations.value.length > 0)
+)
+
+// Key từ tập unique productId — quantity thay đổi không đổi key -> không refetch
+const recommendationKey = computed(() =>
+  [...new Set(cartItems.value.map(item => item.productId))]
+    .filter(Boolean)
+    .sort((a, b) => a - b)
+    .join(',')
+)
+
+watch(recommendationKey, async (key) => {
+  if (!key) {
+    recommendations.value = []
+    return
+  }
+  recommendationLoading.value = true
+  recommendationError.value = false
+  try {
+    const ids = key.split(',').map(Number)
+    recommendations.value = await productService.getCartRecommendations(ids, 8)
+  } catch (error) {
+    console.error('Failed to load recommendations:', error)
+    recommendationError.value = true
+    recommendations.value = []
+  } finally {
+    recommendationLoading.value = false
+  }
+}, { immediate: true })
 
 const formatPrice = (price: number): string => {
-  return new Intl.NumberFormat('vi-VN').format(price) + ' đ'
+  return formatCurrency(price)
+}
+
+const cartItemKey = (item: any): number => {
+  return cartStore.isGuestCart ? item.variantId : item.id
 }
 
 const increaseQuantity = async (item: any) => {
   isUpdating.value = true
   try {
-    await cartStore.updateItem(item.variantId, item.quantity + 1)
+    await cartStore.updateItem(cartItemKey(item), item.quantity + 1)
   } finally {
     isUpdating.value = false
   }
@@ -268,19 +366,19 @@ const decreaseQuantity = async (item: any) => {
   isUpdating.value = true
   try {
     if (item.quantity <= 1) {
-      await removeItem(item.variantId)
+      await removeItem(cartItemKey(item))
     } else {
-      await cartStore.updateItem(item.variantId, item.quantity - 1)
+      await cartStore.updateItem(cartItemKey(item), item.quantity - 1)
     }
   } finally {
     isUpdating.value = false
   }
 }
 
-const removeItem = async (variantId: number) => {
+const removeItem = async (itemKey: number) => {
   isUpdating.value = true
   try {
-    await cartStore.removeItem(variantId)
+    await cartStore.removeItem(itemKey)
   } finally {
     isUpdating.value = false
   }

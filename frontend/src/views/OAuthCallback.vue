@@ -3,10 +3,10 @@
     <div class="text-center">
       <div class="w-16 h-16 border-4 border-black border-t-transparent rounded-full animate-spin mx-auto mb-6" />
       <h1 class="font-geist text-2xl text-black mb-2">
-        ĐANG HOÀN TẤT ĐĂNG NHẬP
+        {{ t('oauth.title') }}
       </h1>
       <p class="font-gelasio text-[#5E5F5C]">
-        Vui lòng chờ một chút...
+        {{ t('oauth.wait') }}
       </p>
     </div>
   </div>
@@ -15,10 +15,12 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth.store'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const { t } = useI18n()
 
 onMounted(async () => {
   try {

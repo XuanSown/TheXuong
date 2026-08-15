@@ -9,7 +9,7 @@
             <div class="w-[82px] h-[75px] bg-[url('@/assets/logo.png')] bg-contain bg-no-repeat bg-center" />
             <div class="mt-1 flex flex-col items-center">
               <p class="font-geist text-base text-[#4C4546] leading-[26px]">
-                Welcome Back!
+                {{ t('auth.welcomeBack') }}
               </p>
             </div>
           </div>
@@ -32,7 +32,7 @@
               <polyline points="22 4 12 14.01 9 11.01" />
             </svg>
             <span class="font-gelasio text-sm font-semibold text-[#2D5A3F]">
-              Đăng xuất thành công!
+              {{ t('auth.logoutSuccess') }}
             </span>
           </div>
 
@@ -54,7 +54,7 @@
               <polyline points="22 4 12 14.01 9 11.01" />
             </svg>
             <span class="font-gelasio text-sm font-semibold text-[#2D5A3F]">
-              Đăng ký thành công! Vui lòng đăng nhập.
+              {{ t('auth.registerSuccessLogin') }}
             </span>
           </div>
 
@@ -67,7 +67,7 @@
             <BaseInput
               v-model="email"
               type="email"
-              placeholder="Email của bạn"
+              :placeholder="t('auth.emailPlaceholder')"
               :error="emailError"
             >
               <template #prefix>
@@ -96,7 +96,7 @@
             <BaseInput
               v-model="password"
               :type="showPassword ? 'text' : 'password'"
-              placeholder="Mật khẩu"
+              :placeholder="t('auth.passwordPlaceholder')"
               :error="passwordError"
             >
               <template #prefix>
@@ -123,7 +123,7 @@
                 <button
                   type="button"
                   class="flex items-center justify-center text-[#7E7576] hover:text-black transition-colors"
-                  aria-label="Toggle password visibility"
+                  :aria-label="t('auth.togglePasswordVisibility')"
                   @click="showPassword = !showPassword"
                 >
                   <svg
@@ -171,7 +171,7 @@
                 to="/forgot-password"
                 class="font-gelasio text-sm font-semibold text-black hover:underline transition-colors"
               >
-                Quên mật khẩu?
+                {{ t('auth.forgotPassword') }}
               </router-link>
             </div>
 
@@ -181,7 +181,7 @@
               full-width
               :loading="isSubmitting"
             >
-              ĐĂNG NHẬP
+              {{ t('auth.login') }}
             </BaseButton>
           </form>
 
@@ -189,7 +189,7 @@
           <div class="relative w-full h-[14.39px] flex items-center">
             <div class="absolute inset-0 border-t border-[#CFC4C5]" />
             <div class="absolute left-1/2 -translate-x-1/2 w-[67.14px] h-[14.39px] bg-white flex items-center justify-center">
-              <span class="font-geist text-xs text-[#CFC4C5] leading-[14px]">HOẶC</span>
+              <span class="font-geist text-xs text-[#CFC4C5] leading-[14px]">{{ t('auth.or') }}</span>
             </div>
           </div>
 
@@ -219,17 +219,17 @@
                 fill="#EA4335"
               />
             </svg>
-            <span class="font-gelasio text-base text-[#1A1C1C]">Đăng nhập bằng Google</span>
+            <span class="font-gelasio text-base text-[#1A1C1C]">{{ t('auth.loginWithGoogle') }}</span>
           </button>
 
           <!-- Register Link -->
           <div class="flex justify-center items-center gap-2">
-            <span class="font-gelasio text-base text-[#4C4546]">Chưa có tài khoản?</span>
+            <span class="font-gelasio text-base text-[#4C4546]">{{ t('auth.noAccount') }}</span>
             <router-link
               to="/register"
               class="font-gelasio text-base font-bold text-black hover:underline transition-colors"
             >
-              Đăng ký ngay
+              {{ t('auth.registerNow') }}
             </router-link>
           </div>
         </div>
@@ -245,9 +245,13 @@ import { useAuthStore } from '@/stores/auth.store'
 import { useForm, useField } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import { loginSchema } from '@/utils/validators'
+import { getApiErrorMessage } from '@/utils/apiError'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import { useToast } from 'vue-toastification'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const router = useRouter()
 const route = useRoute()
@@ -320,7 +324,7 @@ try {
   }
 } catch (error: any) {
   console.error('Login failed:', error)
-  toast.error(error.response?.data?.message || 'Đăng nhập thất bại. Vui lòng kiểm tra lại!')
+  toast.error(getApiErrorMessage(error, 'auth.loginFailed'))
 }
 })
 

@@ -47,14 +47,24 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
-import type { Product } from '@/types'
+import { useI18n } from 'vue-i18n'
 import { formatCurrency } from '@/utils/formatters'
+import { sportTranslationPath } from '@/i18n/labels'
+
+interface ProductCardProduct {
+  id: number
+  name: string
+  price: number
+  imageUrl: string
+  sport: string
+}
 
 const props = defineProps<{
-  product: Product
+  product: ProductCardProduct
 }>()
 
 const router = useRouter()
+const { t } = useI18n()
 
 const goToDetail = () => {
   router.push(`/product-detail/${props.product.id}`)
@@ -65,15 +75,7 @@ const formattedPrice = computed(() => {
 })
 
 const sportLabel = computed(() => {
-  const sport = props.product.sport?.toLowerCase() || ''
-  const labels: Record<string, string> = {
-    football: 'BÓNG ĐÁ',
-    badminton: 'CẦU LÔNG',
-    running: 'CHẠY BỘ',
-    basketball: 'BÓNG RỔ',
-    other: 'KHÁC'
-  }
-  return labels[sport] || sport.toUpperCase()
+  return t(sportTranslationPath(props.product.sport)).toUpperCase()
 })
 </script>
 
