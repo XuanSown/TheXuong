@@ -75,10 +75,10 @@ cartItemRepository.save(newItem);
 }
 
     @Transactional
-    public void removeCartItem(String email, Long variantId) {
+    public void removeCartItem(String email, Long cartItemId) {
         Cart cart = getCartByUser(email);
         CartItem item = cart.getItems().stream()
-            .filter(i -> i.getProductVariant().getId().equals(variantId))
+            .filter(i -> i.getId().equals(cartItemId))
             .findFirst()
             .orElseThrow(() -> new RuntimeException("Cart item not found"));
         cart.getItems().remove(item);
@@ -86,10 +86,10 @@ cartItemRepository.save(newItem);
     }
 
 @Transactional
-public void updateCartItemQuantity(String email, Long variantId, int quantity) {
+public void updateCartItemQuantity(String email, Long cartItemId, int quantity) {
     Cart cart = getCartByUser(email);
     CartItem item = cart.getItems().stream()
-        .filter(i -> i.getProductVariant().getId().equals(variantId))
+        .filter(i -> i.getId().equals(cartItemId))
         .findFirst()
         .orElseThrow(() -> new RuntimeException("Cart item not found"));
 

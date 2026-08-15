@@ -1,5 +1,6 @@
 package com.example.thexuong.controller;
 
+import com.example.thexuong.dto.CartRecommendationRequest;
 import com.example.thexuong.dto.ProductDto;
 import com.example.thexuong.dto.SizeDto;
 import com.example.thexuong.entity.Product;
@@ -8,6 +9,7 @@ import com.example.thexuong.entity.ProductVariant;
 import com.example.thexuong.repository.ProductImageRepository;
 import com.example.thexuong.repository.ProductRepository;
 import com.example.thexuong.repository.ProductVariantRepository;
+import com.example.thexuong.service.RecommendationService;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +40,7 @@ public class ProductRestController {
 	private final ProductRepository productRepository;
 	private final ProductImageRepository productImageRepository;
 	private final ProductVariantRepository productVariantRepository;
+	private final RecommendationService recommendationService;
 
 	/**
 	 * GET /api/v1/products
@@ -150,6 +153,23 @@ public class ProductRestController {
 				.collect(Collectors.toList());
 
 		return ResponseEntity.ok(productDtos);
+	}
+
+	/**
+	 * POST /api/v1/products/recommendations/cart
+	 * Body: { "productIds": [12, 16, 21], "limit": 8 }
+	 *
+	 * Rule-based recommendation dựa trên sản phẩm trong cart.
+	 * Dùng chung cho guest cart và authenticated cart (không phụ thuộc login).
+	 * Empty/invalid productIds -> trả []. Không ảnh hưởng API Product khác.
+	 */
+	@Transactional(readOnly = true)
+	@PostMapping("/recommendations/cart")
+	public ResponseEntity<?> getCartRecommendations(@RequestBody(required = false) CartRecommendationRequest request) {
+		if (request == null || request.getProductIds() == null || request.getProductIds().isEmpty()) {
+			return ResponseEntity.ok(List.of());
+		}
+		return ResponseEntity.ok(recommendationService.recommendForCart(request.getProductIds(), request.getLimit()));
 	}
 
 	/**
