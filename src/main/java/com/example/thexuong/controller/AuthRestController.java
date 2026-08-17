@@ -8,6 +8,7 @@ import com.example.thexuong.dto.auth.UpdateProfileRequest;
 import com.example.thexuong.entity.User;
 import com.example.thexuong.service.PasswordResetService;
 import com.example.thexuong.service.UserService;
+import com.example.thexuong.service.LoginHistoryService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -38,6 +39,7 @@ public class AuthRestController {
     private final AuthenticationManager authenticationManager;
     private final UserService userService;
     private final PasswordResetService passwordResetService;
+    private final LoginHistoryService loginHistoryService;
     private final com.example.thexuong.security.JwtService jwtService;
     private final com.example.thexuong.security.JwtCookieService jwtCookieService;
     private final com.example.thexuong.security.TokenBlacklist tokenBlacklist;
@@ -58,9 +60,20 @@ public class AuthRestController {
                     new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
             );
         } catch (org.springframework.security.core.AuthenticationException e) {
+            loginHistoryService.recordLogin(
+                    request.getEmail(),
+                    httpRequest.getRemoteAddr(),
+                    httpRequest.getHeader("User-Agent"),
+                    "LOCAL", false, e.getMessage());
             throw e; // GlobalExceptionHandler returns 401
         }
         SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        loginHistoryService.recordLogin(
+                request.getEmail(),
+                httpRequest.getRemoteAddr(),
+                httpRequest.getHeader("User-Agent"),
+                "LOCAL", true, null);
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         String accessToken = jwtService.generateAccessToken(userDetails);

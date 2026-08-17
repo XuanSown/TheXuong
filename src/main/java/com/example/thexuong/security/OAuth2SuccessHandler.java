@@ -2,6 +2,7 @@ package com.example.thexuong.security;
 
 import com.example.thexuong.entity.User;
 import com.example.thexuong.repository.UserRepository;
+import com.example.thexuong.service.LoginHistoryService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -25,6 +26,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     private final UserRepository userRepository;
     private final JwtService jwtService;
     private final JwtCookieService jwtCookieService;
+    private final LoginHistoryService loginHistoryService;
 
     @Value("${app.frontend.url:http://localhost:5173}")
     private String frontendUrl;
@@ -64,6 +66,12 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         String accessToken = jwtService.generateAccessToken(userDetails);
         String refreshToken = jwtService.generateRefreshToken(userDetails);
         jwtCookieService.setAuthCookies(response, accessToken, refreshToken);
+
+        loginHistoryService.recordLogin(
+                email,
+                request.getRemoteAddr(),
+                request.getHeader("User-Agent"),
+                "GOOGLE", true, null);
 
         // 4. Redirect to frontend OAuth callback page to complete the flow
         String redirectUrl = frontendUrl + "/oauth/callback";

@@ -1,7 +1,23 @@
 <template>
   <div class="audit-logs-manager">
     <main class="main-content">
-      <section class="logs-list">
+      <div class="tab-bar">
+        <button
+          class="tab-button"
+          :class="{ active: activeTab === 'audit' }"
+          @click="activeTab = 'audit'"
+        >
+          LỊCH SỬ HỆ THỐNG
+        </button>
+        <button
+          class="tab-button"
+          :class="{ active: activeTab === 'login' }"
+          @click="activeTab = 'login'"
+        >
+          ĐĂNG NHẬP
+        </button>
+      </div>
+      <section v-if="activeTab === 'audit'" class="logs-list">
         <div class="list-header">
           <div class="header-info">
             <h2>Lịch Sử Hệ Thống (Audit Logs)</h2>
@@ -67,6 +83,7 @@
           </table>
         </div>
       </section>
+      <LoginHistoryTab v-else />
     </main>
 
     <!-- Detail Modal -->
@@ -132,10 +149,12 @@
 import { ref, onMounted } from 'vue'
 import { useToast } from 'vue-toastification'
 import { adminAuditService, type SystemAuditLog } from '@/services/adminAudit.service'
+import LoginHistoryTab from '@/components/admin/audit-logs/LoginHistoryTab.vue'
 
 const toast = useToast()
 const logs = ref<SystemAuditLog[]>([])
 const isLoading = ref(false)
+const activeTab = ref<'audit' | 'login'>('audit')
 
 const showModal = ref(false)
 const selectedLog = ref<SystemAuditLog | null>(null)
@@ -216,6 +235,36 @@ onMounted(() => {
   padding: 32px 24px;
   width: 100%;
   box-sizing: border-box;
+}
+
+.tab-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.tab-button {
+  padding: 10px 22px;
+  border: 1px solid #E8E8E8;
+  border-radius: 8px;
+  background: #FFFFFF;
+  color: #4C4546;
+  font-family: 'Geist', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tab-button:hover {
+  background: #F3F3F4;
+}
+
+.tab-button.active {
+  background: #000000;
+  color: #FFFFFF;
+  border-color: #000000;
 }
 
 .logs-list {
