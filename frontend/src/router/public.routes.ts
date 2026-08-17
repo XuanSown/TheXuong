@@ -20,6 +20,7 @@ export const publicRoutes: RouteRecordRaw[] = [
   { path: '/policy/privacy', name: 'privacy-policy', component: () => import('@/views/PrivacyPolicy.vue') },
   { path: '/policy/shipping', name: 'shipping-policy', component: () => import('@/views/ShippingPolicy.vue') },
   { path: '/payment-methods', name: 'payment-methods', component: () => import('@/views/PaymentMethods.vue') },
+  { path: '/help', name: 'help', component: () => import('@/views/Help.vue') },
   
   // Auth routes
   { path: '/login', name: 'login', component: () => import('@/views/Login.vue'), meta: { guestOnly: true, layout: 'blank' } },
