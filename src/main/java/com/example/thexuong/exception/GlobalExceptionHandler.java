@@ -53,6 +53,16 @@ public class GlobalExceptionHandler {
   }
 
   /**
+   * 404 — FAQ không tồn tại (Admin Customer Care).
+   */
+  @ExceptionHandler(FaqNotFoundException.class)
+  public ResponseEntity<ApiResponse<Void>> handleFaqNotFound(FaqNotFoundException ex) {
+    return ResponseEntity
+      .status(HttpStatus.NOT_FOUND)
+      .body(ApiResponse.error(ex.getMessage()));
+  }
+
+  /**
    * 400 — User cố spend/reverse nhiều điểm hơn số dư (Batch 1 Loyalty).
    */
   @ExceptionHandler(PointBalanceException.class)

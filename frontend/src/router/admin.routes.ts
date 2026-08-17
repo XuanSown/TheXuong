@@ -28,5 +28,8 @@ export const adminRoutes: RouteRecordRaw[] = [
   ], meta: { requiresAdmin: true, layout: 'admin' } },
   { path: '/admin/audit-logs', name: 'admin-audit-logs', component: () => import('@/router/AdminLayoutWrapper.vue'), children: [
     { path: '', name: 'admin-audit-logs-list', component: () => import('@/views/admin/AdminAuditLogs.vue') }
+  ], meta: { requiresAdmin: true, layout: 'admin' } },
+  { path: '/admin/customer-care', name: 'admin-customer-care', component: () => import('@/router/AdminLayoutWrapper.vue'), children: [
+    { path: '', name: 'admin-customer-care-home', component: () => import('@/views/admin/AdminCustomerCare.vue') }
   ], meta: { requiresAdmin: true, layout: 'admin' } }
 ]

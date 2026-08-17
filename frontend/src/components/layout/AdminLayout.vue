@@ -125,6 +125,23 @@
           <span class="nav-text">Quản Lý Cấp Bậc</span>
         </router-link>
         <router-link
+          to="/admin/customer-care"
+          class="nav-item"
+          :class="{ active: String($route.name).startsWith('admin-customer-care') }"
+        >
+          <span class="nav-icon">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            ><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /><path d="M8 9h8" /><path d="M8 13h5" /></svg>
+          </span>
+          <span class="nav-text">Quản Lý CSKH</span>
+        </router-link>
+        <router-link
           to="/admin/audit-logs"
           class="nav-item"
           :class="{ active: String($route.name).startsWith('admin-audit-logs') }"
