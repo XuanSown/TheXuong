@@ -170,7 +170,7 @@
           to="/login"
           class="text-black underline font-medium"
         >
-          {{ t('common.login') }}
+          {{ t('auth.login') }}
         </router-link>
       </p>
 
