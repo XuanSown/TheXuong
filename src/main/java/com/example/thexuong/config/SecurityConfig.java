@@ -2,6 +2,7 @@ package com.example.thexuong.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -166,6 +167,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/v1/auth/login", "/api/v1/auth/register", "/api/v1/auth/forgot-password", "/api/v1/auth/reset-password", "/api/v1/auth/refresh").permitAll()
                 .requestMatchers("/api/v1/products/**", "/api/v1/categories/**").permitAll()
                 .requestMatchers("/api/v1/chatbot/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/reviews/product/**").permitAll()
                 .requestMatchers("/api/v1/addresses", "/api/v1/addresses/**", "/api/v1/maps", "/api/v1/maps/**").authenticated()
                 .requestMatchers("/api/v1/admin/**").hasAnyAuthority("ADMIN", "BOTH")
                 .anyRequest().authenticated()

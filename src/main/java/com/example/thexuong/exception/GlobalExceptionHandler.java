@@ -128,6 +128,36 @@ public class GlobalExceptionHandler {
   }
 
   /**
+   * 404 — Review (hoặc Product khi tạo review) không tồn tại.
+   */
+  @ExceptionHandler(ReviewNotFoundException.class)
+  public ResponseEntity<ApiResponse<Void>> handleReviewNotFound(ReviewNotFoundException ex) {
+    return ResponseEntity
+      .status(HttpStatus.NOT_FOUND)
+      .body(ApiResponse.error(ex.getMessage()));
+  }
+
+  /**
+   * 403 — Review: chưa mua sản phẩm / không phải chủ review / không phải admin.
+   */
+  @ExceptionHandler(ReviewNotAllowedException.class)
+  public ResponseEntity<ApiResponse<Void>> handleReviewNotAllowed(ReviewNotAllowedException ex) {
+    return ResponseEntity
+      .status(HttpStatus.FORBIDDEN)
+      .body(ApiResponse.error(ex.getMessage()));
+  }
+
+  /**
+   * 409 — User đã review sản phẩm này rồi.
+   */
+  @ExceptionHandler(ReviewAlreadyExistsException.class)
+  public ResponseEntity<ApiResponse<Void>> handleReviewAlreadyExists(ReviewAlreadyExistsException ex) {
+    return ResponseEntity
+      .status(HttpStatus.CONFLICT)
+      .body(ApiResponse.error(ex.getMessage()));
+  }
+
+  /**
    * 500 — Tất cả lỗi không mong muốn còn lại.
    */
   @ExceptionHandler(Exception.class)
