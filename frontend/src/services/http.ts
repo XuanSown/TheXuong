@@ -16,7 +16,11 @@ client.interceptors.response.use(
         window.location.href = '/login'
       }
     }
-    if (error.response?.status === 403) window.location.href = '/'
+    if (error.response?.status === 403) {
+      // Review dùng 403 cho lỗi nghiệp vụ (chưa mua, không phải chủ review) → không redirect, để component hiện toast.
+      const url = error.config?.url || ''
+      if (!url.startsWith('/reviews')) window.location.href = '/'
+    }
     return Promise.reject(error)
   }
 )

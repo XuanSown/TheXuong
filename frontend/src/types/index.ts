@@ -2,6 +2,7 @@ export type { User, Address } from './auth.types'
 export type { Cart, CartItem } from './cart.types'
 export type { Order, OrderItem } from './order.types'
 export { OrderStatus } from './order.types'
+export type { Review, ReviewSummary, ReviewListResponse } from './review.types'
 export type { ApiResponse, PageParams } from './common.types'
 
 export interface Product {
