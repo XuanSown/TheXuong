@@ -1,8 +1,10 @@
 package com.example.thexuong.repository;
 
 import com.example.thexuong.entity.OrderDetail;
+import com.example.thexuong.entity.OrderStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -23,4 +25,15 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> 
             "GROUP BY product_name " +
             "ORDER BY total_sold ASC", nativeQuery = true)
     List<Object[]> findSlowSellingProducts();
+
+    // 3. Kiểm tra user đã mua sản phẩm với trạng thái đơn cụ thể (dùng cho Review).
+    @Query("""
+            SELECT COUNT(d) > 0 FROM OrderDetail d
+            WHERE d.productId = :productId
+              AND d.order.user.id = :userId
+              AND d.order.status = :status
+            """)
+    boolean existsPurchaseWithStatus(@Param("productId") Long productId,
+                                     @Param("userId") Long userId,
+                                     @Param("status") OrderStatus status);
 }
