@@ -2,8 +2,8 @@
   <div
     class="relative inline-block shrink-0"
     :class="sizeClass"
-    role="img"
-    :aria-label="`${modelValue} / 5`"
+    :role="interactive ? 'group' : 'img'"
+    :aria-label="interactive ? undefined : `${modelValue} / 5`"
   >
     <div class="flex h-full w-full">
       <svg
@@ -28,7 +28,7 @@
           v-for="i in 5"
           :key="i"
           viewBox="0 0 24 24"
-          class="h-full w-full shrink-0 text-black"
+          class="h-full w-full text-black"
           fill="currentColor"
         >
           <path :d="STAR_PATH" />
