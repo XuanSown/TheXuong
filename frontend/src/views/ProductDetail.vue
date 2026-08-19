@@ -361,6 +361,12 @@
         </div>
       </section>
 
+      <!-- Product Reviews -->
+      <ProductReviews
+        v-if="product"
+        :product-id="product.id"
+      />
+
       <!-- Loading State -->
       <div
         v-else-if="loading"
@@ -440,6 +446,7 @@ import { useCartStore } from '@/stores/cart.store'
 import { useAuthStore } from '@/stores/auth.store'
 import { useFavoriteStore } from '@/stores/favorite.store'
 import BaseSkeleton from '@/components/ui/BaseSkeleton.vue'
+import ProductReviews from '@/components/review/ProductReviews.vue'
 import { productService } from '@/services/product.service'
 import { useToast } from 'vue-toastification'
 import { useI18n } from 'vue-i18n'
