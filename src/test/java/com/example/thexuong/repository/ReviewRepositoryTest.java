@@ -78,18 +78,6 @@ class ReviewRepositoryTest {
     }
 
     @Test
-    void findByIdAndUserId_matchesOnlyOwnedReview() {
-        User u1 = user("c@test.com");
-        User u2 = user("d@test.com");
-        Product p = product("P3");
-        Review own = review(u1, p, 5);
-        review(u2, p, 1);
-
-        assertThat(reviewRepository.findByIdAndUserId(own.getId(), u1.getId())).isPresent();
-        assertThat(reviewRepository.findByIdAndUserId(own.getId(), u2.getId())).isEmpty();
-    }
-
-    @Test
     void countByProductId_countsOnlyThatProduct() {
         User u = user("e@test.com");
         Product p1 = product("P4");

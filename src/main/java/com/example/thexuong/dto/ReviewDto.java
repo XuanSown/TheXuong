@@ -1,5 +1,6 @@
 package com.example.thexuong.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,6 +19,7 @@ public class ReviewDto {
     private LocalDateTime createdAt;
     private String authorName;
     private boolean verifiedBuyer;
-    private boolean isMine;
+    @JsonProperty("isMine")
+    private boolean mine;
     private boolean canModerate;
 }

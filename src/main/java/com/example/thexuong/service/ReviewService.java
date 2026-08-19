@@ -148,7 +148,7 @@ public class ReviewService {
                 .createdAt(review.getCreatedAt())
                 .authorName(authorName)
                 .verifiedBuyer(true)
-                .isMine(viewerEmail != null && viewerEmail.equalsIgnoreCase(author.getEmail()))
+                .mine(viewerEmail != null && viewerEmail.equalsIgnoreCase(author.getEmail()))
                 .canModerate(viewerIsAdmin)
                 .build();
     }
