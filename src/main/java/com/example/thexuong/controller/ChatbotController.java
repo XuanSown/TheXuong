@@ -7,6 +7,8 @@ import com.example.thexuong.dto.ChatMemoryRequest;
 import com.example.thexuong.service.ChatbotService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +21,9 @@ import java.util.Map;
  *
  * These endpoints are PUBLIC (no auth required) because the chatbot
  * interacts with users who may not have an account.
+ *
+ * /orders/track được bảo vệ thêm bằng shared secret X-Chatbot-Secret
+ * giữa n8n và backend (CHATBOT_API_SECRET) để chống brute-force mã đơn.
  */
 @RestController
 @RequestMapping("/api/v1/chatbot")
@@ -27,6 +32,9 @@ import java.util.Map;
 public class ChatbotController {
 
     private final ChatbotService chatbotService;
+
+    @Value("${chatbot.api.secret:}")
+    private String chatbotApiSecret;
 
     // ==================== Products ====================
 
@@ -65,10 +73,19 @@ public class ChatbotController {
     /**
      * GET /api/v1/chatbot/orders/track
      * Returns order details for a specific order code and phone number.
-     * Public endpoint - no auth required.
+     * Protected by shared secret X-Chatbot-Secret (env CHATBOT_API_SECRET).
      */
     @GetMapping("/orders/track")
-    public ResponseEntity<?> trackOrder(@RequestParam String id, @RequestParam String phone) {
+    public ResponseEntity<?> trackOrder(@RequestParam String id, @RequestParam String phone,
+                                        @RequestHeader(value = "X-Chatbot-Secret", required = false) String secret) {
+        if (chatbotApiSecret == null || chatbotApiSecret.isBlank()
+                || !chatbotApiSecret.equals(secret)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
+                    "success", false,
+                    "message", "Unauthorized"
+            ));
+        }
+
         Long orderId;
         try {
             orderId = Long.parseLong(id);
@@ -102,23 +119,25 @@ public class ChatbotController {
     @GetMapping("/memory/{chatId}")
     public ResponseEntity<?> getChatMemory(@PathVariable String chatId) {
         String history = chatbotService.getChatMemory(chatId);
-        // history_json top-level (không wrap trong data) — n8n đọc memItems[0].json.history_json trực tiếp
+        String state = chatbotService.getChatState(chatId);
+        // history_json + state_json top-level (không wrap trong data) — n8n đọc memItems[0].json.* trực tiếp
         return ResponseEntity.ok(Map.of(
                 "success", true,
                 "chatId", chatId,
-                "history_json", history
+                "history_json", history,
+                "state_json", state
         ));
     }
 
     /**
      * POST /api/v1/chatbot/memory
-     * Saves or updates conversation history.
-     * Body: { "chatId": "string", "historyJson": "string" }
+     * Saves or updates conversation history + state.
+     * Body: { "chatId": "string", "historyJson": "string", "stateJson": "string" }
      * Public endpoint - no auth required.
      */
     @PostMapping("/memory")
     public ResponseEntity<?> saveChatMemory(@RequestBody ChatMemoryRequest request) {
-        chatbotService.saveChatMemory(request.getChatId(), request.getHistoryJson());
+        chatbotService.saveChatMemory(request.getChatId(), request.getHistoryJson(), request.getStateJson());
         return ResponseEntity.ok(Map.of(
                 "success", true,
                 "message", "Đã lưu lịch sử hội thoại"

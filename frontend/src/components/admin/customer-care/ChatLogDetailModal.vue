@@ -1,9 +1,18 @@
 <template>
-  <div v-if="modelValue && log" class="modal-overlay" @click.self="close">
+  <div
+    v-if="modelValue && log"
+    class="modal-overlay"
+    @click.self="close"
+  >
     <div class="modal-content">
       <div class="modal-header">
         <h2>Chi Tiết Chat Log #{{ log.id }}</h2>
-        <button class="btn-close" @click="close">&times;</button>
+        <button
+          class="btn-close"
+          @click="close"
+        >
+          &times;
+        </button>
       </div>
       <div class="modal-body">
         <div class="info-grid">
@@ -27,12 +36,16 @@
 
         <div class="message-section">
           <label>USER MESSAGE</label>
-          <div class="message-box user-box">{{ log.userMessage }}</div>
+          <div class="message-box user-box">
+            {{ log.userMessage }}
+          </div>
         </div>
 
         <div class="message-section">
           <label>BOT REPLY</label>
-          <div class="message-box bot-box">{{ log.botReply }}</div>
+          <div class="message-box bot-box">
+            {{ log.botReply }}
+          </div>
         </div>
       </div>
     </div>

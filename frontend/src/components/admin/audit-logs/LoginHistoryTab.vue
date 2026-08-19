@@ -4,9 +4,15 @@
       <div class="list-header">
         <div class="header-info">
           <h2>LỊCH SỬ ĐĂNG NHẬP</h2>
-          <p class="logs-count">{{ totalElements }} bản ghi</p>
+          <p class="logs-count">
+            {{ totalElements }} bản ghi
+          </p>
         </div>
-        <button class="btn-secondary" @click="reload" :disabled="isLoading">
+        <button
+          class="btn-secondary"
+          :disabled="isLoading"
+          @click="reload"
+        >
           <span>↻</span> TẢI LẠI
         </button>
       </div>
@@ -18,64 +24,140 @@
           class="search-input"
           placeholder="Tìm email..."
           @keyup.enter="applyFilters"
-        />
-        <select v-model="filters.provider" class="select-input">
-          <option value="">TẤT CẢ NGUỒN</option>
-          <option value="LOCAL">LOCAL</option>
-          <option value="GOOGLE">GOOGLE</option>
+        >
+        <select
+          v-model="filters.provider"
+          class="select-input"
+        >
+          <option value="">
+            TẤT CẢ NGUỒN
+          </option>
+          <option value="LOCAL">
+            LOCAL
+          </option>
+          <option value="GOOGLE">
+            GOOGLE
+          </option>
         </select>
-        <select v-model="filters.success" class="select-input">
-          <option value="">TẤT CẢ KẾT QUẢ</option>
-          <option value="true">THÀNH CÔNG</option>
-          <option value="false">THẤT BẠI</option>
+        <select
+          v-model="filters.success"
+          class="select-input"
+        >
+          <option value="">
+            TẤT CẢ KẾT QUẢ
+          </option>
+          <option value="true">
+            THÀNH CÔNG
+          </option>
+          <option value="false">
+            THẤT BẠI
+          </option>
         </select>
-        <input v-model="filters.from" type="date" class="date-input" title="Từ ngày" />
-        <input v-model="filters.to" type="date" class="date-input" title="Đến ngày" />
-        <button class="btn-secondary" @click="applyFilters">LỌC</button>
+        <input
+          v-model="filters.from"
+          type="date"
+          class="date-input"
+          title="Từ ngày"
+        >
+        <input
+          v-model="filters.to"
+          type="date"
+          class="date-input"
+          title="Đến ngày"
+        >
+        <button
+          class="btn-secondary"
+          @click="applyFilters"
+        >
+          LỌC
+        </button>
       </div>
 
       <div class="table-container">
         <table class="logs-table">
           <thead>
             <tr>
-              <th class="col-time">THỜI GIAN</th>
-              <th class="col-email">EMAIL</th>
-              <th class="col-ip">IP</th>
-              <th class="col-provider">NGUỒN</th>
-              <th class="col-result">KẾT QUẢ</th>
-              <th class="col-reason">LÝ DO</th>
-              <th class="col-action">THAO TÁC</th>
+              <th class="col-time">
+                THỜI GIAN
+              </th>
+              <th class="col-email">
+                EMAIL
+              </th>
+              <th class="col-ip">
+                IP
+              </th>
+              <th class="col-provider">
+                NGUỒN
+              </th>
+              <th class="col-result">
+                KẾT QUẢ
+              </th>
+              <th class="col-reason">
+                LÝ DO
+              </th>
+              <th class="col-action">
+                THAO TÁC
+              </th>
             </tr>
           </thead>
           <tbody>
             <tr v-if="isLoading">
-              <td colspan="7" class="loading-cell">Đang tải dữ liệu...</td>
+              <td
+                colspan="7"
+                class="loading-cell"
+              >
+                Đang tải dữ liệu...
+              </td>
             </tr>
             <tr v-else-if="logs.length === 0">
-              <td colspan="7" class="empty-cell">Không có lịch sử đăng nhập nào</td>
+              <td
+                colspan="7"
+                class="empty-cell"
+              >
+                Không có lịch sử đăng nhập nào
+              </td>
             </tr>
-            <tr v-else v-for="log in logs" :key="log.id">
+            <tr
+              v-for="log in logs"
+              v-else
+              :key="log.id"
+            >
               <td class="col-time">
                 <span class="time-text">{{ formatDate(log.createdAt) }}</span>
               </td>
               <td class="col-email">
-                <span class="email-text" :title="log.email">{{ log.email }}</span>
+                <span
+                  class="email-text"
+                  :title="log.email"
+                >{{ log.email }}</span>
               </td>
               <td class="col-ip">
-                <span class="ip-text" :title="log.ipAddress || ''">{{ log.ipAddress || '—' }}</span>
+                <span
+                  class="ip-text"
+                  :title="log.ipAddress || ''"
+                >{{ log.ipAddress || '—' }}</span>
               </td>
               <td class="col-provider">
-                <span class="provider-badge" :class="log.provider === 'GOOGLE' ? 'badge-google' : 'badge-local'">
+                <span
+                  class="provider-badge"
+                  :class="log.provider === 'GOOGLE' ? 'badge-google' : 'badge-local'"
+                >
                   {{ log.provider }}
                 </span>
               </td>
               <td class="col-result">
-                <span class="result-badge" :class="log.success ? 'badge-success' : 'badge-fail'">
+                <span
+                  class="result-badge"
+                  :class="log.success ? 'badge-success' : 'badge-fail'"
+                >
                   {{ log.success ? 'Thành công' : 'Thất bại' }}
                 </span>
               </td>
               <td class="col-reason">
-                <span class="reason-text" :title="log.failureReason || ''">{{ log.failureReason || '—' }}</span>
+                <span
+                  class="reason-text"
+                  :title="log.failureReason || ''"
+                >{{ log.failureReason || '—' }}</span>
               </td>
               <td class="col-action">
                 <button
@@ -87,19 +169,33 @@
                 >
                   {{ isUserActive(log.userId) ? 'KHOÁ TÀI KHOẢN' : 'MỞ KHOÁ' }}
                 </button>
-                <span v-else class="action-none">—</span>
+                <span
+                  v-else
+                  class="action-none"
+                >—</span>
               </td>
             </tr>
           </tbody>
         </table>
       </div>
 
-      <div v-if="totalPages > 1" class="pagination">
-        <button class="btn-secondary" :disabled="page === 0 || isLoading" @click="goToPage(page - 1)">
+      <div
+        v-if="totalPages > 1"
+        class="pagination"
+      >
+        <button
+          class="btn-secondary"
+          :disabled="page === 0 || isLoading"
+          @click="goToPage(page - 1)"
+        >
           ‹ TRƯỚC
         </button>
         <span class="page-info">Trang {{ page + 1 }} / {{ totalPages }}</span>
-        <button class="btn-secondary" :disabled="page >= totalPages - 1 || isLoading" @click="goToPage(page + 1)">
+        <button
+          class="btn-secondary"
+          :disabled="page >= totalPages - 1 || isLoading"
+          @click="goToPage(page + 1)"
+        >
           SAU ›
         </button>
       </div>

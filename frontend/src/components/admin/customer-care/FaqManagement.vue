@@ -4,9 +4,14 @@
       <div class="list-header">
         <div class="header-info">
           <h2>FAQ CHATBOT</h2>
-          <p class="faq-count">{{ totalElements }} câu hỏi</p>
+          <p class="faq-count">
+            {{ totalElements }} câu hỏi
+          </p>
         </div>
-        <button class="btn-primary" @click="openAddModal">
+        <button
+          class="btn-primary"
+          @click="openAddModal"
+        >
           + THÊM FAQ
         </button>
       </div>
@@ -18,16 +23,25 @@
           class="search-input"
           placeholder="Tìm kiếm chủ đề, từ khóa, câu trả lời..."
           @keyup.enter="applyFilters"
-        />
+        >
         <input
           v-model="topic"
           type="text"
           class="topic-input"
           placeholder="Lọc theo chủ đề..."
           @keyup.enter="applyFilters"
-        />
-        <button class="btn-secondary" @click="applyFilters">TÌM</button>
-        <button class="btn-secondary" @click="reload" :disabled="isLoading">
+        >
+        <button
+          class="btn-secondary"
+          @click="applyFilters"
+        >
+          TÌM
+        </button>
+        <button
+          class="btn-secondary"
+          :disabled="isLoading"
+          @click="reload"
+        >
           <span>↻</span> TẢI LẠI
         </button>
       </div>
@@ -36,22 +50,48 @@
         <table class="faq-table">
           <thead>
             <tr>
-              <th class="col-id">ID</th>
-              <th class="col-topic">CHỦ ĐỀ</th>
-              <th class="col-keywords">TỪ KHÓA</th>
-              <th class="col-answer">CÂU TRẢ LỜI</th>
-              <th class="col-updated">CẬP NHẬT</th>
-              <th class="col-actions">THAO TÁC</th>
+              <th class="col-id">
+                ID
+              </th>
+              <th class="col-topic">
+                CHỦ ĐỀ
+              </th>
+              <th class="col-keywords">
+                TỪ KHÓA
+              </th>
+              <th class="col-answer">
+                CÂU TRẢ LỜI
+              </th>
+              <th class="col-updated">
+                CẬP NHẬT
+              </th>
+              <th class="col-actions">
+                THAO TÁC
+              </th>
             </tr>
           </thead>
           <tbody>
             <tr v-if="isLoading">
-              <td colspan="6" class="loading-cell">Đang tải dữ liệu...</td>
+              <td
+                colspan="6"
+                class="loading-cell"
+              >
+                Đang tải dữ liệu...
+              </td>
             </tr>
             <tr v-else-if="faqs.length === 0">
-              <td colspan="6" class="empty-cell">Không tìm thấy FAQ nào</td>
+              <td
+                colspan="6"
+                class="empty-cell"
+              >
+                Không tìm thấy FAQ nào
+              </td>
             </tr>
-            <tr v-else v-for="faq in faqs" :key="faq.id">
+            <tr
+              v-for="faq in faqs"
+              v-else
+              :key="faq.id"
+            >
               <td class="col-id">
                 <span class="faq-id">#{{ faq.id }}</span>
               </td>
@@ -59,12 +99,18 @@
                 <span class="topic-badge">{{ faq.topic }}</span>
               </td>
               <td class="col-keywords">
-                <span class="truncate keywords-text" :title="faq.questionKeywords">
+                <span
+                  class="truncate keywords-text"
+                  :title="faq.questionKeywords"
+                >
                   {{ faq.questionKeywords }}
                 </span>
               </td>
               <td class="col-answer">
-                <span class="truncate answer-text" :title="faq.answer">
+                <span
+                  class="truncate answer-text"
+                  :title="faq.answer"
+                >
                   {{ faq.answer }}
                 </span>
               </td>
@@ -73,8 +119,20 @@
               </td>
               <td class="col-actions">
                 <div class="action-buttons">
-                  <button class="action-btn edit-btn" title="Sửa" @click="openEditModal(faq)">✎</button>
-                  <button class="action-btn delete-btn" title="Xóa" @click="deleteFaq(faq)">🗑</button>
+                  <button
+                    class="action-btn edit-btn"
+                    title="Sửa"
+                    @click="openEditModal(faq)"
+                  >
+                    ✎
+                  </button>
+                  <button
+                    class="action-btn delete-btn"
+                    title="Xóa"
+                    @click="deleteFaq(faq)"
+                  >
+                    🗑
+                  </button>
                 </div>
               </td>
             </tr>
@@ -82,12 +140,23 @@
         </table>
       </div>
 
-      <div v-if="totalPages > 1" class="pagination">
-        <button class="btn-secondary" :disabled="page === 0 || isLoading" @click="goToPage(page - 1)">
+      <div
+        v-if="totalPages > 1"
+        class="pagination"
+      >
+        <button
+          class="btn-secondary"
+          :disabled="page === 0 || isLoading"
+          @click="goToPage(page - 1)"
+        >
           ‹ TRƯỚC
         </button>
         <span class="page-info">Trang {{ page + 1 }} / {{ totalPages }}</span>
-        <button class="btn-secondary" :disabled="page >= totalPages - 1 || isLoading" @click="goToPage(page + 1)">
+        <button
+          class="btn-secondary"
+          :disabled="page >= totalPages - 1 || isLoading"
+          @click="goToPage(page + 1)"
+        >
           SAU ›
         </button>
       </div>

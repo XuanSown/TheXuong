@@ -12,7 +12,10 @@
               Tổng cộng {{ tiers.length }} cấp bậc
             </p>
           </div>
-          <button class="btn-primary" @click="openAddModal">
+          <button
+            class="btn-primary"
+            @click="openAddModal"
+          >
             + THÊM CẤP BẬC
           </button>
         </div>
@@ -22,23 +25,43 @@
           <table class="tiers-table">
             <thead>
               <tr>
-                <th class="col-id">MÃ HẠNG</th>
-                <th class="col-name">TÊN HẠNG</th>
-                <th class="col-condition">ĐIỀU KIỆN (TIỀN / ĐIỂM)</th>
-                <th class="col-discount">GIẢM GIÁ TỰ ĐỘNG</th>
-                <th class="col-actions">THAO TÁC</th>
+                <th class="col-id">
+                  MÃ HẠNG
+                </th>
+                <th class="col-name">
+                  TÊN HẠNG
+                </th>
+                <th class="col-condition">
+                  ĐIỀU KIỆN (TIỀN / ĐIỂM)
+                </th>
+                <th class="col-discount">
+                  GIẢM GIÁ TỰ ĐỘNG
+                </th>
+                <th class="col-actions">
+                  THAO TÁC
+                </th>
               </tr>
             </thead>
             <tbody>
               <tr v-if="isLoading">
-                <td colspan="5" class="loading-cell">Đang tải dữ liệu...</td>
+                <td
+                  colspan="5"
+                  class="loading-cell"
+                >
+                  Đang tải dữ liệu...
+                </td>
               </tr>
               <tr v-else-if="tiers.length === 0">
-                <td colspan="5" class="empty-cell">Không tìm thấy cấp bậc nào</td>
+                <td
+                  colspan="5"
+                  class="empty-cell"
+                >
+                  Không tìm thấy cấp bậc nào
+                </td>
               </tr>
               <tr
-                v-else
                 v-for="tier in tiers"
+                v-else
                 :key="tier.id"
               >
                 <td class="col-id">
@@ -57,10 +80,18 @@
                 </td>
                 <td class="col-actions">
                   <div class="action-buttons">
-                    <button class="action-btn edit-btn" title="Sửa" @click="openEditModal(tier)">
+                    <button
+                      class="action-btn edit-btn"
+                      title="Sửa"
+                      @click="openEditModal(tier)"
+                    >
                       ✎
                     </button>
-                    <button class="action-btn delete-btn" title="Xóa" @click="deleteTier(tier)">
+                    <button
+                      class="action-btn delete-btn"
+                      title="Xóa"
+                      @click="deleteTier(tier)"
+                    >
                       🗑
                     </button>
                   </div>
@@ -73,43 +104,91 @@
     </main>
 
     <!-- Modal Form (Add/Edit) -->
-    <div v-if="showModal" class="modal-overlay" @click.self="closeModal">
+    <div
+      v-if="showModal"
+      class="modal-overlay"
+      @click.self="closeModal"
+    >
       <div class="modal-content">
         <div class="modal-header">
           <h2>{{ isEditing ? 'Sửa cấp bậc' : 'Thêm cấp bậc' }}</h2>
-          <button class="btn-close" @click="closeModal">&times;</button>
+          <button
+            class="btn-close"
+            @click="closeModal"
+          >
+            &times;
+          </button>
         </div>
         <div class="modal-body">
           <form @submit.prevent="submitForm">
             <div class="form-group">
               <label>Mã Hạng (VD: VIP, VVIP)</label>
-              <input type="text" v-model="form.code" required class="form-input" :disabled="isEditing && isBaseTier(form.code)" />
+              <input
+                v-model="form.code"
+                type="text"
+                required
+                class="form-input"
+                :disabled="isEditing && isBaseTier(form.code)"
+              >
             </div>
             
             <div class="form-group">
               <label>Tên Hạng</label>
-              <input type="text" v-model="form.name" required class="form-input" />
+              <input
+                v-model="form.name"
+                type="text"
+                required
+                class="form-input"
+              >
             </div>
 
             <div class="form-row">
               <div class="form-group half">
                 <label>Số tiền tối thiểu (VNĐ)</label>
-                <input type="number" v-model.number="form.minTotalSpent" required min="0" class="form-input" />
+                <input
+                  v-model.number="form.minTotalSpent"
+                  type="number"
+                  required
+                  min="0"
+                  class="form-input"
+                >
               </div>
               <div class="form-group half">
                 <label>Số điểm tối thiểu</label>
-                <input type="number" v-model.number="form.minTotalPoints" required min="0" class="form-input" />
+                <input
+                  v-model.number="form.minTotalPoints"
+                  type="number"
+                  required
+                  min="0"
+                  class="form-input"
+                >
               </div>
             </div>
 
             <div class="form-group">
               <label>Giảm giá tự động (%)</label>
-              <input type="number" v-model.number="form.autoDiscountPercent" min="0" max="100" class="form-input" />
+              <input
+                v-model.number="form.autoDiscountPercent"
+                type="number"
+                min="0"
+                max="100"
+                class="form-input"
+              >
             </div>
 
             <div class="form-actions">
-              <button type="button" class="btn-secondary" @click="closeModal">HỦY</button>
-              <button type="submit" class="btn-primary" :disabled="isSaving">
+              <button
+                type="button"
+                class="btn-secondary"
+                @click="closeModal"
+              >
+                HỦY
+              </button>
+              <button
+                type="submit"
+                class="btn-primary"
+                :disabled="isSaving"
+              >
                 {{ isSaving ? 'ĐANG LƯU...' : 'LƯU LẠI' }}
               </button>
             </div>

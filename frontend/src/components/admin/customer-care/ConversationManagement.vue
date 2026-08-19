@@ -4,7 +4,9 @@
       <section class="conversation-list-panel">
         <div class="panel-header">
           <h3>HỘI THOẠI</h3>
-          <p class="panel-count">{{ totalElements }} hội thoại</p>
+          <p class="panel-count">
+            {{ totalElements }} hội thoại
+          </p>
         </div>
 
         <div class="search-bar">
@@ -14,38 +16,70 @@
             class="search-input"
             placeholder="Tìm kiếm Chat ID..."
             @keyup.enter="applySearch"
-          />
-          <button class="btn-secondary" @click="applySearch">TÌM</button>
+          >
+          <button
+            class="btn-secondary"
+            @click="applySearch"
+          >
+            TÌM
+          </button>
         </div>
 
         <div class="list-scroll">
-          <div v-if="isLoading" class="state-cell">Đang tải dữ liệu...</div>
-          <div v-else-if="conversations.length === 0" class="state-cell">Không có hội thoại nào</div>
+          <div
+            v-if="isLoading"
+            class="state-cell"
+          >
+            Đang tải dữ liệu...
+          </div>
+          <div
+            v-else-if="conversations.length === 0"
+            class="state-cell"
+          >
+            Không có hội thoại nào
+          </div>
           <button
-            v-else
             v-for="conv in conversations"
+            v-else
             :key="conv.chatId"
             class="conv-item"
             :class="{ active: selectedChatId === conv.chatId }"
             @click="selectConversation(conv.chatId)"
           >
             <div class="conv-top">
-              <span class="conv-chatid" :title="conv.chatId">{{ conv.chatId }}</span>
+              <span
+                class="conv-chatid"
+                :title="conv.chatId"
+              >{{ conv.chatId }}</span>
               <span class="conv-count">{{ conv.messageCount }} lượt</span>
             </div>
-            <p class="conv-last" :title="conv.lastMessage || ''">
+            <p
+              class="conv-last"
+              :title="conv.lastMessage || ''"
+            >
               {{ conv.lastMessage || 'Chưa có tin nhắn' }}
             </p>
             <span class="conv-time">{{ formatDate(conv.updatedAt) }}</span>
           </button>
         </div>
 
-        <div v-if="totalPages > 1" class="pagination">
-          <button class="btn-secondary" :disabled="page === 0 || isLoading" @click="goToPage(page - 1)">
+        <div
+          v-if="totalPages > 1"
+          class="pagination"
+        >
+          <button
+            class="btn-secondary"
+            :disabled="page === 0 || isLoading"
+            @click="goToPage(page - 1)"
+          >
             ‹ TRƯỚC
           </button>
           <span class="page-info">Trang {{ page + 1 }} / {{ totalPages }}</span>
-          <button class="btn-secondary" :disabled="page >= totalPages - 1 || isLoading" @click="goToPage(page + 1)">
+          <button
+            class="btn-secondary"
+            :disabled="page >= totalPages - 1 || isLoading"
+            @click="goToPage(page + 1)"
+          >
             SAU ›
           </button>
         </div>
@@ -57,7 +91,10 @@
           :chat-id="selectedChatId"
           @reset="handleReset"
         />
-        <div v-else class="detail-empty">
+        <div
+          v-else
+          class="detail-empty"
+        >
           Chọn một hội thoại bên trái để xem chi tiết
         </div>
       </section>

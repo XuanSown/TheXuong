@@ -17,4 +17,5 @@ import lombok.Setter;
 public class ChatMemoryRequest {
     private String chatId;
     private String historyJson;
+    private String stateJson;
 }

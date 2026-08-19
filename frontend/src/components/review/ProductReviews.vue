@@ -257,7 +257,9 @@
       v-model="deleteModalOpen"
       :title="t('review.deleteTitle')"
     >
-      <p class="text-[#4C4546]">{{ t('review.deleteConfirm') }}</p>
+      <p class="text-[#4C4546]">
+        {{ t('review.deleteConfirm') }}
+      </p>
       <template #footer>
         <button
           class="h-10 px-6 border border-black text-black text-sm font-semibold hover:bg-black hover:text-white transition-colors"

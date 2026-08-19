@@ -31,3 +31,9 @@ spring:
         provider:
           google:
             user-name-attribute: email
+
+chatbot:
+  api:
+    # Shared secret giữa n8n và backend cho /api/v1/chatbot/orders/track
+    # n8n gửi header X-Chatbot-Secret: {{$env.CHATBOT_API_SECRET}}
+    secret: ${CHATBOT_API_SECRET:}

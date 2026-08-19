@@ -17,7 +17,10 @@
           ĐĂNG NHẬP
         </button>
       </div>
-      <section v-if="activeTab === 'audit'" class="logs-list">
+      <section
+        v-if="activeTab === 'audit'"
+        class="logs-list"
+      >
         <div class="list-header">
           <div class="header-info">
             <h2>Lịch Sử Hệ Thống (Audit Logs)</h2>
@@ -25,7 +28,11 @@
               Tổng cộng {{ logs.length }} bản ghi
             </p>
           </div>
-          <button class="btn-secondary" @click="loadLogs" :disabled="isLoading">
+          <button
+            class="btn-secondary"
+            :disabled="isLoading"
+            @click="loadLogs"
+          >
             <span class="icon">↻</span> TẢI LẠI
           </button>
         </div>
@@ -34,24 +41,46 @@
           <table class="logs-table">
             <thead>
               <tr>
-                <th class="col-time">THỜI GIAN</th>
-                <th class="col-admin">NGƯỜI THỰC HIỆN</th>
-                <th class="col-module">MODULE</th>
-                <th class="col-action">HÀNH ĐỘNG</th>
-                <th class="col-target">ĐỐI TƯỢNG (ID)</th>
-                <th class="col-details">CHI TIẾT</th>
+                <th class="col-time">
+                  THỜI GIAN
+                </th>
+                <th class="col-admin">
+                  NGƯỜI THỰC HIỆN
+                </th>
+                <th class="col-module">
+                  MODULE
+                </th>
+                <th class="col-action">
+                  HÀNH ĐỘNG
+                </th>
+                <th class="col-target">
+                  ĐỐI TƯỢNG (ID)
+                </th>
+                <th class="col-details">
+                  CHI TIẾT
+                </th>
               </tr>
             </thead>
             <tbody>
               <tr v-if="isLoading">
-                <td colspan="6" class="loading-cell">Đang tải dữ liệu...</td>
+                <td
+                  colspan="6"
+                  class="loading-cell"
+                >
+                  Đang tải dữ liệu...
+                </td>
               </tr>
               <tr v-else-if="logs.length === 0">
-                <td colspan="6" class="empty-cell">Không có lịch sử nào được ghi nhận</td>
+                <td
+                  colspan="6"
+                  class="empty-cell"
+                >
+                  Không có lịch sử nào được ghi nhận
+                </td>
               </tr>
               <tr
-                v-else
                 v-for="log in logs"
+                v-else
                 :key="log.id"
               >
                 <td class="col-time">
@@ -61,12 +90,18 @@
                   <span class="admin-id">{{ log.adminId }}</span>
                 </td>
                 <td class="col-module">
-                  <span class="badge" :class="getModuleClass(log.module)">
+                  <span
+                    class="badge"
+                    :class="getModuleClass(log.module)"
+                  >
                     {{ log.module }}
                   </span>
                 </td>
                 <td class="col-action">
-                  <span class="badge" :class="getActionClass(log.action)">
+                  <span
+                    class="badge"
+                    :class="getActionClass(log.action)"
+                  >
                     {{ log.action }}
                   </span>
                 </td>
@@ -74,7 +109,10 @@
                   <span class="target-id">#{{ log.targetId }}</span>
                 </td>
                 <td class="col-details">
-                  <button class="btn-detail" @click="openDetailModal(log)">
+                  <button
+                    class="btn-detail"
+                    @click="openDetailModal(log)"
+                  >
                     Xem chi tiết
                   </button>
                 </td>
@@ -87,11 +125,20 @@
     </main>
 
     <!-- Detail Modal -->
-    <div v-if="showModal && selectedLog" class="modal-overlay" @click.self="closeModal">
+    <div
+      v-if="showModal && selectedLog"
+      class="modal-overlay"
+      @click.self="closeModal"
+    >
       <div class="modal-content">
         <div class="modal-header">
           <h2>Chi Tiết Thay Đổi</h2>
-          <button class="btn-close" @click="closeModal">&times;</button>
+          <button
+            class="btn-close"
+            @click="closeModal"
+          >
+            &times;
+          </button>
         </div>
         <div class="modal-body">
           <div class="info-grid">
@@ -105,11 +152,17 @@
             </div>
             <div class="info-item">
               <label>MODULE</label>
-              <span class="badge" :class="getModuleClass(selectedLog.module)">{{ selectedLog.module }}</span>
+              <span
+                class="badge"
+                :class="getModuleClass(selectedLog.module)"
+              >{{ selectedLog.module }}</span>
             </div>
             <div class="info-item">
               <label>HÀNH ĐỘNG</label>
-              <span class="badge" :class="getActionClass(selectedLog.action)">{{ selectedLog.action }}</span>
+              <span
+                class="badge"
+                :class="getActionClass(selectedLog.action)"
+              >{{ selectedLog.action }}</span>
             </div>
             <div class="info-item">
               <label>ĐỐI TƯỢNG</label>
@@ -117,14 +170,20 @@
             </div>
           </div>
           
-          <div v-if="selectedLog.changedFields" class="fields-section">
+          <div
+            v-if="selectedLog.changedFields"
+            class="fields-section"
+          >
             <label>CÁC TRƯỜNG BỊ ẢNH HƯỞNG</label>
             <div class="changed-fields">
               {{ selectedLog.changedFields }}
             </div>
           </div>
 
-          <div class="diff-section" v-if="selectedLog.oldValues || selectedLog.newValues">
+          <div
+            v-if="selectedLog.oldValues || selectedLog.newValues"
+            class="diff-section"
+          >
             <div class="diff-col old-val">
               <label>DỮ LIỆU CŨ</label>
               <pre>{{ formatJson(selectedLog.oldValues) }}</pre>
@@ -135,7 +194,10 @@
             </div>
           </div>
 
-          <div v-if="selectedLog.note" class="note-section">
+          <div
+            v-if="selectedLog.note"
+            class="note-section"
+          >
             <label>GHI CHÚ</label>
             <p>{{ selectedLog.note }}</p>
           </div>

@@ -23,6 +23,9 @@ public class ChatMemory {
     @Column(name = "history_json", nullable = false, columnDefinition = "NVARCHAR(MAX)")
     private String historyJson;
 
+    @Column(name = "state_json", nullable = false, columnDefinition = "NVARCHAR(MAX)")
+    private String stateJson;
+
     @Column(name = "updated_at", nullable = false)
     private java.time.LocalDateTime updatedAt;
 

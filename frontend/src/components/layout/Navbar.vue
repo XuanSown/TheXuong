@@ -56,7 +56,11 @@
       <!-- Right Side -->
       <div class="flex items-center gap-[16px] absolute right-[24px] top-1/2 transform -translate-y-1/2">
         <!-- Language Switcher -->
-        <div class="flex items-center border border-[#E5E5E5] rounded-full overflow-hidden" role="group" :aria-label="t('nav.ariaLanguage')">
+        <div
+          class="flex items-center border border-[#E5E5E5] rounded-full overflow-hidden"
+          role="group"
+          :aria-label="t('nav.ariaLanguage')"
+        >
           <button
             class="px-2.5 h-[32px] font-geist text-xs font-semibold transition-colors whitespace-nowrap"
             :class="currentLocale === 'vi' ? 'bg-black text-white' : 'text-[#707072] hover:text-black'"
@@ -89,8 +93,17 @@
             stroke-linecap="round"
             stroke-linejoin="round"
           >
-            <circle cx="11" cy="11" r="8" />
-            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            <circle
+              cx="11"
+              cy="11"
+              r="8"
+            />
+            <line
+              x1="21"
+              y1="21"
+              x2="16.65"
+              y2="16.65"
+            />
           </svg>
           <span class="ml-3 font-geist text-[15px] font-medium text-[#707072] group-hover:text-black transition-colors whitespace-nowrap">{{ t('nav.search') }}</span>
         </button>
@@ -116,7 +129,10 @@
         </router-link>
 
         <!-- User Dropdown -->
-        <div v-if="isAuthenticated" class="relative group">
+        <div
+          v-if="isAuthenticated"
+          class="relative group"
+        >
           <button
             class="w-[34px] h-[34px] flex items-center justify-center hover:opacity-70 transition-opacity"
             :aria-label="t('nav.ariaProfile')"
@@ -186,8 +202,16 @@
             stroke-linecap="round"
             stroke-linejoin="round"
           >
-            <circle cx="9" cy="21" r="1" />
-            <circle cx="20" cy="21" r="1" />
+            <circle
+              cx="9"
+              cy="21"
+              r="1"
+            />
+            <circle
+              cx="20"
+              cy="21"
+              r="1"
+            />
             <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
           </svg>
           <!-- Badge showing cart item count -->
@@ -215,7 +239,12 @@
           >
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
             <polyline points="16 17 21 12 16 7" />
-            <line x1="21" y1="12" x2="9" y2="12" />
+            <line
+              x1="21"
+              y1="12"
+              x2="9"
+              y2="12"
+            />
           </svg>
         </button>
 
@@ -259,7 +288,7 @@
                 :placeholder="t('nav.search')"
                 class="w-full h-[48px] bg-[#F5F5F5] hover:bg-[#EAEAEA] rounded-full pl-[56px] pr-4 text-base font-geist text-[#111] outline-none transition-colors"
                 @keyup.enter="handleSearch"
-              />
+              >
               <svg
                 class="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 text-[#111]"
                 viewBox="0 0 24 24"
@@ -269,8 +298,17 @@
                 stroke-linecap="round"
                 stroke-linejoin="round"
               >
-                <circle cx="11" cy="11" r="8" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                <circle
+                  cx="11"
+                  cy="11"
+                  r="8"
+                />
+                <line
+                  x1="21"
+                  y1="21"
+                  x2="16.65"
+                  y2="16.65"
+                />
               </svg>
             </div>
 
@@ -284,10 +322,11 @@
 
           <!-- Overlay Content (Popular & Recent) -->
           <div class="max-w-[640px] mx-auto mt-12 flex flex-col gap-10 pl-[86px] pr-[120px]">
-            
             <!-- Popular Search Terms -->
             <div>
-              <h3 class="font-geist text-base text-[#707072] mb-4">{{ t('nav.popularSearchTerms') }}</h3>
+              <h3 class="font-geist text-base text-[#707072] mb-4">
+                {{ t('nav.popularSearchTerms') }}
+              </h3>
               <div class="flex flex-wrap gap-2">
                 <button
                   v-for="term in popularSearches"
@@ -302,7 +341,9 @@
 
             <!-- Recent Searches -->
             <div v-if="recentSearches.length > 0">
-              <h3 class="font-geist text-base text-[#707072] mb-4">{{ t('nav.recentSearches') }}</h3>
+              <h3 class="font-geist text-base text-[#707072] mb-4">
+                {{ t('nav.recentSearches') }}
+              </h3>
               <div class="flex flex-col gap-1">
                 <div
                   v-for="(term, index) in recentSearches"
@@ -319,7 +360,13 @@
                     class="p-2 opacity-0 group-hover:opacity-100 transition-opacity text-[#111] hover:text-[#707072]"
                     @click="removeRecentSearch(index)"
                   >
-                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <svg
+                      class="w-5 h-5"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
                       <path d="M18 6L6 18M6 6l12 12" />
                     </svg>
                   </button>

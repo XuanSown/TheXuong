@@ -122,18 +122,38 @@ public class ChatbotService {
 	}
 
 	/**
-	 * Save or update conversation history for a chat_id.
+	 * Get chatbot state for a chat_id.
+	 * Never returns null: default is "{}".
+	 */
+	@Transactional(readOnly = true)
+	public String getChatState(String chatId) {
+		ChatMemory memory = chatMemoryRepository.findById(chatId).orElse(null);
+		if (memory == null || memory.getStateJson() == null) {
+			return "{}";
+		}
+		return memory.getStateJson();
+	}
+
+	/**
+	 * Save or update conversation history + state for a chat_id.
+	 * null fields keep the existing value (không làm mất history khi chỉ update state).
 	 */
 	@Transactional
-	public void saveChatMemory(String chatId, String historyJson) {
+	public void saveChatMemory(String chatId, String historyJson, String stateJson) {
 		ChatMemory memory = chatMemoryRepository.findById(chatId).orElse(null);
 		if (memory == null) {
 			memory = ChatMemory.builder()
 					.chatId(chatId)
-					.historyJson(historyJson)
+					.historyJson(historyJson != null ? historyJson : "[]")
+					.stateJson(stateJson != null ? stateJson : "{}")
 					.build();
 		} else {
-			memory.setHistoryJson(historyJson);
+			if (historyJson != null) {
+				memory.setHistoryJson(historyJson);
+			}
+			if (stateJson != null) {
+				memory.setStateJson(stateJson);
+			}
 		}
 		chatMemoryRepository.save(memory);
 	}

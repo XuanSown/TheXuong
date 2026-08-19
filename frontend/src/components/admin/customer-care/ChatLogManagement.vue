@@ -4,9 +4,15 @@
       <div class="list-header">
         <div class="header-info">
           <h2>LỊCH SỬ TƯ VẤN CHATBOT</h2>
-          <p class="logs-count">{{ totalElements }} bản ghi</p>
+          <p class="logs-count">
+            {{ totalElements }} bản ghi
+          </p>
         </div>
-        <button class="btn-secondary" @click="reload" :disabled="isLoading">
+        <button
+          class="btn-secondary"
+          :disabled="isLoading"
+          @click="reload"
+        >
           <span>↻</span> TẢI LẠI
         </button>
       </div>
@@ -18,73 +24,151 @@
           class="search-input"
           placeholder="Tìm khách hàng, chat ID, nội dung tin nhắn..."
           @keyup.enter="applyFilters"
-        />
+        >
         <input
           v-model="filters.intent"
           type="text"
           class="intent-input"
           placeholder="Intent (VD: stock, faq)..."
           @keyup.enter="applyFilters"
-        />
-        <input v-model="filters.from" type="date" class="date-input" title="Từ ngày" />
-        <input v-model="filters.to" type="date" class="date-input" title="Đến ngày" />
-        <button class="btn-secondary" @click="applyFilters">LỌC</button>
+        >
+        <input
+          v-model="filters.from"
+          type="date"
+          class="date-input"
+          title="Từ ngày"
+        >
+        <input
+          v-model="filters.to"
+          type="date"
+          class="date-input"
+          title="Đến ngày"
+        >
+        <button
+          class="btn-secondary"
+          @click="applyFilters"
+        >
+          LỌC
+        </button>
       </div>
 
       <div class="table-container">
         <table class="logs-table">
           <thead>
             <tr>
-              <th class="col-time">THỜI GIAN</th>
-              <th class="col-user">KHÁCH HÀNG</th>
-              <th class="col-chatid">CHAT ID</th>
-              <th class="col-intent">INTENT</th>
-              <th class="col-message">TIN NHẮN</th>
-              <th class="col-reply">PHẢN HỒI</th>
-              <th class="col-detail">CHI TIẾT</th>
+              <th class="col-time">
+                THỜI GIAN
+              </th>
+              <th class="col-user">
+                KHÁCH HÀNG
+              </th>
+              <th class="col-chatid">
+                CHAT ID
+              </th>
+              <th class="col-intent">
+                INTENT
+              </th>
+              <th class="col-message">
+                TIN NHẮN
+              </th>
+              <th class="col-reply">
+                PHẢN HỒI
+              </th>
+              <th class="col-detail">
+                CHI TIẾT
+              </th>
             </tr>
           </thead>
           <tbody>
             <tr v-if="isLoading">
-              <td colspan="7" class="loading-cell">Đang tải dữ liệu...</td>
+              <td
+                colspan="7"
+                class="loading-cell"
+              >
+                Đang tải dữ liệu...
+              </td>
             </tr>
             <tr v-else-if="logs.length === 0">
-              <td colspan="7" class="empty-cell">Không tìm thấy log nào</td>
+              <td
+                colspan="7"
+                class="empty-cell"
+              >
+                Không tìm thấy log nào
+              </td>
             </tr>
-            <tr v-else v-for="log in logs" :key="log.id">
+            <tr
+              v-for="log in logs"
+              v-else
+              :key="log.id"
+            >
               <td class="col-time">
                 <span class="time-text">{{ formatDate(log.createdAt) }}</span>
               </td>
               <td class="col-user">
-                <span class="user-text" :title="log.userName || ''">{{ log.userName || '—' }}</span>
+                <span
+                  class="user-text"
+                  :title="log.userName || ''"
+                >{{ log.userName || '—' }}</span>
               </td>
               <td class="col-chatid">
-                <span class="chatid-text" :title="log.chatId">{{ log.chatId }}</span>
+                <span
+                  class="chatid-text"
+                  :title="log.chatId"
+                >{{ log.chatId }}</span>
               </td>
               <td class="col-intent">
-                <span v-if="log.intent" class="intent-badge" :class="getIntentClass(log.intent)">{{ log.intent }}</span>
-                <span v-else class="intent-none">—</span>
+                <span
+                  v-if="log.intent"
+                  class="intent-badge"
+                  :class="getIntentClass(log.intent)"
+                >{{ log.intent }}</span>
+                <span
+                  v-else
+                  class="intent-none"
+                >—</span>
               </td>
               <td class="col-message">
-                <span class="truncate message-text" :title="log.userMessage">{{ log.userMessage }}</span>
+                <span
+                  class="truncate message-text"
+                  :title="log.userMessage"
+                >{{ log.userMessage }}</span>
               </td>
               <td class="col-reply">
-                <span class="truncate reply-text" :title="log.botReply">{{ log.botReply }}</span>
+                <span
+                  class="truncate reply-text"
+                  :title="log.botReply"
+                >{{ log.botReply }}</span>
               </td>
               <td class="col-detail">
-                <button class="btn-detail" @click="openDetail(log)">Xem</button>
+                <button
+                  class="btn-detail"
+                  @click="openDetail(log)"
+                >
+                  Xem
+                </button>
               </td>
             </tr>
           </tbody>
         </table>
       </div>
 
-      <div v-if="totalPages > 1" class="pagination">
-        <button class="btn-secondary" :disabled="page === 0 || isLoading" @click="goToPage(page - 1)">
+      <div
+        v-if="totalPages > 1"
+        class="pagination"
+      >
+        <button
+          class="btn-secondary"
+          :disabled="page === 0 || isLoading"
+          @click="goToPage(page - 1)"
+        >
           ‹ TRƯỚC
         </button>
         <span class="page-info">Trang {{ page + 1 }} / {{ totalPages }}</span>
-        <button class="btn-secondary" :disabled="page >= totalPages - 1 || isLoading" @click="goToPage(page + 1)">
+        <button
+          class="btn-secondary"
+          :disabled="page >= totalPages - 1 || isLoading"
+          @click="goToPage(page + 1)"
+        >
           SAU ›
         </button>
       </div>

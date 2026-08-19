@@ -14,7 +14,7 @@ export const useAuthStore = defineStore('auth', {
 
   getters: {
     isAdmin: (state) => state.roles.includes('ADMIN') || state.roles.includes('BOTH'),
-    isCustomer: (state) => state.roles.includes('CUSTOMER'),
+    isCustomer: (state) => state.roles.includes('CUSTOMER') || state.roles.includes('BOTH'),
     hasRole: (state) => (role: string) => state.roles.includes(role)
   },
 

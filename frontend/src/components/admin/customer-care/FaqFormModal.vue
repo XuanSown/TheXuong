@@ -1,9 +1,18 @@
 <template>
-  <div v-if="modelValue" class="modal-overlay" @click.self="close">
+  <div
+    v-if="modelValue"
+    class="modal-overlay"
+    @click.self="close"
+  >
     <div class="modal-content">
       <div class="modal-header">
         <h2>{{ faq ? 'Sửa FAQ' : 'Thêm FAQ mới' }}</h2>
-        <button class="btn-close" @click="close">&times;</button>
+        <button
+          class="btn-close"
+          @click="close"
+        >
+          &times;
+        </button>
       </div>
       <div class="modal-body">
         <form @submit.prevent="submitForm">
@@ -15,7 +24,7 @@
               required
               class="form-input"
               placeholder="VD: Giao hàng"
-            />
+            >
           </div>
 
           <div class="form-group">
@@ -26,7 +35,7 @@
               required
               class="form-input"
               placeholder="ship, giao hàng, phí ship, bao lâu"
-            />
+            >
             <p class="form-hint">
               Phân cách từ khóa bằng dấu phẩy. Chatbot sử dụng các từ khóa này để nhận diện nội dung câu hỏi.
             </p>
@@ -40,12 +49,23 @@
               rows="6"
               class="form-input form-textarea"
               placeholder="Nội dung chatbot sẽ trả lời khách..."
-            ></textarea>
+            />
           </div>
 
           <div class="form-actions">
-            <button type="button" class="btn-secondary" @click="close">HỦY</button>
-            <button type="submit" class="btn-primary">LƯU LẠI</button>
+            <button
+              type="button"
+              class="btn-secondary"
+              @click="close"
+            >
+              HỦY
+            </button>
+            <button
+              type="submit"
+              class="btn-primary"
+            >
+              LƯU LẠI
+            </button>
           </div>
         </form>
       </div>

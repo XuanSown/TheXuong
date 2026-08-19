@@ -8,7 +8,10 @@
         <p class="font-geist text-[12px] uppercase tracking-[1.8px] text-white/60 mb-6">
           HELP CENTER
         </p>
-        <h1 class="font-geist font-bold text-white text-5xl sm:text-7xl md:text-8xl mb-6" style="letter-spacing:-1.28px;">
+        <h1
+          class="font-geist font-bold text-white text-5xl sm:text-7xl md:text-8xl mb-6"
+          style="letter-spacing:-1.28px;"
+        >
           TRUNG TÂM HỖ TRỢ
         </h1>
         <p class="font-geist text-base sm:text-lg text-white/70 leading-[29px]">

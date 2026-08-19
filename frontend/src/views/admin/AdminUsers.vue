@@ -232,7 +232,10 @@
             Điền thông tin để đăng ký tài khoản mới
           </p>
         </div>
-        <form @submit.prevent="handleSubmit" autocomplete="off">
+        <form
+          autocomplete="off"
+          @submit.prevent="handleSubmit"
+        >
           <div class="form-grid">
             <!-- Email -->
             <div class="form-group">
@@ -369,7 +372,10 @@
           </button>
         </div>
         <div class="modal-body">
-          <form @submit.prevent="submitEdit" autocomplete="off">
+          <form
+            autocomplete="off"
+            @submit.prevent="submitEdit"
+          >
             <div class="form-group">
               <label>EMAIL</label>
               <input

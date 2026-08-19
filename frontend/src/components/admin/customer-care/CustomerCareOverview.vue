@@ -1,12 +1,27 @@
 <template>
   <div class="overview-tab">
-    <div v-if="isLoading" class="loading-state">
-      <div v-for="i in 4" :key="i" class="skeleton-card"></div>
+    <div
+      v-if="isLoading"
+      class="loading-state"
+    >
+      <div
+        v-for="i in 4"
+        :key="i"
+        class="skeleton-card"
+      />
     </div>
 
-    <div v-else-if="loadError" class="error-state">
+    <div
+      v-else-if="loadError"
+      class="error-state"
+    >
       <p>{{ loadError }}</p>
-      <button class="btn-secondary" @click="loadOverview">THỬ LẠI</button>
+      <button
+        class="btn-secondary"
+        @click="loadOverview"
+      >
+        THỬ LẠI
+      </button>
     </div>
 
     <template v-else>
@@ -33,20 +48,46 @@
         <div class="recent-header">
           <h3>HOẠT ĐỘNG GẦN ĐÂY</h3>
         </div>
-        <div v-if="recentLoading" class="recent-state">Đang tải...</div>
-        <div v-else-if="recentLogs.length === 0" class="recent-state">Chưa có hoạt động nào</div>
-        <table v-else class="recent-table">
+        <div
+          v-if="recentLoading"
+          class="recent-state"
+        >
+          Đang tải...
+        </div>
+        <div
+          v-else-if="recentLogs.length === 0"
+          class="recent-state"
+        >
+          Chưa có hoạt động nào
+        </div>
+        <table
+          v-else
+          class="recent-table"
+        >
           <thead>
             <tr>
-              <th class="r-col-time">THỜI GIAN</th>
-              <th class="r-col-user">KHÁCH HÀNG</th>
-              <th class="r-col-chatid">CHAT ID</th>
-              <th class="r-col-intent">INTENT</th>
-              <th class="r-col-message">TIN NHẮN</th>
+              <th class="r-col-time">
+                THỜI GIAN
+              </th>
+              <th class="r-col-user">
+                KHÁCH HÀNG
+              </th>
+              <th class="r-col-chatid">
+                CHAT ID
+              </th>
+              <th class="r-col-intent">
+                INTENT
+              </th>
+              <th class="r-col-message">
+                TIN NHẮN
+              </th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="log in recentLogs" :key="log.id">
+            <tr
+              v-for="log in recentLogs"
+              :key="log.id"
+            >
               <td class="r-col-time">
                 <span class="recent-time">{{ formatDate(log.createdAt) }}</span>
               </td>
@@ -54,14 +95,23 @@
                 <span class="recent-user">{{ log.userName || '—' }}</span>
               </td>
               <td class="r-col-chatid">
-                <span class="recent-chatid" :title="log.chatId">{{ log.chatId }}</span>
+                <span
+                  class="recent-chatid"
+                  :title="log.chatId"
+                >{{ log.chatId }}</span>
               </td>
               <td class="r-col-intent">
-                <span v-if="log.intent" class="intent-badge">{{ log.intent }}</span>
+                <span
+                  v-if="log.intent"
+                  class="intent-badge"
+                >{{ log.intent }}</span>
                 <span v-else>—</span>
               </td>
               <td class="r-col-message">
-                <span class="recent-message" :title="log.userMessage">{{ log.userMessage }}</span>
+                <span
+                  class="recent-message"
+                  :title="log.userMessage"
+                >{{ log.userMessage }}</span>
               </td>
             </tr>
           </tbody>

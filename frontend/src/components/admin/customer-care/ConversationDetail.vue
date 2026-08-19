@@ -3,24 +3,53 @@
     <div class="detail-header">
       <div class="detail-info">
         <span class="detail-label">CHAT ID</span>
-        <span class="detail-chatid" :title="chatId">{{ chatId }}</span>
-        <span v-if="detail?.updatedAt" class="detail-time">{{ formatDate(detail.updatedAt) }}</span>
+        <span
+          class="detail-chatid"
+          :title="chatId"
+        >{{ chatId }}</span>
+        <span
+          v-if="detail?.updatedAt"
+          class="detail-time"
+        >{{ formatDate(detail.updatedAt) }}</span>
       </div>
-      <button class="btn-danger" :disabled="isResetting" @click="confirmReset">
+      <button
+        class="btn-danger"
+        :disabled="isResetting"
+        @click="confirmReset"
+      >
         {{ isResetting ? 'ĐANG XÓA...' : 'XÓA BỘ NHỚ' }}
       </button>
     </div>
 
-    <div v-if="isLoading" class="detail-state">Đang tải hội thoại...</div>
+    <div
+      v-if="isLoading"
+      class="detail-state"
+    >
+      Đang tải hội thoại...
+    </div>
 
-    <div v-else-if="loadError" class="detail-state error-text">{{ loadError }}</div>
+    <div
+      v-else-if="loadError"
+      class="detail-state error-text"
+    >
+      {{ loadError }}
+    </div>
 
-    <div v-else class="messages-scroll">
-      <div v-if="detail?.parseError" class="parse-warning">
+    <div
+      v-else
+      class="messages-scroll"
+    >
+      <div
+        v-if="detail?.parseError"
+        class="parse-warning"
+      >
         ⚠ Không thể đọc dữ liệu bộ nhớ (JSON không hợp lệ).
       </div>
 
-      <div v-if="!detail || detail.messages.length === 0" class="detail-state">
+      <div
+        v-if="!detail || detail.messages.length === 0"
+        class="detail-state"
+      >
         Không có tin nhắn nào trong bộ nhớ
       </div>
 
@@ -30,9 +59,14 @@
         class="message-row"
         :class="msg.role === 'user' ? 'row-user' : 'row-assistant'"
       >
-        <div class="message-bubble" :class="msg.role === 'user' ? 'bubble-user' : 'bubble-assistant'">
+        <div
+          class="message-bubble"
+          :class="msg.role === 'user' ? 'bubble-user' : 'bubble-assistant'"
+        >
           <span class="bubble-role">{{ msg.role === 'user' ? 'KHÁCH' : 'BOT' }}</span>
-          <p class="bubble-content">{{ msg.content }}</p>
+          <p class="bubble-content">
+            {{ msg.content }}
+          </p>
         </div>
       </div>
     </div>
