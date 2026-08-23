@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -113,6 +114,17 @@ public class GlobalExceptionHandler {
     return ResponseEntity
       .status(HttpStatus.FORBIDDEN)
       .body(ApiResponse.error("Bạn không có quyền thực hiện thao tác này."));
+  }
+
+  /**
+   * 423 — Tài khoản bị khóa (DisabledException khi đăng nhập).
+   * Handler riêng để phân biệt với 401 sai email/mật khẩu.
+   */
+  @ExceptionHandler(DisabledException.class)
+  public ResponseEntity<ApiResponse<Void>> handleDisabledAccount(DisabledException ex) {
+    return ResponseEntity
+      .status(HttpStatus.LOCKED)
+      .body(ApiResponse.error("Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên."));
   }
 
   /**
