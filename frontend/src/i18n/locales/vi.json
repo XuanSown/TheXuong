@@ -387,7 +387,9 @@
     "cancelError": "Đã xảy ra lỗi khi hủy đơn hàng",
     "receivedConfirm": "Bạn xác nhận đã nhận được hàng? (Đơn hàng sẽ chuyển sang trạng thái Hoàn thành và bạn sẽ được cộng điểm)",
     "receivedThanks": "Cảm ơn bạn đã xác nhận nhận hàng! Đơn hàng đã hoàn tất.",
-    "receivedError": "Đã xảy ra lỗi khi xác nhận nhận hàng"
+    "receivedError": "Đã xảy ra lỗi khi xác nhận nhận hàng",
+    "reviewProduct": "Đánh giá sản phẩm",
+    "reviewed": "Đã đánh giá"
   },
   "paymentMethod": {
     "cod": "Thanh toán khi nhận hàng (COD)",

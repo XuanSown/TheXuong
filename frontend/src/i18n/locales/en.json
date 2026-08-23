@@ -387,7 +387,9 @@
     "cancelError": "An error occurred while cancelling the order",
     "receivedConfirm": "Do you confirm you have received the goods? (The order will be marked Completed and you will earn points)",
     "receivedThanks": "Thank you for confirming receipt! The order is now complete.",
-    "receivedError": "An error occurred while confirming receipt"
+    "receivedError": "An error occurred while confirming receipt",
+    "reviewProduct": "Review product",
+    "reviewed": "Reviewed"
   },
   "paymentMethod": {
     "cod": "Cash on delivery (COD)",
