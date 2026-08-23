@@ -8,6 +8,7 @@ export interface CartItem {
   quantity: number
   price: number
   subtotal: number
+  stockQuantity?: number
 }
 
 export interface Cart {

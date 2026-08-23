@@ -168,6 +168,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/v1/products/**", "/api/v1/categories/**").permitAll()
                 .requestMatchers("/api/v1/chatbot/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/reviews/product/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/payments/vnpay/return").permitAll()
                 .requestMatchers("/api/v1/addresses", "/api/v1/addresses/**", "/api/v1/maps", "/api/v1/maps/**").authenticated()
                 .requestMatchers("/api/v1/admin/**").hasAnyAuthority("ADMIN", "BOTH")
                 .anyRequest().authenticated()

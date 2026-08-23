@@ -66,13 +66,23 @@ users
  * Tu khoa -> 400 Bad Request + message (bat boi GlobalExceptionHandler)
  * Khong ton tai -> 404 Not Found (bat boi GlobalExceptionHandler)
  */
-@PatchMapping("/{id}/toggle-active")
-public ResponseEntity<ApiResponse<UserStatusDto>> toggleActive(@PathVariable Long id) {
-Long currentUserId = getCurrentUserId();
+ @PatchMapping("/{id}/toggle-active")
+ public ResponseEntity<ApiResponse<UserStatusDto>> toggleActive(@PathVariable Long id) {
+ Long currentUserId = getCurrentUserId();
 
-// Service se nem SelfDeactivationException neu id == currentUserId
-// GlobalExceptionHandler bat va tra 400 Bad Request tu dong
-userService.toggleActive(id, currentUserId);
+ // ADMIN thuan chi duoc quan ly tai khoan CUSTOMER
+ String currentRole = getCurrentUserRole();
+ if ("ADMIN".equals(currentRole)) {
+ User target = userService.getUserById(id);
+ if (!"CUSTOMER".equals(target.getRole())) {
+ return ResponseEntity.status(HttpStatus.FORBIDDEN)
+ .body(ApiResponse.error("ADMIN chi duoc quan ly tai khoan CUSTOMER"));
+ }
+ }
+
+ // Service se nem SelfDeactivationException neu id == currentUserId
+ // GlobalExceptionHandler bat va tra 400 Bad Request tu dong
+ userService.toggleActive(id, currentUserId);
 
 // Load lai user sau khi toggle de tra trang thai moi
 User updated = userService.getUserById(id);
@@ -105,6 +115,15 @@ UserStatusDto.from(updated)
  // Ngăn tự xóa tài khoản
  if (currentUserId.equals(id)) {
  return ResponseEntity.badRequest().body(ApiResponse.error("Khong the xoa tai khoan cua chinh minh"));
+ }
+ // ADMIN thuan chi duoc xoa tai khoan CUSTOMER
+ String currentRole = getCurrentUserRole();
+ if ("ADMIN".equals(currentRole)) {
+ User target = userService.getUserById(id);
+ if (!"CUSTOMER".equals(target.getRole())) {
+ return ResponseEntity.status(HttpStatus.FORBIDDEN)
+ .body(ApiResponse.error("ADMIN chi duoc quan ly tai khoan CUSTOMER"));
+ }
  }
  userService.deleteUser(id);
  return ResponseEntity.ok(ApiResponse.ok(
@@ -140,6 +159,24 @@ UserStatusDto.from(updated)
  String role = body.get("role") != null ? body.get("role").toString() : null;
  String password = body.get("password") != null ? body.get("password").toString() : null;
  Boolean active = body.get("active") != null ? Boolean.valueOf(body.get("active").toString()) : null;
+
+ // ADMIN thuan: khong duoc sua chinh minh, chi duoc quan ly tai khoan CUSTOMER
+ String currentRole = getCurrentUserRole();
+ if ("ADMIN".equals(currentRole)) {
+ if (currentUserId.equals(id)) {
+ return ResponseEntity.status(HttpStatus.FORBIDDEN)
+ .body(ApiResponse.error("Khong duoc tu chinh sua tai khoan cua chinh minh"));
+ }
+ User target = userService.getUserById(id);
+ if (!"CUSTOMER".equals(target.getRole())) {
+ return ResponseEntity.status(HttpStatus.FORBIDDEN)
+ .body(ApiResponse.error("ADMIN chi duoc quan ly tai khoan CUSTOMER"));
+ }
+ if (role != null && !role.isBlank() && !"CUSTOMER".equals(role.trim().toUpperCase())) {
+ return ResponseEntity.status(HttpStatus.FORBIDDEN)
+ .body(ApiResponse.error("ADMIN khong duoc doi role tai khoan thanh ADMIN/BOTH"));
+ }
+ }
 
  if (role != null && !role.isBlank()) {
  String normalizedRole = role.trim().toUpperCase();
@@ -203,7 +240,18 @@ UserStatusDto.from(updated)
  return ResponseEntity.badRequest().body(ApiResponse.error("Mat khau khong duoc de trong"));
  }
 
- User created = userService.createUser(email, username, fullName, password, "LOCAL", role, phone);
+ // ADMIN thuan chi duoc tao tai khoan CUSTOMER
+ String normalizedRole = role != null && !role.isBlank() ? role.trim().toUpperCase() : "CUSTOMER";
+ if (!VALID_ROLES.contains(normalizedRole)) {
+ return ResponseEntity.badRequest().body(ApiResponse.error("Role khong hop le. Chi cho phep: " + VALID_ROLES));
+ }
+ String currentRole = getCurrentUserRole();
+ if ("ADMIN".equals(currentRole) && !"CUSTOMER".equals(normalizedRole)) {
+ return ResponseEntity.status(HttpStatus.FORBIDDEN)
+ .body(ApiResponse.error("ADMIN chi duoc tao tai khoan CUSTOMER"));
+ }
+
+ User created = userService.createUser(email, username, fullName, password, "LOCAL", normalizedRole, phone);
  return ResponseEntity.ok(ApiResponse.ok(
  "Tao nguoi dung thanh cong",
  Map.of(
@@ -234,6 +282,19 @@ String username = auth.getName(); // Spring Security luu email lam principal
 return userRepository.findByEmail(username)
 .or(() -> userRepository.findByUsername(username))
 .map(User::getId)
+.orElse(null);
+}
+
+/** Lay role cua nguoi dang dang nhap (CUSTOMER / ADMIN / BOTH). */
+private String getCurrentUserRole() {
+Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getPrincipal())) {
+return null;
+}
+String username = auth.getName();
+return userRepository.findByEmail(username)
+.or(() -> userRepository.findByUsername(username))
+.map(User::getRole)
 .orElse(null);
 }
 }

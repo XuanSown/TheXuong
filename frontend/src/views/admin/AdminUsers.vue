@@ -108,8 +108,8 @@
                 <td class="col-role">
                   <span
                     class="role-badge"
-                    :class="user.roleClass"
-                    @click="cycleRole(user)"
+                    :class="[user.roleClass, { 'no-cycle': !isBOTH }]"
+                    @click="isBOTH && cycleRole(user)"
                   >
                     {{ user.role }}
                   </span>
@@ -129,8 +129,8 @@
                 <td class="col-status">
                   <span
                     class="status-toggle"
-                    :class="{ active: user.isActive }"
-                    @click="toggleUserActive(user)"
+                    :class="{ active: user.isActive, disabled: !canManage(user) }"
+                    @click="canManage(user) && toggleUserActive(user)"
                   >
                     <div class="toggle-track">
                       <div class="toggle-thumb" />
@@ -146,7 +146,10 @@
                   </span>
                 </td>
                 <td class="col-actions">
-                  <div class="action-buttons">
+                  <div
+                    v-if="canManage(user)"
+                    class="action-buttons"
+                  >
                     <button
                       class="action-btn edit-btn"
                       title="Sua"
@@ -316,6 +319,7 @@
                 CUSTOMER
               </button>
               <button
+                v-if="isBOTH"
                 type="button"
                 class="role-btn"
                 :class="{ active: formData.role === 'ADMIN' }"
@@ -324,6 +328,7 @@
                 ADMIN
               </button>
               <button
+                v-if="isBOTH"
                 type="button"
                 class="role-btn"
                 :class="{ active: formData.role === 'BOTH' }"
@@ -414,10 +419,16 @@
                 <option value="CUSTOMER">
                   CUSTOMER
                 </option>
-                <option value="ADMIN">
+                <option
+                  v-if="isBOTH"
+                  value="ADMIN"
+                >
                   ADMIN
                 </option>
-                <option value="BOTH">
+                <option
+                  v-if="isBOTH"
+                  value="BOTH"
+                >
                   BOTH
                 </option>
               </select>
@@ -561,8 +572,12 @@ import { ref, computed, onMounted } from 'vue'
 import { useToast } from 'vue-toastification'
 import adminService from '@/services/admin.service'
 import { loyaltyAdminService, type UserLoyaltyProgress } from '@/services/loyaltyAdminService'
+import { useAuthStore } from '@/stores/auth.store'
 
 const toast = useToast()
+const authStore = useAuthStore()
+const isBOTH = computed(() => authStore.roles.includes('BOTH'))
+const canManage = (user: any) => isBOTH.value || user.role === 'CUSTOMER'
 const searchQuery = ref('')
 const currentPage = ref(1)
 const itemsPerPage = 10
@@ -1045,6 +1060,14 @@ const onSearch = () => {
   opacity: 0.8;
 }
 
+.role-badge.no-cycle {
+  cursor: default;
+}
+
+.role-badge.no-cycle:hover {
+  opacity: 1;
+}
+
 .col-role {
   width: 130px;
 }
@@ -1117,6 +1140,11 @@ const onSearch = () => {
 
 .status-toggle.active .toggle-thumb {
   transform: translateX(20px);
+}
+
+.status-toggle.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 /* Provider Badge */

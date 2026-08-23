@@ -149,6 +149,10 @@
                 <span class="font-geist text-base text-[#4C4546]">{{ t('product.views', { count: product.viewCount }) }}</span>
               </div>
 
+              <span v-if="totalStock <= 0" class="inline-block bg-red-500 text-white text-xs font-bold px-3 py-1 rounded mb-2">
+                TẠM HẾT HÀNG
+              </span>
+
               <h1 class="font-geist text-[32px] font-semibold leading-[38px] tracking-[-0.32px] text-black">
                 {{ product.name }}
               </h1>
@@ -198,15 +202,19 @@
                 <button
                   v-for="size in product.sizes"
                   :key="size.id"
+                  :disabled="(size.quantity || 0) <= 0"
                   :class="[
-                    'w-[81px] h-[48px] border flex items-center justify-center font-geist text-base text-[#1A1C1C] transition-colors',
-                    selectedSize === size.name
-                      ? 'border-black bg-black text-white hover:bg-gray-900'
-                      : 'border-[#7E7576] hover:border-black hover:bg-black hover:text-white'
+                    'w-[81px] h-[48px] border flex items-center justify-center font-geist text-base transition-colors relative',
+                    (size.quantity || 0) <= 0
+                      ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed line-through'
+                      : selectedSize === size.name
+                        ? 'border-black bg-black text-white hover:bg-gray-900'
+                        : 'border-[#7E7576] hover:border-black hover:bg-black hover:text-white text-[#1A1C1C]'
                   ]"
-                  @click="selectedSize = size.name"
+                  @click="(size.quantity || 0) > 0 && (selectedSize = size.name)"
                 >
                   {{ size.name }}
+                  <span v-if="(size.quantity || 0) <= 0" class="absolute -top-2 -right-2 bg-red-500 text-white text-[8px] px-1 rounded">Hết</span>
                 </button>
               </div>
               <p
@@ -214,6 +222,12 @@
                 class="text-red-500 text-sm"
               >
                 {{ t('product.pleaseSelectSize') }}
+              </p>
+              <p v-if="selectedSize && selectedVariantStock > 0 && selectedVariantStock <= 5" class="text-orange-500 text-sm font-semibold">
+                ⚠️ Chỉ còn {{ selectedVariantStock }} sản phẩm
+              </p>
+              <p v-else-if="selectedSize && selectedVariantStock > 5" class="text-green-600 text-sm">
+                Còn {{ selectedVariantStock }} sản phẩm trong kho
               </p>
             </div>
 
@@ -237,8 +251,9 @@
                   </button>
                   <span class="flex-1 text-center font-inter text-base text-[#1A1C1C]">{{ quantity }}</span>
                   <button
-                    class="w-8 h-8 flex items-center justify-center border-l border-[rgba(207,196,197,0.3)] hover:bg-gray-50 transition-colors"
-                    @click="quantity++"
+                    class="w-8 h-8 flex items-center justify-center border-l border-[rgba(207,196,197,0.3)] hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    :disabled="!selectedSize || quantity >= selectedVariantStock"
+                    @click="quantity < selectedVariantStock && quantity++"
                   >
                     <span
                       class="text-[#5E5F5C] font-inter text-sm"
@@ -253,7 +268,7 @@
             <div class="flex flex-col gap-3">
               <button
                 class="w-full h-[56px] bg-white border-2 border-black text-black font-geist text-base flex items-center justify-center hover:bg-black hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                :disabled="isAdding || !selectedSize"
+                :disabled="isAdding || !selectedSize || totalStock <= 0 || selectedVariantStock <= 0"
                 @click="handleAddToCart"
               >
                 <span v-if="!isAdding">{{ t('cart.addToCart') }}</span>
@@ -285,7 +300,7 @@
               </button>
               <button
                 class="w-full h-[56px] bg-black text-white font-geist text-base flex items-center justify-center hover:bg-gray-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                :disabled="!selectedSize"
+                :disabled="!selectedSize || totalStock <= 0 || selectedVariantStock <= 0"
                 @click="handleBuyNow"
               >
                 {{ t('product.buyNow') }}
@@ -440,7 +455,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useCartStore } from '@/stores/cart.store'
 import { useAuthStore } from '@/stores/auth.store'
@@ -466,6 +481,11 @@ const loading = ref(true)
 const selectedSize = ref<string | null>(null)
 const quantity = ref(1)
 const isAdding = ref(false)
+
+const totalStock = computed(() => {
+  if (!product.value?.sizes) return 0
+  return product.value.sizes.reduce((sum: number, s: any) => sum + (s.quantity || 0), 0)
+})
 
 const mainImage = ref<string>('')
 const zoomLevel = ref<number>(1)
@@ -502,6 +522,19 @@ const getSelectedVariant = computed(() => {
   return product.value.sizes.find((s: any) => s.name === selectedSize.value)
 })
 
+const selectedVariantStock = computed(() => {
+  const v = getSelectedVariant.value
+  return v ? (v.quantity || 0) : 0
+})
+
+watch(selectedVariantStock, (newStock) => {
+  if (newStock > 0 && quantity.value > newStock) {
+    quantity.value = newStock
+  } else if (newStock <= 0) {
+    quantity.value = 1
+  }
+})
+
 const handleAddToCart = async () => {
   if (!selectedSize.value || !product.value) return
 
@@ -517,9 +550,10 @@ const handleAddToCart = async () => {
       price: product.value.price
     }, authStore.isAuthenticated)
     toast.success(t('toast.addedToCart'))
-  } catch (error) {
+  } catch (error: any) {
     console.error('Failed to add to cart:', error)
-    toast.error(t('toast.addToCartFailed'))
+    const msg = error?.response?.data?.error || error?.response?.data?.message || t('toast.addToCartFailed')
+    toast.error(msg)
   } finally {
     isAdding.value = false
   }
@@ -546,9 +580,10 @@ const handleBuyNow = async () => {
     } else {
       router.push('/checkout')
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('Failed to add to cart:', error)
-    toast.error(t('toast.addToCartFailed'))
+    const msg = error?.response?.data?.error || error?.response?.data?.message || t('toast.addToCartFailed')
+    toast.error(msg)
   } finally {
     isAdding.value = false
   }

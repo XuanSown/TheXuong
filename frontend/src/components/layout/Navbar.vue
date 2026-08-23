@@ -422,6 +422,9 @@ const popularSearches = computed(() => [
 ])
 
 onMounted(() => {
+  if (authStore.isAuthenticated && !cartStore.cart) {
+    cartStore.fetchCart().catch(console.error)
+  }
   const saved = localStorage.getItem('recent_searches')
   if (saved) {
     try {

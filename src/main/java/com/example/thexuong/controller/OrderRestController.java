@@ -5,6 +5,7 @@ import com.example.thexuong.dto.OrderItemDto;
 import com.example.thexuong.dto.order.PlaceOrderRequest;
 import com.example.thexuong.dto.order.UpdateOrderInfoRequest;
 import com.example.thexuong.entity.Order;
+import com.example.thexuong.exception.InsufficientStockException;
 import com.example.thexuong.repository.OrderRepository;
 import com.example.thexuong.repository.UserRepository;
 import com.example.thexuong.service.OrderService;
@@ -45,7 +46,8 @@ public class OrderRestController {
     @PostMapping
     public ResponseEntity<?> createOrder(
         Authentication authentication,
-        @Valid @RequestBody PlaceOrderRequest request) {
+        @Valid @RequestBody PlaceOrderRequest request,
+        jakarta.servlet.http.HttpServletRequest httpRequest) {
 
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -83,7 +85,7 @@ public class OrderRestController {
                 String orderInfo = request.getVoucherCode() != null && !request.getVoucherCode().isBlank()
                     ? "Thanh toan don hang ma so " + order.getId() + " voucher=" + request.getVoucherCode().trim()
                     : "Thanh toan don hang ma so " + order.getId();
-                String vnpayUrl = vnPayService.createOrder(order.getTotalMoney().intValue(), orderInfo, null);
+                String vnpayUrl = vnPayService.createOrder(order.getId(), order.getTotalMoney().intValue(), orderInfo, httpRequest);
                 orderDto.setPaymentUrl(vnpayUrl);
             }
 
@@ -92,10 +94,14 @@ public class OrderRestController {
                 "order", orderDto
             ));
 
+        } catch (InsufficientStockException e) {
+            log.warn("Insufficient stock for user {}: {}", authentication.getName(), e.getMessage());
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Map.of("error", e.getMessage()));
         } catch (Exception e) {
             log.error("Failed to create order for user {}: {}", authentication.getName(), e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(Map.of("error", "Đã xảy ra lỗi khi đặt hàng. Vui lòng thử lại sau."));
+                .body(Map.of("error", e.getMessage() != null ? e.getMessage() : "Đã xảy ra lỗi khi đặt hàng. Vui lòng thử lại sau."));
         }
     }
 

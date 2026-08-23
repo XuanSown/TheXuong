@@ -2,6 +2,7 @@ package com.example.thexuong.service;
 
 import com.example.thexuong.entity.*;
 import com.example.thexuong.exception.IllegalOrderTransitionException;
+import com.example.thexuong.exception.InsufficientStockException;
 import com.example.thexuong.repository.*;
 import com.example.thexuong.service.InventoryService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -114,14 +115,18 @@ if (pointsToUse != null && pointsToUse > 0 && userId != null) {
     }
     
     BigDecimal remainingToPay = subtotal.add(shippingFee).subtract(discountAmount);
-    int maxPointsUsable = remainingToPay.compareTo(BigDecimal.ZERO) > 0 ? remainingToPay.intValue() : 0;
-    int actualPointsToDeduct = Math.min(pointsToUse, maxPointsUsable);
+    if (remainingToPay.compareTo(BigDecimal.ZERO) > 0) {
+        BigDecimal pointRate = BigDecimal.valueOf(1000); // 1 điểm = 1.000 VNĐ
+        int maxPointsUsable = remainingToPay.divide(pointRate, 0, java.math.RoundingMode.CEILING).intValue();
+        int actualPointsToDeduct = Math.min(pointsToUse, maxPointsUsable);
 
-    if (actualPointsToDeduct > 0) {
-        pointService.spendPoints(userId, actualPointsToDeduct,
-            "Đổi " + actualPointsToDeduct + " điểm tại đơn (giảm " + actualPointsToDeduct + "đ)");
-        actualPointsUsed = actualPointsToDeduct;
-        discountAmount = discountAmount.add(BigDecimal.valueOf(actualPointsUsed));
+        if (actualPointsToDeduct > 0) {
+            BigDecimal pointDiscount = BigDecimal.valueOf(actualPointsToDeduct).multiply(pointRate);
+            pointService.spendPoints(userId, actualPointsToDeduct,
+                "Đổi " + actualPointsToDeduct + " điểm tại đơn (giảm " + String.format("%,d", pointDiscount.longValue()) + "đ)");
+            actualPointsUsed = actualPointsToDeduct;
+            discountAmount = discountAmount.add(pointDiscount);
+        }
     }
 }
 
@@ -144,6 +149,18 @@ Order order = Order.builder()
 .totalMoney(totalMoney)
 .status(OrderStatus.PENDING)
 .build();
+
+// Pre-validate tồn kho trước khi tạo order
+for (CartItem item : cartItems) {
+    ProductVariant variant = item.getProductVariant();
+    Product product = variant.getProduct();
+    int currentStock = variant.getQuantity() != null ? variant.getQuantity() : 0;
+    if (currentStock < item.getQuantity()) {
+        throw new InsufficientStockException(String.format(
+            "Sản phẩm '%s' (Size %s) chỉ còn %d trong kho, không đủ %d để đặt hàng.",
+            product.getName(), variant.getSize().getName(), currentStock, item.getQuantity()));
+    }
+}
 
 Order savedOrder = orderRepository.save(order);
 java.util.List<OrderDetail> detailsList = new java.util.ArrayList<>();
@@ -278,71 +295,116 @@ order.setStatus(OrderStatus.CANCEL_REQUESTED);
 orderRepository.save(order);
 }
 
-@Transactional
-public Order confirmReceived(Long orderId, Long userId) {
-Order order = getOrderByIdAndUser(orderId, userId);
+    /**
+     * Xử lý cộng điểm Loyalty, kiểm tra nâng hạng VIP và gửi email khi đơn hàng hoàn thành (COMPLETED).
+     * Dùng chung cho cả khách hàng tự xác nhận lẫn Admin duyệt hoàn thành.
+     */
+    private void processOrderCompletionLoyalty(Order saved) {
+        if (saved == null || saved.getUser() == null) {
+            return;
+        }
 
-if (!order.getStatus().canTransitionTo(OrderStatus.COMPLETED)) {
-throw new IllegalOrderTransitionException(
-"Không thể xác nhận nhận hàng từ trạng thái " + order.getStatus()
-+ ". Chỉ chấp nhận khi đơn đang DELIVERED.");
-}
+        int points = 0;
+        try {
+            if (saved.getTotalForPointCalc() != null) {
+                points = pointService.earnPoints(
+                        saved.getUser().getId(),
+                        saved.getId(),
+                        saved.getTotalForPointCalc(),
+                        "Cộng điểm từ đơn #" + saved.getId());
+                if (points > 0) {
+                    log.info("[LOYALTY] User {} earned {} points from order #{}",
+                            saved.getUser().getId(), points, saved.getId());
+                }
+            }
+        } catch (Exception e) {
+            log.error("[LOYALTY ERROR] Failed to earn points for order #{}: {}", saved.getId(), e.getMessage(), e);
+        }
 
-order.setStatus(OrderStatus.COMPLETED);
-order.setCompletedAt(LocalDateTime.now());
-Order saved = orderRepository.save(order);
+        try {
+            boolean upgraded = pointTierService.upgradeTierIfEligible(saved.getUser().getId());
+            if (upgraded) {
+                log.info("[TIER] User {} upgraded to {}", saved.getUser().getId(), saved.getUser().getTierCode());
+                if (saved.getUser().getEmail() != null) {
+                    emailService.sendVipWelcome(saved.getUser().getEmail(), saved.getUser().getFullName());
+                }
+            }
+        } catch (Exception e) {
+            log.error("[TIER ERROR] Failed to upgrade tier: {}", e.getMessage(), e);
+        }
 
-int points = 0;
-try {
-if (saved.getTotalForPointCalc() != null && saved.getUser() != null) {
-points = pointService.earnPoints(
-saved.getUser().getId(),
-saved.getId(),
-saved.getTotalForPointCalc(),
-"Cộng điểm từ đơn #" + saved.getId());
-if (points > 0) {
-log.info("[LOYALTY] User {} earned {} points from order #{}",
-saved.getUser().getId(), points, saved.getId());
-}
-}
-} catch (Exception e) {
-log.error("[LOYALTY ERROR] Failed to earn points for order #{}: {}", saved.getId(), e.getMessage(), e);
-}
+        try {
+            if (points > 0 && saved.getUser().getEmail() != null) {
+                int currentBalance = userPointsRepository.findByUserId(saved.getUser().getId())
+                        .map(UserPoints::getCurrentPoints).orElse(0);
+                emailService.sendPointsEarned(
+                        saved.getUser().getEmail(),
+                        saved.getUser().getFullName() != null ? saved.getUser().getFullName() : saved.getUser().getUsername(),
+                        points,
+                        saved.getId(),
+                        currentBalance
+                );
+            }
+        } catch (Exception e) {
+            log.error("[EMAIL ERROR] Failed to send points earned email: {}", e.getMessage(), e);
+        }
+    }
 
-try {
-boolean upgraded = pointTierService.upgradeTierIfEligible(saved.getUser().getId());
-if (upgraded) {
-log.info("[TIER] User {} upgraded to {}", saved.getUser().getId(), saved.getUser().getTierCode());
-if (saved.getUser() != null && saved.getUser().getEmail() != null) {
-emailService.sendVipWelcome(saved.getUser().getEmail(), saved.getUser().getFullName());
-}
-}
-} catch (Exception e) {
-log.error("[TIER ERROR] Failed to upgrade tier: {}", e.getMessage(), e);
-}
+    @Transactional
+    public Order confirmReceived(Long orderId, Long userId) {
+        Order order = getOrderByIdAndUser(orderId, userId);
 
-try {
-if (points > 0 && saved.getUser() != null && saved.getUser().getEmail() != null) {
-int currentBalance = userPointsRepository.findByUserId(saved.getUser().getId())
-.map(UserPoints::getCurrentPoints).orElse(0);
-emailService.sendPointsEarned(
-saved.getUser().getEmail(),
-saved.getUser().getFullName() != null ? saved.getUser().getFullName() : saved.getUser().getUsername(),
-points,
-saved.getId(),
-currentBalance
-);
-}
-} catch (Exception e) {
-log.error("[EMAIL ERROR] Failed to send points earned email: {}", e.getMessage(), e);
-}
+        if (!order.getStatus().canTransitionTo(OrderStatus.COMPLETED)) {
+            throw new IllegalOrderTransitionException(
+                    "Không thể xác nhận nhận hàng từ trạng thái " + order.getStatus()
+                            + ". Chỉ chấp nhận khi đơn đang DELIVERED.");
+        }
 
-orderEventService.recordTransition(saved.getId(), "DELIVERED", "COMPLETED",
-saved.getUser() != null ? saved.getUser().getId() : null, "CUSTOMER",
-"Khách xác nhận đã nhận hàng");
+        order.setStatus(OrderStatus.COMPLETED);
+        order.setCompletedAt(LocalDateTime.now());
+        Order saved = orderRepository.save(order);
 
-return saved;
-}
+        // Gọi hàm xử lý cộng điểm & nâng hạng dùng chung
+        processOrderCompletionLoyalty(saved);
+
+        orderEventService.recordTransition(saved.getId(), "DELIVERED", "COMPLETED",
+                saved.getUser() != null ? saved.getUser().getId() : null, "CUSTOMER",
+                "Khách xác nhận đã nhận hàng");
+
+        return saved;
+    }
+
+    /**
+     * Xác nhận thanh toán VNPay thành công: PENDING -> CONFIRMED, ghi paidAt.
+     * Idempotent: nếu đơn đã qua PENDING thì trả về nguyên trạng (callback lặp).
+     *
+     * @param vnpAmount số tiền VNPay báo đã thanh toán (đơn vị VND x100)
+     */
+    @Transactional
+    public Order confirmVnpayPayment(Long orderId, long vnpAmount) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found: " + orderId));
+
+        if (order.getStatus() != OrderStatus.PENDING) {
+            log.info("Order #{} already processed (status={}), skipping VNPay confirmation", orderId, order.getStatus());
+            return order;
+        }
+
+        if (order.getTotalMoney() == null || order.getTotalMoney().longValue() * 100L != vnpAmount) {
+            throw new RuntimeException("Số tiền thanh toán không khớp với đơn hàng");
+        }
+
+        order.setStatus(OrderStatus.CONFIRMED);
+        order.setPaidAt(LocalDateTime.now());
+        Order saved = orderRepository.save(order);
+
+        orderEventService.recordTransition(saved.getId(), "PENDING", "CONFIRMED",
+                saved.getUser() != null ? saved.getUser().getId() : null, "VNPAY",
+                "Thanh toán VNPay thành công");
+
+        log.info("Order #{} confirmed via VNPay payment (amount={})", saved.getId(), vnpAmount);
+        return saved;
+    }
 
 @Transactional
 public Order refundOrder(Long orderId, String adminUsername) {
@@ -413,6 +475,14 @@ case REFUNDED -> order.setRefundedAt(now);
 default -> {}
 }
 Order saved = orderRepository.save(order);
+
+    if (newStatus == OrderStatus.COMPLETED) {
+        processOrderCompletionLoyalty(saved);
+    }
+    // Ghi nhận dòng lịch sử đơn hàng
+    orderEventService.recordTransition(saved.getId(), current.name(), newStatus.name(),
+            null, "ADMIN", "Admin cập nhật trạng thái đơn hàng sang " + newStatus.name());
+
 
 auditLogService.logAction(
         "ORDER",

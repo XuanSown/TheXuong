@@ -1,5 +1,5 @@
 {
-  "name": "Telegram Chatbot TheXuong Dev#1",
+  "name": "Telegram Chatbot TheXuong version1.0",
   "nodes": [
     {
       "parameters": {
@@ -21,13 +21,13 @@
           "timeout": 60000
         }
       },
-      "id": "602a4c03-f0bc-4b52-a977-6e081d0fb521",
+      "id": "112abc15-9c8b-4ace-b0d9-331b5e1608b5",
       "name": "Ollama AI (qwen2.5:3b)",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -2032,
-        -112
+        -896,
+        16
       ],
       "onError": "continueRegularOutput"
     },
@@ -50,10 +50,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        -3600,
-        160
+        -2464,
+        288
       ],
-      "id": "3444e719-77a6-4c1e-8503-2d7fd1c62126",
+      "id": "a4c54141-047a-47dc-9284-c29c94c650e5",
       "name": "Lấy Dữ Liệu Sản Phẩm",
       "onError": "continueRegularOutput"
     },
@@ -64,13 +64,13 @@
         ],
         "additionalFields": {}
       },
-      "id": "fa6a1549-27c5-4efc-a568-77cad31bdbe0",
+      "id": "4fcabb5c-8c2e-4216-b682-39776158df14",
       "name": "Telegram Trigger",
       "type": "n8n-nodes-base.telegramTrigger",
       "typeVersion": 1.1,
       "position": [
-        -4048,
-        160
+        -2912,
+        288
       ],
       "webhookId": "telegram-sport-bot",
       "credentials": {
@@ -104,13 +104,13 @@
         },
         "options": {}
       },
-      "id": "2a6f0780-5b97-4145-9ab8-b8a4d5da49df",
+      "id": "ee5d515f-6ceb-4ab9-86e6-45db3d0d6488",
       "name": "Kiểm Tra Loại Message",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
       "position": [
-        -3824,
-        160
+        -2688,
+        288
       ]
     },
     {
@@ -121,13 +121,13 @@
           "parse_mode": "HTML"
         }
       },
-      "id": "d97bd6a6-09c1-4ee0-b42a-c7a353374027",
+      "id": "ca8dd17b-a3de-4654-9629-85a72fc2c716",
       "name": "Trả Lời Non-Text",
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        -3600,
-        352
+        -2464,
+        480
       ],
       "webhookId": "93bc5ae6-11ca-4221-86cb-f11c713647e5",
       "credentials": {
@@ -139,13 +139,13 @@
     },
     {
       "parameters": {},
-      "id": "b7dd5b0a-964c-4eb5-b4db-1173d53225fd",
+      "id": "6ae17364-a871-438e-a881-5d776ea2c5dc",
       "name": "Gộp Dữ Liệu",
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3,
       "position": [
-        -3376,
-        64
+        -2240,
+        192
       ]
     },
     {
@@ -167,10 +167,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        -2928,
-        64
+        -1792,
+        192
       ],
-      "id": "ba21bfd8-d763-471a-865a-be06e7471c65",
+      "id": "ab139036-9a38-4510-a919-38fcf10c05c3",
       "name": "Load Memory",
       "alwaysOutputData": true,
       "onError": "continueRegularOutput"
@@ -179,52 +179,52 @@
       "parameters": {
         "jsCode": "// ============================================================\n// SMART FILTER + INTENT - THEXUONG TELEGRAM BOT\n// ============================================================\n\n\n// ============================================================\n// 1. HELPER FUNCTIONS\n// ============================================================\n\nfunction sanitize(str) {\n  return String(str ?? '')\n    .replace(/[\\r\\n\\t]/g, ' ')\n    .replace(/[\\x00-\\x1F\\x7F]/g, ' ')\n    .trim();\n}\n\nfunction normalize(str) {\n  return String(str ?? '')\n    .toLowerCase()\n    .normalize('NFD')\n    .replace(/[\\u0300-\\u036f]/g, '') // Bỏ dấu tiếng Việt\n    .replace(/đ/g, 'd')\n    .replace(/[^a-z0-9\\s]/g, '')\n    .trim();\n}\n\nfunction fuzzyMatch(keyword, message) {\n  const rawKeyword = String(keyword ?? '').toLowerCase();\n  const rawMessage = String(message ?? '').toLowerCase();\n\n  // Exact match trước\n  if (rawMessage.includes(rawKeyword)) {\n    return true;\n  }\n\n  // Bỏ dấu rồi kiểm tra\n  const normKw = normalize(rawKeyword);\n  const normMsg = normalize(rawMessage);\n\n  if (normMsg.includes(normKw)) {\n    return true;\n  }\n\n  // Cho phép thiếu 1 ký tự để xử lý lỗi gõ đơn giản\n  // Partial phải bắt đầu ở đầu từ (tránh \"đơn hàng\" match nhầm \"còn hàng\")\n  if (normKw.length >= 4) {\n    for (let i = 0; i < normKw.length; i++) {\n      const partial =\n        normKw.slice(0, i) +\n        normKw.slice(i + 1);\n\n      if (partial.length >= 3) {\n        const idx = normMsg.indexOf(partial);\n\n        if (idx !== -1) {\n          const prevChar = normMsg[idx - 1];\n\n          if (idx === 0 || prevChar === ' ') {\n            return true;\n          }\n        }\n      }\n    }\n  }\n\n  return false;\n}\n\n\n// ============================================================\n// 2. LẤY DỮ LIỆU TELEGRAM\n// ============================================================\n\nconst telegramData =\n  $('Kiểm Tra Loại Message').item.json ?? {};\n\nconst telegramMessage =\n  telegramData.message ?? {};\n\nconst userMessage =\n  String(telegramMessage.text ?? '').trim();\n\nconst chatId =\n  telegramMessage.chat?.id;\n\nconst userName =\n  telegramMessage.from?.first_name || 'Bạn';\n\n\n// Không có chatId thì dừng để tránh lỗi phía sau\nif (chatId === undefined || chatId === null) {\n  throw new Error(\n    'Smart Filter + Intent: Không tìm thấy message.chat.id từ node \"Kiểm Tra Loại Message\".'\n  );\n}\n\n\n// ============================================================\n// 3. RATE LIMIT\n// 5 REQUEST / 10 GIÂY / CHAT\n// ============================================================\n\nconst now = Date.now();\n\nif (!globalThis.rateLimitMap) {\n  globalThis.rateLimitMap = new Map();\n}\n\nconst userRequests =\n  globalThis.rateLimitMap.get(chatId) || [];\n\nconst recentRequests =\n  userRequests.filter(timestamp => {\n    return now - timestamp < 10000;\n  });\n\n\n// Nếu >= 5 request trong 10 giây\nif (recentRequests.length >= 5) {\n  return [\n    {\n      json: {\n        chatId,\n        userName: sanitize(userName),\n        userMessage: sanitize(userMessage),\n\n        intent: 'rate_limited',\n        isPolicy: false,\n\n        productContext:\n          'Không tìm thấy sản phẩm phù hợp',\n\n        faqContext:\n          'Không có FAQ phù hợp',\n\n        orderPhone: null,\n        orderId: null,\n        needOrderFetch: false,\n\n        timestamp:\n          new Date().toISOString(),\n\n        isGreetingOnly: false,\n\n        secondaryIntents: [],\n\n        mentionedProductIds: [],\n\n        _rateLimited: true\n      }\n    }\n  ];\n}\n\n\n// Ghi nhận request hiện tại\nrecentRequests.push(now);\n\nglobalThis.rateLimitMap.set(\n  chatId,\n  recentRequests\n);\n\n\n// ============================================================\n// 4. LẤY DATA PRODUCT + FAQ TỪ INPUT\n// ============================================================\n\nconst allItems = $input.all();\n\nconst products = [];\nconst faqs = [];\n\n\nfor (const item of allItems) {\n  const resp = item?.json ?? {};\n\n  const dataArr =\n    resp.data !== undefined\n      ? resp.data\n      : resp;\n\n  const rows =\n    Array.isArray(dataArr)\n      ? dataArr\n      : [dataArr];\n\n\n  for (const row of rows) {\n\n    // Tránh lỗi nếu API trả null\n    if (!row || typeof row !== 'object') {\n      continue;\n    }\n\n\n    // ========================================================\n    // PRODUCT\n    // ========================================================\n\n    if (\n      row.id !== undefined &&\n      row.id !== null &&\n      row.name &&\n      row.price !== undefined\n    ) {\n\n      const price = Number(row.price);\n\n      products.push({\n        id: String(row.id ?? ''),\n\n        name:\n          String(row.name ?? '')\n            .toLowerCase(),\n\n        name_orig:\n          String(row.name ?? ''),\n\n        brand:\n          String(row.brand ?? '')\n            .toLowerCase(),\n\n        brand_orig:\n          String(row.brand ?? ''),\n\n        sport:\n          String(row.sport ?? ''),\n\n        category:\n          String(row.category ?? ''),\n\n        price:\n          Number.isFinite(price)\n            ? price\n            : 0,\n\n        description:\n          String(row.description ?? ''),\n\n        stock:\n          String(\n            row.stockStatus ??\n            'Không rõ'\n          )\n      });\n    }\n\n\n    // ========================================================\n    // FAQ\n    // ========================================================\n\n    if (row.topic && row.answer) {\n      faqs.push({\n        topic:\n          String(row.topic ?? ''),\n\n        keywords:\n          String(\n            row.questionKeywords ?? ''\n          ).toLowerCase(),\n\n        answer:\n          String(row.answer ?? '')\n      });\n    }\n  }\n}\n\n\n// ============================================================\n// 5. INTENT DETECTION\n// ============================================================\n\nconst msg =\n  userMessage.toLowerCase();\n\n\nconst INTENT_MAP = [\n\n  [\n    'exchange',\n    [\n      'đổi hàng',\n      'trả hàng',\n      'hoàn tiền',\n      'đổi size',\n      'đổi trả',\n      'đổi',\n      'trả',\n      'hoàn'\n    ]\n  ],\n\n  [\n    'shipping',\n    [\n      'phí ship',\n      'giao hàng',\n      'vận chuyển',\n      'thời gian giao',\n      'ship',\n      'bao lâu'\n    ]\n  ],\n\n  [\n    'payment',\n    [\n      'thanh toán',\n      'trả tiền',\n      'cod',\n      'chuyển khoản',\n      'momo',\n      'zalopay',\n      'zalo',\n      'thẻ'\n    ]\n  ],\n\n  [\n    'warranty',\n    [\n      'bảo hành',\n      'hàng lỗi',\n      'lỗi hàng',\n      'bảo hành mấy tháng'\n    ]\n  ],\n\n  [\n    'stock',\n    [\n      'còn hàng',\n      'còn không',\n      'hết hàng',\n      'có hàng',\n      'tồn kho',\n      'còn size',\n      'hết size'\n    ]\n  ],\n\n  [\n    'compare',\n    [\n      'so sánh',\n      'khác nhau',\n      'tốt hơn',\n      'nên chọn',\n      'hay là'\n    ]\n  ],\n\n  [\n    'describe',\n    [\n      'mô tả',\n      'giới thiệu',\n      'thông tin',\n      'chi tiết',\n      'công nghệ',\n      'chất liệu',\n      'tính năng'\n    ]\n  ],\n\n  [\n    'brand',\n    [\n      'hãng nào',\n      'thương hiệu',\n      'của ai',\n      'sản xuất',\n      'nhà sản xuất'\n    ]\n  ],\n\n  [\n    'size',\n    [\n      'bảng size',\n      'size áo',\n      'size giày',\n      'cỡ áo',\n      'cỡ giày',\n      'số giày',\n      'form',\n      'chọn size'\n    ]\n  ],\n\n  [\n    'price',\n    [\n      'giá bao nhiêu',\n      'bao nhiêu tiền',\n      'giá',\n      'bao nhiêu',\n      'tiền'\n    ]\n  ],\n\n  [\n    'greeting',\n    [\n      'xin chào',\n      'hello',\n      'hi',\n      'chào',\n      'hey',\n      'alo',\n      'xin chào bạn'\n    ]\n  ],\n\n  [\n    'order_tracking',\n    [\n      'tra cứu',\n      'tra cứu đơn',\n      'tra cứu đơn hàng',\n      'đơn hàng',\n      'kiểm tra đơn',\n      'kiểm tra đơn hàng',\n      'xem đơn',\n      'xem đơn hàng',\n      'tình trạng đơn',\n      'trạng thái đơn',\n      'mã đơn',\n      'đơn của tôi',\n      'đơn của mình'\n    ]\n  ]\n\n];\n\n\n// ============================================================\n// 6. MATCH INTENT\n// ============================================================\n\nconst matchedIntents = [];\n\nfor (const [key, keywords] of INTENT_MAP) {\n\n  const matched =\n    keywords.some(keyword =>\n      fuzzyMatch(keyword, msg)\n    );\n\n  if (matched) {\n    matchedIntents.push(key);\n  }\n}\n\n\nlet intent =\n  matchedIntents[0] || 'general';\n\nlet secondaryIntents =\n  matchedIntents.slice(1);\n\n\n// ============================================================\n// 7. POLICY INTENT\n// ============================================================\n\nconst POLICY_INTENTS = [\n  'exchange',\n  'size',\n  'shipping',\n  'payment',\n  'warranty'\n];\n\nconst isPolicy =\n  POLICY_INTENTS.includes(intent);\n\n\n// ============================================================\n// 8. TOKENIZE USER MESSAGE\n// ============================================================\n\nconst STOP = new Set([\n  'của',\n  'và',\n  'có',\n  'không',\n  'cho',\n  'bao',\n  'nhiêu',\n  'giá',\n  'còn',\n  'thì',\n  'sao',\n  'muốn',\n  'mua',\n  'cái',\n  'chiếc',\n  'đôi',\n  'như',\n  'nào',\n  'rồi',\n  'này',\n  'đó',\n  'là',\n  'gì',\n  'với',\n  'anh',\n  'chị',\n  'em',\n  'shop',\n  'ạ',\n  'nhé'\n]);\n\n\nconst tokens =\n  msg\n    .replace(/[?,!.:;]/g, ' ')\n    .split(/\\s+/)\n    .map(token => token.trim())\n    .filter(token => {\n      return (\n        token.length > 1 &&\n        !STOP.has(token)\n      );\n    });\n\n\n// ============================================================\n// 9. PRODUCT SCORING\n// ============================================================\n\nfunction scoreProduct(product) {\n\n  let score = 0;\n\n  const name =\n    String(product.name ?? '');\n\n  const brand =\n    String(product.brand ?? '');\n\n  const category =\n    String(product.category ?? '')\n      .toLowerCase();\n\n  const sport =\n    String(product.sport ?? '')\n      .toLowerCase();\n\n  const description =\n    String(product.description ?? '')\n      .toLowerCase();\n\n\n  for (const token of tokens) {\n\n    if (name.includes(token)) {\n      score += 10;\n    }\n\n    if (brand.includes(token)) {\n      score += 8;\n    }\n\n    if (category.includes(token)) {\n      score += 5;\n    }\n\n    if (sport.includes(token)) {\n      score += 4;\n    }\n\n    if (description.includes(token)) {\n      score += 1;\n    }\n  }\n\n  return score;\n}\n\n\n// ============================================================\n// 10. FAQ SCORING\n// ============================================================\n\nfunction scoreFaq(faq) {\n\n  let score = 0;\n\n  const keywords =\n    String(faq.keywords ?? '');\n\n  const topic =\n    String(faq.topic ?? '')\n      .toLowerCase();\n\n  const answer =\n    String(faq.answer ?? '')\n      .toLowerCase();\n\n\n  for (const token of tokens) {\n\n    if (keywords.includes(token)) {\n      score += 10;\n    }\n\n    if (topic.includes(token)) {\n      score += 5;\n    }\n\n    if (answer.includes(token)) {\n      score += 1;\n    }\n  }\n\n  return score;\n}\n\n\n// ============================================================\n// 11. FILTER PRODUCT\n// ============================================================\n\nlet filteredProducts =\n  products\n    .map(product => ({\n      ...product,\n      score: scoreProduct(product)\n    }))\n    .filter(product =>\n      product.score > 0\n    )\n    .sort(\n      (a, b) =>\n        b.score - a.score\n    );\n\n\n// ============================================================\n// 12. FILTER FAQ\n// ============================================================\n\nlet filteredFaqs =\n  faqs\n    .map(faq => ({\n      ...faq,\n      score: scoreFaq(faq)\n    }))\n    .filter(faq =>\n      faq.score > 0\n    )\n    .sort(\n      (a, b) =>\n        b.score - a.score\n    );\n\n\n// ============================================================\n// 13. GIỚI HẠN SẢN PHẨM\n// ============================================================\n\nconst maxProducts =\n  intent === 'compare'\n    ? 4\n    : 3;\n\n\nif (\n  filteredProducts.length === 0 &&\n  tokens.length === 0 &&\n  intent === 'general'\n) {\n\n  filteredProducts =\n    products.slice(0, 3);\n\n} else {\n\n  filteredProducts =\n    filteredProducts.slice(\n      0,\n      maxProducts\n    );\n}\n\n\n// ============================================================\n// 14. FAQ FALLBACK\n// ============================================================\n\nif (\n  filteredFaqs.length === 0 &&\n  isPolicy\n) {\n\n  const fallbackFaqs =\n    faqs.filter(faq => {\n\n      const topic =\n        String(faq.topic ?? '')\n          .toLowerCase();\n\n      return topic.includes(intent);\n    });\n\n\n  if (fallbackFaqs.length > 0) {\n\n    filteredFaqs =\n      fallbackFaqs.slice(0, 3);\n\n  } else {\n\n    filteredFaqs =\n      faqs.slice(0, 3);\n  }\n\n} else {\n\n  filteredFaqs =\n    filteredFaqs.slice(0, 3);\n}\n\n\n// ============================================================\n// 15. BUILD PRODUCT CONTEXT\n// ============================================================\n\nlet productContext = '';\n\nfor (const product of filteredProducts) {\n\n  productContext +=\n    `- [${product.id}] ` +\n    `${product.name_orig} | ` +\n    `Hãng: ${product.brand_orig || 'Không rõ'} | ` +\n    `Giá: ${product.price.toLocaleString('vi-VN')} VNĐ | ` +\n    `Tình trạng: ${product.stock}\\n`;\n}\n\n\n// ============================================================\n// 16. BUILD FAQ CONTEXT\n// ============================================================\n\nlet faqContext = '';\n\nfor (const faq of filteredFaqs) {\n\n  faqContext +=\n    `- [${faq.topic}] ${faq.answer}\\n`;\n}\n\n\n// ============================================================\n// 17. EXTRACT ORDER INFO\n// ============================================================\n\nlet msgForId =\n  userMessage;\n\nlet orderPhone =\n  null;\n\nlet orderId =\n  null;\n\n\n// ============================================================\n// PHONE VIỆT NAM\n// Ví dụ:\n//\n// 0912345678\n// 091 234 5678\n// 091-234-5678\n// 091.234.5678\n// +84 912 345 678\n// 84912345678\n// ============================================================\n\nconst phoneRegex =\n  /(?:\\+?84[\\s.-]?|0)(?:3|5|7|8|9)(?:[\\s.-]?\\d){8}\\b/;\n\nconst phoneMatch =\n  userMessage.match(phoneRegex);\n\n\nif (phoneMatch) {\n\n  const rawPhone =\n    phoneMatch[0];\n\n  let rawDigits =\n    rawPhone.replace(/\\D/g, '');\n\n  // Chuẩn hóa về 10 chữ số bắt đầu bằng 0\n  if (rawDigits.startsWith('84')) {\n    rawDigits =\n      '0' + rawDigits.slice(2);\n  }\n\n  orderPhone =\n    rawDigits;\n\n  // Xóa phone trước khi tìm order ID\n  msgForId =\n    userMessage.replace(\n      rawPhone,\n      ' '\n    );\n}\n\n\n// ============================================================\n// ORDER ID\n// Chỉ nhận số ĐỨNG ĐỘC LẬP:\n// - 1-10 chữ số\n// - không phải giá tiền (1.590.000) hoặc số thập phân\n// - không dính đơn vị (125k, 42 size, 2 đôi...)\n// - ưu tiên số đi sau từ khóa \"mã đơn\"/\"đơn\"\n// ============================================================\n\nfunction extractOrderId(text) {\n\n  const lower =\n    String(text ?? '').toLowerCase();\n\n  // Loại bỏ giá tiền: 1.590.000 / 1,590,000\n  const cleaned =\n    lower\n      .replace(\n        /\\d{1,3}(?:[.,]\\d{3})+(?:[.,]\\d+)?/g,\n        ' '\n      )\n      // Loại bỏ số dính đơn vị: 125k, 125đ, 2 đôi, size 42...\n      .replace(\n        /\\d+(?:[.,]\\d+)?\\s*(?:k|đ|d|vnd|vnđ|đồng|dong|nghìn|trieu|triệu|tr|%|cm|mm|kg|đôi|cái|chiếc|con|món|bộ|size|cỡ|sl)\\b/g,\n        ' '\n      );\n\n  // Ưu tiên số đi ngay sau từ khóa mã đơn/đơn hàng\n  const afterKw =\n    cleaned.match(\n      /(?:mã đơn|mã đh|mã đơn hàng|đơn hàng|đơn|order|đh)\\s*[#:\\s]*(\\d{1,10})\\b/\n    );\n\n  if (afterKw) {\n    return afterKw[1];\n  }\n\n  // Số đứng độc lập\n  const standalone =\n    cleaned.match(/\\b(\\d{1,10})\\b/g);\n\n  if (standalone && standalone.length > 0) {\n    return standalone[0];\n  }\n\n  return null;\n}\n\n\norderId =\n  extractOrderId(msgForId);\n\n\n// ============================================================\n// 18. GREETING ONLY\n// ============================================================\n\nconst isGreetingOnly =\n  intent === 'greeting' &&\n  tokens.length <= 2;\n\n\n// ============================================================\n// 19. PRODUCT IDS\n// ============================================================\n\nconst mentionedProductIds =\n  filteredProducts.map(\n    product => product.id\n  );\n\n\n// ============================================================\n// 20. CÓ CẦN FETCH ORDER KHÔNG\n// ============================================================\n\nconst needOrderFetch =\n  Boolean(\n    orderPhone &&\n    orderId &&\n    intent === 'order_tracking'\n  );\n\n\n// ============================================================\n// 21. FINAL OUTPUT\n// ============================================================\n\nreturn [\n  {\n    json: {\n\n      chatId,\n\n      userName:\n        sanitize(userName),\n\n      userMessage:\n        sanitize(userMessage),\n\n      intent,\n\n      isPolicy,\n\n      productContext:\n        productContext.trim() ||\n        'Không tìm thấy sản phẩm phù hợp',\n\n      faqContext:\n        faqContext.trim() ||\n        'Không có FAQ phù hợp',\n\n      orderPhone,\n\n      orderId,\n\n      needOrderFetch,\n\n      timestamp:\n        new Date().toISOString(),\n\n      isGreetingOnly,\n\n      secondaryIntents,\n\n      mentionedProductIds,\n\n      _rateLimited: false\n    }\n  }\n];"
       },
-      "id": "92878a63-5d7b-4a9b-b31e-cb1ea5f9014d",
+      "id": "6638d3fb-f030-4b59-bf55-1c4a131e49fd",
       "name": "Smart Filter + Intent",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -3152,
-        64
+        -2016,
+        192
       ]
     },
     {
       "parameters": {
         "jsCode": "// ============================================================\n// BUILD PROMPT - THEXUONG TELEGRAM BOT\n// ============================================================\n\n\n// ============================================================\n// 1. LẤY CONTEXT TỪ SMART FILTER + INTENT\n// PHẢI KHAI BÁO TRƯỚC KHI DÙNG ctx\n// ============================================================\n\nconst ctx = $('Smart Filter + Intent').item.json ?? {};\n\n\n// ============================================================\n// 2. RATE LIMIT\n// ============================================================\n\nif (ctx._rateLimited) {\n  return [\n    {\n      json: {\n        chatId: ctx.chatId,\n        userName: ctx.userName || 'Bạn',\n        userMessage: ctx.userMessage || '',\n        intent: 'rate_limited',\n        timestamp: ctx.timestamp || new Date().toISOString(),\n\n        requestBody: null,\n\n        _rateLimited: true,\n\n        _reply:\n          'Bạn đang gửi tin nhắn quá nhanh. Vui lòng chờ một chút rồi thử lại nhé! ⏳'\n      }\n    }\n  ];\n}\n\n\n// ============================================================\n// 3. TRA CỨU ĐƠN HÀNG — ĐÃ CHUYỂN SANG NHÁNH DETERMINISTIC RIÊNG\n// (Parse Order Tracking / Format Order Response / Xử Lý Order Reply)\n// Build Prompt không còn xử lý order.\n// ============================================================\n\n\n// ============================================================\n// 4. ĐỌC MEMORY - LỊCH SỬ HỘI THOẠI\n// ============================================================\n\nlet conversationHistory = [];\n\ntry {\n  const memItems =\n    $('Load Memory').all();\n\n  if (\n    memItems.length > 0 &&\n    memItems[0]?.json?.history_json\n  ) {\n    const rawHistory =\n      memItems[0].json.history_json;\n\n    if (Array.isArray(rawHistory)) {\n      conversationHistory = rawHistory;\n    } else if (typeof rawHistory === 'string') {\n      const parsed =\n        JSON.parse(rawHistory);\n\n      conversationHistory =\n        Array.isArray(parsed)\n          ? parsed\n          : [];\n    }\n  }\n\n} catch (e) {\n  conversationHistory = [];\n}\n\n\n// Chỉ lấy 5 lượt gần nhất\nconversationHistory =\n  conversationHistory.slice(-5);\n\n\n// ============================================================\n// 5. ĐỌC MEMORY - SẢN PHẨM ĐÃ NHẮC TRƯỚC ĐÓ\n// ============================================================\n\nlet lastMentionedProducts = [];\n\ntry {\n  const memItems =\n    $('Load Memory').all();\n\n  if (\n    memItems.length > 0 &&\n    memItems[0]?.json?.last_mentioned\n  ) {\n    const rawMentioned =\n      memItems[0].json.last_mentioned;\n\n    if (Array.isArray(rawMentioned)) {\n      lastMentionedProducts =\n        rawMentioned;\n\n    } else if (typeof rawMentioned === 'string') {\n      const parsed =\n        JSON.parse(rawMentioned);\n\n      lastMentionedProducts =\n        Array.isArray(parsed)\n          ? parsed\n          : [];\n    }\n  }\n\n} catch (e) {\n  lastMentionedProducts = [];\n}\n\n\n// ============================================================\n// 6. XỬ LÝ CÂU THAM CHIẾU\n// Ví dụ:\n// \"cái đó\"\n// \"đôi đó\"\n// \"sản phẩm này\"\n// ============================================================\n\nconst REFERENCE_WORDS = [\n  'cái đó',\n  'cái này',\n  'sản phẩm đó',\n  'sản phẩm này',\n  'nó',\n  'chúng',\n  'đôi đó',\n  'đôi này'\n];\n\nconst safeUserMessage =\n  String(ctx.userMessage ?? '');\n\nconst lowerUserMessage =\n  safeUserMessage.toLowerCase();\n\nconst hasReference =\n  REFERENCE_WORDS.some(word =>\n    lowerUserMessage.includes(word)\n  );\n\n\nlet referenceContext = '';\n\nif (\n  hasReference &&\n  lastMentionedProducts.length > 0\n) {\n  referenceContext =\n    '\\n[LƯU Ý: Khách đang nhắc đến sản phẩm đã giới thiệu trước đó. ' +\n    'Nếu sản phẩm nằm trong [SẢN PHẨM] thì trả lời. ' +\n    'Nếu không thì hỏi lại khách \"Bạn muốn hỏi về sản phẩm nào ạ?\"]\\n';\n}\n\n\n// ============================================================\n// 7. BUILD HISTORY STRING\n// ============================================================\n\nlet historyStr = '';\n\nif (conversationHistory.length > 0) {\n  historyStr =\n    '[LỊCH SỬ HỘI THOẠI GẦN ĐÂY]\\n';\n\n  for (const turn of conversationHistory) {\n    const userText =\n      String(turn?.user ?? '');\n\n    const botText =\n      String(turn?.bot ?? '');\n\n    historyStr +=\n      `Khách: ${userText}\\n` +\n      `Tư vấn viên: ${botText}\\n`;\n  }\n\n  historyStr += '\\n';\n}\n\n\n// ============================================================\n// 8. BUILD DATA BLOCK\n// ============================================================\n\nlet dataBlock = '';\n\nconst productContext =\n  String(\n    ctx.productContext ??\n    'Không tìm thấy sản phẩm phù hợp'\n  );\n\nconst faqContext =\n  String(\n    ctx.faqContext ??\n    'Không có FAQ phù hợp'\n  );\n\n\nconst hasProduct =\n  productContext !==\n  'Không tìm thấy sản phẩm phù hợp';\n\nconst hasFaq =\n  faqContext !==\n  'Không có FAQ phù hợp';\n\n\nif (hasProduct) {\n  dataBlock +=\n    `[SẢN PHẨM]\\n${productContext}\\n`;\n}\n\nif (hasFaq) {\n  dataBlock +=\n    `[CHÍNH SÁCH]\\n${faqContext}\\n`;\n}\n\nif (referenceContext) {\n  dataBlock += referenceContext;\n}\n\n\n// ============================================================\n// 9. HƯỚNG DẪN THEO INTENT\n// ============================================================\n\nconst intentGuide = {\n\n  greeting:\n    'Chào hỏi thân thiện, giới thiệu mình là nhân viên TheXuong. Hỏi khách cần hỗ trợ gì.',\n\n  stock:\n    'Thông báo tình trạng tồn kho từ [SẢN PHẨM].',\n\n  price:\n    'Nêu giá sản phẩm từ [SẢN PHẨM].',\n\n  describe:\n    'Mô tả sản phẩm từ [SẢN PHẨM].',\n\n  brand:\n    'Xác nhận thương hiệu từ [SẢN PHẨM].',\n\n  exchange:\n    'Trả lời dựa nội dung [CHÍNH SÁCH] mục đổi trả.',\n\n  size:\n    'Trả lời dựa nội dung [CHÍNH SÁCH] mục size.',\n\n  shipping:\n    'Trả lời dựa nội dung [CHÍNH SÁCH] mục vận chuyển.',\n\n  payment:\n    'Trả lời dựa nội dung [CHÍNH SÁCH] mục thanh toán.',\n\n  warranty:\n    'Trả lời dựa nội dung [CHÍNH SÁCH] mục bảo hành.',\n\n  compare:\n    'So sánh các sản phẩm trong [SẢN PHẨM].',\n\n  general:\n    'Trò chuyện lịch sự. Nếu chưa rõ nhu cầu, hỏi khách đang quan tâm sản phẩm hoặc môn thể thao nào.'\n};\n\n\nconst guide =\n  intentGuide[ctx.intent] ||\n  intentGuide.general;\n\n\n// ============================================================\n// 10. RULE ĐỘNG\n// ============================================================\n\nlet rule2 = '';\nlet rule3 = '';\n\n\nif (\n  [\n    'stock',\n    'price',\n    'describe',\n    'brand',\n    'compare'\n  ].includes(ctx.intent)\n) {\n\n  rule2 =\n    '2. NẾU KHÁCH HỎI VỀ MỘT SẢN PHẨM NHƯNG [SẢN PHẨM] TRỐNG ' +\n    '→ Tuyệt đối không đoán thông tin. ' +\n    'PHẢI trả lời rằng hiện tại chưa có thông tin về sản phẩm này và xin khách cung cấp thêm tên sản phẩm.\\n';\n}\n\n\nif (\n  [\n    'exchange',\n    'size',\n    'shipping',\n    'payment',\n    'warranty'\n  ].includes(ctx.intent)\n) {\n\n  rule3 =\n    '3. NẾU KHÁCH HỎI CHÍNH SÁCH NHƯNG [CHÍNH SÁCH] TRỐNG ' +\n    '→ Không tự bịa chính sách. Hướng dẫn khách liên hệ bộ phận hỗ trợ của TheXuong.\\n';\n}\n\n\nif (ctx.intent === 'general') {\n\n  rule2 =\n    '2. NẾU KHÁCH HỎI VỀ SẢN PHẨM NHƯNG KHÔNG RÕ RÀNG ' +\n    '→ Trả lời lịch sự và xin thêm tên sản phẩm hoặc nhu cầu cụ thể.\\n';\n}\n\n\n// ============================================================\n// 11. BUILD PROMPT\n// ============================================================\n\nconst prompt =\n`Bạn là AI tư vấn viên của TheXuong Sport Store. Tên bạn là TheXuong AI.\n\n=== LUẬT TUYỆT ĐỐI (CẤM VI PHẠM) ===\n0. CHỈ ĐƯỢC PHÉP TRẢ LỜI BẰNG TIẾNG VIỆT.\nTUYỆT ĐỐI KHÔNG SỬ DỤNG TIẾNG TRUNG QUỐC.\n\n1. KHÔNG TỰ BỊA ĐẶT THÔNG TIN.\nChỉ sử dụng dữ liệu được cung cấp bên dưới.\n\n${rule2}${rule3}4. Trả lời tự nhiên, lịch sự, súc tích, ưu tiên dưới 80 từ.\n5. Có thể dùng emoji phù hợp nhưng không lạm dụng.\n6. Hướng dẫn riêng cho câu hỏi hiện tại: ${guide}\n\n=== DỮ LIỆU ĐƯỢC CẤP ===\n${dataBlock || '(Trống)'}\n===========================\n\n${historyStr}Khách (${ctx.userName || 'Bạn'}): ${safeUserMessage}\nTư vấn viên:`;\n\n\n// ============================================================\n// 12. OUTPUT CHO OLLAMA\n// ============================================================\n\nreturn [\n  {\n    json: {\n\n      chatId:\n        ctx.chatId,\n\n      userName:\n        ctx.userName || 'Bạn',\n\n      userMessage:\n        safeUserMessage,\n\n      intent:\n        ctx.intent || 'general',\n\n      timestamp:\n        ctx.timestamp ||\n        new Date().toISOString(),\n\n      _rateLimited:\n        false,\n\n      requestBody: {\n\n        model:\n          'qwen2.5:3b',\n\n        prompt,\n\n        stream:\n          false,\n\n        options: {\n          temperature: 0.1,\n          top_p: 0.85,\n          num_predict: 600,\n          repeat_penalty: 1.2\n        }\n      }\n    }\n  }\n];"
       },
-      "id": "e18e5d07-df80-4f61-a5e6-645ae7219b7c",
+      "id": "e82bdd05-f8e7-40d2-b568-7d50197bbdfa",
       "name": "Build Prompt",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -2256,
-        -112
+        -1120,
+        16
       ]
     },
     {
       "parameters": {
         "jsCode": "if ($json._rateLimited) {\n  return [{ json: {\n    chatId: $json.chatId,\n    botReply: $json._reply,\n    botReplyRaw: $json._reply,\n    updatedHistory: [],\n    timestamp: new Date().toISOString(),\n  }}];\n}\n\nconst ollamaResp = ($json.response || '').trim();\nconst buildCtx = $('Build Prompt').item.json;\n\nconst botReply = ollamaResp ||\n  'Xin lỗi, hệ thống đang bận. Vui lòng thử lại sau! 🙏';\n\nlet history = [];\ntry {\n  const memItems = $('Load Memory').all();\n  if (memItems.length > 0 && memItems[0].json.history_json) {\n    history = JSON.parse(memItems[0].json.history_json);\n  }\n} catch(e) {\n  history = [];\n}\n\nhistory.push({ user: buildCtx.userMessage, bot: ollamaResp });\nconst updatedHistory = history.slice(-5);\n\nreturn [{\n  json: {\n    chatId: buildCtx.chatId,\n    userName: buildCtx.userName,\n    userMessage: buildCtx.userMessage,\n    intent: buildCtx.intent,\n    botReply: botReply,\n    botReplyRaw: ollamaResp,\n    updatedHistory: updatedHistory,\n    timestamp: buildCtx.timestamp,\n    mentionedProductIds: buildCtx.mentionedProductIds || [],\n  }\n}];"
       },
-      "id": "8539dbfa-a0bb-4f0d-bf73-79378e56db6c",
+      "id": "a81a6362-d498-4a4e-bb23-6a86cc6b51a4",
       "name": "Xử Lý Phản Hồi AI",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -1584,
-        -112
+        -448,
+        16
       ]
     },
     {
       "parameters": {
         "jsCode": "// ============================================================\n// CHUẨN BỊ SAVE MEMORY - THEXUONG TELEGRAM BOT\n// Gửi cả historyJson + stateJson (nếu có thay đổi).\n// ============================================================\n\nconst d = $json;\nconst historyJson = JSON.stringify(d.updatedHistory);\nconst now = new Date().toISOString();\n\n// State: ưu tiên từ nhánh order (Xử Lý Order Reply),\n// fallback là reset state khi timeout (Parse Order Tracking).\nlet stateJson = null;\n\ntry {\n  const o = $('Xử Lý Order Reply').item.json;\n  stateJson = o.stateJsonToPersist ?? null;\n} catch (e) {\n  stateJson = null;\n}\n\nif (stateJson === null) {\n  try {\n    const p = $('Parse Order Tracking').item.json;\n    stateJson = p.resetStateJson ?? null;\n  } catch (e) {\n    stateJson = null;\n  }\n}\n\nconst payloadSave = {\n  chatId: String(d.chatId),\n  historyJson: historyJson,\n  lastMentioned: JSON.stringify(d.mentionedProductIds || [])\n};\n\n// Chỉ gửi stateJson khi có thay đổi → backend giữ state cũ nếu không gửi\nif (stateJson !== null && stateJson !== undefined) {\n  payloadSave.stateJson = stateJson;\n}\n\nreturn [{\n  json: {\n    chatId: d.chatId,\n    userName: d.userName,\n    userMessage: d.userMessage,\n    intent: d.intent,\n    botReply: d.botReplyRaw,\n    timestamp: d.timestamp,\n    historyJson: historyJson,\n    updatedAt: now,\n    payloadSave: payloadSave,\n    payloadLog: {\n      chatId: String(d.chatId),\n      userName: d.userName,\n      intent: d.intent,\n      userMessage: d.userMessage,\n      botReply: d.botReplyRaw\n    }\n  }\n}];\n"
       },
-      "id": "d1039bb8-20e8-4a8b-9b0b-8fbb0e5648e2",
+      "id": "8ee8e2c1-5ef6-48e4-a2a1-c33d73a3e180",
       "name": "Chuẩn Bị Save Memory",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -1360,
-        -32
+        -224,
+        96
       ]
     },
     {
@@ -235,13 +235,13 @@
           "appendAttribution": false
         }
       },
-      "id": "87a811a0-7c8d-43c8-8448-4390e592bb8f",
+      "id": "1693f5f3-5d80-4ae6-b15a-823605dbef90",
       "name": "Gửi Phản Hồi Telegram",
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        -1360,
-        160
+        -224,
+        288
       ],
       "webhookId": "e685a7e8-0ab7-4e79-8e2f-5201e8587b50",
       "credentials": {
@@ -274,10 +274,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        -1136,
-        -128
+        0,
+        0
       ],
-      "id": "03a30bcd-b58b-4c3e-a141-d6c146aeb640",
+      "id": "b637f467-5fca-4048-b8a7-0b3de86cd2ab",
       "name": "Save Memory",
       "onError": "continueErrorOutput"
     },
@@ -304,10 +304,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        -1136,
-        64
+        0,
+        192
       ],
-      "id": "04d138e2-ea25-469b-9d44-4deef4a4c8a7",
+      "id": "ae9e63a8-dbec-427b-9f11-475c6be931d7",
       "name": "Logging",
       "onError": "continueErrorOutput"
     },
@@ -330,10 +330,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        -3600,
-        -32
+        -2464,
+        96
       ],
-      "id": "87ee3573-f70c-451d-8d02-ea8aa42a6ff4",
+      "id": "47f3850b-20a8-480a-ab14-928b95cd4cdb",
       "name": "Lấy Dữ Liệu FAQ",
       "onError": "continueRegularOutput"
     },
@@ -346,22 +346,18 @@
             {
               "name": "Accept",
               "value": "application/json"
-            },
-            {
-              "name": "X-Chatbot-Secret",
-              "value": "={{ $env.CHATBOT_API_SECRET }}"
             }
           ]
         },
         "options": {}
       },
-      "id": "8ea04ece-ed47-4cab-a376-ab3f446f32d8",
+      "id": "fb0529ca-a541-4d68-b365-d2ee85fba872",
       "name": "Lấy Dữ Liệu Đơn Hàng",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -2032,
-        144
+        -896,
+        272
       ],
       "onError": "continueRegularOutput"
     },
@@ -372,23 +368,23 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -1808,
-        -112
+        -672,
+        16
       ],
-      "id": "e2eae683-9d65-4950-a56e-0337a27bea35",
+      "id": "f274850c-00e8-4ee3-9e25-3b929c14ebd2",
       "name": "Post-Validation"
     },
     {
       "parameters": {
         "jsCode": "// ============================================================\n// PARSE ORDER TRACKING - THEXUONG TELEGRAM BOT\n// Merge state_json từ memory với dữ liệu trích từ message hiện tại.\n// Quyết định order flow deterministically (KHÔNG qua Ollama).\n// ============================================================\n\nconst ctx =\n  $('Smart Filter + Intent').item.json ?? {};\n\nconst memJson =\n  $json ?? {};\n\nconst TIMEOUT_MS =\n  15 * 60 * 1000;\n\n\n// ============================================================\n// 1. ĐỌC STATE TỪ MEMORY\n// ============================================================\n\nlet state = {};\n\ntry {\n  const raw = memJson.state_json;\n\n  if (typeof raw === 'string' && raw.trim()) {\n    state = JSON.parse(raw);\n  } else if (raw && typeof raw === 'object') {\n    state = raw;\n  }\n} catch (e) {\n  state = {};\n}\n\nconst ol =\n  (state.orderLookup &&\n    typeof state.orderLookup === 'object')\n    ? state.orderLookup\n    : null;\n\n\n// ============================================================\n// 2. TIMEOUT CHECK (15 PHÚT)\n// ============================================================\n\nlet pendingActive =\n  Boolean(ol && ol.active === true);\n\nlet resetStateJson =\n  null;\n\nif (pendingActive && ol.startedAt) {\n  const started =\n    Date.parse(ol.startedAt);\n\n  if (!isNaN(started) &&\n      (Date.now() - started) > TIMEOUT_MS) {\n    pendingActive = false;\n    resetStateJson =\n      '{\"orderLookup\":{\"active\":false,\"phone\":null,\"orderId\":null}}';\n  }\n}\n\n\n// ============================================================\n// 3. MERGE VỚI DỮ LIỆU MỚI TỪ MESSAGE\n// ============================================================\n\nlet phone =\n  ctx.orderPhone ?? null;\n\nlet orderId =\n  ctx.orderId ?? null;\n\nif (pendingActive) {\n  if (!phone && ol.phone) {\n    phone = ol.phone;\n  }\n  if (!orderId && ol.orderId) {\n    orderId = ol.orderId;\n  }\n}\n\n\n// ============================================================\n// 4. QUYẾT ĐỊNH ORDER FLOW\n// ============================================================\n\nconst rateLimited =\n  Boolean(ctx._rateLimited);\n\nconst isOrderIntent =\n  ctx.intent === 'order_tracking' ||\n  (Array.isArray(ctx.secondaryIntents) &&\n    ctx.secondaryIntents.includes('order_tracking'));\n\nconst orderFlowActive =\n  (pendingActive || isOrderIntent) && !rateLimited;\n\nconst missingOrderPhone =\n  !phone;\n\nconst missingOrderId =\n  !orderId;\n\nlet needOrderFetch =\n  false;\n\nlet pendingStateJson =\n  null;\n\nlet askText =\n  null;\n\nif (orderFlowActive) {\n\n  if (phone && orderId) {\n\n    // Đủ cả 2 → fetch đơn ngay\n    needOrderFetch = true;\n\n  } else {\n\n    // Giữ startedAt cũ nếu vẫn đang pending (không reset timeout mỗi message)\n    const startedAt =\n      (pendingActive && ol.startedAt)\n        ? ol.startedAt\n        : new Date().toISOString();\n\n    pendingStateJson =\n      JSON.stringify({\n        orderLookup: {\n          active: true,\n          phone: phone ?? null,\n          orderId: orderId ?? null,\n          startedAt: startedAt\n        }\n      });\n\n    if (missingOrderPhone && missingOrderId) {\n\n      // Case A — thiếu cả phone và orderId\n      askText =\n        '📦 Được ạ. Bạn vui lòng cung cấp số điện thoại dùng khi đặt hàng nhé.';\n\n    } else if (missingOrderPhone) {\n\n      // Case C — có orderId, thiếu phone\n      askText =\n        '✅ Mình đã nhận mã đơn hàng.\\n\\nBạn gửi thêm số điện thoại đã dùng khi đặt hàng giúp mình nhé.';\n\n    } else if (missingOrderId) {\n\n      // Case B — có phone, thiếu orderId\n      askText =\n        '✅ Mình đã nhận số điện thoại.\\n\\nBạn gửi thêm mã đơn hàng giúp mình nhé.\\nVí dụ: 125';\n\n    }\n\n  }\n\n}\n\n\n// ============================================================\n// 5. OUTPUT\n// ============================================================\n\nreturn [\n  {\n    json: {\n\n      chatId: ctx.chatId,\n      userName: ctx.userName,\n      userMessage: ctx.userMessage,\n\n      intent:\n        orderFlowActive\n          ? 'order_tracking'\n          : (ctx.intent || 'general'),\n\n      isOrderFlow: orderFlowActive,\n\n      orderPhone: phone,\n      orderId: orderId,\n\n      orderLookupActive: pendingActive,\n      missingOrderPhone: missingOrderPhone,\n      missingOrderId: missingOrderId,\n      needOrderFetch: needOrderFetch,\n\n      pendingStateJson: pendingStateJson,\n      resetStateJson: resetStateJson,\n\n      askText: askText,\n\n      // Passthrough cho nhánh Ollama\n      isPolicy: ctx.isPolicy,\n      productContext: ctx.productContext,\n      faqContext: ctx.faqContext,\n      isGreetingOnly: ctx.isGreetingOnly,\n      secondaryIntents: ctx.secondaryIntents,\n      mentionedProductIds: ctx.mentionedProductIds,\n\n      timestamp: ctx.timestamp || new Date().toISOString(),\n      _rateLimited: ctx._rateLimited || false\n    }\n  }\n];\n"
       },
-      "id": "6eb61e8f-2ac7-4038-813c-972e83fc9c4e",
+      "id": "9bc62591-ed52-4a23-a0a4-ef5b7ece9bfb",
       "name": "Parse Order Tracking",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -2704,
-        64
+        -1568,
+        192
       ]
     },
     {
@@ -402,13 +398,13 @@
           ]
         }
       },
-      "id": "119329e4-7149-4158-b917-116db47eb5fb",
+      "id": "40e8b2c6-c9c0-41d3-ae8e-0d9e2a14d23d",
       "name": "Order Routing",
       "type": "n8n-nodes-base.if",
       "typeVersion": 1,
       "position": [
-        -2480,
-        64
+        -1344,
+        192
       ]
     },
     {
@@ -422,39 +418,39 @@
           ]
         }
       },
-      "id": "58ec2479-9bdf-4b19-bd8b-cfeb5ee012f6",
+      "id": "fdcecd1b-ec83-417c-9af9-7265bee0fb92",
       "name": "Kiểm Tra Fetch Đơn",
       "type": "n8n-nodes-base.if",
       "typeVersion": 1,
       "position": [
-        -2256,
-        208
+        -1120,
+        336
       ]
     },
     {
       "parameters": {
         "jsCode": "// ============================================================\n// FORMAT ORDER RESPONSE - THEXUONG TELEGRAM BOT\n// Format kết quả tra cứu đơn TRỰC TIẾP - KHÔNG đi qua Ollama.\n// Input: response từ \"Lấy Dữ Liệu Đơn Hàng\"\n// ============================================================\n\nconst orderResp =\n  $json ?? {};\n\nconst po =\n  $('Parse Order Tracking').item.json ?? {};\n\nconst orderId =\n  po.orderId ?? '?';\n\n\n// Map status thực tế trong project (OrderStatus.java)\nconst STATUS_MAP = {\n  PENDING: 'Chờ xử lý',\n  CONFIRMED: 'Đã xác nhận',\n  SHIPPING: 'Đang giao hàng',\n  DELIVERED: 'Đã giao hàng',\n  COMPLETED: 'Hoàn thành',\n  CANCEL_REQUESTED: 'Chờ duyệt hủy',\n  CANCELLED: 'Đã hủy',\n  REFUNDED: 'Đã hoàn tiền'\n};\n\n\nlet botReply;\nlet stateAfter;\n\n\nif (orderResp.success && orderResp.data) {\n\n  // ============ SUCCESS ============\n\n  const d = orderResp.data;\n\n  const total =\n    Number(d.totalMoney ?? 0);\n\n  const totalFmt =\n    Number.isFinite(total)\n      ? total.toLocaleString('vi-VN')\n      : '0';\n\n  const statusVn =\n    STATUS_MAP[d.status] || 'Không rõ';\n\n  let itemsText = 'Không rõ';\n\n  if (Array.isArray(d.items) &&\n      d.items.length > 0) {\n\n    itemsText =\n      d.items\n        .map(item => String(item ?? ''))\n        .filter(Boolean)\n        .map(s => '• ' + s)\n        .join('\\n');\n  }\n\n  botReply =\n    '📦 ĐƠN HÀNG #' + orderId + '\\n\\n' +\n    '🟡 Trạng thái: ' + statusVn + '\\n' +\n    '💰 Tổng tiền: ' + totalFmt + ' VNĐ\\n' +\n    '💳 Thanh toán: ' + (d.paymentMethod || 'Không rõ') + '\\n\\n' +\n    '🛍 Sản phẩm:\\n' +\n    itemsText + '\\n\\n' +\n    'Nếu bạn cần hỗ trợ thêm về đơn này cứ nhắn mình nhé.';\n\n  // Tra cứu xong → clear state\n  stateAfter =\n    '{\"orderLookup\":{\"active\":false,\"phone\":null,\"orderId\":null}}';\n\n} else if (orderResp.success === false) {\n\n  // ============ NOT FOUND (hợp lệ) ============\n\n  botReply =\n    'Mình không tìm thấy đơn hàng phù hợp với mã đơn và số điện thoại bạn cung cấp.\\n\\n' +\n    'Bạn kiểm tra lại thông tin rồi gửi lại giúp mình nhé.';\n\n  // Not-found hợp lệ → clear state\n  stateAfter =\n    '{\"orderLookup\":{\"active\":false,\"phone\":null,\"orderId\":null}}';\n\n} else {\n\n  // ============ API LỖI / KHÔNG XÁC ĐỊNH ============\n  // Không expose stack trace / URL nội bộ\n  // Giữ state để khách retry\n\n  botReply =\n    'Hệ thống tra cứu đơn hàng đang tạm thời gặp sự cố. Bạn vui lòng thử lại sau nhé.';\n\n  stateAfter =\n    null;\n\n}\n\n\nreturn [\n  {\n    json: {\n\n      ...$json,\n\n      botReply: botReply,\n      stateAfter: stateAfter,\n\n      _orderFetched: true\n    }\n  }\n];\n"
       },
-      "id": "d8715047-fc29-4102-88d9-0c0796c5f00f",
+      "id": "659e6195-926d-4036-9750-eed9a2b1170e",
       "name": "Format Order Response",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -1808,
-        144
+        -672,
+        272
       ]
     },
     {
       "parameters": {
         "jsCode": "// ============================================================\n// XỬ LÝ ORDER REPLY - THEXUONG TELEGRAM BOT\n// Deterministic: KHÔNG qua Ollama.\n// 2 nhánh đầu vào (cùng input index 0, phân biệt theo content):\n//   Ask path   (thiếu field)  - item có askText\n//   Fetch path (có kết quả)   - item có botReply / stateAfter\n// Output cùng shape với \"Xử Lý Phản Hồi AI\" để tái sử dụng\n// Chuẩn Bị Save Memory + Gửi Phản Hồi Telegram.\n// ============================================================\n\nconst item =\n  $json ?? {};\n\nconst po =\n  $('Parse Order Tracking').item.json ?? {};\n\n\n// ============================================================\n// 1. HISTORY TỪ MEMORY\n// ============================================================\n\nlet history = [];\n\ntry {\n  const memItems =\n    $('Load Memory').all();\n\n  if (memItems.length > 0) {\n    const raw =\n      memItems[0]?.json?.history_json;\n\n    if (typeof raw === 'string' && raw.trim()) {\n      history = JSON.parse(raw);\n    } else if (Array.isArray(raw)) {\n      history = raw;\n    }\n  }\n} catch (e) {\n  history = [];\n}\n\n\n// ============================================================\n// 2. CHỌN REPLY + STATE\n// ============================================================\n\nconst userMessage =\n  po.userMessage ?? item.userMessage ?? '';\n\nlet botReply;\nlet stateJsonToPersist;\n\nif (item.askText !== undefined &&\n    item.askText !== null) {\n\n  // ============ ASK PATH (thiếu field) ============\n\n  botReply =\n    item.askText;\n\n  stateJsonToPersist =\n    po.pendingStateJson ?? null;\n\n} else {\n\n  // ============ FETCH PATH (có kết quả) ============\n\n  botReply =\n    item.botReply ||\n    'Hệ thống tra cứu đơn hàng đang tạm thời gặp sự cố. Bạn vui lòng thử lại sau nhé.';\n\n  stateJsonToPersist =\n    item.stateAfter ?? null;\n\n}\n\n\n// ============================================================\n// 3. CẬP NHẬT HISTORY\n// ============================================================\n\nhistory.push({\n  user: userMessage,\n  bot: botReply\n});\n\nconst updatedHistory =\n  history.slice(-5);\n\n\n// ============================================================\n// 4. OUTPUT (cùng shape với Xử Lý Phản Hồi AI)\n// ============================================================\n\nreturn [\n  {\n    json: {\n\n      chatId:\n        po.chatId,\n\n      userName:\n        po.userName || 'Bạn',\n\n      userMessage:\n        userMessage,\n\n      intent:\n        'order_tracking',\n\n      botReply:\n        botReply,\n\n      botReplyRaw:\n        botReply,\n\n      updatedHistory:\n        updatedHistory,\n\n      timestamp:\n        po.timestamp || new Date().toISOString(),\n\n      mentionedProductIds:\n        po.mentionedProductIds || [],\n\n      stateJsonToPersist:\n        stateJsonToPersist\n    }\n  }\n];\n"
       },
-      "id": "ef860d49-1b80-4681-af36-216978abac04",
+      "id": "fe2f7a2b-2602-43dd-91d8-7cd3670e7c4a",
       "name": "Xử Lý Order Reply",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -1584,
-        208
+        -448,
+        336
       ]
     }
   ],
@@ -705,11 +701,11 @@
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "96a7fe9e-bd50-4ce6-b436-2e6e87d26f70",
+  "versionId": "ccd248b1-568a-42c5-8522-a957a29645c9",
   "meta": {
     "instanceId": "4b1d3183ed1cb372c21586a67151e76db4c967b85cb979a1ab24e76cbec31270"
   },
-  "id": "5nD5bqBSBWdutH8n",
+  "id": "KbmHmB3bRNR9PMkf",
   "tags": [
     {
       "updatedAt": "2026-06-07T13:43:17.696Z",

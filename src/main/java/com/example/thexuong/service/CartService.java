@@ -8,6 +8,7 @@ import com.example.thexuong.repository.CartItemRepository;
 import com.example.thexuong.repository.CartRepository;
 import com.example.thexuong.repository.ProductVariantRepository;
 import com.example.thexuong.repository.UserRepository;
+import com.example.thexuong.exception.InsufficientStockException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -44,6 +45,9 @@ ProductVariant variant = productVariantRepository.findById(variantId)
 
 // Phase 3: Kiểm tra tồn kho trước khi thêm vào giỏ
 int currentStock = variant.getQuantity() != null ? variant.getQuantity() : 0;
+if (currentStock <= 0) {
+    throw new InsufficientStockException("Size " + variant.getSize().getName() + " hiện đã hết hàng.");
+}
 
 // Tính tổng số lượng sẽ có trong giỏ (existing + new)
 Optional<CartItem> existingItem = cart.getItems().stream()
@@ -54,7 +58,7 @@ int existingQty = existingItem.map(CartItem::getQuantity).orElse(0);
 int totalQtyAfterAdd = existingQty + quantity;
 
 if (totalQtyAfterAdd > currentStock) {
-throw new RuntimeException(String.format(
+throw new InsufficientStockException(String.format(
 "Không đủ hàng trong kho. Size %s: còn %d, giỏ đang có %d, cần thêm %d",
 variant.getSize().getName(), currentStock, existingQty, quantity));
 }
@@ -97,7 +101,7 @@ public void updateCartItemQuantity(String email, Long cartItemId, int quantity) 
     ProductVariant variant = item.getProductVariant();
     int currentStock = variant.getQuantity() != null ? variant.getQuantity() : 0;
     if (quantity > currentStock) {
-        throw new RuntimeException(String.format(
+        throw new InsufficientStockException(String.format(
             "Không đủ hàng. Size %s: còn %d, yêu cầu %d",
             variant.getSize().getName(), currentStock, quantity));
     }

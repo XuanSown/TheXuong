@@ -69,6 +69,12 @@
                     >
                       {{ t('cart.itemSize', { size: item.size }) }}
                     </p>
+                    <p v-if="item.stockQuantity !== undefined && item.stockQuantity <= 0" class="text-red-500 text-xs font-semibold mt-1">
+                      ⚠️ Size này hiện đã hết hàng. Vui lòng xóa khỏi giỏ.
+                    </p>
+                    <p v-else-if="item.stockQuantity !== undefined && item.quantity > item.stockQuantity" class="text-orange-500 text-xs font-semibold mt-1">
+                      ⚠️ Kho chỉ còn {{ item.stockQuantity }} sản phẩm. Vui lòng giảm số lượng.
+                    </p>
                   </div>
 
                   <div class="flex justify-between items-end">
@@ -87,8 +93,8 @@
                         </button>
                         <span class="flex-1 text-center font-inter text-base text-[#1A1C1C]">{{ item.quantity }}</span>
                         <button
-                          class="w-8 h-8 flex items-center justify-center border-l border-[rgba(207,196,197,0.3)] hover:bg-gray-50 transition-colors"
-                          :disabled="isUpdating"
+                          class="w-8 h-8 flex items-center justify-center border-l border-[rgba(207,196,197,0.3)] hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                          :disabled="isUpdating || (item.stockQuantity !== undefined && item.quantity >= item.stockQuantity)"
                           @click="increaseQuantity(item)"
                         >
                           <span
@@ -166,9 +172,12 @@
               </div>
 
               <!-- Checkout Button -->
+              <p v-if="hasStockIssues" class="text-red-500 text-xs text-center mb-2 font-semibold">
+                ⚠️ Giỏ hàng có sản phẩm hết hàng hoặc vượt tồn kho. Vui lòng cập nhật trước khi thanh toán.
+              </p>
               <button
                 class="w-full h-[56px] bg-black border-2 border-black text-white font-geist text-base flex items-center justify-center hover:bg-gray-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                :disabled="isUpdating"
+                :disabled="isUpdating || hasStockIssues"
                 @click="handleCheckout"
               >
                 <span v-if="!isUpdating">{{ t('cart.checkout') }}</span>
@@ -287,7 +296,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, ref, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.store'
 import { useCartStore } from '@/stores/cart.store'
@@ -297,17 +306,32 @@ import ProductCard from '@/components/ui/ProductCard.vue'
 import BaseSkeleton from '@/components/ui/BaseSkeleton.vue'
 import { useI18n } from 'vue-i18n'
 import { formatCurrency } from '@/utils/formatters'
+import { useToast } from 'vue-toastification'
 
 const { t } = useI18n()
 
 const router = useRouter()
 const authStore = useAuthStore()
 const cartStore = useCartStore()
+const toast = useToast()
 
 const isUpdating = ref(false)
 
+onMounted(async () => {
+  if (authStore.isAuthenticated) {
+    await cartStore.fetchCart().catch(console.error)
+  }
+})
+
 // Use displayItems which works for both authenticated and guest users
 const cartItems = computed(() => cartStore.displayItems)
+
+const hasStockIssues = computed(() => {
+  return cartItems.value.some((item: any) => {
+    if (item.stockQuantity === undefined || item.stockQuantity === null) return false
+    return item.stockQuantity <= 0 || item.quantity > item.stockQuantity
+  })
+})
 
 // Recommendation state - load độc lập với Cart, fail không ảnh hưởng cart/checkout
 const recommendations = ref<RecommendationProduct[]>([])
@@ -357,6 +381,9 @@ const increaseQuantity = async (item: any) => {
   isUpdating.value = true
   try {
     await cartStore.updateItem(cartItemKey(item), item.quantity + 1)
+  } catch (error: any) {
+    const msg = error?.response?.data?.error || error?.response?.data?.message || t('toast.updateFailed', 'Không thể tăng số lượng')
+    toast.error(msg)
   } finally {
     isUpdating.value = false
   }
@@ -370,6 +397,9 @@ const decreaseQuantity = async (item: any) => {
     } else {
       await cartStore.updateItem(cartItemKey(item), item.quantity - 1)
     }
+  } catch (error: any) {
+    const msg = error?.response?.data?.error || error?.response?.data?.message || t('toast.updateFailed', 'Không thể giảm số lượng')
+    toast.error(msg)
   } finally {
     isUpdating.value = false
   }

@@ -24,6 +24,7 @@ public class CartItemDto {
     private Long variantId;
     private String size;
     private Integer quantity;
+    private Integer stockQuantity;
     private BigDecimal price;
     private BigDecimal subtotal;
 }

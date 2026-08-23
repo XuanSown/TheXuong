@@ -309,7 +309,7 @@
     "chooseVoucher": "Chọn voucher của bạn ({count})",
     "voucherHint": "Click vào mã để tự động điền và áp dụng",
     "usePoints": "SỬ DỤNG ĐIỂM THƯỞNG",
-    "pointsBalance": "Bạn đang có {points} (1 điểm = 1đ)",
+    "pointsBalance": "Bạn đang có {points} điểm (1 điểm = 1.000đ)",
     "pointsPlaceholder": "Nhập số điểm...",
     "useAll": "DÙNG TẤT CẢ",
     "tierDiscount": "Giảm giá hạng TV ({percent}%)",
@@ -350,7 +350,10 @@
     "viewAll": "Xem tất cả lịch sử",
     "loadFailed": "Không thể tải danh sách đơn hàng",
     "loadDetailFailed": "Không thể tải chi tiết đơn hàng",
-    "cancelFailed": "Không thể hủy đơn hàng"
+    "cancelFailed": "Không thể hủy đơn hàng",
+    "paymentSuccess": "Thanh toán VNPay thành công! Đơn hàng của bạn đã được xác nhận.",
+    "paymentFail": "Thanh toán không thành công. Bạn có thể thử lại hoặc chọn phương thức khác.",
+    "paymentError": "Không thể xác minh kết quả thanh toán. Vui lòng liên hệ hỗ trợ."
   },
   "order": {
     "backToHistory": "Quay lại lịch sử đơn hàng",

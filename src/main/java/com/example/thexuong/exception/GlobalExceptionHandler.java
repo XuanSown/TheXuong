@@ -158,6 +158,16 @@ public class GlobalExceptionHandler {
   }
 
   /**
+   * 409 — Hết hàng / không đủ tồn kho.
+   */
+  @ExceptionHandler(InsufficientStockException.class)
+  public ResponseEntity<ApiResponse<Void>> handleInsufficientStock(InsufficientStockException ex) {
+    return ResponseEntity
+      .status(HttpStatus.CONFLICT)
+      .body(ApiResponse.error(ex.getMessage()));
+  }
+
+  /**
    * 500 — Tất cả lỗi không mong muốn còn lại.
    */
   @ExceptionHandler(Exception.class)

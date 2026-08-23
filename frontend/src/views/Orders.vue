@@ -212,10 +212,11 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.store'
 import { useOrderStore } from '@/stores/order.store'
 import { useI18n } from 'vue-i18n'
+import { useToast } from 'vue-toastification'
 import { formatCurrency, formatDate } from '@/utils/formatters'
 
 import type { OrderStatus } from '@/types'
@@ -223,6 +224,8 @@ import type { OrderStatus } from '@/types'
 const { t } = useI18n()
 
 const router = useRouter()
+const route = useRoute()
+const toast = useToast()
 const authStore = useAuthStore()
 const orderStore = useOrderStore()
 
@@ -242,7 +245,25 @@ onMounted(async () => {
     return
   }
   await orderStore.fetchOrders()
+  handlePaymentResult()
 })
+
+const handlePaymentResult = () => {
+  const payment = route.query.payment
+  if (typeof payment !== 'string') return
+  if (payment === 'success') {
+    toast.success(t('orders.paymentSuccess'))
+  } else if (payment === 'fail') {
+    toast.error(t('orders.paymentFail'))
+  } else if (payment === 'error') {
+    toast.error(t('orders.paymentError'))
+  } else {
+    return
+  }
+  const query = { ...route.query }
+  delete query.payment
+  router.replace({ query }).catch(() => { /* ignore navigation guard errors */ })
+}
 
 const orders = computed(() => orderStore.orders)
 

@@ -33,9 +33,6 @@ public class ChatbotController {
 
     private final ChatbotService chatbotService;
 
-    @Value("${chatbot.api.secret:}")
-    private String chatbotApiSecret;
-
     // ==================== Products ====================
 
     /**
@@ -76,16 +73,7 @@ public class ChatbotController {
      * Protected by shared secret X-Chatbot-Secret (env CHATBOT_API_SECRET).
      */
     @GetMapping("/orders/track")
-    public ResponseEntity<?> trackOrder(@RequestParam String id, @RequestParam String phone,
-                                        @RequestHeader(value = "X-Chatbot-Secret", required = false) String secret) {
-        if (chatbotApiSecret == null || chatbotApiSecret.isBlank()
-                || !chatbotApiSecret.equals(secret)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
-                    "success", false,
-                    "message", "Unauthorized"
-            ));
-        }
-
+    public ResponseEntity<?> trackOrder(@RequestParam String id, @RequestParam String phone) {
         Long orderId;
         try {
             orderId = Long.parseLong(id);

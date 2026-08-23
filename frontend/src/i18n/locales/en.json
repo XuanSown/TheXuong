@@ -309,7 +309,7 @@
     "chooseVoucher": "Choose your voucher ({count})",
     "voucherHint": "Click a code to auto-fill and apply",
     "usePoints": "USE REWARD POINTS",
-    "pointsBalance": "You have {points} (1 point = 1đ)",
+    "pointsBalance": "You have {points} points (1 point = 1,000đ)",
     "pointsPlaceholder": "Enter points...",
     "useAll": "USE ALL",
     "tierDiscount": "TV tier discount ({percent}%)",
@@ -350,7 +350,10 @@
     "viewAll": "View all history",
     "loadFailed": "Unable to load order list",
     "loadDetailFailed": "Unable to load order details",
-    "cancelFailed": "Unable to cancel order"
+    "cancelFailed": "Unable to cancel order",
+    "paymentSuccess": "VNPay payment successful! Your order has been confirmed.",
+    "paymentFail": "Payment was not successful. You can retry or choose another method.",
+    "paymentError": "Unable to verify payment result. Please contact support."
   },
   "order": {
     "backToHistory": "Back to order history",

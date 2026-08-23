@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import type { User } from '@/types'
 import authService from '@/services/auth.service'
+import { useCartStore } from '@/stores/cart.store'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -34,6 +35,7 @@ export const useAuthStore = defineStore('auth', {
       try {
         const user = await authService.login({ email: credentials.email, password: credentials.password })
         this.setUser(user)
+        await useCartStore().mergeGuestCart().catch(console.error)
         return user
       } finally {
         this.loading = false
@@ -99,6 +101,7 @@ export const useAuthStore = defineStore('auth', {
       this.redirectTo = null
       // Clear guest cart on logout
       localStorage.removeItem('guest_cart_items')
+      useCartStore().clearCart()
     }
   }
 })

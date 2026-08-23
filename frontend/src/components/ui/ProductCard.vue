@@ -11,8 +11,11 @@
         loading="lazy"
         class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
       >
+      <div v-if="product.stockQuantity !== undefined && product.stockQuantity <= 0" class="absolute inset-0 bg-black/40 flex items-center justify-center">
+        <span class="bg-red-500 text-white text-xs font-bold px-3 py-1 rounded">HẾT HÀNG</span>
+      </div>
       <div
-        v-else
+        v-else-if="!product.imageUrl"
         class="w-full h-full flex items-center justify-center text-gray-400"
       >
         <svg
@@ -57,6 +60,7 @@ interface ProductCardProduct {
   price: number
   imageUrl: string
   sport: string
+  stockQuantity?: number
 }
 
 const props = defineProps<{

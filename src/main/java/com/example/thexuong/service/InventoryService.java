@@ -2,6 +2,7 @@
 package com.example.thexuong.service;
 
 import com.example.thexuong.entity.ProductVariant;
+import com.example.thexuong.exception.InsufficientStockException;
 import com.example.thexuong.repository.ProductVariantRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +25,7 @@ public class InventoryService {
                         "Khong tim thay variant cho productId=" + productId + " sizeId=" + sizeId));
         int current = variant.getQuantity() != null ? variant.getQuantity() : 0;
         if (current < quantity) {
-            throw new RuntimeException("Khong du ton kho: con " + current + ", can " + quantity);
+            throw new InsufficientStockException("Không đủ tồn kho: còn " + current + ", cần " + quantity);
         }
         variant.setQuantity(current - quantity);
         productVariantRepository.save(variant);

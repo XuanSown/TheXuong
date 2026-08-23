@@ -241,6 +241,12 @@
                   <p class="font-gelasio text-[12px] text-[#848484]">
                     {{ t('cart.itemSize', { size: item.size }) }}
                   </p>
+                  <p v-if="item.stockQuantity !== undefined && item.stockQuantity <= 0" class="text-red-500 text-xs font-semibold mt-1">
+                    ⚠️ Size này hiện đã hết hàng trong kho.
+                  </p>
+                  <p v-else-if="item.stockQuantity !== undefined && item.quantity > item.stockQuantity" class="text-orange-500 text-xs font-semibold mt-1">
+                    ⚠️ Kho chỉ còn {{ item.stockQuantity }} sản phẩm.
+                  </p>
                   <div class="flex justify-between items-center mt-2">
                     <span class="font-gelasio text-[14px] font-semibold text-black">
                       {{ formatPrice(item.price) }} x {{ item.quantity }}
@@ -369,7 +375,7 @@
                 {{ t('checkout.usePoints') }}
               </label>
               <p class="text-sm font-gelasio text-[#4C4546] mb-2">
-                {{ t('checkout.pointsBalance', { points: formatPrice(currentPoints) }) }}
+                {{ t('checkout.pointsBalance', { points: currentPoints }) }}
               </p>
               <div class="flex gap-2">
                 <input
@@ -427,7 +433,7 @@
                 class="flex justify-between text-green-600"
               >
                 <span class="font-gelasio text-[14px]">{{ t('checkout.pointsDeduction') }}</span>
-                <span class="font-gelasio text-[14px]">-{{ formatPrice(pointsToUse) }}</span>
+                <span class="font-gelasio text-[14px]">-{{ formatPrice(pointsToUse * POINT_TO_VND_RATE) }}</span>
               </div>
               <div class="flex justify-between text-lg font-bold">
                 <span class="font-gelasio text-[16px] text-black">{{ t('common.total') }}</span>
@@ -436,11 +442,14 @@
             </div>
 
             <!-- Place Order Button -->
+            <p v-if="hasStockIssues" class="text-red-500 text-xs text-center mt-4 font-semibold">
+              ⚠️ Đơn hàng có sản phẩm đã hết hàng hoặc vượt tồn kho. Vui lòng quay lại giỏ hàng để cập nhật.
+            </p>
             <BaseButton
               v-if="cartItems.length > 0"
-              :disabled="cartItems.length === 0"
+              :disabled="cartItems.length === 0 || hasStockIssues"
               :loading="isSubmitting"
-              class="w-full mt-6 !h-[56px]"
+              class="w-full mt-4 !h-[56px]"
               @click="onSubmit"
             >
               {{ t('checkout.placeOrder') }}
@@ -483,6 +492,12 @@ const authStore = useAuthStore()
 const router = useRouter()
 
 const cartItems = computed(() => cartStore.displayItems)
+const hasStockIssues = computed(() => {
+  return cartItems.value.some((item: any) => {
+    if (item.stockQuantity === undefined || item.stockQuantity === null) return false
+    return item.stockQuantity <= 0 || item.quantity > item.stockQuantity
+  })
+})
 const cartTotal = computed(() => cartStore.totalPrice)
 const shippingFee = ref(0)
 const total = computed(() => cartTotal.value + shippingFee.value)
@@ -501,6 +516,7 @@ const tierDiscountAmount = ref(0)
 const currentPoints = ref(0)
 const pointsToUse = ref<number>(0)
 const pointsError = ref('')
+const POINT_TO_VND_RATE = 1000
 
 const addressStore = useAddressStore()
 const checkoutToast = useToast()
@@ -517,7 +533,7 @@ const finalTotal = computed(() => {
     amt -= tierDiscountAmount.value
   }
   if (pointsToUse.value > 0) {
-    amt -= pointsToUse.value
+    amt -= pointsToUse.value * POINT_TO_VND_RATE
   }
   return amt > 0 ? amt : 0
 })
@@ -532,7 +548,8 @@ const applyAllPoints = () => {
     return
   }
   
-  pointsToUse.value = Math.min(currentPoints.value, maxUsable)
+  const maxPointsNeeded = Math.ceil(maxUsable / POINT_TO_VND_RATE)
+  pointsToUse.value = Math.min(currentPoints.value, maxPointsNeeded)
 }
 
 // Validation setup
@@ -568,6 +585,10 @@ const loadCheckoutData = async () => {
 }
 
 onMounted(async () => {
+  if (authStore.isAuthenticated && !cartStore.cart) {
+    await cartStore.fetchCart().catch(console.error)
+  }
+
   // Check if cart is empty
   if (cartItems.value.length === 0) {
     router.push('/cart')
@@ -694,7 +715,12 @@ const onSubmit = handleSubmit(async (values) => {
 
   } catch (error: any) {
     console.error('Failed to place order:', error)
-    checkoutToast.error(t('toast.orderFailed'))
+    const msg = error?.response?.data?.error || error?.response?.data?.message || t('toast.orderFailed')
+    checkoutToast.error(msg)
+    // Refresh cart to get updated stock info
+    try {
+      await cartStore.fetchCart()
+    } catch (_) { /* ignore */ }
   }
 })
 </script>

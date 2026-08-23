@@ -6,16 +6,19 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationProperties(prefix = "vnpay")
 public class VNPayConfig {
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(VNPayConfig.class);
+
     private String tmnCode;
     private String secretKey;
     private String payUrl;
     private String returnUrl;
+    private String frontendReturnUrl;
 
-    public String getVnp_TmnCode() {
+    public String getTmnCode() {
         return tmnCode;
     }
 
-    public void setVnp_TmnCode(String tmnCode) {
+    public void setTmnCode(String tmnCode) {
         this.tmnCode = tmnCode;
     }
 
@@ -25,6 +28,39 @@ public class VNPayConfig {
 
     public void setSecretKey(String secretKey) {
         this.secretKey = secretKey;
+    }
+
+    public String getPayUrl() {
+        return payUrl;
+    }
+
+    public void setPayUrl(String payUrl) {
+        this.payUrl = payUrl;
+    }
+
+    public String getReturnUrl() {
+        return returnUrl;
+    }
+
+    public void setReturnUrl(String returnUrl) {
+        this.returnUrl = returnUrl;
+    }
+
+    public String getFrontendReturnUrl() {
+        return frontendReturnUrl;
+    }
+
+    public void setFrontendReturnUrl(String frontendReturnUrl) {
+        this.frontendReturnUrl = frontendReturnUrl;
+    }
+
+    // Aliases tương thích ngược (theo convention VNPAY cũ)
+    public String getVnp_TmnCode() {
+        return tmnCode;
+    }
+
+    public void setVnp_TmnCode(String tmnCode) {
+        this.tmnCode = tmnCode;
     }
 
     public String getVnp_PayUrl() {
@@ -46,8 +82,12 @@ public class VNPayConfig {
     // Hàm mã hóa SHA512 theo chuẩn VNPAY
     public String hmacSHA512(final String key, final String data) {
         try {
-            if (key == null || data == null) {
-                throw new NullPointerException("Key and data must not be null");
+            if (key == null || key.isBlank()) {
+                log.error("VNPay secret key is missing. Check VNPAY_HASH_SECRET in .env");
+                throw new IllegalStateException("VNPay secret key is not configured");
+            }
+            if (data == null) {
+                throw new NullPointerException("Data must not be null");
             }
             final javax.crypto.Mac hmac512 = javax.crypto.Mac.getInstance("HmacSHA512");
             byte[] hmacKeyBytes = key.getBytes(java.nio.charset.StandardCharsets.UTF_8);
@@ -66,18 +106,22 @@ public class VNPayConfig {
         }
     }
 
-    // Hàm lấy IP của khách hàng
+    // Hàm lấy IP thực của khách hàng
     public static String getIpAddress(jakarta.servlet.http.HttpServletRequest request) {
-        String ipAddress;
-        try {
-            ipAddress = request.getHeader("X-FORWARDED-FOR");
-            if (ipAddress == null) {
-                ipAddress = request.getRemoteAddr();
-            }
-        } catch (Exception e) {
-            ipAddress = "Invalid IP";
+        if (request == null) {
+            return "127.0.0.1";
         }
-        return ipAddress;
+        try {
+            String forwarded = request.getHeader("X-Forwarded-For");
+            if (forwarded != null && !forwarded.isBlank()) {
+                int comma = forwarded.indexOf(',');
+                return comma > 0 ? forwarded.substring(0, comma).trim() : forwarded.trim();
+            }
+            String remoteAddr = request.getRemoteAddr();
+            return (remoteAddr == null || remoteAddr.isBlank()) ? "127.0.0.1" : remoteAddr;
+        } catch (Exception e) {
+            return "127.0.0.1";
+        }
     }
 
     // Hàm random mã giao dịch

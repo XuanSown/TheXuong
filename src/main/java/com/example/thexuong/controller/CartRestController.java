@@ -189,6 +189,7 @@ public class CartRestController {
                 .variantId(variant.getId())
                 .size(variant.getSize() != null ? variant.getSize().getName() : "")
                 .quantity(item.getQuantity())
+                .stockQuantity(variant.getQuantity())
                 .price(price)
                 .subtotal(subtotal)
                 .build();

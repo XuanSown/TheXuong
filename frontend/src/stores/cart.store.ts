@@ -77,14 +77,8 @@ export const useCartStore = defineStore('cart', {
     async addItem(variantId: number, quantity: number = 1, productInfo?: Partial<GuestCartItem>, isAuthenticated?: boolean) {
       // If explicitly authenticated or cart exists (server cart loaded), use API
       if (isAuthenticated || this.cart !== null) {
-        try {
-          const cart = await cartService.addCartItem({ variantId, quantity })
-          this.cart = cart
-        } catch (error) {
-          // If API fails (e.g., token expired), fallback to guest cart
-          console.error('Add to API failed, falling back to guest cart:', error)
-          this.addToGuestCart(variantId, quantity, productInfo)
-        }
+        const cart = await cartService.addCartItem({ variantId, quantity })
+        this.cart = cart
       } else {
         // Guest: save to localStorage
         this.addToGuestCart(variantId, quantity, productInfo)
@@ -124,7 +118,10 @@ export const useCartStore = defineStore('cart', {
     // Merge guest cart (from localStorage) into server cart after login
     async mergeGuestCart() {
       const guestItems = [...this.guestItems];
-      if (!guestItems || guestItems.length === 0) return;
+      if (!guestItems || guestItems.length === 0) {
+        await this.fetchCart()
+        return
+      }
       try {
         // Fetch current server cart
         await this.fetchCart()
