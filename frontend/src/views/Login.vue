@@ -58,6 +58,29 @@
             </span>
           </div>
 
+          <!-- Locked Account Alert -->
+          <div
+            v-if="showLockedAlert"
+            class="bg-[#FDE8E8] border border-[#F5C6C6] rounded-lg p-4 flex items-center gap-3"
+          >
+            <svg
+              class="w-5 h-5 text-[#9B1C1C] flex-shrink-0"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+            <span class="font-gelasio text-sm font-semibold text-[#9B1C1C]">
+              {{ t('auth.accountLocked') }}
+            </span>
+          </div>
+
           <!-- Login Form -->
           <form
             class="flex flex-col gap-5"
@@ -278,6 +301,7 @@ const { value: password, errorMessage: passwordError } = useField<string>('passw
 const showPassword = ref(false)
 const showSuccessAlert = ref(false)
 const showRegisterSuccess = ref(false)
+const showLockedAlert = ref(false)
 
 onMounted(() => {
 // Show success message if redirected from logout
@@ -295,6 +319,14 @@ if (route.query.registered === 'success') {
   setTimeout(() => {
   showRegisterSuccess.value = false
   }, 5000)
+}
+
+// Show locked account alert if redirected after being kicked
+if (route.query.locked === '1') {
+  showLockedAlert.value = true
+  setTimeout(() => {
+    showLockedAlert.value = false
+  }, 8000)
 }
 
 // Store redirect path if present (validate to prevent open redirect)

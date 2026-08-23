@@ -5,6 +5,7 @@ import i18n from '@/i18n'
 // Message động (có biến nội suy, VD: "Số dư không đủ. Bạn có X điểm") sẽ rơi vào fallback.
 const BACKEND_MESSAGE_KEYS: Record<string, string> = {
   'Email hoặc mật khẩu không đúng': 'backendError.loginFailed',
+  'Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên.': 'auth.accountLocked',
   'Email đã được đăng ký': 'backendError.emailExists',
   'Xác nhận mật khẩu không khớp': 'backendError.passwordConfirmMismatch',
   'Mat khau hien tai khong dung.': 'backendError.currentPasswordWrong',

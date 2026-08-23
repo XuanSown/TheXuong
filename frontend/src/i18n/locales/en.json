@@ -96,6 +96,7 @@
   "auth": {
     "welcomeBack": "Welcome Back!",
     "logoutSuccess": "Logged out successfully!",
+    "accountLocked": "Your account has been locked. Please contact the administrator.",
     "registerSuccessLogin": "Registration successful! Please log in.",
     "emailPlaceholder": "Your email",
     "passwordPlaceholder": "Password",
