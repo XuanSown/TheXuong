@@ -377,10 +377,13 @@
       </section>
 
       <!-- Product Reviews -->
-      <ProductReviews
+      <div
         v-if="product"
-        :product-id="product.id"
-      />
+        id="reviews"
+        class="scroll-mt-[120px]"
+      >
+        <ProductReviews :product-id="product.id" />
+      </div>
 
       <!-- Loading State -->
       <div
@@ -455,7 +458,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useCartStore } from '@/stores/cart.store'
 import { useAuthStore } from '@/stores/auth.store'
@@ -610,6 +613,11 @@ onMounted(async () => {
     console.error('Failed to fetch product:', error)
   } finally {
     loading.value = false
+  }
+
+  if (route.query.review === '1') {
+    await nextTick()
+    document.getElementById('reviews')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 })
 </script>
