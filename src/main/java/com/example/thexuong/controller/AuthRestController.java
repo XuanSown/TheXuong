@@ -126,6 +126,10 @@ public class AuthRestController {
         String email = jwtService.extractUsername(refreshToken);
         try {
             UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+            if (!userDetails.isEnabled()) {
+                return ResponseEntity.status(HttpStatus.LOCKED)
+                        .body(Map.of("error", "Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên."));
+            }
             String newAccess = jwtService.generateAccessToken(userDetails);
             String newRefresh = jwtService.generateRefreshToken(userDetails);
             jwtCookieService.setAuthCookies(response, newAccess, newRefresh);

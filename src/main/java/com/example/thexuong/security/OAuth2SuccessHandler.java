@@ -55,6 +55,17 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             return userRepository.save(newUser);
         });
 
+        // 2b. Nếu tài khoản bị khóa → không cấp token, redirect về login kèm thông báo
+        if (!Boolean.TRUE.equals(user.getActive())) {
+            loginHistoryService.recordLogin(
+                    email,
+                    request.getRemoteAddr(),
+                    request.getHeader("User-Agent"),
+                    "GOOGLE", false, "Tài khoản bị khóa");
+            getRedirectStrategy().sendRedirect(request, response, frontendUrl + "/login?locked=1");
+            return;
+        }
+
         // 3. Build UserDetails từ User entity và issue JWT vào httpOnly cookie
         String role = (user.getRole() == null || user.getRole().isBlank()) ? "CUSTOMER" : user.getRole();
         UserDetails userDetails = org.springframework.security.core.userdetails.User.withUsername(email)
