@@ -127,6 +127,11 @@ public class AuthRestController {
         try {
             UserDetails userDetails = userDetailsService.loadUserByUsername(email);
             if (!userDetails.isEnabled()) {
+                try {
+                    var claims = jwtService.extractClaims(refreshToken);
+                    tokenBlacklist.blacklist(claims.getId(), claims.getExpiration().toInstant());
+                } catch (Exception ignored) {}
+                jwtCookieService.clearAuthCookies(response);
                 return ResponseEntity.status(HttpStatus.LOCKED)
                         .body(Map.of("error", "Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên."));
             }
