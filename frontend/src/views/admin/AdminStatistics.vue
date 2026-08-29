@@ -272,10 +272,65 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed, watch } from 'vue'
 import adminService from '@/services/admin.service'
 
 const isLoading = ref(false)
+
+// Filter state
+const activeFilter = ref('month') // Default: Tháng này
+const customDate = ref('')
+const customMonth = ref('')
+const customYear = ref(new Date().getFullYear().toString())
+
+const filterOptions = [
+  { value: 'today', label: 'Hôm nay' },
+  { value: 'day', label: 'Chọn ngày' },
+  { value: 'month', label: 'Tháng này' },
+  { value: 'month-custom', label: 'Chọn tháng' },
+  { value: 'year', label: 'Năm nay' },
+  { value: 'year-custom', label: 'Chọn năm' }
+]
+
+const dateRange = computed(() => {
+  const today = new Date()
+  const year = today.getFullYear()
+  const month = today.getMonth()
+
+  switch (activeFilter.value) {
+    case 'today': {
+      const dateStr = today.toISOString().split('T')[0]
+      return { startDate: dateStr, endDate: dateStr }
+    }
+    case 'day': {
+      if (!customDate.value) return { startDate: null, endDate: null }
+      return { startDate: customDate.value, endDate: customDate.value }
+    }
+    case 'month': {
+      const start = new Date(year, month, 1).toISOString().split('T')[0]
+      const end = new Date(year, month + 1, 0).toISOString().split('T')[0]
+      return { startDate: start, endDate: end }
+    }
+    case 'month-custom': {
+      if (!customMonth.value) return { startDate: null, endDate: null }
+      const [y, m] = customMonth.value.split('-')
+      const start = new Date(y, m - 1, 1).toISOString().split('T')[0]
+      const end = new Date(y, m, 0).toISOString().split('T')[0]
+      return { startDate: start, endDate: end }
+    }
+    case 'year': {
+      const start = `${year}-01-01`
+      const end = `${year}-12-31`
+      return { startDate: start, endDate: end }
+    }
+    case 'year-custom': {
+      if (!customYear.value) return { startDate: null, endDate: null }
+      return { startDate: `${customYear.value}-01-01`, endDate: `${customYear.value}-12-31` }
+    }
+    default:
+      return { startDate: null, endDate: null }
+  }
+})
 
 const stats = reactive({
   totalRevenue: 0,
@@ -296,7 +351,11 @@ const stats = reactive({
 const fetchStatistics = async () => {
   isLoading.value = true
   try {
-    const data = await adminService.getStatistics()
+    const params = {}
+    if (dateRange.value.startDate) params.startDate = dateRange.value.startDate
+    if (dateRange.value.endDate) params.endDate = dateRange.value.endDate
+
+    const data = await adminService.getStatistics(params)
 
     stats.totalRevenue = data.revenueByDay?.reduce((sum, row) => sum + (Number(row[1]) || 0), 0) || 0
     stats.totalOrders = data.orderStatusStats?.reduce((sum, row) => sum + (Number(row[1]) || 0), 0) || 0
@@ -351,6 +410,10 @@ const getStatusColor = (status) => {
   }
   return colors[status] || ''
 }
+
+watch(dateRange, () => {
+  fetchStatistics()
+}, { deep: true })
 
 onMounted(() => {
   fetchStatistics()
