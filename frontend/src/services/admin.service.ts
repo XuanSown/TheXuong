@@ -25,7 +25,7 @@ export const adminService = {
 		return (await http.delete(`/admin/users/${id}`)).data
 	},
 
-	async createUser(data: { email: string; username: string; fullName: string; password: string; role: string }): Promise<any> {
+	async createUser(data: { email: string; username: string; fullName: string; phone: string; password: string; role: string }): Promise<any> {
 		return (await http.post('/admin/users', data)).data
 	},
 
@@ -144,8 +144,8 @@ export const adminService = {
 	},
 
 	// Statistics
-	async getStatistics(): Promise<any> {
-		return (await http.get('/admin/statistics')).data
+	async getStatistics(params?: { startDate?: string; endDate?: string }): Promise<any> {
+		return (await http.get('/admin/statistics', { params })).data
 	},
 
 	// Size Catalog
