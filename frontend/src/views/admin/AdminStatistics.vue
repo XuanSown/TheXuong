@@ -70,39 +70,34 @@
       <div class="section-header">
         <h3>Doanh thu theo ngày</h3>
       </div>
+      
+      <!-- Filter Controls -->
+      <div class="filter-controls">
+        <button
+          v-for="option in filterOptions"
+          :key="option.value"
+          :class="['filter-btn', { active: activeFilter === option.value }]"
+          @click="activeFilter = option.value"
+        >
+          {{ option.label }}
+        </button>
+      </div>
+      
+      <!-- Custom Inputs -->
+      <div v-if="activeFilter === 'day'" class="custom-input">
+        <input type="date" v-model="customDate" />
+      </div>
+      <div v-if="activeFilter === 'month-custom'" class="custom-input">
+        <input type="month" v-model="customMonth" />
+      </div>
+      <div v-if="activeFilter === 'year-custom'" class="custom-input">
+        <input type="number" v-model="customYear" min="2020" max="2099" placeholder="Nhập năm" />
+      </div>
+      
       <div class="chart-container">
-        <div
-          v-if="isLoading"
-          class="chart-placeholder"
-        >
-          Đang tải...
-        </div>
-        <div
-          v-else-if="stats.revenueByDay.length === 0"
-          class="chart-placeholder"
-        >
-          Chưa có dữ liệu
-        </div>
-        <table
-          v-else
-          class="revenue-table"
-        >
-          <thead>
-            <tr>
-              <th>Ngày</th>
-              <th>Doanh thu</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr
-              v-for="row in stats.revenueByDay"
-              :key="row[0]"
-            >
-              <td>{{ row[0] }}</td>
-              <td>{{ formatPrice(row[1]) }}</td>
-            </tr>
-          </tbody>
-        </table>
+        <div v-if="isLoading" class="chart-placeholder">Đang tải...</div>
+        <div v-else-if="stats.revenueByDay.length === 0" class="chart-placeholder">Chưa có dữ liệu</div>
+        <div v-else class="chart-placeholder">Biểu đồ sẽ hiển thị ở đây</div>
       </div>
     </section>
 
@@ -527,6 +522,45 @@ onMounted(() => {
   color: #6B7280;
   font-family: 'Geist', sans-serif;
   font-size: 14px;
+}
+
+.filter-controls {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.filter-controls .filter-btn {
+  padding: 8px 16px;
+  border: 1px solid #E5E7EB;
+  background: #FFFFFF;
+  color: #374151;
+  font-family: 'Geist', sans-serif;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filter-controls .filter-btn:hover {
+  border-color: #000000;
+}
+
+.filter-controls .filter-btn.active {
+  background: #000000;
+  color: #FFFFFF;
+  border-color: #000000;
+}
+
+.custom-input {
+  margin-bottom: 16px;
+}
+
+.custom-input input {
+  padding: 8px 12px;
+  border: 1px solid #E5E7EB;
+  font-family: 'Geist', sans-serif;
+  font-size: 13px;
 }
 
 .revenue-table {
