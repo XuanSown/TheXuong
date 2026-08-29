@@ -84,20 +84,55 @@
       </div>
       
       <!-- Custom Inputs -->
-      <div v-if="activeFilter === 'day'" class="custom-input">
-        <input type="date" v-model="customDate" />
+      <div
+        v-if="activeFilter === 'day'"
+        class="custom-input"
+      >
+        <input
+          v-model="customDate"
+          type="date"
+        >
       </div>
-      <div v-if="activeFilter === 'month-custom'" class="custom-input">
-        <input type="month" v-model="customMonth" />
+      <div
+        v-if="activeFilter === 'month-custom'"
+        class="custom-input"
+      >
+        <input
+          v-model="customMonth"
+          type="month"
+        >
       </div>
-      <div v-if="activeFilter === 'year-custom'" class="custom-input">
-        <input type="number" v-model="customYear" min="2020" max="2099" placeholder="Nhập năm" />
+      <div
+        v-if="activeFilter === 'year-custom'"
+        class="custom-input"
+      >
+        <input
+          v-model="customYear"
+          type="number"
+          min="2020"
+          max="2099"
+          placeholder="Nhập năm"
+        >
       </div>
       
       <div class="chart-container">
-        <div v-if="isLoading" class="chart-placeholder">Đang tải...</div>
-        <div v-else-if="stats.revenueByDay.length === 0" class="chart-placeholder">Chưa có dữ liệu</div>
-        <div v-else class="chart-placeholder">Biểu đồ sẽ hiển thị ở đây</div>
+        <div
+          v-if="isLoading"
+          class="chart-placeholder"
+        >
+          Đang tải...
+        </div>
+        <div
+          v-else-if="stats.revenueByDay.length === 0"
+          class="chart-placeholder"
+        >
+          Chưa có dữ liệu
+        </div>
+        <Line
+          v-else
+          :data="chartData"
+          :options="chartOptions"
+        />
       </div>
     </section>
 
@@ -268,7 +303,30 @@
 
 <script setup>
 import { ref, reactive, onMounted, computed, watch } from 'vue'
+import { Line } from 'vue-chartjs'
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+} from 'chart.js'
 import adminService from '@/services/admin.service'
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+)
 
 const isLoading = ref(false)
 
@@ -326,6 +384,55 @@ const dateRange = computed(() => {
       return { startDate: null, endDate: null }
   }
 })
+
+const chartData = computed(() => ({
+  labels: stats.revenueByDay.map(row => row[0]),
+  datasets: [
+    {
+      label: 'Doanh thu (VND)',
+      data: stats.revenueByDay.map(row => Number(row[1]) || 0),
+      borderColor: '#000000',
+      backgroundColor: 'rgba(0, 0, 0, 0.1)',
+      borderWidth: 2,
+      fill: true,
+      tension: 0.4,
+      pointRadius: 4,
+      pointHoverRadius: 6
+    }
+  ]
+}))
+
+const chartOptions = computed(() => ({
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      display: false
+    },
+    tooltip: {
+      callbacks: {
+        label: (context) => {
+          return new Intl.NumberFormat('vi-VN').format(context.raw) + ' đ'
+        }
+      }
+    }
+  },
+  scales: {
+    x: {
+      grid: {
+        display: false
+      }
+    },
+    y: {
+      beginAtZero: true,
+      ticks: {
+        callback: (value) => {
+          return new Intl.NumberFormat('vi-VN').format(value) + ' đ'
+        }
+      }
+    }
+  }
+}))
 
 const stats = reactive({
   totalRevenue: 0,
@@ -509,7 +616,8 @@ onMounted(() => {
 
 .chart-container {
   width: 100%;
-  min-height: 200px;
+  min-height: 300px;
+  position: relative;
 }
 
 .chart-placeholder {
