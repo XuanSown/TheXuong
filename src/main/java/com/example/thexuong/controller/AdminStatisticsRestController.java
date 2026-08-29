@@ -11,8 +11,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -33,15 +35,21 @@ public class AdminStatisticsRestController {
     private final UserRepository userRepository;
 
     @GetMapping
-    public ResponseEntity<?> getStatistics() {
+    public ResponseEntity<?> getStatistics(
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate) {
+
+        LocalDate start = startDate != null ? LocalDate.parse(startDate) : null;
+        LocalDate end = endDate != null ? LocalDate.parse(endDate) : null;
+
         // 1. Top Bán Chạy (Top 5)
         List<Object[]> topSelling = orderDetailRepository.findTopSellingProducts().stream().limit(5).toList();
 
         // 2. Top Bán Chậm (Top 5)
         List<Object[]> slowSelling = orderDetailRepository.findSlowSellingProducts().stream().limit(5).toList();
 
-        // 3. Doanh thu theo ngày
-        List<Object[]> revenueByDay = orderRepository.getRevenueByDay(null, null);
+        // 3. Doanh thu theo ngày (with date filter)
+        List<Object[]> revenueByDay = orderRepository.getRevenueByDay(start, end);
 
         // 4. Tồn kho
         List<Object[]> inventory = productVariantRepository.getInventoryStatistics();
@@ -52,12 +60,12 @@ public class AdminStatisticsRestController {
         // 6. Top 5 xem ít nhất
         List<Object[]> leastViewed = productRepository.findLeastViewedProducts(PageRequest.of(0, 5));
 
-        // 7. Trạng thái đơn hàng
-        List<Object[]> orderStatusStats = orderRepository.countOrdersByStatus(null, null);
+        // 7. Trạng thái đơn hàng (with date filter)
+        List<Object[]> orderStatusStats = orderRepository.countOrdersByStatus(start, end);
 
-        // 8. Thống kê người dùng
+        // 8. Thống kê người dùng (with date filter)
         long totalUsers = userRepository.count();
-        long usersWithOrders = orderRepository.countUsersWithOrders(null, null);
+        long usersWithOrders = orderRepository.countUsersWithOrders(start, end);
         long usersWithoutOrders = totalUsers - usersWithOrders;
 
         // Build response
