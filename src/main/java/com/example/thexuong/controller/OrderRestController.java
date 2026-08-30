@@ -265,6 +265,7 @@ public class OrderRestController {
                     }
                     return OrderItemDto.builder()
                         .id(d.getId())
+                        .productId(d.getProductId())
                         .productName(d.getProductName())
                         .size(d.getSize())
                         .price(d.getPrice())

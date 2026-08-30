@@ -6,7 +6,9 @@ import { resolve } from 'path'
 export default defineConfig({
   plugins: [
     vue(),
-    vueJsx()
+    vueJsx({
+      oxc: true
+    })
   ],
   resolve: {
     alias: {

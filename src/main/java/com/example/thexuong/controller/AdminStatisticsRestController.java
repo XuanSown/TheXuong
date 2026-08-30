@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -41,6 +42,8 @@ public class AdminStatisticsRestController {
 
         LocalDate start = startDate != null ? LocalDate.parse(startDate) : null;
         LocalDate end = endDate != null ? LocalDate.parse(endDate) : null;
+        LocalDateTime startDt = start != null ? start.atStartOfDay() : null;
+        LocalDateTime endDt = end != null ? end.atTime(23, 59, 59) : null;
 
         // 1. Top Bán Chạy (Top 5)
         List<Object[]> topSelling = orderDetailRepository.findTopSellingProducts().stream().limit(5).toList();
@@ -61,11 +64,11 @@ public class AdminStatisticsRestController {
         List<Object[]> leastViewed = productRepository.findLeastViewedProducts(PageRequest.of(0, 5));
 
         // 7. Trạng thái đơn hàng (with date filter)
-        List<Object[]> orderStatusStats = orderRepository.countOrdersByStatus(start, end);
+        List<Object[]> orderStatusStats = orderRepository.countOrdersByStatus(startDt, endDt);
 
         // 8. Thống kê người dùng (with date filter)
         long totalUsers = userRepository.count();
-        long usersWithOrders = orderRepository.countUsersWithOrders(start, end);
+        long usersWithOrders = orderRepository.countUsersWithOrders(startDt, endDt);
         long usersWithoutOrders = totalUsers - usersWithOrders;
 
         // Build response

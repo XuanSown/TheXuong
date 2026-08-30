@@ -68,7 +68,7 @@
     <!-- Orders Chart Section -->
     <section class="chart-section">
       <div class="section-header">
-        <h3>Doanh thu theo ngày</h3>
+        <h3>Doanh thu - Line Chart</h3>
       </div>
       
       <!-- Filter Controls -->
@@ -123,10 +123,10 @@
           Đang tải...
         </div>
         <div
-          v-else-if="stats.revenueByDay.length === 0"
+          v-else-if="!hasChartRange"
           class="chart-placeholder"
         >
-          Chưa có dữ liệu
+          {{ emptyRangeMessage }}
         </div>
         <Line
           v-else
@@ -246,8 +246,8 @@
                 <td>{{ item[0] }}</td>
                 <td>{{ item[1] }}</td>
                 <td>
-                  <span :class="['status-badge', item[1] <= 5 ? 'urgent' : 'warning']">
-                    {{ item[1] <= 5 ? 'KHẨN CẤP' : 'CẢNH BÁO' }}
+                  <span :class="['status-badge', getStockStatusClass(item[1])]">
+                    {{ getStockStatusLabel(item[1]) }}
                   </span>
                 </td>
               </tr>
@@ -345,6 +345,9 @@ const filterOptions = [
   { value: 'year-custom', label: 'Chọn năm' }
 ]
 
+const formatLocalDate = (d) =>
+  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+
 const dateRange = computed(() => {
   const today = new Date()
   const year = today.getFullYear()
@@ -352,7 +355,7 @@ const dateRange = computed(() => {
 
   switch (activeFilter.value) {
     case 'today': {
-      const dateStr = today.toISOString().split('T')[0]
+      const dateStr = formatLocalDate(today)
       return { startDate: dateStr, endDate: dateStr }
     }
     case 'day': {
@@ -360,15 +363,15 @@ const dateRange = computed(() => {
       return { startDate: customDate.value, endDate: customDate.value }
     }
     case 'month': {
-      const start = new Date(year, month, 1).toISOString().split('T')[0]
-      const end = new Date(year, month + 1, 0).toISOString().split('T')[0]
+      const start = formatLocalDate(new Date(year, month, 1))
+      const end = formatLocalDate(new Date(year, month + 1, 0))
       return { startDate: start, endDate: end }
     }
     case 'month-custom': {
       if (!customMonth.value) return { startDate: null, endDate: null }
-      const [y, m] = customMonth.value.split('-')
-      const start = new Date(y, m - 1, 1).toISOString().split('T')[0]
-      const end = new Date(y, m, 0).toISOString().split('T')[0]
+      const [y, m] = customMonth.value.split('-').map(Number)
+      const start = formatLocalDate(new Date(y, m - 1, 1))
+      const end = formatLocalDate(new Date(y, m, 0))
       return { startDate: start, endDate: end }
     }
     case 'year': {
@@ -385,22 +388,69 @@ const dateRange = computed(() => {
   }
 })
 
-const chartData = computed(() => ({
-  labels: stats.revenueByDay.map(row => row[0]),
-  datasets: [
-    {
-      label: 'Doanh thu (VND)',
-      data: stats.revenueByDay.map(row => Number(row[1]) || 0),
-      borderColor: '#000000',
-      backgroundColor: 'rgba(0, 0, 0, 0.1)',
-      borderWidth: 2,
-      fill: true,
-      tension: 0.4,
-      pointRadius: 4,
-      pointHoverRadius: 6
+const isYearView = computed(() => activeFilter.value === 'year' || activeFilter.value === 'year-custom')
+
+const chartData = computed(() => {
+  const revenueByDate = {}
+  for (const row of stats.revenueByDay || []) {
+    revenueByDate[String(row[0]).slice(0, 10)] = Number(row[1]) || 0
+  }
+
+  const range = dateRange.value
+  const [sy, sm] = (range.startDate || '').split('-').map(Number)
+
+  let labels = []
+  let data = []
+
+  if (isYearView.value) {
+    const year = Number((range.startDate || '').slice(0, 4))
+    if (!year) return { labels: [], datasets: [] }
+    labels = Array.from({ length: 12 }, (_, i) => `T${i + 1}`)
+    data = labels.map((_, i) => {
+      const prefix = `${year}-${String(i + 1).padStart(2, '0')}`
+      return Object.entries(revenueByDate)
+        .filter(([date]) => date.startsWith(prefix))
+        .reduce((sum, [, v]) => sum + v, 0)
+    })
+  } else if (activeFilter.value === 'today' || activeFilter.value === 'day') {
+    if (range.startDate) {
+      labels = [range.startDate.split('-').reverse().join('/')]
+      data = [revenueByDate[range.startDate] || 0]
     }
-  ]
-}))
+  } else if (sy && sm) {
+    const daysInMonth = new Date(sy, sm, 0).getDate()
+    for (let d = 1; d <= daysInMonth; d++) {
+      const key = `${sy}-${String(sm).padStart(2, '0')}-${String(d).padStart(2, '0')}`
+      labels.push(`${String(d).padStart(2, '0')}/${String(sm).padStart(2, '0')}`)
+      data.push(revenueByDate[key] || 0)
+    }
+  }
+
+  return {
+    labels,
+    datasets: [
+      {
+        label: 'Doanh thu (VND)',
+        data,
+        borderColor: '#000000',
+        backgroundColor: 'rgba(0, 0, 0, 0.1)',
+        borderWidth: 2,
+        fill: true,
+        tension: 0.4,
+        pointRadius: 4,
+        pointHoverRadius: 6
+      }
+    ]
+  }
+})
+
+const hasChartRange = computed(() => chartData.value.labels.length > 0)
+
+const emptyRangeMessage = computed(() => {
+  if (activeFilter.value === 'day') return 'Vui lòng chọn ngày'
+  if (activeFilter.value === 'month-custom') return 'Vui lòng chọn tháng'
+  return 'Chưa có dữ liệu'
+})
 
 const chartOptions = computed(() => ({
   responsive: true,
@@ -427,7 +477,13 @@ const chartOptions = computed(() => ({
       beginAtZero: true,
       ticks: {
         callback: (value) => {
-          return new Intl.NumberFormat('vi-VN').format(value) + ' đ'
+          const v = Number(value)
+          if (v >= 1000000) {
+            const m = v / 1000000
+            return (Number.isInteger(m) ? m : m.toFixed(1)) + ' triệu'
+          }
+          if (v >= 1000) return (v / 1000) + ' nghìn'
+          return v + ' đ'
         }
       }
     }
@@ -450,14 +506,32 @@ const stats = reactive({
   orderStatusStats: []
 })
 
+let fetchId = 0
+
+const getStockStatusClass = (stock) => {
+  const qty = Number(stock) || 0
+  if (qty === 0) return 'out'
+  return 'urgent'
+}
+
+const getStockStatusLabel = (stock) => {
+  const qty = Number(stock) || 0
+  if (qty === 0) return 'HẾT'
+  return 'KHẨN CẤP'
+}
+
 const fetchStatistics = async () => {
+  const range = dateRange.value
+  if (!range.startDate && ['day', 'month-custom', 'year-custom'].includes(activeFilter.value)) return
+  const id = ++fetchId
   isLoading.value = true
   try {
     const params = {}
-    if (dateRange.value.startDate) params.startDate = dateRange.value.startDate
-    if (dateRange.value.endDate) params.endDate = dateRange.value.endDate
+    if (range.startDate) params.startDate = range.startDate
+    if (range.endDate) params.endDate = range.endDate
 
     const data = await adminService.getStatistics(params)
+    if (id !== fetchId) return
 
     stats.totalRevenue = data.revenueByDay?.reduce((sum, row) => sum + (Number(row[1]) || 0), 0) || 0
     stats.totalOrders = data.orderStatusStats?.reduce((sum, row) => sum + (Number(row[1]) || 0), 0) || 0
@@ -475,7 +549,7 @@ const fetchStatistics = async () => {
   } catch (error) {
     console.error('Failed to fetch statistics:', error)
   } finally {
-    isLoading.value = false
+    if (id === fetchId) isLoading.value = false
   }
 }
 
@@ -887,6 +961,11 @@ onMounted(() => {
 .status-badge.warning {
   background: #FEF9C3;
   color: #854D0E;
+}
+
+.status-badge.out {
+  background: #E5E7EB;
+  color: #374151;
 }
 
 .customers-list {

@@ -24,4 +24,5 @@ public class ChatbotProductDto {
     private String brand;
     private String description;
     private String stockStatus; // "Còn hàng" / "Hết hàng" / "Sắp hết"
+    private String productUrl;  // Link trang chi tiết sản phẩm
 }

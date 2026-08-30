@@ -149,7 +149,10 @@
                 <span class="font-geist text-base text-[#4C4546]">{{ t('product.views', { count: product.viewCount }) }}</span>
               </div>
 
-              <span v-if="totalStock <= 0" class="inline-block bg-red-500 text-white text-xs font-bold px-3 py-1 rounded mb-2">
+              <span
+                v-if="totalStock <= 0"
+                class="inline-block bg-red-500 text-white text-xs font-bold px-3 py-1 rounded mb-2"
+              >
                 TẠM HẾT HÀNG
               </span>
 
@@ -214,7 +217,10 @@
                   @click="(size.quantity || 0) > 0 && (selectedSize = size.name)"
                 >
                   {{ size.name }}
-                  <span v-if="(size.quantity || 0) <= 0" class="absolute -top-2 -right-2 bg-red-500 text-white text-[8px] px-1 rounded">Hết</span>
+                  <span
+                    v-if="(size.quantity || 0) <= 0"
+                    class="absolute -top-2 -right-2 bg-red-500 text-white text-[8px] px-1 rounded"
+                  >Hết</span>
                 </button>
               </div>
               <p
@@ -223,10 +229,16 @@
               >
                 {{ t('product.pleaseSelectSize') }}
               </p>
-              <p v-if="selectedSize && selectedVariantStock > 0 && selectedVariantStock <= 5" class="text-orange-500 text-sm font-semibold">
+              <p
+                v-if="selectedSize && selectedVariantStock > 0 && selectedVariantStock <= 5"
+                class="text-orange-500 text-sm font-semibold"
+              >
                 ⚠️ Chỉ còn {{ selectedVariantStock }} sản phẩm
               </p>
-              <p v-else-if="selectedSize && selectedVariantStock > 5" class="text-green-600 text-sm">
+              <p
+                v-else-if="selectedSize && selectedVariantStock > 5"
+                class="text-green-600 text-sm"
+              >
                 Còn {{ selectedVariantStock }} sản phẩm trong kho
               </p>
             </div>
@@ -609,6 +621,13 @@ onMounted(async () => {
 
     product.value = productData
     mainImage.value = productData.imageUrl
+
+    const freesize = productData.sizes?.find(
+      (s: any) => s.name?.toLowerCase() === 'freesize'
+    )
+    if (freesize && (freesize.quantity || 0) > 0) {
+      selectedSize.value = freesize.name
+    }
   } catch (error) {
     console.error('Failed to fetch product:', error)
   } finally {

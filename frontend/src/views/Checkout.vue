@@ -241,10 +241,16 @@
                   <p class="font-gelasio text-[12px] text-[#848484]">
                     {{ t('cart.itemSize', { size: item.size }) }}
                   </p>
-                  <p v-if="item.stockQuantity !== undefined && item.stockQuantity <= 0" class="text-red-500 text-xs font-semibold mt-1">
+                  <p
+                    v-if="item.stockQuantity !== undefined && item.stockQuantity <= 0"
+                    class="text-red-500 text-xs font-semibold mt-1"
+                  >
                     ⚠️ Size này hiện đã hết hàng trong kho.
                   </p>
-                  <p v-else-if="item.stockQuantity !== undefined && item.quantity > item.stockQuantity" class="text-orange-500 text-xs font-semibold mt-1">
+                  <p
+                    v-else-if="item.stockQuantity !== undefined && item.quantity > item.stockQuantity"
+                    class="text-orange-500 text-xs font-semibold mt-1"
+                  >
                     ⚠️ Kho chỉ còn {{ item.stockQuantity }} sản phẩm.
                   </p>
                   <div class="flex justify-between items-center mt-2">
@@ -442,7 +448,10 @@
             </div>
 
             <!-- Place Order Button -->
-            <p v-if="hasStockIssues" class="text-red-500 text-xs text-center mt-4 font-semibold">
+            <p
+              v-if="hasStockIssues"
+              class="text-red-500 text-xs text-center mt-4 font-semibold"
+            >
               ⚠️ Đơn hàng có sản phẩm đã hết hàng hoặc vượt tồn kho. Vui lòng quay lại giỏ hàng để cập nhật.
             </p>
             <BaseButton

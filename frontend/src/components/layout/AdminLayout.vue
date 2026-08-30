@@ -3,7 +3,11 @@
     <!-- Sidebar Navigation -->
     <aside class="sidebar">
       <!-- Logo Section -->
-      <div class="logo-section">
+      <div
+        class="logo-section"
+        :class="{ 'logo-clickable': authStore.hasRole('BOTH') }"
+        @click="handleLogoClick"
+      >
         <img
           src="@/assets/logo.png"
           alt="Logo"
@@ -235,6 +239,12 @@ import { useAuthStore } from '@/stores/auth.store'
 const router = useRouter()
 const authStore = useAuthStore()
 
+const handleLogoClick = () => {
+  if (authStore.hasRole('BOTH')) {
+    window.location.href = '/'
+  }
+}
+
 const handleLogout = async () => {
   await authStore.logout()
   router.push('/login')
@@ -278,6 +288,14 @@ const handleLogout = async () => {
 .logo {
   max-width: 150px;
   height: auto;
+}
+
+.logo-clickable {
+  cursor: pointer;
+}
+
+.logo-clickable:hover {
+  opacity: 0.8;
 }
 
 .nav-menu {

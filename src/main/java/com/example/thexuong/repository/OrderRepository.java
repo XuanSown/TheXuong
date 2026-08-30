@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,20 +40,20 @@ public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecific
             "WHERE (:startDate IS NULL OR o.createdAt >= :startDate) " +
             "AND (:endDate IS NULL OR o.createdAt <= :endDate) " +
             "GROUP BY o.status")
-    List<Object[]> countOrdersByStatus(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
+    List<Object[]> countOrdersByStatus(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 
     // 2. Đếm số lượng User (đã đăng ký) CÓ thực hiện mua hàng (có đơn hàng) trong khoảng thời gian
     @Query("SELECT COUNT(DISTINCT o.user.id) FROM Order o " +
             "WHERE o.user IS NOT NULL " +
             "AND (:startDate IS NULL OR o.createdAt >= :startDate) " +
             "AND (:endDate IS NULL OR o.createdAt <= :endDate)")
-    long countUsersWithOrders(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
+    long countUsersWithOrders(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 
     // 4. Đếm tổng số đơn hàng trong khoảng thời gian
     @Query("SELECT COUNT(o) FROM Order o " +
             "WHERE (:startDate IS NULL OR o.createdAt >= :startDate) " +
             "AND (:endDate IS NULL OR o.createdAt <= :endDate)")
-    long countOrdersByDateRange(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
+    long countOrdersByDateRange(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 
     // 5. Tổng doanh thu trong khoảng thời gian (chỉ tính đơn đã giao - COMPLETED)
     // Task 0.9: Sửa 'SHIPPED, DELIVERED' → 'COMPLETED' (chuẩn hoá theo OrderStatus enum)

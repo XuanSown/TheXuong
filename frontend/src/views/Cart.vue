@@ -69,10 +69,16 @@
                     >
                       {{ t('cart.itemSize', { size: item.size }) }}
                     </p>
-                    <p v-if="item.stockQuantity !== undefined && item.stockQuantity <= 0" class="text-red-500 text-xs font-semibold mt-1">
+                    <p
+                      v-if="item.stockQuantity !== undefined && item.stockQuantity <= 0"
+                      class="text-red-500 text-xs font-semibold mt-1"
+                    >
                       ⚠️ Size này hiện đã hết hàng. Vui lòng xóa khỏi giỏ.
                     </p>
-                    <p v-else-if="item.stockQuantity !== undefined && item.quantity > item.stockQuantity" class="text-orange-500 text-xs font-semibold mt-1">
+                    <p
+                      v-else-if="item.stockQuantity !== undefined && item.quantity > item.stockQuantity"
+                      class="text-orange-500 text-xs font-semibold mt-1"
+                    >
                       ⚠️ Kho chỉ còn {{ item.stockQuantity }} sản phẩm. Vui lòng giảm số lượng.
                     </p>
                   </div>
@@ -172,7 +178,10 @@
               </div>
 
               <!-- Checkout Button -->
-              <p v-if="hasStockIssues" class="text-red-500 text-xs text-center mb-2 font-semibold">
+              <p
+                v-if="hasStockIssues"
+                class="text-red-500 text-xs text-center mb-2 font-semibold"
+              >
                 ⚠️ Giỏ hàng có sản phẩm hết hàng hoặc vượt tồn kho. Vui lòng cập nhật trước khi thanh toán.
               </p>
               <button

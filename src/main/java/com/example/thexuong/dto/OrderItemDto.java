@@ -18,6 +18,7 @@ import java.math.BigDecimal;
 @Builder
 public class OrderItemDto {
     private Long id;
+    private Long productId;
     private String productName;
     private String size;
     private BigDecimal price;

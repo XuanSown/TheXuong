@@ -20,6 +20,7 @@ import com.example.thexuong.entity.Order;
 import com.example.thexuong.entity.OrderDetail;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,6 +39,9 @@ public class ChatbotService {
 	private final ChatLogRepository chatLogRepository;
 	private final ProductVariantRepository productVariantRepository;
 	private final OrderRepository orderRepository;
+
+	@Value("${app.frontend.url:https://thexuong.xuansown.id.vn}")
+	private String frontendUrl;
 
 	// ==================== Products ====================
 
@@ -70,6 +74,7 @@ public class ChatbotService {
 				.brand(product.getBrand() != null ? product.getBrand().getName() : null)
 				.description(product.getDescription())
 				.stockStatus(stockStatus)
+				.productUrl(frontendUrl + "/product-detail/" + product.getId())
 				.build();
 	}
 

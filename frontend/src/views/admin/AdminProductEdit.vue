@@ -187,6 +187,9 @@
                   <option value="Balo">
                     Balo
                   </option>
+                  <option value="Dụng cụ">
+                    Dụng cụ
+                  </option>
                   <option value="Khác">
                     Khác
                   </option>
@@ -302,6 +305,9 @@
                 </option>
                 <option value="Bóng rổ">
                   Bóng rổ
+                </option>
+                <option value="Gym">
+                  Gym
                 </option>
                 <option value="Khác">
                   Khác
@@ -490,7 +496,8 @@ const CATEGORY_TO_SIZE_TYPE: Record<string, string> = {
   'Giày': 'SHOES',
   'Phụ kiện': 'ACCESSORIES',
   'Balo': 'ACCESSORIES',
-  'Khác': 'CUSTOM'
+  'Dụng cụ': 'ACCESSORIES',
+  'Khác': 'ACCESSORIES'
 }
 
 function getSizeTypeForCategory(category: string): string | undefined {

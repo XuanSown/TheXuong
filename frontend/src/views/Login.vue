@@ -6,7 +6,10 @@
         <div class="flex flex-col gap-8">
           <!-- Logo & Brand -->
           <div class="flex flex-col items-center gap-0">
-            <div class="w-[82px] h-[75px] bg-[url('@/assets/logo.png')] bg-contain bg-no-repeat bg-center" />
+            <div
+              class="w-[82px] h-[75px] bg-[url('@/assets/logo.png')] bg-contain bg-no-repeat bg-center cursor-pointer hover:opacity-80 transition-opacity"
+              @click="router.push('/')"
+            />
             <div class="mt-1 flex flex-col items-center">
               <p class="font-geist text-base text-[#4C4546] leading-[26px]">
                 {{ t('auth.welcomeBack') }}

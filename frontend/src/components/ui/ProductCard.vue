@@ -11,7 +11,10 @@
         loading="lazy"
         class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
       >
-      <div v-if="product.stockQuantity !== undefined && product.stockQuantity <= 0" class="absolute inset-0 bg-black/40 flex items-center justify-center">
+      <div
+        v-if="product.stockQuantity !== undefined && product.stockQuantity <= 0"
+        class="absolute inset-0 bg-black/40 flex items-center justify-center"
+      >
         <span class="bg-red-500 text-white text-xs font-bold px-3 py-1 rounded">HẾT HÀNG</span>
       </div>
       <div
