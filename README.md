@@ -29,6 +29,7 @@ Full-stack e-commerce platform for sports equipment, built with Spring Boot and 
 | **Backend** | Java 21, Spring Boot 3.5, Spring Security, Spring Data JPA, Gradle |
 | **Frontend** | Vue 3, TypeScript, Pinia, Vue Router, Tailwind CSS, Vite |
 | **Database** | SQL Server 2019 |
+| **Chatbot** | Telegram Bot, N8N, Ollama (AI Local) |
 
 ## Getting Started
 
