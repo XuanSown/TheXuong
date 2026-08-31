@@ -91,6 +91,9 @@
     "badminton": "Badminton",
     "running": "Running",
     "basketball": "Basketball",
+    "pickleball": "Pickleball",
+    "racing": "Racing",
+    "gym": "Gym",
     "other": "Other"
   },
   "auth": {

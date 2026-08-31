@@ -178,6 +178,9 @@
                   <option value="Quần">
                     Quần
                   </option>
+                  <option value="Quần áo">
+                    Quần áo
+                  </option>
                   <option value="Giày">
                     Giày
                   </option>
@@ -493,6 +496,7 @@ const sizeLoadError = ref('')
 const CATEGORY_TO_SIZE_TYPE: Record<string, string> = {
   'Áo': 'CLOTHING',
   'Quần': 'CLOTHING',
+  'Quần áo': 'CLOTHING',
   'Giày': 'SHOES',
   'Phụ kiện': 'ACCESSORIES',
   'Balo': 'ACCESSORIES',

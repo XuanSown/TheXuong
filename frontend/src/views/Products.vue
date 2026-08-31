@@ -55,6 +55,38 @@
                 </li>
                 <li>
                   <router-link
+                    :to="getFilterUrl('sport', 'basketball')"
+                    :class="['text-sm', activeSport === 'basketball' ? 'text-black font-semibold' : 'text-[#5E5F5C] hover:text-black']"
+                  >
+                    {{ t('sports.basketball') }}
+                  </router-link>
+                </li>
+                <li>
+                  <router-link
+                    :to="getFilterUrl('sport', 'pickleball')"
+                    :class="['text-sm', activeSport === 'pickleball' ? 'text-black font-semibold' : 'text-[#5E5F5C] hover:text-black']"
+                  >
+                    {{ t('sports.pickleball') }}
+                  </router-link>
+                </li>
+                <li>
+                  <router-link
+                    :to="getFilterUrl('sport', 'racing')"
+                    :class="['text-sm', activeSport === 'racing' ? 'text-black font-semibold' : 'text-[#5E5F5C] hover:text-black']"
+                  >
+                    {{ t('sports.racing') }}
+                  </router-link>
+                </li>
+                <li>
+                  <router-link
+                    :to="getFilterUrl('sport', 'gym')"
+                    :class="['text-sm', activeSport === 'gym' ? 'text-black font-semibold' : 'text-[#5E5F5C] hover:text-black']"
+                  >
+                    {{ t('sports.gym') }}
+                  </router-link>
+                </li>
+                <li>
+                  <router-link
                     :to="getFilterUrl('sport', 'other')"
                     :class="['text-sm', activeSport === 'other' ? 'text-black font-semibold' : 'text-[#5E5F5C] hover:text-black']"
                   >
@@ -111,6 +143,46 @@
                     :class="['text-sm', activeBrand === 'puma' ? 'text-black font-semibold' : 'text-[#5E5F5C] hover:text-black']"
                   >
                     Puma
+                  </router-link>
+                </li>
+                <li>
+                  <router-link
+                    :to="getFilterUrl('brand', 'mizuno')"
+                    :class="['text-sm', activeBrand === 'mizuno' ? 'text-black font-semibold' : 'text-[#5E5F5C] hover:text-black']"
+                  >
+                    Mizuno
+                  </router-link>
+                </li>
+                <li>
+                  <router-link
+                    :to="getFilterUrl('brand', 'yonex')"
+                    :class="['text-sm', activeBrand === 'yonex' ? 'text-black font-semibold' : 'text-[#5E5F5C] hover:text-black']"
+                  >
+                    Yonex
+                  </router-link>
+                </li>
+                <li>
+                  <router-link
+                    :to="getFilterUrl('brand', 'asics')"
+                    :class="['text-sm', activeBrand === 'asics' ? 'text-black font-semibold' : 'text-[#5E5F5C] hover:text-black']"
+                  >
+                    ASICS
+                  </router-link>
+                </li>
+                <li>
+                  <router-link
+                    :to="getFilterUrl('brand', 'fila')"
+                    :class="['text-sm', activeBrand === 'fila' ? 'text-black font-semibold' : 'text-[#5E5F5C] hover:text-black']"
+                  >
+                    Fila
+                  </router-link>
+                </li>
+                <li>
+                  <router-link
+                    :to="getFilterUrl('brand', 'decathlon')"
+                    :class="['text-sm', activeBrand === 'decathlon' ? 'text-black font-semibold' : 'text-[#5E5F5C] hover:text-black']"
+                  >
+                    Decathlon
                   </router-link>
                 </li>
                 <li>
@@ -495,6 +567,9 @@ const SPORT_NAME: Record<string, string> = {
   badminton: 'Cầu lông',
   running: 'Chạy bộ',
   basketball: 'Bóng rổ',
+  pickleball: 'Cầu lông & Pickleball',
+  racing: 'Đua xe',
+  gym: 'Gym',
   other: 'Khác'
 }
 
@@ -504,8 +579,10 @@ const BRAND_NAME: Record<string, string> = {
   lining: 'Li-Ning',
   puma: 'Puma',
   yonex: 'Yonex',
-  asics: 'Asics',
+  asics: 'ASICS',
   mizuno: 'Mizuno',
+  fila: 'Fila',
+  decathlon: 'Decathlon',
   other: 'Khác'
 }
 

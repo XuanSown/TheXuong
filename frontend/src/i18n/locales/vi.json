@@ -91,6 +91,9 @@
     "badminton": "Cầu lông",
     "running": "Chạy bộ",
     "basketball": "Bóng rổ",
+    "pickleball": "Cầu lông & Pickleball",
+    "racing": "Đua xe",
+    "gym": "Gym",
     "other": "Khác"
   },
   "auth": {

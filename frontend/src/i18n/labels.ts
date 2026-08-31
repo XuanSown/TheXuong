@@ -9,6 +9,11 @@ const SPORT_KEY_MAP: Record<string, string> = {
   running: 'running',
   'bóng rổ': 'basketball',
   basketball: 'basketball',
+  'cầu lông & pickleball': 'pickleball',
+  pickleball: 'pickleball',
+  'đua xe': 'racing',
+  racing: 'racing',
+  gym: 'gym',
   khác: 'other',
   other: 'other'
 }
